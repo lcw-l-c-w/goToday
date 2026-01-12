@@ -1,9 +1,9 @@
-package kr.co.gotoday.user;
+package kr.co.gotoday.vendor;
 
 import java.sql.Timestamp;
 import java.util.List;
 
-public class UserVo {
+public class VendorVo {
 	private int user_id;
     private String email;
     private int role; //0:유저 1:관리자
@@ -14,6 +14,4 @@ public class UserVo {
     private String birthday;
     private Timestamp registered_at;
     private String phone_number;
-    
-    private List<UserTagVO> userTagList;
 }
