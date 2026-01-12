@@ -1,0 +1,18 @@
+# Eclipse / STS
+.metadata/
+.settings/
+.classpath
+.project
+
+# Build
+/target/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (혹시 나중에 프론트 붙일 경우)
+node_modules/
