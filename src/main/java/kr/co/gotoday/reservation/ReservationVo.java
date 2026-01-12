@@ -1,5 +1,24 @@
 package kr.co.gotoday.reservation;
 
-public class ReservationVo {
+import java.sql.Timestamp;
 
+public class ReservationVo {
+	private int reservation_id;
+    private String reservation_code;
+    private Timestamp reserved_for_at;
+    private String reservation_status;
+    private int total_price;
+    private Timestamp created_at;
+    private int adult_qty;
+    private int child_qty;
+    private int student_qty;
+    private int user_id;
+    private int content_id;
+    private String reservation_type;
+    private String receiver_name;
+    private Timestamp receiver_birth;
+    private String receiver_phone;
+    private Boolean reserve_visit;
+    private String receive_type;
+    private int admin_id;
 }
