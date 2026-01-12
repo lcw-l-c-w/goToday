@@ -24,6 +24,6 @@ public class ContentVo {
     private String instagram_url;
     private String x_url;
     private int admin_id;
-    
+    private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
 }
