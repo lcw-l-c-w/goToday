@@ -23,7 +23,7 @@ function goSave() {
         <span class="step">가입완료</span>
     </div>
 
-	 <form id="frm" action="registerUser/step2" method="POST">
+	 <form id="frm" action="/gotoday/member/register2" method="POST">
 	    <h3>전시 or 팝업</h3>
 	    <input type="radio" name="event" value="exhibition"> 전시
 	    <input type="radio" name="event" value="popup"> 팝업

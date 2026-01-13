@@ -20,7 +20,7 @@
         </p>
     </div>
     <div class="footer">
-        <a href="/auth/loginUser" class="login-btn">로그인하러 가기</a>
+        <a href="/gotoday/member/login" class="login-btn">로그인하러 가기</a>
     </div>
 </div>
 </body>

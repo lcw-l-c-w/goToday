@@ -9,7 +9,7 @@
 <body>
 <div class="login-container">
     <h1 class="login-title">LOGIN</h1>
-    <form action="/auth/loginUser" method="POST"> 
+    <form action="/gotoday/member/login" method="POST"> 
         <div class="form-group">
             <label class="form-label">이메일 주소</label>
             <input type="email" name="email" class="input-control" placeholder="이메일을 입력하세요" required>
@@ -24,7 +24,7 @@
         <button type="submit" class="primary-btn">LOGIN</button>
         <div class="signup-prompt">
             회원이 아니신가요?
-            <a href="/gotoday/registerUser" class="sign-in-link">SIGN IN</a>
+            <a href="/gotoday/member/register1" class="sign-in-link">SIGN IN</a>
         </div>
         <div class="social-group">
 			<a href="/kakao" class="social-btn kakao">

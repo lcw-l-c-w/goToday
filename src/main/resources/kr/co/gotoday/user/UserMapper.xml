@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.user.UserMapper">
 	
-<!-- 로그인 -->
-    <select id="loginUser" parameterType="kr.co.gotoday.user.UserVo" resultType="kr.co.gotoday.user.UserVo">
-        SELECT user_id, email, password, name, gender, birthday, phone_number, registered_at
-        FROM user
-        WHERE email = #{email} AND password = #{password}
+	<!-- 로그인 -->
+    <select id="login" parameterType="kr.co.gotoday.user.UserVO" resultType="kr.co.gotoday.user.UserVO">
+        SELECT * FROM user WHERE email = #{email} AND password = #{password}
     </select>
 
     <!-- 회원가입 -->
-    <insert id="registerUser" parameterType="kr.co.gotoday.user.UserVo" useGeneratedKeys="true" keyProperty="user_id">
-        INSERT INTO user(email, password, name, gender, birthday, phone_number, registered_at)
-        VALUES(#{email}, #{password}, #{name}, #{gender}, #{birthday}, #{phone_number}, NOW())
+    <insert id="register" parameterType="kr.co.gotoday.user.UserVO">
+        INSERT INTO user (
+        	email, password, name, gender, birthday
+        	, phone_number, registered_at, role
+        ) VALUES(#{email}, #{password}, #{name}, #{gender}, #{birthday}, #{phone_number}, NOW(), 0)
     </insert>
 
     <!-- user_tag insert -->
@@ -21,8 +21,13 @@
     </insert>
 
     <!-- tag_name -> tag_id -->
-    <select id="findTagIdByName" parameterType="string" resultType="long">
+    <select id="findTagIdByName" parameterType="String" resultType="long">
         SELECT tag_id FROM tag WHERE tag_name = #{tagName}
+    </select>
+    
+    <!-- 이메일 중복 체크 -->
+    <select id="emailCheck" parameterType="String" resultType="Integer">
+        SELECT COUNT(*) FROM user WHERE email = #{email}
     </select>
 	
 	
