@@ -3,7 +3,9 @@ package kr.co.gotoday.content;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class ContentVo {
+import lombok.Data;
+@Data
+public class ContentVO {
 	private int content_id;
     private String contentkind;
     private String category;
@@ -26,4 +28,7 @@ public class ContentVo {
     private int admin_id;
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
+    
+    
+    
 }
