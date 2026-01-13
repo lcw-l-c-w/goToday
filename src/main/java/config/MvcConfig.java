@@ -46,7 +46,7 @@ public class MvcConfig implements WebMvcConfigurer{
 		configurer.enable();
 	}
 	
-	// JSP ��� (ViewResolver)
+	// JSP 占쏙옙占� (ViewResolver)
 	@Override
 	public void configureViewResolvers(ViewResolverRegistry registry) {
 		registry.jsp("/WEB-INF/views/", ".jsp");
@@ -91,7 +91,7 @@ public class MvcConfig implements WebMvcConfigurer{
 	}
 	
 
-	//DB property ó�� 
+	//DB property 처占쏙옙 
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer config = new PropertyPlaceholderConfigurer();
