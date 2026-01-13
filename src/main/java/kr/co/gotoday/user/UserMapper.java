@@ -1,5 +1,11 @@
 package kr.co.gotoday.user;
 
-public class UserMapper {
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
+public interface UserMapper {
+	UserVo loginUser(UserVo vo);
+    int registerUser(UserVo vo);
+    void createUserTags(UserTagVO vo);
+    Long findTagIdByName(String tagName);
 }

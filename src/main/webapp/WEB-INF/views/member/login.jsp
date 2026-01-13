@@ -24,7 +24,7 @@
         <button type="submit" class="primary-btn">LOGIN</button>
         <div class="signup-prompt">
             회원이 아니신가요?
-            <a href="/registerUser" class="sign-in-link">SIGN IN</a>
+            <a href="/gotoday/registerUser" class="sign-in-link">SIGN IN</a>
         </div>
         <div class="social-group">
 			<a href="/kakao" class="social-btn kakao">

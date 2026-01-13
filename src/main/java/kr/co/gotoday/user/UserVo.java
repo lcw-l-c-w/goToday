@@ -3,6 +3,9 @@ package kr.co.gotoday.user;
 import java.sql.Timestamp;
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class UserVo {
 	private int user_id;
     private String email;

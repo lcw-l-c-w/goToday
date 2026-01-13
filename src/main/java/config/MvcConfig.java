@@ -26,7 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@MapperScan(basePackages = {"kr.co.gotoday"}, annotationClass = Mapper.class)
+@MapperScan("kr.co.gotoday")
 @ComponentScan(basePackages = {"kr.co.gotoday"})
 @EnableWebMvc
 @EnableTransactionManagement
