@@ -395,7 +395,7 @@
             <div class="radio-group">
                 <label class="radio-item">
                     <input type="radio" name="reservation_type" value="onsite" <c:if test="${content.reservation_type eq 'onsite'}">checked</c:if>>
-                    <span>현장수령</span>
+                    <span>현장수령 (상시전시)</span>
                 </label>
                 <label class="radio-item">
                     <input type="radio" name="reservation_type" value="advance" <c:if test="${content.reservation_type eq 'advance'}">checked</c:if>>
@@ -407,10 +407,10 @@
             <label>전시 기간</label>
             <div class="date-range">
             <p>시작일</p>
-            <input type="date" name="start_at" value="${startDate}">
+            <input type="date" name="start_at" value="${content.startDate}">
             <p>~</p>
             <p>종료일</p>
-            <input type="date" name="end_at" value="${endDate}">
+            <input type="date" name="end_at" value="${content.endDate}">
             </div>
         </div>
 
@@ -434,7 +434,7 @@
     <!-- 업로드 버튼 -->
     <div class="poster-upload-header">
         <label for="posterInput" class="upload-btn">이미지 추가</label>
-        <input type="file" id="posterInput" accept="image/*">
+        <input type="file" name="main_image_path" id="posterInput" accept="image/*">
     </div>
 
     <!-- 포스터 미리보기 영역 -->
