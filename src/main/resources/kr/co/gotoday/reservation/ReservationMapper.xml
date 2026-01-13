@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.gotoday.content.ContentMapper">
-
+<mapper namespace="kr.co.gotoday.reservation.ReservationMapper">
+	<insert id="payment" parameterType="kr.co.gotoday.reservation.ReservationMapper">
+		INSERT INTO reservation(
+			reservation_code, reserved_for_at, reservation_status, total_price, adult_qty,
+		    child_qty, teen_qty, user_id, content_id, reservation_type, receiver_name,
+		    receiver_birth, receiver_phone, reserve_visit, receive_type, created_at
+		) VALUES (
+			#{reservation_code}, #{reserved_for_at}, #{reservation_status}, #{total_price}, #{adult_qty},
+			#{child_qty}, #{teen_qty}, #{user_id}, #{content_id}, #{reservation_type}, #{receiver_name},
+			#{receiver_birth}, #{receiver_phone}, #{reserve_visit}, #{receive_type}, NOW()
+		)
+	</insert>
+	
+	<select id="findByReservationCode" resultType="ReservationVO">
+	    SELECT * FROM reservation 
+	    WHERE reservation_code = #{reservationCode}
+	</select>
 </mapper>

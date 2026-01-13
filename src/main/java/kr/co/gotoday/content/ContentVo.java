@@ -3,6 +3,8 @@ package kr.co.gotoday.content;
 import java.sql.Timestamp;
 import java.util.List;
 
+import lombok.Data;
+@Data
 public class ContentVo {
 	private int content_id;
     private String contentkind;
