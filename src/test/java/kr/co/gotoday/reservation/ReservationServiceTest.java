@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -16,9 +17,10 @@ import kr.co.gotoday.content.ContentVo;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {config.MvcConfig.class})
+@PropertySource("classpath:db.properties")
 @WebAppConfiguration
 @Transactional
-class ReservationServiceImplTest {
+class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;

@@ -13,7 +13,7 @@
 		)
 	</insert>
 	
-	<select id="findByReservationCode" resultType="ReservationVO">
+	<select id="findByReservationCode" resultType="kr.co.gotoday.reservation.ReservationVO">
 	    SELECT * FROM reservation 
 	    WHERE reservation_code = #{reservationCode}
 	</select>
