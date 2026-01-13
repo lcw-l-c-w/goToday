@@ -5,8 +5,8 @@ import java.util.List;
 
 public class ContentVo {
 	private int content_id;
-    private String contentkind;
-    private String category;
+    private String content_kind; //CONTENT_POPUP, CONTENT_EXHIBITION, 둘다 아니면 NULL
+    private String category; // 여러 카테고리가 있음 . parsing해서 꺼내올듯.
     private String location;
     private String title;
     private String description;
@@ -18,8 +18,8 @@ public class ContentVo {
     private int child_price;
     private String main_image_path;
     private String detail_description;
-    private Boolean is_active;
-    private Boolean is_delete;
+    private Boolean is_active;//사용자와 상관없음
+    private Boolean is_delete; //사용자와 상관없음
     private String content_time;
     private String instagram_url;
     private String x_url;
