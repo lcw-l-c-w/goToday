@@ -17,12 +17,6 @@ function goSave() {
 </head>
 <body>
 <div class="container">
-    <div class="step-container">
-        <span class="step">정보입력</span>
-        <span class="step active">관심사 입력</span>
-        <span class="step">가입완료</span>
-    </div>
-
 	 <form id="frm" action="/gotoday/member/register2" method="POST">
 	    <h3>전시 or 팝업</h3>
 	    <input type="radio" name="event" value="exhibition"> 전시
