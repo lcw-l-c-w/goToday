@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.gotoday.content.ContentEnum;
-import kr.co.gotoday.content.ContentVo;
+import kr.co.gotoday.content.ContentVO;
 
 @Controller
 public class VendorController {
@@ -21,8 +21,8 @@ public class VendorController {
 	
 	//content 관리 페이지
 	@GetMapping("vendor/content_manage")
-	public String contentManage(Model model, ContentVo contentVo) {
-		model.addAttribute("map", vendorService.list(contentVo));
+	public String contentManage(Model model, ContentVO ContentVO) {
+		model.addAttribute("map", vendorService.list(ContentVO));
 		return "vendor/content_manage";
 	}
 	
@@ -36,20 +36,20 @@ public class VendorController {
 	//content 등록 처리
 	@PostMapping("/vendor/content_create")
 	public String createContent(
-			ContentVo contentVo, 
+			ContentVO ContentVO, 
 			Model model, 
 			HttpServletRequest request, 
 			@RequestParam("main_image_file")MultipartFile file
 			) {
 //		HttpSession sess = request.getSession();
 //		UserVo login = (UserVo)sess.getAttribute("loginSess");
-//		contentVo.setUser_id(login.getUser_id());
+//		ContentVO.setUser_id(login.getUser_id());
 		
-		contentVo.setUser_id(1); //임시 로그인
-		contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
-		contentVo.setIs_active(true);
-		contentVo.setIs_delete(false);
-		int r = vendorService.createContent(contentVo, file, request);
+		ContentVO.setUser_id(1); //임시 로그인
+		ContentVO.setContent_status(ContentEnum.STATUS_REQUESTED.name());
+		ContentVO.setIs_active(true);
+		ContentVO.setIs_delete(false);
+		int r = vendorService.createContent(ContentVO, file, request);
 		if(r > 0) {
 			model.addAttribute("cmd", "move");
 			model.addAttribute("msg", "정상적으로 등록되었습니다.");

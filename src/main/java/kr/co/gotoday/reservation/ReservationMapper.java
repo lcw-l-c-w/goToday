@@ -1,5 +1,5 @@
 package kr.co.gotoday.reservation;
 
-public class ReservationMapper {
+public interface ReservationMapper {
 
 }

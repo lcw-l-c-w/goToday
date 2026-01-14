@@ -1,13 +1,11 @@
 package kr.co.gotoday.content;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-import kr.co.gotoday.user.UserVo;
 import lombok.Data;
 
 @Data
-public class ContentVo {
+public class ContentVO {
 	private int content_id;
     private String content_kind;
     private String category;

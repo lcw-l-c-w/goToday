@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import kr.co.gotoday.content.ContentVo;
+import kr.co.gotoday.content.ContentVO;
 
 @Service
 public class VendorServiceImpl implements VendorService {
@@ -19,7 +19,7 @@ public class VendorServiceImpl implements VendorService {
 	private VendorMapper vendorMapper;
 	
 	@Override
-	public int createContent(ContentVo contentVo, MultipartFile file, HttpServletRequest request) {
+	public int createContent(ContentVO contentVo, MultipartFile file, HttpServletRequest request) {
 		if(file !=null  && !file.isEmpty()) {
 			//파일 명명
 			String uploadDir = request.getServletContext().getRealPath("/upload/poster");
@@ -41,7 +41,7 @@ public class VendorServiceImpl implements VendorService {
 	}
 	
 	@Override
-	public Map<String, Object> list(ContentVo contentVo){
+	public Map<String, Object> list(ContentVO contentVo){
 		Map<String, Object> map = new HashMap<>();
 		
 		return map;

@@ -6,11 +6,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import kr.co.gotoday.content.ContentVo;
+import kr.co.gotoday.content.ContentVO;
 
 public interface VendorService {
-	int createContent(ContentVo contentVo, MultipartFile file, HttpServletRequest request);
+	int createContent(ContentVO contentVo, MultipartFile file, HttpServletRequest request);
 	
-	Map<String, Object> list(ContentVo contentVo);
+	Map<String, Object> list(ContentVO contentVo);
 
 }
