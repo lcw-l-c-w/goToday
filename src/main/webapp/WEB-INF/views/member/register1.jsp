@@ -9,6 +9,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
+let emailChecked = false;
 
 function goSave() {
     let emailPrefix = $("#email_prefix").val();
@@ -20,22 +21,13 @@ function goSave() {
         return;
     }
 
+ 	// 중복확인 여부 체크
+    if (!emailChecked) {
+        alert("이메일 중복확인을 해주세요");
+        return;
+    }
+ 
     $("#email").val(email);
-
-    let con = true;
-    $.ajax({
-        url: "/gotoday/member/emailCheck",
-        data: { email: email },
-        async: false,
-        success: function(res) {
-            if (res != 0) {
-                alert("중복확인을 해주세요.");
-                con = false;
-            }
-        }
-    });
-
-    if (!con) return;
 
     if ($("#password").val() == '') {
     	alert("비밀번호를 입력해주세요.")
@@ -89,13 +81,22 @@ function emailCheck() {
         success: function(res) {
             if (res == 0) {
                 $("#emailCheckMsg").text("사용 가능한 이메일입니다.");
+                emailChecked = true;
             } else {
                 $("#emailCheckMsg").text("이미 사용 중인 이메일입니다.");
+                emailChecked = false;
             }
         }
     });
 }
 
+// 이메일 입력 필드 변경 감지
+$(document).ready(function() {
+    $("#email_prefix, #email_domain").on("input change", function() {
+        emailChecked = false; // 이메일 변경 시 중복확인 초기화
+        $("#emailCheckMsg").text(""); // 메시지 초기화
+    });
+});
 </script>
 </head>
 
