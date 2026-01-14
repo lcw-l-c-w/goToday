@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.payment.PaymentDTO;
 import kr.co.gotoday.user.UserVO;
 
 
@@ -77,7 +78,7 @@ public class ReservationController {
 	
 	//수령인 정보 입력 및 결제 페이지 
 	@GetMapping("/reserve/payment.do")
-	public String showPaymentForm(HttpSession session, ReservationDTO dto, Model model){
+	public String showPaymentForm(HttpSession session, Model model){
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
 		if (reservation == null) {
 		    return "redirect:/reserve/schedule.do";
@@ -99,10 +100,21 @@ public class ReservationController {
 		//금액 정보를 모델에 저장
 		model.addAttribute("total_price", reservation.getTotal_price());
 		
+		PaymentDTO paymentDTO = new PaymentDTO();
+		
 		// 토스 order_key 미리 생성
-		String order_key = "ORDER_" + UUID.randomUUID().toString();
-	    model.addAttribute("order_key", order_key);
-	    session.setAttribute("order_key", order_key);
+		String orderId = "ORDER_" + UUID.randomUUID().toString();
+	    
+		paymentDTO.setOrderId(orderId);
+		paymentDTO.setOrderName(contentVO.getTitle()); // 상품명
+		paymentDTO.setAmount(reservation.getTotal_price());                // 초기 가격
+		paymentDTO.setCustomerName(userInfo.getName());        // 구매자 이름
+		paymentDTO.setCustomerEmail(userInfo.getEmail()); // 이메일
+		
+		model.addAttribute("paymentDTO",paymentDTO);
+		model.addAttribute("order_key", orderId);
+		
+	    session.setAttribute("paymentDTO",paymentDTO);
 	    
 		return "reserve_pay/payment";
 	}
@@ -151,11 +163,12 @@ public class ReservationController {
 			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
 			session.setAttribute("pendingReservation", reservationVO);
 			
+			PaymentDTO paymentDTO = (PaymentDTO) session.getAttribute("paymentDTO");
 			
 			// 토스페이먼츠 결제 정보 준비
 			result.put("success", true);
-	        result.put("orderId", session.getAttribute("orderId"));
-	        result.put("orderName", "무한도전 티켓");
+	        result.put("orderId", paymentDTO.getOrderId());
+	        result.put("orderName",  paymentDTO.getOrderName());
 	        result.put("amount", reservationVO.getTotal_price());
 	        result.put("customerName", reservationVO.getReceiver_name());
 					
