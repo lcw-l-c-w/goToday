@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.co.gotoday.content.ContentVo;
-import kr.co.gotoday.payment.PaymentMapper;
+import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentVO;
 
 @Service
@@ -14,14 +13,14 @@ public class ReservationServiceImpl implements ReservationService{
 	ReservationMapper reservationMapper;
 
 	@Override
-	public int calculate(ReservationDTO reservationDTO, ContentVo contentVo) {
-		if (reservationDTO == null || contentVo == null) {
+	public int calculate(ReservationDTO reservationDTO, ContentVO contentVO) {
+		if (reservationDTO == null || contentVO == null) {
             throw new IllegalArgumentException("예약 정보와 콘텐츠 정보 누락");
         }
 		
-		int adultPrice = reservationDTO.getAdult_qty() * contentVo.getAdult_price();
-		int teenPrice = reservationDTO.getTeen_qty() * contentVo.getTeen_price();
-		int childPrice = reservationDTO.getChild_qty() * contentVo.getChild_price();
+		int adultPrice = reservationDTO.getAdult_qty() * contentVO.getAdult_price();
+		int teenPrice = reservationDTO.getTeen_qty() * contentVO.getTeen_price();
+		int childPrice = reservationDTO.getChild_qty() * contentVO.getChild_price();
 		
 		return adultPrice + teenPrice + childPrice;
 	}

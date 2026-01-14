@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.reservation.ReservationMapper">
+
 	<insert id="createReservation" parameterType="kr.co.gotoday.reservation.ReservationVO">
 		INSERT INTO reservation(
 			reservation_code, reserved_for_at, reservation_status, total_price, adult_qty,
@@ -32,4 +33,5 @@
 	    SELECT * FROM reservation 
 	    WHERE reservation_id = #{reservation_id}
 	</select>
+
 </mapper>

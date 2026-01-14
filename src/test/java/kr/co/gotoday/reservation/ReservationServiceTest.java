@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import kr.co.gotoday.content.ContentVo;
+import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
 
@@ -34,12 +34,12 @@ class ReservationServiceTest {
     class CalculateTest {
 
         private ReservationDTO reservationDTO;
-        private ContentVo contentVo;
+        private ContentVO contentVO;
 
         @BeforeEach
         void setUp() {
             reservationDTO = new ReservationDTO();
-            contentVo = new ContentVo();
+            contentVO = new ContentVO();
         }
 
         @Test
@@ -50,12 +50,12 @@ class ReservationServiceTest {
             reservationDTO.setTeen_qty(1);
             reservationDTO.setChild_qty(3);
 
-            contentVo.setAdult_price(10000);
-            contentVo.setTeen_price(8000);
-            contentVo.setChild_price(5000);
+            contentVO.setAdult_price(10000);
+            contentVO.setTeen_price(8000);
+            contentVO.setChild_price(5000);
 
             // when
-            int result = reservationService.calculate(reservationDTO, contentVo);
+            int result = reservationService.calculate(reservationDTO, contentVO);
 
             // then
             // 성인: 2 * 10000 = 20000
@@ -73,12 +73,12 @@ class ReservationServiceTest {
             reservationDTO.setTeen_qty(0);
             reservationDTO.setChild_qty(0);
 
-            contentVo.setAdult_price(10000);
-            contentVo.setTeen_price(8000);
-            contentVo.setChild_price(5000);
+            contentVO.setAdult_price(10000);
+            contentVO.setTeen_price(8000);
+            contentVO.setChild_price(5000);
 
             // when
-            int result = reservationService.calculate(reservationDTO, contentVo);
+            int result = reservationService.calculate(reservationDTO, contentVO);
 
             // then
             assertEquals(0, result);
@@ -92,12 +92,12 @@ class ReservationServiceTest {
             reservationDTO.setTeen_qty(0);
             reservationDTO.setChild_qty(0);
 
-            contentVo.setAdult_price(15000);
-            contentVo.setTeen_price(10000);
-            contentVo.setChild_price(5000);
+            contentVO.setAdult_price(15000);
+            contentVO.setTeen_price(10000);
+            contentVO.setChild_price(5000);
 
             // when
-            int result = reservationService.calculate(reservationDTO, contentVo);
+            int result = reservationService.calculate(reservationDTO, contentVO);
 
             // then
             assertEquals(45000, result);
@@ -107,17 +107,17 @@ class ReservationServiceTest {
         @DisplayName("reservationDTO가 null이면 IllegalArgumentException이 발생한다")
         void calculate_nullReservationDTO() {
             // given
-            contentVo.setAdult_price(10000);
+            contentVO.setAdult_price(10000);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                reservationService.calculate(null, contentVo);
+                reservationService.calculate(null, contentVO);
             });
         }
 
         @Test
-        @DisplayName("contentVo가 null이면 IllegalArgumentException이 발생한다")
-        void calculate_nullContentVo() {
+        @DisplayName("contentVO가 null이면 IllegalArgumentException이 발생한다")
+        void calculate_nullcontentVO() {
             // given
             reservationDTO.setAdult_qty(1);
 

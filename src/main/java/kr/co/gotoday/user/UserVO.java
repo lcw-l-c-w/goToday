@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class UserVo {
+public class UserVO {
 	private int user_id;
     private String email;
     private int role; //0:유저 1:관리자

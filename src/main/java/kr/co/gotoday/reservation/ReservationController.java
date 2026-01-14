@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import kr.co.gotoday.content.ContentService;
-import kr.co.gotoday.content.ContentVo;
-import kr.co.gotoday.user.UserVo;
+import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.user.UserVO;
 
 
 @Controller
@@ -24,14 +23,13 @@ public class ReservationController {
 	
 	@Autowired
 	ReservationService reservationService;
-	ContentService contentService;
 	
 	@PostMapping("/reserve/schedule.do")
-	public String selctSchedule(HttpSession session, ReservationDTO dto) {
+	public String selctSchedule(HttpSession session, ReservationDTO dto, @RequestParam int content_id) {
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());
-		reservation.setContent_id(dto.getContent_id());
+		reservation.setContent_id(content_id);
 		
 		session.setAttribute("schedule", reservation);
 		return "redirect:/reserve/quantity.do";
@@ -46,10 +44,10 @@ public class ReservationController {
 		 model.addAttribute("reservationDTO", dto);
 		 
 		 //ContentVo contentVo = contentService.findContentById(reservation.getContent_id());
-		 ContentVo contentVo = new ContentVo();
-		 contentVo.setTitle("무한도전");
-		 contentVo.setAdult_price(17000);
-		 model.addAttribute("contentVo",contentVo);
+		 ContentVO contentVO = new ContentVO();
+		 contentVO.setTitle("무한도전");
+		 contentVO.setAdult_price(17000);
+		 model.addAttribute("contentVo",contentVO);
 		 
 		return "reserve_pay/reservation";
 	}
@@ -65,10 +63,10 @@ public class ReservationController {
 		reservation.setChild_qty(dto.getChild_qty());
 		
 		//ContentVo contentVo = contentService.findContentById(reservation.getContent_id());
-		ContentVo contentVo = new ContentVo();
-		contentVo.setAdult_price(17000); 
+		ContentVO contentVO = new ContentVO();
+		contentVO.setAdult_price(17000); 
 		
-		int total_price = reservationService.calculate(reservation, contentVo);
+		int total_price = reservationService.calculate(reservation, contentVO);
 		reservation.setTotal_price(total_price);
 		
 		session.setAttribute("schedule", reservation);
@@ -88,13 +86,13 @@ public class ReservationController {
 		
 		//컨텐츠 정보를 모델에 저장.
 		//ContentVo contentVo = contentService.findContentById(reservation.getContent_id());
-		ContentVo contentVo = new ContentVo();
-		contentVo.setTitle("무한도전");
-		contentVo.setAdult_price(17000);
-		model.addAttribute("contentVo",contentVo);
+		ContentVO contentVO = new ContentVO();
+		contentVO.setTitle("무한도전");
+		contentVO.setAdult_price(17000);
+		model.addAttribute("contentVo",contentVO);
 		
 		//기본적으로 세션에 있는 유저의 정보를 가져다가 수령인 란에 저장하기 위해 정보를 모델에 저장
-		UserVo userInfo = (UserVo)session.getAttribute("userVo");
+		UserVO userInfo = (UserVO)session.getAttribute("userVo");
 		model.addAttribute("receiver_info", userInfo);
 		
 		//금액 정보를 모델에 저장
