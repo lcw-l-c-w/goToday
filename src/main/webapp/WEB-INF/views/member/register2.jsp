@@ -38,7 +38,7 @@ function goSave() {
 	    <input type="checkbox" name="interest" value="art"> 미술
 	    <input type="checkbox" name="interest" value="fashion"> 패션
 	    <input type="checkbox" name="interest" value="digitaltech"> 디지털/테크
-	    <input type="checkbox" name="interest" value="fidspets"> 키즈/반려동물
+	    <input type="checkbox" name="interest" value="kidspets"> 키즈/반려동물
 	    <input type="checkbox" name="interest" value="etc"> 기타
 	
 		<br>

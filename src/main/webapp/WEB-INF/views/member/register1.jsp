@@ -9,6 +9,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
+
 function goSave() {
     let emailPrefix = $("#email_prefix").val();
     let emailDomain = $("#email_domain").val();
@@ -19,7 +20,6 @@ function goSave() {
         return;
     }
 
-    // hidden input에 email 세팅 (중요!)
     $("#email").val(email);
 
     let con = true;
@@ -29,7 +29,7 @@ function goSave() {
         async: false,
         success: function(res) {
             if (res != 0) {
-                alert("중복된 이메일입니다.");
+                alert("중복확인을 해주세요.");
                 con = false;
             }
         }
@@ -37,8 +37,38 @@ function goSave() {
 
     if (!con) return;
 
+    if ($("#password").val() == '') {
+    	alert("비밀번호를 입력해주세요.")
+    	return;
+    }
+    
+    if ($("#password_confirm").val() == '') {
+    	alert("비밀번호 확인을 입력해주세요.")
+    	return;
+    }
+    
     if ($("#password").val() !== $("#password_confirm").val()) {
         alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+    
+    if($("#name").val() == '') {
+    	alert("이름을 입력해주세요.");
+        return;
+    }
+    
+    if($("#birthday").val() == '') {
+    	alert("생년월일을 입력해주세요.");
+        return;
+    }
+    
+    if(!$("input[name='gender']:checked").val()) {
+    	alert("성별을 선택해주세요.");
+        return;
+    }
+    
+    if($("#phone_number").val() == '') {
+    	alert("전화번호를 입력해주세요.");
         return;
     }
 
@@ -65,6 +95,7 @@ function emailCheck() {
         }
     });
 }
+
 </script>
 </head>
 
@@ -91,38 +122,38 @@ function emailCheck() {
 
     <p>
         비밀번호<br>
-        <input type="password" name="password" id="password">
+        <input type="password" id="password" name="password" >
     </p>
 
     <p>
         비밀번호 확인<br>
-        <input type="password" id="password_confirm">
+        <input type="password" id="password_confirm" name="password_confirm" >
     </p>
 
     <p>
         이름<br>
-        <input type="text" name="name">
+        <input type="text" id="name" name="name" >
     </p>
 
     <p>
         생년월일<br>
-        <input type="text" name="birthday" placeholder="YYYYMMDD">
+        <input type="text" id="birthday" name="birthday" placeholder="YYYYMMDD">
     </p>
 
     <p>
         성별<br>
-        <label><input type="radio" name="gender" value="M"> 남</label>
-        <label><input type="radio" name="gender" value="F"> 여</label>
+        <label><input type="radio" id="genderM" name="gender" value="M"> 남</label>
+        <label><input type="radio" id="genderF" name="gender" value="F"> 여</label>
     </p>
 
     <p>
-        휴대전화<br>
-        <input type="tel" name="phone_number">
+        전화번호<br>
+        <input type="tel" id="phone_number" name="phone_number">
     </p>
 
     <p>
         <button type="button" onclick="history.back()">이전단계</button>
-        <button type="button" onclick="goSave()">다음단계</button>
+        <button type="button" onclick="goSave()">회원가입</button>
     </p>
 
 </form>

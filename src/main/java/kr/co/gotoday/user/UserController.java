@@ -36,7 +36,7 @@ public class UserController {
             return "common/return";
         } else {
             sess.setAttribute("loginSess", userVO);
-            return "redirect:/";
+            return "redirect:/main";
         }
     }
     
@@ -48,31 +48,12 @@ public class UserController {
     
     // 회원가입 1단계: 정보입력 처리
     @PostMapping("/member/register1")
-    public String registerUserStep1(HttpSession sess, 
-    		@RequestParam String email_prefix,
-            @RequestParam String email_domain,
-            @RequestParam String password,
-            @RequestParam String name,
-            @RequestParam String birthday,
-            @RequestParam String gender,
-            @RequestParam String phone_number,
-            Model model) {
+    public String registerUserStep1(HttpSession sess, UserVO vo, Model model) {
 
-        String email = email_prefix + "@" + email_domain;
-
-        UserVO user = new UserVO();
-        
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setName(name);
-        user.setBirthday(birthday);
-        user.setGender(gender);
-        user.setPhone_number(phone_number);
-        
-        boolean result = userService.registerUserInfo(user);
+        boolean result = userService.registerUserInfo(vo);
         
         if (result) {
-            sess.setAttribute("tempUser", user);
+            sess.setAttribute("tempUser", vo);
             return "redirect:/member/register2";
         } else {
             model.addAttribute("msg", "회원가입 중 오류가 발생했습니다.");
@@ -101,7 +82,7 @@ public class UserController {
         if (user == null) {
             model.addAttribute("msg", "잘못된 접근입니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/registerUser");
+            model.addAttribute("url", "/gotoday/member/register1");
             return "common/return";
         }
 
