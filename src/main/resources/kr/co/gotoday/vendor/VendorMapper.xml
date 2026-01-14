@@ -2,7 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.vendor.VendorMapper">
 
-	<insert id="createContent" parameterType="kr.co.gotoday.content.ContentVo">
+	<insert id="createContent" parameterType="kr.co.gotoday.content.ContentVO" 
+				useGeneratedKeys="true" keyProperty="content_id">
 		INSERT INTO content (
 			user_id, content_kind, category, location, title, description, reservation_type,
 			start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
@@ -11,6 +12,13 @@
 			#{user_id}, #{content_kind}, #{category}, #{location}, #{title}, #{description}, #{reservation_type},
 			#{start_at}, #{end_at}, #{adult_price}, #{teen_price}, #{child_price}, #{main_image_path}, #{detail_description},
 			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}
+		)
+	</insert>
+	<insert id="createSchedule" parameterType="kr.co.gotoday.content.ContentScheduleVO">
+		INSERT INTO content_schedule (
+			schedule_id, scheduled_at, time_zone, total_ticket, current_ticket, content_id 
+		) VALUES (
+			#{schedule_id}, #{scheduled_at}, #{time_zone}, #{total_ticket}, #{current_ticket}, #{content_id}
 		)
 	</insert>
 

@@ -2,7 +2,7 @@ package kr.co.gotoday.reservation;
 
 import java.sql.Timestamp;
 
-public class ReservationVo {
+public class ReservationVO {
 	private int reservation_id;
     private String reservation_code;
     private Timestamp reserved_for_at;

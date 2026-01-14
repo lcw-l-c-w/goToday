@@ -1,5 +1,5 @@
 package kr.co.gotoday.userAction;
 
-public class userActionVo {
+public class userActionVO {
 
 }

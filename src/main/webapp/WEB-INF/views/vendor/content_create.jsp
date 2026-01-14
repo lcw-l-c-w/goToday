@@ -180,6 +180,34 @@
       border-radius: 8px;
       font-size: 14px;
     }
+    
+    /* 시간대별 티켓 수 */
+    #ticket-total {
+	    width: 120px;     
+	    text-align: center;
+	}
+    
+    /* 스케줄 입력 */
+    #scheduleList {
+	    display: flex;
+	    flex-direction: column; 
+	    gap: 10px;
+	}
+    .schedule-item {
+	    display: flex;
+	    gap: 4px;
+	    align-items: center;
+	    margin-bottom: 8px;
+	}
+	
+	.remove-btn {
+	    background: #eee;
+	    border: 1px solid #ccc;
+	    cursor: pointer;
+	    width: 40px;
+	    height: 35px;
+	    border-radius: 8px;
+	}
 
     /* 링크 입력 */
     .link-inputs {
@@ -414,11 +442,11 @@ $(function() {
             <label>종류 *</label>
             <div class="radio-group">
                 <label class="radio-item">
-                    <input type="radio" name="content_kind" value="popup" required <c:if test="${content.content_kind eq 'popup'}">checked</c:if>>
+                    <input type="radio" name="content_kind" value="popup" required <c:if test="${contentVo.content_kind eq 'popup'}">checked</c:if>>
                     <span>팝업스토어</span>
                 </label>
                 <label class="radio-item">
-                    <input type="radio" name="content_kind" value="exhibition" <c:if test="${content.content_kind eq 'exhibition'}">checked</c:if>>
+                    <input type="radio" name="content_kind" value="exhibition" <c:if test="${contentVo.content_kind eq 'exhibition'}">checked</c:if>>
                     <span>전시</span>
                 </label>
             </div>
@@ -429,47 +457,47 @@ $(function() {
                  <select name="category" required>
 			        <option value="">카테고리를 선택하세요</option>
 			        <option value="식품"
-			            <c:if test="${content.category eq '식품'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '식품'}">selected</c:if>>
 			            식품
 			        </option>
 			
 			        <option value="캐릭터"
-			            <c:if test="${content.category eq '캐릭터'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '캐릭터'}">selected</c:if>>
 			            캐릭터
 			        </option>
 			
 			        <option value="화장품"
-			            <c:if test="${content.category eq '화장품'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '화장품'}">selected</c:if>>
 			            화장품
 			        </option>
 			
 			        <option value="미디어"
-			            <c:if test="${content.category eq '미디어'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '미디어'}">selected</c:if>>
 			            미디어
 			        </option>
 			
 			        <option value="미술"
-			            <c:if test="${content.category eq '미술'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '미술'}">selected</c:if>>
 			            미술
 			        </option>
 			
 			        <option value="패션"
-			            <c:if test="${content.category eq '패션'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '패션'}">selected</c:if>>
 			            패션
 			        </option>
 			
 			        <option value="디지털/테크"
-			            <c:if test="${content.category eq '디지털/테크'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '디지털/테크'}">selected</c:if>>
 			            디지털/테크
 			        </option>
 			
 			        <option value="키즈/반려동물"
-			            <c:if test="${content.category eq '키즈/반려동물'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq '키즈/반려동물'}">selected</c:if>>
 			            키즈/반려동물
 			        </option>
 			
 			        <option value="etc"
-			            <c:if test="${content.category eq 'etc'}">selected</c:if>>
+			            <c:if test="${contentVo.category eq 'etc'}">selected</c:if>>
 			            기타 (etc)
 			        </option>
 			    </select>
@@ -477,46 +505,78 @@ $(function() {
         </div>
         <div class="form-group">
             <label>전시명 *</label>
-            <input type="text" name="title" placeholder="전시명을 입력하세요" value="${content.title}" required>
+            <input type="text" name="title" placeholder="전시명을 입력하세요" value="${contentVo.title}" required>
         </div>
 
         <div class="form-group">
             <label>장소 *</label>
-            <input type="text" name="location" placeholder="형식 : 도로명 주소 , 상호명 ( , 필수)" value="${content.location}" required>
+            <input type="text" name="location" placeholder="형식 : 도로명 주소 , 상호명 ( , 필수)" value="${contentVo.location}" required>
         </div>
 
         <div class="form-group">
             <label>수령방법 *</label>
             <div class="radio-group">
                 <label class="radio-item">
-                    <input type="radio" name="reservation_type" value="onsite" required <c:if test="${content.reservation_type eq 'onsite'}">checked</c:if>>
-                    <span>현장수령 (상시전시)</span>
+                    <input type="radio" name="reservation_type" value="onsite" required <c:if test="${contentVo.reservation_type eq 'onsite'}">checked</c:if>>
+                    <span>현장수령</span>
                 </label>
                 <label class="radio-item">
-                    <input type="radio" name="reservation_type" value="advance" <c:if test="${content.reservation_type eq 'advance'}">checked</c:if>>
-                    <span>사전예매</span>
+                    <input type="radio" name="reservation_type" value="advance" <c:if test="${contentVo.reservation_type eq 'advance'}">checked</c:if>>
+                    <span>모바일 티켓</span>
                 </label>
             </div>
         </div>
         <div class="form-group">
+        	<label>상시 전시 여부</label>
+        	<div class="radio-group">
+                <label class="radio-item">
+                    <input type="radio" name="always" value="always" required <c:if test="${contentScheduleVO == null || contentScheduleVO.content_id == null}">checked</c:if>>
+                    <span>상시 전시</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="always" value="alwaysNo" <c:if test="${contentScheduleVO != null && contentScheduleVO.content_id eq contentVo.content_id}">checked</c:if>>
+                    <span>날짜, 시간대별 예약</span>
+                </label>
+            </div>
+       	</div>  
+       	<div class="form-group">
             <label>전시 기간 *</label>
             <div class="date-range">
-            <p>시작일</p>
-            <input type="date" name="start_at" value="${content.startDate}" required>
-            <p>~</p>
-            <p>종료일</p>
-            <input type="date" name="end_at" value="${content.endDate}" required>
+	            <p>시작일</p>
+	            <input type="date" name="start_at" value="${contentVo.startDate}" required>
+	            <p>~</p>
+	            <p>종료일</p>
+	            <input type="date" name="end_at" value="${contentVo.endDate}" required>
             </div>
         </div>
-
+        <div class="form-row"  id= "schedule-visual" style="display:none">
+	        <div class="form-group">
+	            <div class="schedule-section">
+					<label>전시 시간대 등록</label>
+					<button type="button" id="addScheduleBtn">+ 시간대 추가</button>
+				</div>
+			</div>
+			<div class="form-group">	
+	            <div id="scheduleList">
+	       			<div class="schedule-item">
+					    <input type="text" name="Time[]" placeholder="시간대 (예 : 10:00 ~ 11:00)" required>
+					    <button type="button" class="remove-btn">삭제</button>
+					</div>
+    			</div>
+	        </div>
+	        <div class="form-group">
+	        	<label>시간당 티켓 수</label>
+	        	<input type="number" name="total_ticket" value="${contentScheduleVO.content_id eq contentVo.content_id && contentScheduleVO.total_ticket}" min="0" required>
+	        </div>
+		</div>
         <div class="form-group">
             <label>판매자 인스타그램 주소</label>
             <div class="link-inputs">
-                <input type="text" name="instagram_url" placeholder="INSTAGRAM URL" value="${content.instagram_url}">
+                <input type="text" name="instagram_url" placeholder="INSTAGRAM URL" value="${contentVo.instagram_url}">
             </div>
             <label>판매자 엑스 주소</label>
             <div class="link-inputs">
-                <input type="text" name="x_url" placeholder="X URL" value="${content.x_url}">
+                <input type="text" name="x_url" placeholder="X URL" value="${contentVo.x_url}">
             </div>
         </div>
     </section>
@@ -625,6 +685,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    //상시 버튼에 따라 숨기기
+    document.querySelectorAll('input[name="always"]').forEach(radio => {
+        radio.addEventListener("change", () => {
+            document.getElementById("schedule-visual").style.display =
+                radio.value === "alwaysNo" ? "block" : "none";
+        });
+    });
+
+    //5개 이상 시 버튼 비활성화
+    function updateAddButtonState() {
+        const btn = document.getElementById("addScheduleBtn");
+        const count = document.getElementById("scheduleList").children.length;
+
+        btn.disabled = count >= 5;
+    }
+    
+    // 스케줄 추가 버튼
+    document.getElementById("addScheduleBtn").addEventListener("click", function () {
+        const scheduleList = document.getElementById("scheduleList");
+        const item = document.createElement("div");
+        item.className = "schedule-item";
+
+        item.innerHTML = `
+            <input type="text" name="Time[]" placeholder="시간대 (예 : 10:00 ~ 11:00)" required>
+            <button type="button" class="remove-btn">삭제</button>
+        `;
+
+        scheduleList.appendChild(item);
+        updateAddButtonState();
+    });
+
+    /* 삭제 버튼 (이벤트 위임) */
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-btn")) {
+            e.target.closest(".schedule-item").remove();
+            updateAddButtonState();
+        }
+    });
 
     // 포스터 이미지 업로드 미리보기
     const posterInput = document.getElementById('posterInput');
