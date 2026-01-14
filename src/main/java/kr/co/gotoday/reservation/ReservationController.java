@@ -2,6 +2,7 @@ package kr.co.gotoday.reservation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -43,7 +44,7 @@ public class ReservationController {
 		 }
 		 model.addAttribute("reservationDTO", dto);
 		 
-		 //ContentVo contentVo = contentService.findContentById(reservation.getContent_id());
+		 //ContentVO contentVO = contentService.findContentById(reservation.getContent_id());
 		 ContentVO contentVO = new ContentVO();
 		 contentVO.setTitle("무한도전");
 		 contentVO.setAdult_price(17000);
@@ -98,64 +99,77 @@ public class ReservationController {
 		//금액 정보를 모델에 저장
 		model.addAttribute("total_price", reservation.getTotal_price());
 		
-		// 토스 orderId 미리 생성
-	    String orderId = "ORDER_" + System.currentTimeMillis();
-	    model.addAttribute("orderId", orderId);
-	    session.setAttribute("orderId", orderId);
+		// 토스 order_key 미리 생성
+		String order_key = "ORDER_" + UUID.randomUUID().toString();
+	    model.addAttribute("order_key", order_key);
+	    session.setAttribute("order_key", order_key);
 	    
 		return "reserve_pay/payment";
 	}
 	
-//	//결제 요청 -> jsp에서 ajax로 호출  - peding으로 저장한 후 json응답 보내주기
-//	@PostMapping("/reserve/payment.do")
-//	@ResponseBody
-//	public ResponseEntity<Map<String, Object>> payment(
-//			ReservationVO reservationVO, 
-//			HttpSession session,
-//			Model model) {
-//		
-//		Map<String, Object> result = new HashMap();
-//		
-//		
-//		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-//		if (reservation == null) {
-//			return ResponseEntity.badRequest().body(null)
-//		}
-//		// Session 데이터를 VO로 복사
-//		String reservedForAt = reservation.getReserved_for_at() +" "+ reservation.getTime_zone();
-//		reservationVO.setReserved_for_at(reservedForAt);
-//		reservationVO.setAdult_qty(reservation.getAdult_qty());
-//		reservationVO.setTeen_qty(reservation.getTeen_qty());
-//		reservationVO.setChild_qty(reservation.getChild_qty());
-//		reservationVO.setContent_id(reservation.getContent_id());
-//		reservationVO.setTotal_price(reservation.getTotal_price());
-//		
-//		//예약코드 생성 (밀리타임을코드로)
-//		String reservationCode = "RES_" + System.currentTimeMillis();
-//		reservationVO.setReservation_code(reservationCode);
-//		reservationVO.setReservation_status("PENDING");  // 결제 대기 상태
-//		
-//		//화면에서 입력 받는 값은 reservationVO로 바인딩
-//		reservationVO.getReceiver_name();
-//		reservationVO.getReceiver_birth();
-//		reservationVO.getReceiver_phone();
-//		
-//		UserVo userVo = (UserVo) session.getAttribute("userVo");
-//		reservationVO.setUser_id(userVo.getUser_id());
-//
-//		// Session에 임시예약 정보 저장 (결제 완료 후 사용)
-//		session.setAttribute("pendingReservation", reservationVO);
-//		
-//		
-//		// 토스페이먼츠 결제 정보 준비(PaymentDTO 형식)
-//		String orderId = "ORDER_" + System.currentTimeMillis();
-//		model.addAttribute("orderId", orderId);
-//		model.addAttribute("orderName", "무한도전 티켓");  // contentVo.getTitle()
-//		model.addAttribute("amount", reservationVO.getTotal_price());
-//		model.addAttribute("customerName", reservationVO.getReceiver_name());
-//				
-//		return "reserve_pay/payment";  // 토스 결제창 호출하는 페이지
-//	}
+	//결제 요청 -> jsp에서 ajax로 호출  - peding으로 저장한 후 json응답 보내주기
+	@PostMapping("/reserve/payment.do")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> payment(
+			ReservationVO reservationVO, 
+			HttpSession session,
+			Model model) {
+		
+		Map<String, Object> result = new HashMap();
+		
+		try {
+			
+			ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
+			if (reservation == null) {
+				result.put("success", false);
+	            result.put("msg", "예약 정보가 없습니다.");
+				return ResponseEntity.badRequest().body(result);
+			}
+			
+			// Session 데이터를 VO로 복사
+			String reserved_for_at = reservation.getReserved_for_at() +" "+ reservation.getTime_zone();
+			reservationVO.setReserved_for_at(reserved_for_at);
+			reservationVO.setAdult_qty(reservation.getAdult_qty());
+			reservationVO.setTeen_qty(reservation.getTeen_qty());
+			reservationVO.setChild_qty(reservation.getChild_qty());
+			reservationVO.setContent_id(reservation.getContent_id());
+			reservationVO.setTotal_price(reservation.getTotal_price());
+			
+			//예약코드 생성 (밀리타임을코드로)
+			String reservation_code = "RES_" + System.currentTimeMillis();
+			reservationVO.setReservation_code(reservation_code);
+			reservationVO.setReservation_status("PENDING");  // 결제 대기 상태
+			
+			//화면에서 입력 받는 값은 reservationVO로 바인딩
+			reservationVO.setReceiver_name(reservationVO.getReceiver_name());
+			reservationVO.setReceiver_birth(reservationVO.getReceiver_birth());
+			reservationVO.setReceiver_phone(reservationVO.getReceiver_phone());
+			
+			UserVO userVo = (UserVO) session.getAttribute("userVO");
+			reservationVO.setUser_id(userVo.getUser_id());
+
+			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
+			session.setAttribute("pendingReservation", reservationVO);
+			
+			
+			// 토스페이먼츠 결제 정보 준비
+			result.put("success", true);
+	        result.put("orderId", session.getAttribute("orderId"));
+	        result.put("orderName", "무한도전 티켓");
+	        result.put("amount", reservationVO.getTotal_price());
+	        result.put("customerName", reservationVO.getReceiver_name());
+					
+			return ResponseEntity.ok(result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+	        result.put("success", false);
+	        result.put("msg", "서버 오류: " + e.getMessage());
+	        return ResponseEntity.status(500).body(result);
+		}
+		
+		
+	}
 	
 	//토스 페이먼츠 결제 성공 콜백 -> 최종확인
 	@GetMapping("reserve_pay/success.do")
