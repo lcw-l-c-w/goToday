@@ -123,10 +123,17 @@ public class ReservationController {
 		reservationVO.setReservation_code(reservationCode);
 		reservationVO.setReservation_status("PENDING");  // 결제 대기 상태
 		
-		//화면에서 입력 받는 값은 reservationVO로 바인딩,,?
+		//화면에서 입력 받는 값은 reservationVO로 바인딩
+		reservationVO.getReceiver_name();
+		reservationVO.getReceiver_birth();
+		reservationVO.getReceiver_phone();
 		
+		UserVo userVo = (UserVo) session.getAttribute("userVo");
+		reservationVO.setUser_id(userVo.getUser_id());
+
 		// Session에 임시예약 정보 저장 (결제 완료 후 사용)
 		session.setAttribute("pendingReservation", reservationVO);
+		
 		
 		// 토스페이먼츠 결제창으로 이동하기 위한 정보 전달
 		model.addAttribute("reservationCode", reservationCode);//키부여
@@ -144,6 +151,7 @@ public class ReservationController {
 			@RequestParam int amount,
 			HttpSession session,
 			Model model) {
+		
 		try {
 			ReservationVO pendingReservation = (ReservationVO) session.getAttribute("pendingReservation");
 			if (pendingReservation == null ) {
@@ -159,25 +167,11 @@ public class ReservationController {
 				return "reserve_pay/payment_fail"; //실패 페이지로 이동
 			}
 			
-//			// 토스페이먼츠 API로 결제 승인 요청
-//	//		boolean paymentConfirmed = reservationService.confirmPaymentWithToss(
-//	//			paymentKey,
-//	//			orderId,
-//	//			amount
-//	//		);
-//			boolean paymentConfirmed = true;
-//			
-//			if (!paymentConfirmed) {
-//				model.addAttribute("msg", "결제 승인에 실패했습니다.");
-//				model.addAttribute("status", "failed");
-//				return "reserve_pay/payment_fail";
-//			}
-			
 			ReservationVO result = reservationService.createReservationWithPaymentent(
-					pendingReservation,
-					paymentKey, 
-					orderId, 
-					amount);
+				pendingReservation,
+				paymentKey, 
+				orderId, 
+				amount);
 			
 			if (result != null) {
 				// 성공 시 예약 정보를 모델에 추가

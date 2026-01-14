@@ -10,17 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import config.MvcConfig;
 import kr.co.gotoday.payment.PaymentVO;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = {
-    "file:src/main/webapp/WEB-INF/spring/root-context.xml"  // ← DB 설정만!
-})
+@ContextConfiguration(classes = MvcConfig.class)
 @TestPropertySource(locations = "classpath:db.properties")
-@Transactional  // 테스트 후 자동 롤백
+@Transactional
+@WebAppConfiguration
 class ReservationMapperTest {
 
     @Autowired
@@ -56,14 +56,15 @@ class ReservationMapperTest {
 
         // then
         assertEquals(1, result);
+        assertTrue(reservationVO.getReservation_id() > 0);
     }
 
     @Test
-    @DisplayName("예약 코드로 예약 정보를 조회할 수 있다")
+    @DisplayName("예약 ID로 예약 정보를 조회할 수 있다")
     void findByReservationId_success() {
-        // given
-        int reservationId = reservationVO.getReservation_id();
+        // given - 먼저 저장
         reservationMapper.createReservation(reservationVO);
+        int reservationId = reservationVO.getReservation_id();  // 저장 후 ID 가져오기
 
         // when
         ReservationVO found = reservationMapper.findByReservationId(reservationId);
@@ -78,11 +79,10 @@ class ReservationMapperTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 예약 코드 조회 시 null을 반환한다")
-    void findByReservationCode_notFound() {
-    	reservationVO.setReservation_id(0);
+    @DisplayName("존재하지 않는 예약 ID 조회 시 null을 반환한다")
+    void findByReservationId_notFound() {
         // when
-        ReservationVO found = reservationMapper.findByReservationId(reservationVO.getReservation_id());
+        ReservationVO found = reservationMapper.findByReservationId(999999);
 
         // then
         assertNull(found);
@@ -93,15 +93,13 @@ class ReservationMapperTest {
     void createPayment_success() {
         // given - 먼저 예약 생성
         reservationMapper.createReservation(reservationVO);
-
-        // 생성된 예약 조회하여 ID 확인
-        ReservationVO savedReservation = reservationMapper.findByReservationId(reservationVO.getReservation_id() );
+        int reservationId = reservationVO.getReservation_id();
 
         PaymentVO paymentVO = new PaymentVO();
         paymentVO.setPayment_key("test_payment_key_123");
         paymentVO.setOrder_key("ORDER_TEST_001");
         paymentVO.setAmount_price(50000);
-        paymentVO.setReservation_id(savedReservation.getReservation_id());
+        paymentVO.setReservation_id(reservationId);
         paymentVO.setPayment_status("COMPLETED");
         paymentVO.setPayment_method("CARD");
         paymentVO.setRefund_status("NONE");

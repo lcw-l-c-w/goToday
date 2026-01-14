@@ -11,6 +11,10 @@
 			#{child_qty}, #{teen_qty}, #{user_id}, #{content_id}, #{reservation_type}, #{receiver_name},
 			#{receiver_birth}, #{receiver_phone}, #{reserve_visit}, #{receive_type}, NOW()
 		)
+		
+		<selectKey keyProperty="reservation_id" order="AFTER" resultType="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
 	</insert>
 	
 	<insert id="createPayment" parameterType="kr.co.gotoday.payment.PaymentVO">
