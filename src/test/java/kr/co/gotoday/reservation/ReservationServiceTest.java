@@ -1,243 +1,257 @@
 package kr.co.gotoday.reservation;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.co.gotoday.content.ContentVo;
+import kr.co.gotoday.payment.PaymentMapper;
+import kr.co.gotoday.payment.PaymentVO;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {config.MvcConfig.class})
-@PropertySource("classpath:db.properties")
-@WebAppConfiguration
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
-    @Autowired
-    private ReservationService reservationService;
-    
-    @Autowired
+    @Mock
     private ReservationMapper reservationMapper;
-    
-    private ReservationDTO reservationDTO;
-    private ContentVo contentVo;
-    private ReservationVO reservationVO;
-    
-    @BeforeEach
-    void setUp() {
-        // Å×½ºÆ®¿ë ¿¹¾à µ¥ÀÌÅÍ ÁØºñ
-        reservationDTO = new ReservationDTO();
-        reservationDTO.setAdult_qty(2);
-        reservationDTO.setTeen_qty(1);
-        reservationDTO.setChild_qty(1);
-        
-        // Å×½ºÆ®¿ë ÄÜÅÙÃ÷ µ¥ÀÌÅÍ ÁØºñ
-        contentVo = new ContentVo();
-        contentVo.setTitle("¹«ÇÑµµÀü");
-        contentVo.setAdult_price(17000);
-        contentVo.setTeen_price(12000);
-        contentVo.setChild_price(8000);
-        
-        // Å×½ºÆ®¿ë °áÁ¦ µ¥ÀÌÅÍ ÁØºñ
-        reservationVO = new ReservationVO();
-        reservationVO.setReservation_code("TEST_" + System.currentTimeMillis());
-        reservationVO.setReservation_status("PENDING");
-        reservationVO.setTotal_price(54000);
-        reservationVO.setAdult_qty(2);
-        reservationVO.setTeen_qty(1);
-        reservationVO.setChild_qty(1);
-        reservationVO.setUser_id(1);
-        reservationVO.setContent_id(1);
-        reservationVO.setReservation_type("ONLINE");
-        reservationVO.setReceiver_name("È«±æµ¿");
-        reservationVO.setReceiver_birth("19900101");
-        reservationVO.setReceiver_phone("01012345678");
+
+    @Mock
+    private PaymentMapper paymentMapper;
+
+    @InjectMocks
+    private ReservationServiceImpl reservationService;
+
+    @Nested
+    @DisplayName("calculate ë©”ì„œë“œ í…ŒìŠ¤íŠ¸")
+    class CalculateTest {
+
+        private ReservationDTO reservationDTO;
+        private ContentVo contentVo;
+
+        @BeforeEach
+        void setUp() {
+            reservationDTO = new ReservationDTO();
+            contentVo = new ContentVo();
+        }
+
+        @Test
+        @DisplayName("ì„±ì¸, ì²­ì†Œë…„, ì–´ë¦°ì´ ê°€ê²©ì´ ì •ìƒì ìœ¼ë¡œ ê³„ì‚°ëœë‹¤")
+        void calculate_success() {
+            // given
+            reservationDTO.setAdult_qty(2);
+            reservationDTO.setTeen_qty(1);
+            reservationDTO.setChild_qty(3);
+
+            contentVo.setAdult_price(10000);
+            contentVo.setTeen_price(8000);
+            contentVo.setChild_price(5000);
+
+            // when
+            int result = reservationService.calculate(reservationDTO, contentVo);
+
+            // then
+            // ì„±ì¸: 2 * 10000 = 20000
+            // ì²­ì†Œë…„: 1 * 8000 = 8000
+            // ì–´ë¦°ì´: 3 * 5000 = 15000
+            // ì´í•©: 43000
+            assertEquals(43000, result);
+        }
+
+        @Test
+        @DisplayName("ì¸ì›ì´ 0ëª…ì¼ ê²½ìš° 0ì„ ë°˜í™˜í•œë‹¤")
+        void calculate_zeroQuantity() {
+            // given
+            reservationDTO.setAdult_qty(0);
+            reservationDTO.setTeen_qty(0);
+            reservationDTO.setChild_qty(0);
+
+            contentVo.setAdult_price(10000);
+            contentVo.setTeen_price(8000);
+            contentVo.setChild_price(5000);
+
+            // when
+            int result = reservationService.calculate(reservationDTO, contentVo);
+
+            // then
+            assertEquals(0, result);
+        }
+
+        @Test
+        @DisplayName("ì„±ì¸ë§Œ ìžˆëŠ” ê²½ìš° ì„±ì¸ ê°€ê²©ë§Œ ê³„ì‚°ëœë‹¤")
+        void calculate_onlyAdult() {
+            // given
+            reservationDTO.setAdult_qty(3);
+            reservationDTO.setTeen_qty(0);
+            reservationDTO.setChild_qty(0);
+
+            contentVo.setAdult_price(15000);
+            contentVo.setTeen_price(10000);
+            contentVo.setChild_price(5000);
+
+            // when
+            int result = reservationService.calculate(reservationDTO, contentVo);
+
+            // then
+            assertEquals(45000, result);
+        }
+
+        @Test
+        @DisplayName("reservationDTOê°€ nullì´ë©´ IllegalArgumentExceptionì´ ë°œìƒí•œë‹¤")
+        void calculate_nullReservationDTO() {
+            // given
+            contentVo.setAdult_price(10000);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                reservationService.calculate(null, contentVo);
+            });
+        }
+
+        @Test
+        @DisplayName("contentVoê°€ nullì´ë©´ IllegalArgumentExceptionì´ ë°œìƒí•œë‹¤")
+        void calculate_nullContentVo() {
+            // given
+            reservationDTO.setAdult_qty(1);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                reservationService.calculate(reservationDTO, null);
+            });
+        }
     }
-    
-    // ==================== calculate() ¸Þ¼­µå Å×½ºÆ® ====================
-    
-    @Test
-    @DisplayName("Á¤»óÀûÀÎ °¡°Ý °è»ê Å×½ºÆ®")
-    void °¡°Ý°è»ê_Á¤»ó() {
-        // given: ¼ºÀÎ 2¸í(17000), Ã»¼Ò³â 1¸í(12000), ¾î¸°ÀÌ 1¸í(8000)
-        
-        // when
-        int totalPrice = reservationService.calculate(reservationDTO, contentVo);
-        
-        // then
-        int expected = (2 * 17000) + (1 * 12000) + (1 * 8000); // 54000
-        assertEquals(expected, totalPrice);
-    }
-    
-    @Test
-    @DisplayName("¼ºÀÎ¸¸ ÀÖ´Â °æ¿ì °¡°Ý °è»ê")
-    void °¡°Ý°è»ê_¼ºÀÎ¸¸() {
-        // given
-        reservationDTO.setAdult_qty(3);
-        reservationDTO.setTeen_qty(0);
-        reservationDTO.setChild_qty(0);
-        
-        // when
-        int totalPrice = reservationService.calculate(reservationDTO, contentVo);
-        
-        // then
-        assertEquals(3 * 17000, totalPrice);
-    }
-    
-    @Test
-    @DisplayName("¸ðµç ¼ö·®ÀÌ 0ÀÎ °æ¿ì")
-    void °¡°Ý°è»ê_¼ö·®0() {
-        // given
-        reservationDTO.setAdult_qty(0);
-        reservationDTO.setTeen_qty(0);
-        reservationDTO.setChild_qty(0);
-        
-        // when
-        int totalPrice = reservationService.calculate(reservationDTO, contentVo);
-        
-        // then
-        assertEquals(0, totalPrice);
-    }
-    
-    @Test
-    @DisplayName("calculate - null °ª ÀÔ·Â ½Ã ¿¹¿Ü ¹ß»ý")
-    void °¡°Ý°è»ê_nullÃ¼Å©() {
-        // when & then
-        assertThrows(IllegalArgumentException.class, () -> {
-            reservationService.calculate(null, contentVo);
-        });
-        
-        assertThrows(IllegalArgumentException.class, () -> {
-            reservationService.calculate(reservationDTO, null);
-        });
-    }
-    
-    // ==================== payment() ¸Þ¼­µå Å×½ºÆ® ====================
-    
-    @Test
-    @DisplayName("°áÁ¦ Á¤º¸ ÀúÀå ¼º°ø")
-    void °áÁ¦Á¤º¸_ÀúÀå_¼º°ø() {
-        // when
-        int result = reservationService.payment(reservationVO);
-        
-        // then
-        assertEquals(1, result, "INSERT ¼º°ø ½Ã 1À» ¹ÝÈ¯ÇØ¾ß ÇÔ");
-    }
-    
-    @Test
-    @DisplayName("°áÁ¦ Á¤º¸ ÀúÀå ÈÄ DB Á¶È¸ È®ÀÎ")
-    void °áÁ¦Á¤º¸_ÀúÀå_ÈÄ_Á¶È¸() {
-        // given
-        reservationService.payment(reservationVO);
-        
-        // when
-        ReservationVO saved = reservationMapper.findByReservationCode(
-            reservationVO.getReservation_code()
-        );
-        
-        // then
-        assertNotNull(saved);
-        assertEquals(reservationVO.getReservation_code(), saved.getReservation_code());
-        assertEquals(reservationVO.getTotal_price(), saved.getTotal_price());
-        assertEquals(reservationVO.getReceiver_name(), saved.getReceiver_name());
-    }
-    
-    @Test
-    @DisplayName("payment - ÇÊ¼ö °ª ´©¶ô ½Ã ¿¹¿Ü ¹ß»ý")
-    void °áÁ¦Á¤º¸_ÇÊ¼ö°ª_´©¶ô() {
-        // given
-        reservationVO.setReservation_code(null); // ÇÊ¼ö°ª ´©¶ô
-        
-        // when & then
-        assertThrows(Exception.class, () -> {
-            reservationService.payment(reservationVO);
-        });
-    }
-    
-    @Test
-    @DisplayName("payment - Áßº¹ ¿¹¾àÄÚµå ÀúÀå ½Ãµµ")
-    void °áÁ¦Á¤º¸_Áßº¹_¿¹¾àÄÚµå() {
-        // given - Ã¹ ¹øÂ° ÀúÀå
-        reservationService.payment(reservationVO);
-        
-        // when & then - °°Àº ¿¹¾àÄÚµå·Î ´Ù½Ã ÀúÀå ½Ãµµ
-        ReservationVO duplicate = new ReservationVO();
-        duplicate.setReservation_code(reservationVO.getReservation_code()); // °°Àº ÄÚµå
-        duplicate.setTotal_price(10000);
-        duplicate.setUser_id(2);
-        duplicate.setContent_id(2);
-        
-        assertThrows(Exception.class, () -> {
-            reservationService.payment(duplicate);
-        });
-    }
-    
-    @Test
-    @DisplayName("¿©·¯ °ÇÀÇ °áÁ¦ Á¤º¸ ÀúÀå")
-    void ´Ù°Ç_°áÁ¦Á¤º¸_ÀúÀå() {
-        // given
-        ReservationVO reservation1 = createReservationVO("CODE1", 10000);
-        ReservationVO reservation2 = createReservationVO("CODE2", 20000);
-        ReservationVO reservation3 = createReservationVO("CODE3", 30000);
-        
-        // when
-        int result1 = reservationService.payment(reservation1);
-        int result2 = reservationService.payment(reservation2);
-        int result3 = reservationService.payment(reservation3);
-        
-        // then
-        assertEquals(1, result1);
-        assertEquals(1, result2);
-        assertEquals(1, result3);
-    }
-    
-    // ==================== ÅëÇÕ Å×½ºÆ® ====================
-    
-    @Test
-    @DisplayName("°¡°Ý °è»ê ÈÄ °áÁ¦ Á¤º¸ ÀúÀå - ÅëÇÕ Å×½ºÆ®")
-    void °¡°Ý°è»ê_ÈÄ_°áÁ¦ÀúÀå_ÅëÇÕ() {
-        // given - °¡°Ý °è»ê
-        int calculatedPrice = reservationService.calculate(reservationDTO, contentVo);
-        
-        // when - °è»êµÈ °¡°ÝÀ¸·Î °áÁ¦ Á¤º¸ ÀúÀå
-        reservationVO.setTotal_price(calculatedPrice);
-        int result = reservationService.payment(reservationVO);
-        
-        // then
-        assertEquals(1, result);
-        
-        // ÀúÀåµÈ µ¥ÀÌÅÍ È®ÀÎ
-        ReservationVO saved = reservationMapper.findByReservationCode(
-            reservationVO.getReservation_code()
-        );
-        assertEquals(calculatedPrice, saved.getTotal_price());
-    }
-    
-    // ==================== Helper ¸Þ¼­µå ====================
-    
-    private ReservationVO createReservationVO(String code, int price) {
-        ReservationVO vo = new ReservationVO();
-        vo.setReservation_code(code);
-        vo.setReservation_status("PENDING");
-        vo.setTotal_price(price);
-        vo.setAdult_qty(1);
-        vo.setTeen_qty(0);
-        vo.setChild_qty(0);
-        vo.setUser_id(1);
-        vo.setContent_id(1);
-        vo.setReservation_type("ONLINE");
-        vo.setReceiver_name("Å×½ºÆ®");
-        vo.setReceiver_birth("19900101");
-        vo.setReceiver_phone("01012345678");
-        return vo;
+
+    @Nested
+    @DisplayName("createReservationWithPaymentent ë©”ì„œë“œ í…ŒìŠ¤íŠ¸")
+    class CreateReservationWithPaymentTest {
+
+        private ReservationVO reservationVO;
+        private String paymentKey;
+        private String orderId;
+        private int amount;
+
+        @BeforeEach
+        void setUp() {
+            reservationVO = new ReservationVO();
+            reservationVO.setReservation_id(1);
+            reservationVO.setUser_id(100);
+            reservationVO.setContent_id(200);
+            reservationVO.setTotal_price(50000);
+
+            paymentKey = "test_payment_key_123";
+            orderId = "ORDER_20240101_001";
+            amount = 50000;
+        }
+
+        @Test
+        @DisplayName("ì˜ˆì•½ê³¼ ê²°ì œê°€ ì •ìƒì ìœ¼ë¡œ ìƒì„±ëœë‹¤")
+        void createReservationWithPayment_success() {
+            // given
+            when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(1);
+
+            PaymentVO createdPayment = new PaymentVO();
+            createdPayment.setPayment_key(paymentKey);
+            createdPayment.setOrder_key(orderId);
+            createdPayment.setAmount_price(amount);
+            when(reservationMapper.createPayment(any(PaymentVO.class))).thenReturn(createdPayment);
+
+            // when
+            ReservationVO result = reservationService.createReservationWithPaymentent(
+                reservationVO, paymentKey, orderId, amount
+            );
+
+            // then
+            assertNotNull(result);
+            assertEquals("CONFIRMED", result.getReservation_status());
+            verify(reservationMapper, times(1)).createReservation(any(ReservationVO.class));
+            verify(reservationMapper, times(1)).createPayment(any(PaymentVO.class));
+        }
+
+        @Test
+        @DisplayName("ì˜ˆì•½ ìƒì„± ì‹¤íŒ¨ ì‹œ RuntimeExceptionì´ ë°œìƒí•œë‹¤")
+        void createReservationWithPayment_reservationFail() {
+            // given
+            when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(0);
+
+            // when & then
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+                reservationService.createReservationWithPaymentent(
+                    reservationVO, paymentKey, orderId, amount
+                );
+            });
+
+            assertTrue(exception.getMessage().contains("ì˜ˆì•½ ë° ê²°ì œ ì²˜ë¦¬ ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤."));
+            verify(reservationMapper, times(1)).createReservation(any(ReservationVO.class));
+            verify(reservationMapper, never()).createPayment(any(PaymentVO.class));
+        }
+
+        @Test
+        @DisplayName("ê²°ì œ ìƒì„± ì‹¤íŒ¨ ì‹œ RuntimeExceptionì´ ë°œìƒí•œë‹¤")
+        void createReservationWithPayment_paymentFail() {
+            // given
+            when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(1);
+            when(reservationMapper.createPayment(any(PaymentVO.class))).thenReturn(null);
+
+            // when & then
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+                reservationService.createReservationWithPaymentent(
+                    reservationVO, paymentKey, orderId, amount
+                );
+            });
+
+            assertTrue(exception.getMessage().contains("ì˜ˆì•½ ë° ê²°ì œ ì²˜ë¦¬ ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤."));
+        }
+
+        @Test
+        @DisplayName("ì˜ˆì•½ ìƒíƒœê°€ CONFIRMEDë¡œ ì„¤ì •ëœë‹¤")
+        void createReservationWithPayment_statusConfirmed() {
+            // given
+            when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(1);
+
+            PaymentVO createdPayment = new PaymentVO();
+            when(reservationMapper.createPayment(any(PaymentVO.class))).thenReturn(createdPayment);
+
+            // when
+            ReservationVO result = reservationService.createReservationWithPaymentent(
+                reservationVO, paymentKey, orderId, amount
+            );
+
+            // then
+            assertNotNull(result);
+            assertEquals("CONFIRMED", result.getReservation_status());
+        }
+
+        @Test
+        @DisplayName("PaymentVOì— ì˜¬ë°”ë¥¸ ê°’ì´ ì„¤ì •ë˜ì–´ ì €ìž¥ëœë‹¤")
+        void createReservationWithPayment_paymentVOValues() {
+            // given
+            when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(1);
+
+            PaymentVO createdPayment = new PaymentVO();
+            when(reservationMapper.createPayment(any(PaymentVO.class))).thenAnswer(invocation -> {
+                PaymentVO paymentVO = invocation.getArgument(0);
+                assertEquals(paymentKey, paymentVO.getPayment_key());
+                assertEquals(orderId, paymentVO.getOrder_key());
+                assertEquals(amount, paymentVO.getAmount_price());
+                assertEquals(reservationVO.getReservation_id(), paymentVO.getReservation_id());
+                assertEquals("COMPLETED", paymentVO.getPayment_status());
+                return createdPayment;
+            });
+
+            // when
+            reservationService.createReservationWithPaymentent(
+                reservationVO, paymentKey, orderId, amount
+            );
+
+            // then
+            verify(reservationMapper).createPayment(any(PaymentVO.class));
+        }
     }
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 public class ReservationVO {
 	private int reservation_id;
     private String reservation_code;
-    private Timestamp reserved_for_at;
+    private String reserved_for_at;	//날짜랑 시간 정보 합쳐진 것
     private String reservation_status;
     private int total_price;
     private Timestamp created_at;
