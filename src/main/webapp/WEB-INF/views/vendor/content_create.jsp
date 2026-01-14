@@ -572,7 +572,7 @@ $(function() {
             <div>
             <br><br><br><br>
                 <label>운영 시간</label>
-                <input type="text" name="content_time_weekday" placeholder="00:00 ~ 00:00" value="${content.content_time}">
+                <input type="text" name="content_time" placeholder="00:00 ~ 00:00" value="${content.content_time}">
             </div>
         </div>
     </div>
