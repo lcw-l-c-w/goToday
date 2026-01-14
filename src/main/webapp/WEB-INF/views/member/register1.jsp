@@ -121,8 +121,8 @@ function emailCheck() {
     </p>
 
     <p>
-        <button type="button" onclick="goSave()">다음단계</button>
         <button type="button" onclick="history.back()">이전단계</button>
+        <button type="button" onclick="goSave()">다음단계</button>
     </p>
 
 </form>

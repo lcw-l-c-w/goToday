@@ -55,21 +55,30 @@ public class UserController {
             @RequestParam String name,
             @RequestParam String birthday,
             @RequestParam String gender,
-            @RequestParam String phone_number) {
+            @RequestParam String phone_number,
+            Model model) {
 
         String email = email_prefix + "@" + email_domain;
 
-        UserVO tempUser = new UserVO();
+        UserVO user = new UserVO();
         
-        tempUser.setEmail(email);
-        tempUser.setPassword(password);
-        tempUser.setName(name);
-        tempUser.setBirthday(birthday);
-        tempUser.setGender(gender);
-        tempUser.setPhone_number(phone_number);
-
-        sess.setAttribute("tempUser", tempUser);
-        return "redirect:/member/register2";
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+        user.setBirthday(birthday);
+        user.setGender(gender);
+        user.setPhone_number(phone_number);
+        
+        boolean result = userService.registerUserInfo(user);
+        
+        if (result) {
+            sess.setAttribute("tempUser", user);
+            return "redirect:/member/register2";
+        } else {
+            model.addAttribute("msg", "회원가입 중 오류가 발생했습니다.");
+            model.addAttribute("cmd", "back");
+            return "common/return";
+        }
     }
     
     // 회원가입 2단계: 관심사 입력 처리
@@ -103,6 +112,7 @@ public class UserController {
             if (tagId != null) {
                 UserTagVO ut = new UserTagVO();
                 ut.setTag_id(tagId.intValue());
+                ut.setUser_id(user.getUser_id());
                 userTagList.add(ut);
             }
         }
@@ -113,6 +123,7 @@ public class UserController {
                 if (tagId != null) {
                     UserTagVO ut = new UserTagVO();
                     ut.setTag_id(tagId.intValue());
+                    ut.setUser_id(user.getUser_id());
                     userTagList.add(ut);
                 }
             }
@@ -124,21 +135,20 @@ public class UserController {
                 if (tagId != null) {
                     UserTagVO ut = new UserTagVO();
                     ut.setTag_id(tagId.intValue());
+                    ut.setUser_id(user.getUser_id());
                     userTagList.add(ut);
                 }
             }
         }
 
-        user.setUserTagList(userTagList);
-
-        boolean result = userService.register(user);
+        boolean result = userService.registerUserTags(userTagList);
 
         if (result) {
             sess.removeAttribute("tempUser");
             model.addAttribute("user", user);
             return "member/register3";
         } else {
-            model.addAttribute("msg", "회원가입 중 오류가 발생했습니다.");
+            model.addAttribute("msg", "관심사 등록 중 오류가 발생했습니다.");
             model.addAttribute("cmd", "back");
             return "common/return";
         }

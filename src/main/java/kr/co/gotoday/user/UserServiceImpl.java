@@ -1,5 +1,7 @@
 package kr.co.gotoday.user;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,21 +19,20 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public boolean register(UserVO vo) {
-        try {
-            int result = userMapper.register(vo);
-
-            if (result > 0 && vo.getUserTagList() != null && !vo.getUserTagList().isEmpty()) {
-                for (UserTagVO tag : vo.getUserTagList()) {
-                    tag.setUser_id(vo.getUser_id());
-                    userMapper.createUserTags(tag);
-                }
-            }
-            return result > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean registerUserInfo(UserVO vo) {
+    	return userMapper.register(vo) > 0 ? true : false;
+    }
+    
+    @Override
+    @Transactional
+    public boolean registerUserTags(List<UserTagVO> tagList) {
+    	try {
+    	    if (tagList != null) tagList.forEach(userMapper::createUserTags);
+    	    return true;
+    	} catch (Exception e) {
+    	    e.printStackTrace();
+    	    return false;
+    	}
     }
 
     @Override

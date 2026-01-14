@@ -8,11 +8,11 @@
     </select>
 
     <!-- 회원가입 -->
-    <insert id="register" parameterType="kr.co.gotoday.user.UserVO">
+    <insert id="register" parameterType="kr.co.gotoday.user.UserVO" useGeneratedKeys="true" keyProperty="user_id">
         INSERT INTO user (
         	email, password, name, gender, birthday
-        	, phone_number, registered_at, role
-        ) VALUES(#{email}, #{password}, #{name}, #{gender}, #{birthday}, #{phone_number}, NOW(), 0)
+        	, phone_number, registered_at, role, login_type
+        ) VALUES(#{email}, #{password}, #{name}, #{gender}, #{birthday}, #{phone_number}, NOW(), 0, 'L')
     </insert>
 
     <!-- user_tag insert -->
