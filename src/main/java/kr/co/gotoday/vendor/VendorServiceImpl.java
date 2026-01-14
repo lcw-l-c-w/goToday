@@ -19,21 +19,25 @@ public class VendorServiceImpl implements VendorService {
 	private VendorMapper vendorMapper;
 	
 	@Override
-	public int contentCreate(ContentVo contentVo, MultipartFile file, HttpServletRequest request) {
-		if(!file.isEmpty() && file !=null) {
+	public int createContent(ContentVo contentVo, MultipartFile file, HttpServletRequest request) {
+		if(file !=null  && !file.isEmpty()) {
 			//파일 명명
+			String uploadDir = request.getServletContext().getRealPath("/upload/poster");
 			String org = file.getOriginalFilename();
-			String file_name = contentVo.getTitle() + org;
+			String filename = contentVo.getTitle()+ "_" + org;
 			
+			File dir = new File(uploadDir);
+
 			//파일 저장
-			String path = request.getRealPath("/upload/poster/") + file_name;
 			try {
-				file.transferTo(new File(path));
-			} catch (Exception e) {	}
-			contentVo.setMain_image_path(path);
+				file.transferTo(new File(uploadDir, filename));
+				contentVo.setMain_image_path("/upload/poster/" + filename);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return 0;
+			}
 		}
-		int r = vendorMapper.contentCreate(contentVo);
-		return r;
+		return vendorMapper.createContent(contentVo);
 	}
 	
 	@Override

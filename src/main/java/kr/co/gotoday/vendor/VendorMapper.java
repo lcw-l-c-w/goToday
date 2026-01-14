@@ -7,5 +7,5 @@ import kr.co.gotoday.content.ContentVo;
 @Mapper
 public interface VendorMapper {
 	
-	int contentCreate(ContentVo contentVo);
+	int createContent(ContentVo contentVo);
 }

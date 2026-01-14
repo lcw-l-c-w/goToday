@@ -4,12 +4,12 @@
 
 	<insert id="createContent" parameterType="kr.co.gotoday.content.ContentVo">
 		INSERT INTO content (
-			user_id, contentkind, category, location, title, description, reservation_type,
-			start_at, end_at, adult_price, teen_price, child_price, main_image_path, datail_description,
+			user_id, content_kind, category, location, title, description, reservation_type,
+			start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
 			is_active, is_delete, content_time, instagram_url, x_url, content_status
 		) VALUES (
-			#{user_id}, #{contentkind}, #{category}, #{location}, #{title}, #{description}, #{reservation_type},
-			#{start_at}, #{end_at}, #{adult_price}, #{teen_price}, #{child_price}, #{main_image_path}, #{datail_description},
+			#{user_id}, #{content_kind}, #{category}, #{location}, #{title}, #{description}, #{reservation_type},
+			#{start_at}, #{end_at}, #{adult_price}, #{teen_price}, #{child_price}, #{main_image_path}, #{detail_description},
 			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}
 		)
 	</insert>

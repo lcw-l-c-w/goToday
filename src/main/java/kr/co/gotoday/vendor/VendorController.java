@@ -1,17 +1,17 @@
 package kr.co.gotoday.vendor;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import kr.co.gotoday.content.ContentEnum;
 import kr.co.gotoday.content.ContentVo;
-import kr.co.gotoday.user.UserVo;
 
 @Controller
 public class VendorController {
@@ -38,13 +38,18 @@ public class VendorController {
 	public String createContent(
 			ContentVo contentVo, 
 			Model model, 
-			HttpServletRequest request
-			, MultipartFile file
+			HttpServletRequest request, 
+			@RequestParam("main_image_file")MultipartFile file
 			) {
 //		HttpSession sess = request.getSession();
 //		UserVo login = (UserVo)sess.getAttribute("loginSess");
 //		contentVo.setUser_id(login.getUser_id());
-		int r = vendorService.contentCreate(contentVo, file, request);
+		
+		contentVo.setUser_id(1); //임시 로그인
+		contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
+		contentVo.setIs_active(true);
+		contentVo.setIs_delete(false);
+		int r = vendorService.createContent(contentVo, file, request);
 		if(r > 0) {
 			model.addAttribute("cmd", "move");
 			model.addAttribute("msg", "정상적으로 등록되었습니다.");
