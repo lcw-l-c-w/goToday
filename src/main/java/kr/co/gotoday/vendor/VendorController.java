@@ -1,6 +1,9 @@
 package kr.co.gotoday.vendor;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.gotoday.content.ContentEnum;
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.user.UserVO;
 
 @Controller
 public class VendorController {
@@ -21,8 +26,8 @@ public class VendorController {
 	
 	//content 관리 페이지
 	@GetMapping("vendor/content_manage")
-	public String contentManage(Model model, ContentVO ContentVO) {
-		model.addAttribute("map", vendorService.list(ContentVO));
+	public String contentManage(Model model, ContentVO contentVo) {
+		model.addAttribute("map", vendorService.list(contentVo));
 		return "vendor/content_manage";
 	}
 	
@@ -36,20 +41,30 @@ public class VendorController {
 	//content 등록 처리
 	@PostMapping("/vendor/content_create")
 	public String createContent(
-			ContentVO ContentVO, 
+			ContentVO contentVo, 
+			ContentScheduleVO contentScheduleVO,
 			Model model, 
 			HttpServletRequest request, 
-			@RequestParam("main_image_file")MultipartFile file
+			@RequestParam("main_image_file")MultipartFile file,
+			@RequestParam(value="Time[]", required = false) List<String> timeList,
+			@RequestParam(value="total_ticket", required = false) Integer total_ticket
 			) {
-//		HttpSession sess = request.getSession();
-//		UserVo login = (UserVo)sess.getAttribute("loginSess");
-//		ContentVO.setUser_id(login.getUser_id());
+		HttpSession sess = request.getSession();
+		UserVO login = (UserVO)sess.getAttribute("loginSess");
+		if (login == null) {
+		    return "redirect:/member/login"; 
+		}
+		contentVo.setUser_id(login.getUser_id());
 		
-		ContentVO.setUser_id(1); //임시 로그인
-		ContentVO.setContent_status(ContentEnum.STATUS_REQUESTED.name());
-		ContentVO.setIs_active(true);
-		ContentVO.setIs_delete(false);
-		int r = vendorService.createContent(ContentVO, file, request);
+		contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
+		contentVo.setIs_active(true);
+		contentVo.setIs_delete(false);
+		int r = vendorService.createContent(contentVo, contentScheduleVO, file, request, timeList, total_ticket);
+		
+		if (contentScheduleVO != null && contentScheduleVO.getTotal_ticket() != null) {
+		    contentScheduleVO.setCurrent_ticket(contentScheduleVO.getTotal_ticket());
+		}
+		
 		if(r > 0) {
 			model.addAttribute("cmd", "move");
 			model.addAttribute("msg", "정상적으로 등록되었습니다.");

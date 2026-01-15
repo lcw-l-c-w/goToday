@@ -29,4 +29,5 @@ public class ContentVO {
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
     private int user_id;
+    private String place_tag;
 }
