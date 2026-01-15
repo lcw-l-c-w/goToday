@@ -1,9 +1,11 @@
 package kr.co.gotoday.content;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-public class ContentVo {
+import lombok.Data;
+
+@Data
+public class ContentVO {
 	private int content_id;
     private String content_kind; //CONTENT_POPUP, CONTENT_EXHIBITION, 둘다 아니면 NULL
     private String category; // 여러 카테고리가 있음 . parsing해서 꺼내올듯.
@@ -11,8 +13,8 @@ public class ContentVo {
     private String title;
     private String description;
     private String reservation_type;
-    private Timestamp start_at;
-    private Timestamp end_at;
+    private String  start_at;
+    private String  end_at;
     private int adult_price;
     private int teen_price;
     private int child_price;
@@ -26,4 +28,5 @@ public class ContentVo {
     private int admin_id;
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
+    private int user_id;
 }

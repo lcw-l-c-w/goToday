@@ -2,4 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.vendor.VendorMapper">
 
+	<insert id="createContent" parameterType="kr.co.gotoday.content.ContentVO">
+		INSERT INTO content (
+			user_id, content_kind, category, location, title, description, reservation_type,
+			start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
+			is_active, is_delete, content_time, instagram_url, x_url, content_status
+		) VALUES (
+			#{user_id}, #{content_kind}, #{category}, #{location}, #{title}, #{description}, #{reservation_type},
+			#{start_at}, #{end_at}, #{adult_price}, #{teen_price}, #{child_price}, #{main_image_path}, #{detail_description},
+			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}
+		)
+	</insert>
+
+
 </mapper>

@@ -3,7 +3,10 @@ package kr.co.gotoday.vendor;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class VendorVo {
+import lombok.Data;
+
+@Data
+public class VendorVO {
 	private int user_id;
     private String email;
     private int role; //0:유저 1:관리자
