@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -43,25 +41,16 @@ public class UserController {
     
     // 회원가입 1단계: 정보입력 폼
     @GetMapping("/member/register1")
-    public void registerUserStep1() {
-    
+    public String registerUserStep1(
+    		@RequestParam(required = false) Integer role,
+    		Model model) {
+    	model.addAttribute("role", role != null ? role : 0);
+    	return "/member/register1";
     }
     
     // 회원가입 1단계: 정보입력 처리
     @PostMapping("/member/register1")
-    public String registerUserStep1(HttpSession sess, UserVO vo, Model model) {
-
-//        boolean result = userService.registerUserInfo(vo);
-// 
-//        if (result) {
-//            sess.setAttribute("tempUser", vo);
-//            return "redirect:/member/register2";
-//        } else {
-//            model.addAttribute("msg", "회원가입 중 오류가 발생했습니다.");
-//            model.addAttribute("cmd", "back");
-//            return "common/return";
-//        }
-    	
+    public String registerUserStep1(HttpSession sess, UserVO vo, Model model) {	
     	boolean result = userService.registerUserInfo(vo);
 
         if (!result) {
@@ -73,15 +62,14 @@ public class UserController {
         sess.setAttribute("tempUser", vo);
 
         // 기업회원이면 register2 단계 건너뛰기
-        if (vo.getRole() == 1) { // 1 = 기업회원
-            // 관심사 없이 빈 리스트로 registerUserTags 호출 가능
+        if (vo.getRole() == 1) {
             List<UserTagVO> emptyTagList = new ArrayList<>();
             userService.registerUserTags(emptyTagList);
 
             // 세션 제거 후 register3로 이동
             sess.removeAttribute("tempUser");
             model.addAttribute("user", vo);
-            return "member/register3"; // 바로 완료 페이지
+            return "member/register3";
         }
 
         // 개인회원이면 기존 흐름 유지

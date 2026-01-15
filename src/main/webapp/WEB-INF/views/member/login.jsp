@@ -14,6 +14,11 @@ $(function () {
 
     $("input[name='role']").on("change", socialDisplay);
     socialDisplay();
+    
+    $("#btnRegister").on("click", function() {
+    	let role = $("input[name='role']:checked").val();
+    	location.href = "/gotoday/member/register1?role=" + role;
+    });
 });
 
 </script>
@@ -43,7 +48,8 @@ $(function () {
 	    <br>
 	    
 	    회원이 아니신가요?
-	    <a href="/gotoday/member/register1">SIGN IN</a>
+	    <button type="button" id="btnRegister">SIGN IN</button>
+	    <!-- <a href="/gotoday/member/register1">SIGN IN</a>  -->
 	    <br>
 	    
 	    <div id="socialLogin">

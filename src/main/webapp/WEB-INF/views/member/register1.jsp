@@ -10,30 +10,29 @@
 
 <script>
 $(function () {
-    function Display() {
+    function ChangeForm() {
         let role = $("input[name='role']:checked").val();
-        $("#socialLogin").css("display", role === "1" ? "none" : "block");
-        $("#vendorNo").css("display", role === "0" ? "none" : "block");
+        $("#vendorNo").toggle(role === "1");
         $("#nameLabel").text(role === "1" ? "등록자명" : "이름");
-    }
-    
- 	// 회원유형 선택 후 폼 초기화
-    function resetForm() {
-    	let role = $("input[name='role']:checked").val();
-    	
-        $("#frm")[0].reset();
-        $("input[name='role'][value='" + role + "']").prop("checked", true);
+
+        // 선택 변경 시 필드 초기화
+        $("#vendor_no").val('');
+        $("#name").val('');
+        $("#email_prefix").val('');
+        $("#email_domain").val('');
+        $("#password").val('');
+        $("#password_confirm").val('');
+        $("#birthday").val('');
+        $("#phone_number").val('');
+        $("input[name='gender']").prop("checked", false);
 
         emailChecked = false;
-        $("#emailCheckMsg").text("");
-
-        Display();
+        $("#emailCheckMsg").text('');
     }
 
-    // 회원유형 선택 라디오 변경 시
-    $("input[name='role']").on("change", resetForm);
-
-    Display();
+    $("input[name='role']").on("change", ChangeForm);
+ 	// 초기 load 시
+    ChangeForm(); 
 });
 
 let emailChecked = false;
@@ -100,16 +99,12 @@ function goSave() {
     	alert("전화번호를 입력해주세요.");
         return;
     }
-
-
     
     let birthdayRegex = /^[0-9]+$/;
     if(!birthdayRegex.test($("#birthday").val())) {
     	alert("생년월일은 숫자만 입력해주세요.");
     	return;
     }
-    	
-    	
     	
     $("#frm").submit();
 }
@@ -154,9 +149,7 @@ $(document).ready(function() {
 </head>
 
 <body>
-
 <h2>회원가입 - 정보입력</h2>
-
 <form id="frm"
       action="/gotoday/member/register1"
       method="POST">
@@ -164,8 +157,14 @@ $(document).ready(function() {
 	<p>
 		회원유형 선택
 		<br>
-		<label><input type="radio" id="user" name="role" value=0>개인 회원</label>
-        <label><input type="radio" id="vendor" name="role" value=1>기업 회원</label>
+		<label>
+		    <input type="radio" id="user" name="role" value="0" 
+		    	${role == 0 ? 'checked' : ''}>개인 회원
+		</label>
+		<label>
+		    <input type="radio" id="vendor" name="role" value="1"
+		    	${role == 1 ? 'checked' : ''}>기업 회원
+		</label>
 	</p>
     <!-- 서버로 실제 전달될 email -->
     <input type="hidden" name="email" id="email">
@@ -190,16 +189,19 @@ $(document).ready(function() {
         비밀번호 확인<br>
         <input type="password" id="password_confirm" name="password_confirm" >
     </p>
-	<p>
-		<div id="vendorNo">
+    
+	<p>		
+		<div id="vendorNo" style="display: ${role == 1 ? 'block' : 'none'}">
 			사업자등록번호<br>
 			<input type="text" id="vendor_no" name="vendor_no">
 		</div>
 	</p>
+	
     <p>
-	    <span id="nameLabel">이름</span><br>
+	    <span id="nameLabel">${role == 1 ? '등록자명' : '이름'}</span><br>
 	    <input type="text" id="name" name="name">
 	</p>
+	
     <p>
         생년월일<br>
         <input type="text" id="birthday" name="birthday" placeholder="YYYYMMDD">
