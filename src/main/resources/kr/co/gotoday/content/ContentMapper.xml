@@ -2,4 +2,60 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.content.ContentMapper">
 
+<sql id="contentCommonWhere">
+  c.is_delete = 0
+  AND c.is_active = 1
+  <if test="kind != null and kind != ''">
+    AND c.content_kind = #{kind}
+  </if>
+</sql>
+
+
+<select id="selectPopularContent" parameterType="int" resultType="kr.co.gotoday.content.MainContentViewDTO">
+  SELECT
+    c.content_id        AS contentId,
+    c.title             AS title,
+    c.main_image_path   AS main_image_path,
+    c.category          AS category,
+    c.location          AS location,
+    c.start_at          AS start_at,
+    c.end_at            AS end_at
+  FROM content c
+  LEFT JOIN (
+    SELECT content_id, COUNT(*) AS res_cnt
+    FROM reservation
+    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+      AND reservation_status IN ('PAID','CONFIRMED')  <!-- 실제 값으로 바꿔 -->
+    GROUP BY content_id
+  ) r ON r.content_id = c.content_id
+  LEFT JOIN (
+    SELECT content_id, COUNT(*) AS like_cnt
+    FROM content_like
+    GROUP BY content_id
+  ) l ON l.content_id = c.content_id
+  WHERE  
+  	<include refid="contentCommonWhere"/>
+    AND c.end_at >= NOW()
+  ORDER BY (COALESCE(r.res_cnt,0)*3 + COALESCE(l.like_cnt,0)) DESC,
+           c.start_at ASC
+  LIMIT #{limit}
+</select>
+<select id="selectUpcomingContent" parameterType="int" resultType="kr.co.gotoday.content.MainContentViewDTO">
+SELECT 
+	c.content_id		AS contentId,
+	c.title				AS title,
+	c.main_image_path	AS main_image_path,
+	c.category			AS category,
+	c.content_kind		AS content_kind,
+	c.location			AS location,
+	c.start_at			AS start_at,
+	c.end_at			AS end_at
+FROM content c
+WHERE    
+	<include refid="contentCommonWhere"/>
+	AND c.start_at > NOW()
+ORDER BY c.start_at ASC
+LIMIT #{limit}
+</select>
+
 </mapper>

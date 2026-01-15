@@ -2,6 +2,8 @@ package kr.co.gotoday.content;
 
 import java.util.List;
 
+import lombok.Data;
+@Data
 public class MainContentDTO {
 	// 메인홈페이지 + 팝업 + 전시 창 홈페이지 전용 요구사항
 	
