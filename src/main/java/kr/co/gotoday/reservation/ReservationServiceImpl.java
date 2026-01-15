@@ -5,12 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
 
 @Service
 public class ReservationServiceImpl implements ReservationService{
 	@Autowired
 	ReservationMapper reservationMapper;
+	@Autowired
+	PaymentMapper paymentMapper;
 
 	@Override
 	public int calculate(ReservationDTO reservationDTO, ContentVO contentVO) {
@@ -56,9 +59,11 @@ public class ReservationServiceImpl implements ReservationService{
 			paymentVO.setAmount_price(amount);
 			paymentVO.setReservation_id(reservationVO.getReservation_id());
 			paymentVO.setPayment_status("COMPLETED");
+			paymentVO.setPayment_method(paymentKey);
+			paymentVO.setRefund_status("NOTREFUND");
 			
-			PaymentVO paymentResult = reservationMapper.createPayment(paymentVO);//			
-			if (paymentResult == null ) {
+			int paymentResult = paymentMapper.createPayment(paymentVO);//			
+			if (paymentResult ==0) {
 				throw new Exception("결제 정보 저장에 실패했습니다.");
 			}
 			// 5. 저장된 예약 정보 반환

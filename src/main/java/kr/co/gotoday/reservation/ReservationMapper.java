@@ -8,5 +8,5 @@ import kr.co.gotoday.payment.PaymentVO;
 public interface ReservationMapper {
 	int createReservation(ReservationVO reservationVO);
 	ReservationVO findByReservationId(int reservation_id);
-	PaymentVO createPayment(PaymentVO paymentVO);
+	int createPayment(PaymentVO paymentVO);
 }
