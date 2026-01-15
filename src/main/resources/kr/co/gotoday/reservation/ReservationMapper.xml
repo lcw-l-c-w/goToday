@@ -18,17 +18,6 @@
 		</selectKey>
 	</insert>
 	
-	<insert id="createPayment" parameterType="kr.co.gotoday.payment.PaymentVO">
-		INSERT INTO payment (
-		    payment_method, payment_status, amount_price, paid_at, 
-		    reservation_id, refund_status, payment_key, order_key
-		)
-		VALUES (
-		    #{payment_method}, #{payment_status}, #{amount_price}, CURRENT_TIMESTAMP(),
-		    #{reservation_id}, #{refund_status}, #{payment_key}, #{order_key}
-		)
-	</insert>
-	
 	<select id="findByReservationId" parameterType="int"  resultType="kr.co.gotoday.reservation.ReservationVO">
 	    SELECT * FROM reservation 
 	    WHERE reservation_id = #{reservation_id}

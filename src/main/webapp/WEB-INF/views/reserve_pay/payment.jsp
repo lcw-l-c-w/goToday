@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+1<%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -6,6 +6,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>티켓 결제</title>
+    <!-- 토스페이먼츠 SDK -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
 </head>
 <body>
     <!-- ===================== HEADER ===================== -->
@@ -32,15 +34,15 @@
     <main>
         <!-- 상단 타이틀(콘텐츠명/기간) -->
         <section aria-label="콘텐츠 타이틀">
-            <h1>무한도전 특별전 2026-01-01(목) ~ 2026-02-28(토)</h1>
+            <h1>${contentVo.title} 2026-01-01(목) ~ 2026-02-28(토)</h1>
         </section>
 
         <!-- 결제 폼 -->
-        <form action="#" method="post">
-            <!-- 서버 연동용 hidden (나중에 값 세팅) -->
-            <input type="hidden" name="contentId" value="" />
-            <input type="hidden" name="scheduleId" value="" />
-            <input type="hidden" name="reservationId" value="" />
+        <form id="paymentForm" action="#" method="post">
+            <!-- 서버 연동용 hidden -->
+            <input type="hidden" name="contentId" value="${reservation.content_id}" />
+            <input type="hidden" name="orderId" value="${paymentDTO.orderId}" />
+            <input type="hidden" name="totalPrice" value="${reservation.total_price}" />
 
             <!-- ===================== 티켓 결제 / 주문 상세 ===================== -->
             <section aria-label="티켓 결제">
@@ -50,73 +52,29 @@
                     <summary>티켓 주문 상세</summary>
 
                     <div>
-                        <!-- 주문 정보(나중에 서버 바인딩/반복) -->
                         <p>
-                            <strong name="contentTitle"
-                                >무한 도전 특별전</strong
-                            ><br />
-                            <span name="contentPlace"
-                                >더서울라이티움(위치)</span
-                            >
+                            <strong name="contentTitle">${contentVo.title}</strong><br />
+                            <span name="contentPlace">더서울라이티움(위치)</span>
                         </p>
 
-                        <!-- 티켓 라인(나중에 반복 가능) -->
                         <div>
-                            <p><strong>입장권</strong> <span>1</span></p>
+                            <p><strong>입장권</strong></p>
 
-                            <!-- 티켓 식별/가격/수량 -->
-                            <input
-                                type="hidden"
-                                name="ticketTypeId"
-                                value=""
-                            />
-                            <input
-                                type="hidden"
-                                name="ticketName"
-                                value=""
-                            />
+                            <div>
+                                <label>성인: ${reservation.adult_qty}매</label>
+                                <label>청소년: ${reservation.teen_qty}매</label>
+                                <label>어린이: ${reservation.child_qty}매</label>
+                            </div>
 
                             <div>
                                 <label>
-                                    가격정보(예: 성인(만 19세 이상))
-                                    <input
-                                        type="hidden"
-                                        name="ticketLabel"
-                                        value=""
-                                    />
+                                    단가: ${contentVo.adult_price}원
                                 </label>
                             </div>
 
                             <div>
                                 <label>
-                                    단가
-                                    <input
-                                        type="text"
-                                        name="ticketUnitPrice"
-                                        value=""
-                                    />
-                                </label>
-                            </div>
-
-                            <div>
-                                <label>
-                                    수량
-                                    <input
-                                        type="text"
-                                        name="ticketQty"
-                                        value=""
-                                    />
-                                </label>
-                            </div>
-
-                            <div>
-                                <label>
-                                    소계(티켓금액)
-                                    <input
-                                        type="text"
-                                        name="ticketSubtotal"
-                                        value=""
-                                    />
+                                    소계: ${reservation.total_price}원
                                 </label>
                             </div>
                         </div>
@@ -133,40 +91,32 @@
                 <div>
                     <label>
                         예약자
-                        <input type="text" name="receiverName" value="" />
+                        <input type="text" name="receiver_name" value="${receiver_info.name}" />
                     </label>
                 </div>
 
                 <div>
                     <label>
                         생년월일
-                        <input
-                            type="text"
-                            name="receiverBirth"
-                            value=""
-                            placeholder="YYYY-MM-DD"
-                        />
+                        <input type="text" name="receiver_birth" value="${receiver_info.birthday}" placeholder="YYYY-MM-DD" />
                     </label>
                 </div>
 
                 <div>
                     <label>
                         이메일
-                        <input type="text" name="receiverEmail" value="" />
+                        <input type="text" name="receiver_email" value="${receiver_info.email}" />
                     </label>
                 </div>
 
                 <div>
                     <label>
                         휴대폰
-                        <input type="text" name="receiverPhone" value="" />
+                        <input type="text" name="receiver_phone" value="${receiver_info.phone_number}" />
                     </label>
                 </div>
 
-                <p>
-                    티켓 수령 및 본인 확인을 위해 정확한 정보를
-                    입력해주세요.
-                </p>
+                <p>티켓 수령 및 본인 확인을 위해 정확한 정보를 입력해주세요.</p>
             </section>
 
             <hr />
@@ -177,20 +127,12 @@
 
                 <div>
                     <label>
-                        <input
-                            type="radio"
-                            name="deliveryMethod"
-                            value="ONSITE"
-                        />
+                        <input type="radio" name="reservation_type" value="onsite" checked />
                         현장수령
                     </label>
 
                     <label>
-                        <input
-                            type="radio"
-                            name="deliveryMethod"
-                            value="MOBILE"
-                        />
+                        <input type="radio" name="reservation_type" value="advance" />
                         모바일 티켓
                     </label>
                 </div>
@@ -200,21 +142,15 @@
 
             <hr />
 
-            <!-- ===================== 결제 수단 ===================== -->
+            <!-- ===================== 결제 수단 (토스페이먼츠 위젯) ===================== -->
             <section aria-label="결제 수단">
                 <h2>결제 수단</h2>
 
-                <!-- 토스페이먼츠 자리(나중에 JS SDK 붙일 자리) -->
-                <div>
-                    <p>토스 페이먼츠</p>
-                    <input
-                        type="hidden"
-                        name="paymentProvider"
-                        value="TOSS"
-                    />
-                    <input type="hidden" name="paymentMethod" value="" />
-                    <p>(결제 위젯/버튼이 들어갈 영역 - 나중에 연결)</p>
-                </div>
+                <!-- 토스페이먼츠 결제 위젯 영역 -->
+                <div id="payment-method"></div>
+
+                <!-- 토스페이먼츠 약관 동의 영역 -->
+                <div id="agreement"></div>
             </section>
 
             <hr />
@@ -232,30 +168,20 @@
 
                 <div>
                     <label>
-                        <input
-                            type="checkbox"
-                            name="agreeCancelPolicy"
-                            value="Y"
-                        />
+                        <input type="checkbox" name="agreeCancelPolicy" value="Y" />
                         (필수) 취소 규정 안내
                     </label>
                 </div>
 
                 <div>
                     <label>
-                        <input
-                            type="checkbox"
-                            name="agreePrivacy"
-                            value="Y"
-                        />
+                        <input type="checkbox" name="agreePrivacy" value="Y" />
                         (필수) 개인정보 이용/제공 동의
                     </label>
                 </div>
 
                 <div>
-                    <a href="#" name="linkThirdParty"
-                        >개인정보 제3자 제공 안내</a
-                    >
+                    <a href="#" name="linkThirdParty">개인정보 제3자 제공 안내</a>
                 </div>
             </section>
 
@@ -267,21 +193,107 @@
 
                 <div>
                     <p>티켓 금액</p>
-                    <input type="text" name="ticketAmount" value="" />
+                    <span id="ticketAmount">${reservation.total_price}원</span>
                 </div>
 
                 <div>
                     <p>최종 결제금액</p>
-                    <input type="text" name="finalAmount" value="" />
+                    <span id="finalAmount">${reservation.total_price}원</span>
                 </div>
 
                 <div>
-                    <button type="submit" name="btnPay">
-                        총 000원 결제하기
+                    <button type="button" id="payment-button">
+                        총 ${reservation.total_price}원 결제하기
                     </button>
                 </div>
             </section>
         </form>
     </main>
+
+    <!-- ===================== 토스페이먼츠 결제 스크립트 ===================== -->
+    <script>
+        main();
+
+        async function main() {
+            const button = document.getElementById("payment-button");
+
+            // 결제위젯 초기화
+            const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+            const tossPayments = TossPayments(clientKey);
+
+            const customerKey = "xcvul8W8I_rktuXVZPPHS";
+            const widgets = tossPayments.widgets({
+                customerKey,
+            });
+
+            // 결제 금액 설정
+            const amount = parseInt("${paymentDTO.amount}") || 0;
+
+            await widgets.setAmount({
+                currency: "KRW",
+                value: amount,
+            });
+
+            // 결제 위젯 렌더링
+            await Promise.all([
+                widgets.renderPaymentMethods({
+                    selector: "#payment-method",
+                    variantKey: "DEFAULT",
+                }),
+                widgets.renderAgreement({
+                    selector: "#agreement",
+                    variantKey: "AGREEMENT"
+                }),
+            ]);
+
+            // '결제하기' 버튼 클릭
+            button.addEventListener("click", async function () {
+                // 수령인 정보 가져오기
+                const receiverName = document.querySelector('input[name="receiver_name"]').value;
+                const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
+                const receiverPhone = document.querySelector('input[name="receiver_phone"]').value;
+                const receiverEmail = document.querySelector('input[name="receiver_email"]').value;
+                const receiveType = document.querySelector('input[name="receive_type"]:checked').value;
+
+                // 1. 먼저 서버에 예약 정보 저장 요청 (POST /reserve/payment.do)
+                try {
+                    const response = await fetch("${pageContext.request.contextPath}/reserve/payment.do", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({
+                            receiver_name: receiverName,
+                            receiver_birth: receiverBirth,
+                            receiver_phone: receiverPhone,
+                            receive_type: receiveType
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    // 2. 서버 응답이 성공이면 토스페이먼츠 결제 요청
+                    if (result.success) {
+                        console.log("예약 정보 저장 성공, 토스 결제 요청 시작");
+
+                        await widgets.requestPayment({
+                            orderId: result.orderId,
+                            orderName: result.orderName,
+                            customerName: result.customerName || receiverName,
+                            customerEmail: receiverEmail,
+
+                            successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/success.do",
+                            failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
+                        });
+                    } else {
+                        alert("예약 처리 실패: " + result.msg);
+                    }
+                } catch (error) {
+                    console.error("예약 요청 오류:", error);
+                    alert("예약 처리 중 오류가 발생했습니다.");
+                }
+            });
+        }
+    </script>
 </body>
 </html>
