@@ -94,6 +94,21 @@ public class VendorServiceImpl implements VendorService {
 		return map;
 	}
 	
+	@Override
+	public Map<String, Object> getFilterList(int user_id, String keyword, String status) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("user_id", user_id);
+		param.put("keyword", keyword);
+		param.put("status", status);
+		
+		List<ContentVO> list = vendorMapper.selectContentList(param);
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("list", list);
+		return result;
+		
+	}
+	
 	
 
 }
