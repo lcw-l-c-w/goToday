@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface ContentMapper {
 
 	//random sql
-	List<ContentVo> randomContent(MainContentDTO mcd);	
+	List<MainContentViewDTO> randomContent(MainContentDTO mcd);	
 	//recommand sql
-	List<ContentVo> recommandContent(MainContentDTO mcd);
+	List<MainContentViewDTO> hotContent(MainContentDTO mcd);
 }
