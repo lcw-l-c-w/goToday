@@ -30,18 +30,9 @@ public class ReservationServiceImpl implements ReservationService{
 
 	@Override
 	@Transactional
-	public ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, String paymentKey, String orderId, int amount) {
+	public ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, PaymentVO paymentVO) {
 		
 		try {
-			// 1. 토스페이먼츠 API로 결제 최종 승인
-//			boolean paymentConfirmed = paymentService.confirmPaymentWithToss(
-//					paymentKey,
-//					orderId,
-//					amount
-//				);
-//			if (!paymentConfirmed) {
-//				throw new PaymentException("토스페이먼츠 결제 승인에 실패했습니다.");
-//			}
 			
 			// 2. 예약 상태를 CONFIRMED로 변경
 			reservationVO.setReservation_status("RESERVED");
@@ -51,16 +42,6 @@ public class ReservationServiceImpl implements ReservationService{
 			if(reservationResult <= 0) {
 				throw new Exception("에약 정보 저장에 실패했습니다.");
 			}
-			
-			// 결제 정보 저장
-			PaymentVO paymentVO = new PaymentVO();
-			paymentVO.setPayment_key(paymentKey);
-			paymentVO.setOrder_key(orderId);
-			paymentVO.setAmount_price(amount);
-			paymentVO.setReservation_id(reservationVO.getReservation_id());
-			paymentVO.setPayment_status("COMPLETED");
-			paymentVO.setPayment_method(paymentKey);
-			paymentVO.setRefund_status("NOTREFUND");
 			
 			int paymentResult = paymentMapper.createPayment(paymentVO);//			
 			if (paymentResult ==0) {
@@ -79,5 +60,6 @@ public class ReservationServiceImpl implements ReservationService{
 	public ReservationVO findByReservationId(int reservation_id) {
 		return reservationMapper.findByReservationId(reservation_id);
 	}
+
 
 }

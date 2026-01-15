@@ -71,7 +71,7 @@
           widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
         ]);
 
-        // '결제하기' 버튼 클릭
+        <!--// '결제하기' 버튼 클릭
         button.addEventListener("click", async function () {
           try {
             // 1. 먼저 서버에 결제 요청 (PENDING 상태로 예약 저장)
@@ -111,7 +111,21 @@
             alert("결제 요청 중 오류가 발생했습니다.");
           }
         });
-      }
-    </script>
+      }-->
+      
+   // '결제하기' 버튼 클릭
+      button.addEventListener("click", async function () {
+        await widgets.requestPayment({
+          orderId: "${payInfo.orderId}",
+          orderName: "${payInfo.orderName}",
+          customerName: "${payInfo.customerName}",
+          customerEmail: "${payInfo.customerEmail}",
+          
+          successUrl: window.location.origin + "/project/success",
+          failUrl: window.location.origin + "/project/fail",
+        });
+      });
+    }
+  </script>
   </body>
 </html>

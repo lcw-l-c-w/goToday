@@ -282,8 +282,8 @@
                             customerName: result.customerName || receiverName,
                             customerEmail: receiverEmail,
 
-                            successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve_pay/success.do",
-                            failUrl: window.location.origin + "${pageContext.request.contextPath}/payments/fail.do",
+                            successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/success.do",
+                            failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
                         });
                     } else {
                         alert("예약 처리 실패: " + result.msg);

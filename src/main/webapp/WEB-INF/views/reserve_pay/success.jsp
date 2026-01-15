@@ -3,18 +3,30 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
+    <title>결제 처리 중</title>
+    <style>
+      body { font-family: 'Malgun Gothic', sans-serif; margin: 40px; text-align: center; }
+      .loading { font-size: 18px; color: #666; }
+      .success { color: #27ae60; }
+      .error { color: #e74c3c; }
+      .result-box { margin-top: 30px; padding: 20px; border-radius: 8px; }
+      .result-box.success { background: #d5f5e3; }
+      .result-box.error { background: #fadbd8; }
+    </style>
   </head>
   <body>
-    <h2>결제 성공</h2>
-    <p id="paymentKey"></p>
-    <p id="orderId"></p>
-    <p id="amount"></p>
+    <h2 id="title" class="loading">결제 승인 처리 중...</h2>
+    <div id="result" class="result-box" style="display:none;">
+      <p id="message"></p>
+      <p id="reservationCode"></p>
+    </div>
 
     <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const paymentKey = urlParams.get("paymentKey");
-      const orderId = urlParams.get("orderId");
-      const amount = urlParams.get("amount");
+      // 서버에서 전달받은 토스 파라미터
+      const paymentKey = "${paymentKey}";
+      const orderId = "${orderId}";
+      const amount = "${amount}";
+      const contextPath = "${pageContext.request.contextPath}";
 
       async function confirm() {
         const requestData = {
@@ -23,34 +35,54 @@
           amount: amount,
         };
 
-        const response = await fetch("/project/confirm", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
+        try {
+          const response = await fetch(contextPath + "/reserve/confirm", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          });
 
-        const json = await response.json();
+          const json = await response.json();
+          const titleEl = document.getElementById("title");
+          const resultEl = document.getElementById("result");
+          const messageEl = document.getElementById("message");
+          const codeEl = document.getElementById("reservationCode");
 
-        if (!response.ok) {
-          // 결제 실패 시 fail.jsp로 이동
-          console.log(json);
-          window.location.href = `/fail?message=${json.message}&code=${json.code}`;
-          return;
+          if (json.success) {
+            // 성공
+            titleEl.textContent = "결제가 완료되었습니다!";
+            titleEl.className = "success";
+            resultEl.className = "result-box success";
+            resultEl.style.display = "block";
+            messageEl.textContent = json.msg;
+            codeEl.textContent = "예약코드: " + json.reservationCode;
+          } else {
+            // 실패
+            titleEl.textContent = "결제 처리 실패";
+            titleEl.className = "error";
+            resultEl.className = "result-box error";
+            resultEl.style.display = "block";
+            messageEl.textContent = json.msg;
+
+            // 3초 후 fail 페이지로 이동
+            setTimeout(function() {
+              window.location.href = contextPath + "/reserve/fail.do?message=" + encodeURIComponent(json.msg);
+            }, 3000);
+          }
+        } catch (error) {
+          console.error("결제 승인 오류:", error);
+          document.getElementById("title").textContent = "결제 처리 중 오류 발생";
+          document.getElementById("title").className = "error";
+
+          setTimeout(function() {
+            window.location.href = contextPath + "/reserve/fail.do?message=" + encodeURIComponent("결제 처리 중 오류가 발생했습니다.");
+          }, 3000);
         }
-
-        // 결제 성공 시 화면 표시
-        console.log(json);
-        const paymentKeyElement = document.getElementById("paymentKey");
-        const orderIdElement = document.getElementById("orderId");
-        const amountElement = document.getElementById("amount");
-
-        orderIdElement.textContent = "주문번호: " + json.orderId;
-        amountElement.textContent = "결제 금액: " + json.totalAmount; // 응답 필드명 확인 필요 (보통 totalAmount)
-        paymentKeyElement.textContent = "paymentKey: " + json.paymentKey;
       }
-      
+
+      // 페이지 로드 시 자동 실행
       confirm();
     </script>
   </body>

@@ -1,22 +1,35 @@
 package kr.co.gotoday.reservation;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.payment.TossInputDTO;
+import kr.co.gotoday.payment.TossOutputDTO;
 import kr.co.gotoday.user.UserVO;
 
 
@@ -67,6 +80,8 @@ public class ReservationController {
 	public String selectQuantity(HttpSession session, ReservationDTO dto, Model model) {
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
 		if (reservation == null) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "예약정보가 누락되었습니다.");
 		    return "redirect:/reserve/schedule.do";
 		}
 		reservation.setAdult_qty(dto.getAdult_qty());
@@ -78,6 +93,7 @@ public class ReservationController {
 		contentVO.setAdult_price(1);
 		contentVO.setTeen_price(12000);
 		contentVO.setChild_price(8000);
+		
 
 		int total_price = reservationService.calculate(reservation, contentVO);
 		reservation.setTotal_price(total_price);
@@ -92,6 +108,8 @@ public class ReservationController {
 	public String showPaymentForm(HttpSession session, Model model){
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
 		if (reservation == null) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "예약정보가 누락되었습니다.");
 		    return "redirect:/reserve/schedule.do";
 		}
 		//스케줄 관련 세션 정보를 예약 정보로 모델에 저장
@@ -107,7 +125,7 @@ public class ReservationController {
 		model.addAttribute("contentVo",contentVO);
 
 		//기본적으로 세션에 있는 유저의 정보를 가져다가 수령인 란에 저장하기 위해 정보를 모델에 저장
-		UserVO userInfo = (UserVO)session.getAttribute("userVo");
+		UserVO userInfo = (UserVO)session.getAttribute("loginSess");
 
 		// [테스트용] 로그인 안 된 경우 임시 사용자 정보 생성
 		if (userInfo == null) {
@@ -141,7 +159,7 @@ public class ReservationController {
 		return "reserve_pay/payment";
 	}
 	
-	//결제 요청 -> jsp에서 ajax로 호출  - peding으로 저장한 후 json응답 보내주기
+	//결제하기 버튼 누르면 여기로 와서 임시예약정보 세션에 저장
 	@PostMapping("/reserve/payment.do")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> payment(
@@ -160,10 +178,11 @@ public class ReservationController {
 				return ResponseEntity.badRequest().body(result);
 			}
 			
-			//reservation_type 지정
+			//[테스트] reservation_type 지정
 			reservationVO.setReservation_type("onsite");
-			// Session 데이터를 VO로 복사
+			//예약 날짜 : 날짜+시간대
 			String reserved_for_at = reservation.getReserved_for_at() +" "+ reservation.getTime_zone();
+			
 			reservationVO.setReserved_for_at(reserved_for_at);
 			reservationVO.setAdult_qty(reservation.getAdult_qty());
 			reservationVO.setTeen_qty(reservation.getTeen_qty());
@@ -182,11 +201,8 @@ public class ReservationController {
 			reservationVO.setReceiver_birth(reservationVO.getReceiver_birth());
 			reservationVO.setReceiver_phone(reservationVO.getReceiver_phone());
 			
-			System.out.println(reservationVO.getReceiver_birth());
-			
-			UserVO userVo = (UserVO) session.getAttribute("userVO");
-//			reservationVO.setUser_id(userVo.getUser_id());
-			reservationVO.setUser_id(1);
+			UserVO userVo = (UserVO) session.getAttribute("loginSess");
+			reservationVO.setUser_id(userVo.getUser_id());
 
 			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
 			session.setAttribute("pendingReservation", reservationVO);
@@ -212,70 +228,147 @@ public class ReservationController {
 		
 	}
 	
-	//토스 페이먼츠 결제 성공 콜백 -> 최종확인
-	@GetMapping("reserve_pay/success.do")
+	//토스 페이먼츠 결제 성공 콜백 -> success.jsp 렌더링 (실제 승인은 /reserve/confirm에서 처리)
+	@GetMapping("/reserve/success.do")
 	public String paymentSuccess(
 			@RequestParam String paymentKey,
 			@RequestParam String orderId,
 			@RequestParam int amount,
-			HttpSession session,
 			Model model) {
-		
-		try {
-			ReservationVO pendingReservation = (ReservationVO) session.getAttribute("pendingReservation");
-			if (pendingReservation == null ) {
-				model.addAttribute("msg","예약 정보 누락");
-				model.addAttribute("status", "failed");
-				return "reserve_pay/payment_fail"; //실패 페이지로 이동
-			}
-			
-			//가격 검증 -> 프론트 단에서 넘어오는 가격은 변동 될 수 있는 정보니 세션에 저장된 값과 동일한지 비교
-			if (pendingReservation.getTotal_price() != amount ) {
-				model.addAttribute("msg","결제 금액이 일치하지 않습니다");
-				model.addAttribute("status", "failed");
-				return "reserve_pay/payment_fail"; //실패 페이지로 이동
-			}
-			
-			ReservationVO result = reservationService.createReservationWithPaymentent(
-				pendingReservation,
-				paymentKey, 
-				orderId, 
-				amount);
-			
-			if (result != null) {
-				// 성공 시 예약 정보를 모델에 추가
-//				model.addAttribute("reservation", pendingReservation);
-//				model.addAttribute("reservationCode", pendingReservation.getReservation_code());
-				
-				// Session 정리
-				session.removeAttribute("schedule");
-				session.removeAttribute("pendingReservation");
-				session.removeAttribute("orderId");
-				
-				// 예약 완료 페이지로 이동
-				return "reserve_pay/success";
-				
-			} else {
-				model.addAttribute("msg", "예약 저장에 실패했습니다.");
-				model.addAttribute("status", "failed");
-				return "reserve_pay/fail";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			model.addAttribute("msg", "서버 오류가 발생: " + e.getMessage());
-			model.addAttribute("status", "failed");
-			return "reserve_pay/fail";
-		}
+
+		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
+		model.addAttribute("paymentKey", paymentKey);
+		model.addAttribute("orderId", orderId);
+		model.addAttribute("amount", amount);
+
+		return "reserve_pay/success";
 	}
 
 	//토스페이먼츠에서 결제 실패 콜백 
-	@GetMapping("/payments/fail.do")
+	@GetMapping("/reserve/fail.do")
 	public String paymentFail(@RequestParam String message, Model model) {
 		model.addAttribute("msg", message);
-		return "reserve_pay/payment_fail";
+		return "reserve_pay/fail";
 	}
-	
-	
+
+    
+	//토스 결제 승인 API (success.jsp에서 호출)
+	@PostMapping("/reserve/confirm")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> confirmPayment(
+			@RequestBody String jsonBody,
+			HttpSession session) {
+
+		Map<String, Object> response = new HashMap<>();
+		JSONParser parser = new JSONParser();
+		String orderId;
+		String amountStr;
+		String paymentKey;
+		int amount;
+
+		try {
+			// 1. 요청 데이터 파싱
+			JSONObject requestData = (JSONObject) parser.parse(jsonBody);
+			paymentKey = (String) requestData.get("paymentKey");
+			orderId = (String) requestData.get("orderId");
+			amountStr = (String) requestData.get("amount");
+			amount = Integer.parseInt(amountStr);
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("msg", "요청 데이터 파싱 오류");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		// 2. 세션에서 예약 정보 확인
+		ReservationVO pendingReservation = (ReservationVO) session.getAttribute("pendingReservation");
+		if (pendingReservation == null) {
+			response.put("success", false);
+			response.put("msg", "예약 정보가 없습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		// 3. 금액 검증
+		if (pendingReservation.getTotal_price() != amount) {
+			response.put("success", false);
+			response.put("msg", "결제 금액이 일치하지 않습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		try {
+			// 4. 토스페이먼츠 승인 API 호출
+			JSONObject obj = new JSONObject();
+			obj.put("orderId", orderId);
+			obj.put("amount", amountStr);
+			obj.put("paymentKey", paymentKey);
+
+			String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+			Base64.Encoder encoder = Base64.getEncoder();
+			byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+			String authorizations = "Basic " + new String(encodedBytes);
+
+			URL url = new URL("https://api.tosspayments.com/v1/payments/confirm");
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("Authorization", authorizations);
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestMethod("POST");
+			connection.setDoOutput(true);
+
+			OutputStream outputStream = connection.getOutputStream();
+			outputStream.write(obj.toString().getBytes("UTF-8"));
+
+			int code = connection.getResponseCode();
+			boolean isSuccess = code == 200;
+
+			InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
+			Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
+			JSONObject tossResponse = (JSONObject) parser.parse(reader);
+			responseStream.close();
+
+			// 5. 토스 승인 실패 시
+			if (!isSuccess) {
+				response.put("success", false);
+				response.put("msg", "토스 결제 승인 실패: " + tossResponse.get("message"));
+				return ResponseEntity.status(code).body(response);
+			}
+
+			// 6. 토스 승인 성공 → DB 저장
+
+			PaymentVO paymentVO = new PaymentVO();
+			paymentVO.setPayment_key((String) tossResponse.get("paymentKey"));
+			paymentVO.setOrder_key((String) tossResponse.get("orderId"));
+			paymentVO.setPayment_method((String) tossResponse.get("method"));
+			paymentVO.setPayment_status((String) tossResponse.get("status")); // "DONE"
+			
+			ReservationVO reservationVO = (ReservationVO) session.getAttribute("pendingReservation");
+			reservationVO.setReservation_status("DONE");
+			
+			ReservationVO result = reservationService.createReservationWithPaymentent(
+					reservationVO,
+					paymentVO);
+
+			if (result != null) {
+				// 세션 정리
+				session.removeAttribute("schedule");
+				session.removeAttribute("pendingReservation");
+				session.removeAttribute("paymentDTO");
+
+				response.put("success", true);
+				response.put("msg", "예약이 완료되었습니다.");
+				response.put("reservationCode", result.getReservation_code());
+				return ResponseEntity.ok(response);
+			} else {
+				response.put("success", false);
+				response.put("msg", "예약 저장에 실패했습니다.");
+				return ResponseEntity.status(500).body(response);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("msg", "서버 오류: " + e.getMessage());
+			return ResponseEntity.status(500).body(response);
+		}
+	}
 	
 	
 	
