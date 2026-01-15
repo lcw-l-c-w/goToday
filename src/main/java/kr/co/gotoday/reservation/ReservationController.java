@@ -324,6 +324,10 @@ public class ReservationController {
 			JSONObject tossResponse = (JSONObject) parser.parse(reader);
 			responseStream.close();
 
+			if (code != 200) {
+			    System.out.println(code);
+			}
+			
 			// 5. 토스 승인 실패 시
 			if (!isSuccess) {
 				response.put("success", false);

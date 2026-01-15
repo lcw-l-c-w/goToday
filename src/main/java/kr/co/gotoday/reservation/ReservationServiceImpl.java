@@ -39,10 +39,11 @@ public class ReservationServiceImpl implements ReservationService{
 			
 			// 예약 정보 저장
 			int reservationResult = reservationMapper.createReservation(reservationVO);
-			if(reservationResult <= 0) {
+			if(reservationResult <= 0 ) {
 				throw new Exception("에약 정보 저장에 실패했습니다.");
 			}
 			
+			paymentVO.setReservation_id(reservationVO.getReservation_id());
 			int paymentResult = paymentMapper.createPayment(paymentVO);//			
 			if (paymentResult ==0) {
 				throw new Exception("결제 정보 저장에 실패했습니다.");
