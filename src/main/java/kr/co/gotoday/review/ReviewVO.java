@@ -2,7 +2,10 @@ package kr.co.gotoday.review;
 
 import java.sql.Timestamp;
 
-public class ReviewVo {
+import lombok.Data;
+
+@Data
+public class ReviewVO {
 	private int review_id;
     private String content;
     private int rating;
