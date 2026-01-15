@@ -9,6 +9,33 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
+$(function () {
+    function Display() {
+        let role = $("input[name='role']:checked").val();
+        $("#socialLogin").css("display", role === "1" ? "none" : "block");
+        $("#vendorNo").css("display", role === "0" ? "none" : "block");
+        $("#nameLabel").text(role === "1" ? "등록자명" : "이름");
+    }
+    
+ 	// 회원유형 선택 후 폼 초기화
+    function resetForm() {
+    	let role = $("input[name='role']:checked").val();
+    	
+        $("#frm")[0].reset();
+        $("input[name='role'][value='" + role + "']").prop("checked", true);
+
+        emailChecked = false;
+        $("#emailCheckMsg").text("");
+
+        Display();
+    }
+
+    // 회원유형 선택 라디오 변경 시
+    $("input[name='role']").on("change", resetForm);
+
+    Display();
+});
+
 let emailChecked = false;
 
 function goSave() {
@@ -16,12 +43,16 @@ function goSave() {
     let emailDomain = $("#email_domain").val();
     let email = emailPrefix + "@" + emailDomain;
 
+    if(!$("input[name='role']:checked").val()) {
+    	alert("회원유형을 선택해주세요.");
+        return;
+    }
+    
     if (emailPrefix === '' || emailDomain === '') {
         alert("이메일을 입력해주세요");
         return;
     }
 
- 	// 중복확인 여부 체크
     if (!emailChecked) {
         alert("이메일 중복확인을 해주세요");
         return;
@@ -54,6 +85,12 @@ function goSave() {
         return;
     }
     
+    let phoneRegex = /^[0-9]+$/;
+    if(!phoneRegex.test($("#phone_number").val())) {
+		alert("전화번호는 숫자만 입력해주세요.")
+		return;
+    }
+    
     if(!$("input[name='gender']:checked").val()) {
     	alert("성별을 선택해주세요.");
         return;
@@ -64,6 +101,16 @@ function goSave() {
         return;
     }
 
+
+    
+    let birthdayRegex = /^[0-9]+$/;
+    if(!birthdayRegex.test($("#birthday").val())) {
+    	alert("생년월일은 숫자만 입력해주세요.");
+    	return;
+    }
+    	
+    	
+    	
     $("#frm").submit();
 }
 
@@ -71,7 +118,6 @@ function emailCheck() {
     let email = $("#email_prefix").val() + "@" + $("#email_domain").val();
 
     if ($("#email_prefix").val() === '' || $("#email_domain").val() === '') {
-        // alert("이메일을 입력해주세요");
         $("#emailCheckMsg").text("이메일을 입력해주세요");
         return;
     }
@@ -115,6 +161,12 @@ $(document).ready(function() {
       action="/gotoday/member/register1"
       method="POST">
 
+	<p>
+		회원유형 선택
+		<br>
+		<label><input type="radio" id="user" name="role" value=0>개인 회원</label>
+        <label><input type="radio" id="vendor" name="role" value=1>기업 회원</label>
+	</p>
     <!-- 서버로 실제 전달될 email -->
     <input type="hidden" name="email" id="email">
 
@@ -123,6 +175,7 @@ $(document).ready(function() {
         <input type="text" id="email_prefix" name="email_prefix">
         @
         <input type="text" id="email_domain" name="email_domain">
+        <br>
         <button type="button" onclick="emailCheck()">중복확인</button>
         <br>
         <span id="emailCheckMsg"></span>
@@ -137,12 +190,16 @@ $(document).ready(function() {
         비밀번호 확인<br>
         <input type="password" id="password_confirm" name="password_confirm" >
     </p>
-
+	<p>
+		<div id="vendorNo">
+			사업자등록번호<br>
+			<input type="text" id="vendor_no" name="vendor_no">
+		</div>
+	</p>
     <p>
-        이름<br>
-        <input type="text" id="name" name="name" >
-    </p>
-
+	    <span id="nameLabel">이름</span><br>
+	    <input type="text" id="name" name="name">
+	</p>
     <p>
         생년월일<br>
         <input type="text" id="birthday" name="birthday" placeholder="YYYYMMDD">
@@ -159,6 +216,12 @@ $(document).ready(function() {
         <input type="tel" id="phone_number" name="phone_number">
     </p>
 
+    <div id="socialLogin">
+	    <a href="/kakao">카카오 로그인</a>
+	    <br>
+	    <a href="/naver">네이버 로그인</a>
+	</div>
+		
     <p>
         <button type="button" onclick="history.back()">이전단계</button>
         <button type="button" onclick="goSave()">회원가입</button>

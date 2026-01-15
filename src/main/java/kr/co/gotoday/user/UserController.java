@@ -51,16 +51,41 @@ public class UserController {
     @PostMapping("/member/register1")
     public String registerUserStep1(HttpSession sess, UserVO vo, Model model) {
 
-        boolean result = userService.registerUserInfo(vo);
-        
-        if (result) {
-            sess.setAttribute("tempUser", vo);
-            return "redirect:/member/register2";
-        } else {
+//        boolean result = userService.registerUserInfo(vo);
+// 
+//        if (result) {
+//            sess.setAttribute("tempUser", vo);
+//            return "redirect:/member/register2";
+//        } else {
+//            model.addAttribute("msg", "회원가입 중 오류가 발생했습니다.");
+//            model.addAttribute("cmd", "back");
+//            return "common/return";
+//        }
+    	
+    	boolean result = userService.registerUserInfo(vo);
+
+        if (!result) {
             model.addAttribute("msg", "회원가입 중 오류가 발생했습니다.");
             model.addAttribute("cmd", "back");
             return "common/return";
         }
+
+        sess.setAttribute("tempUser", vo);
+
+        // 기업회원이면 register2 단계 건너뛰기
+        if (vo.getRole() == 1) { // 1 = 기업회원
+            // 관심사 없이 빈 리스트로 registerUserTags 호출 가능
+            List<UserTagVO> emptyTagList = new ArrayList<>();
+            userService.registerUserTags(emptyTagList);
+
+            // 세션 제거 후 register3로 이동
+            sess.removeAttribute("tempUser");
+            model.addAttribute("user", vo);
+            return "member/register3"; // 바로 완료 페이지
+        }
+
+        // 개인회원이면 기존 흐름 유지
+        return "redirect:/member/register2";
     }
     
     // 회원가입 2단계: 관심사 입력 처리
