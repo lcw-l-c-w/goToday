@@ -71,8 +71,15 @@ function emailCheck() {
     let email = $("#email_prefix").val() + "@" + $("#email_domain").val();
 
     if ($("#email_prefix").val() === '' || $("#email_domain").val() === '') {
-        alert("이메일을 입력해주세요");
+        // alert("이메일을 입력해주세요");
+        $("#emailCheckMsg").text("이메일을 입력해주세요");
         return;
+    }
+    
+    if (!$("#email_domain").val().endsWith(".com")
+    		&& !$("#email_domain").val().endsWith(".co.kr")) {
+    	$("#emailCheckMsg").text("도메인 형식을 다시 확인해주세요.")
+    	return;
     }
 
     $.ajax({

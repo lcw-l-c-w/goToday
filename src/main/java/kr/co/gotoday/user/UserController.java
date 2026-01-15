@@ -37,7 +37,7 @@ public class UserController {
             return "common/return";
         } else {
             sess.setAttribute("loginSess", userVO);
-            return "redirect:/main";
+            return "redirect:/";
         }
     }
     
