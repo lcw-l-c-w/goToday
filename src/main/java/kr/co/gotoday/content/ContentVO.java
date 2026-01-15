@@ -13,7 +13,7 @@ public class ContentVO {
     private String title;
     private String description;
     private String reservation_type;
-    private String  start_at;
+    private String start_at;
     private String  end_at;
     private int adult_price;
     private int teen_price;
