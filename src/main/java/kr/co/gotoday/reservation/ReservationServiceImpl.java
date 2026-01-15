@@ -86,7 +86,7 @@ public class ReservationServiceImpl implements ReservationService{
 			requestBody.put("paymentKey", paymentKey);
 
 			// Secret Key 인코딩-> 설정 파일로 분리 필요)
-			String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+			String secretKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN";
 			Base64.Encoder encoder = Base64.getEncoder();
 			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 			String authorization = "Basic " + new String(encodedBytes);
@@ -148,7 +148,7 @@ public class ReservationServiceImpl implements ReservationService{
 	public ReservationVO convertToVO(ReservationDTO dto, ReservationVO reservationVO) {
 		// 날짜 + 시간대 합치기
 		String reservedForAt = dto.getReserved_for_at() + " " + dto.getTime_zone();
-		vreservationVO.setReserved_for_at(reservedForAt);
+		reservationVO.setReserved_for_at(reservedForAt);
 
 		// 수량 정보
 		reservationVO.setAdult_qty(dto.getAdult_qty());
@@ -164,7 +164,7 @@ public class ReservationServiceImpl implements ReservationService{
 		reservationVO.setReservation_status("PENDING");
 		reservationVO.setReservation_type("onsite");
 
-		return vo;
+		return reservationVO;
 	}
 
 	@Override
@@ -197,9 +197,7 @@ public class ReservationServiceImpl implements ReservationService{
 		}
 	}
 
-	/**
-	 * 토스 결제 취소 API 호출
-	 */
+	//토스 결제 취소 API 호출
 	@SuppressWarnings("unchecked")
 	private void cancelTossPayment(String paymentKey, String cancelReason) {
 		HttpURLConnection connection = null;
@@ -213,7 +211,7 @@ public class ReservationServiceImpl implements ReservationService{
 			requestBody.put("cancelReason", cancelReason);
 
 			// Secret Key 인코딩
-			String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+			String secretKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN";
 			Base64.Encoder encoder = Base64.getEncoder();
 			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 			String authorization = "Basic " + new String(encodedBytes);

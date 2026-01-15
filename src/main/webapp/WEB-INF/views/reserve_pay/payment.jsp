@@ -218,12 +218,12 @@
             const button = document.getElementById("payment-button");
 
             // 결제위젯 초기화
-            const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+            const clientKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN";
             const tossPayments = TossPayments(clientKey);
 
-            const customerKey = "xcvul8W8I_rktuXVZPPHS";
+            const customerKey = "gotoday_xcvul8W8I_rktuXVZPPHS";
             const widgets = tossPayments.widgets({
-                customerKey,
+                customerKey
             });
 
             // 결제 금액 설정
@@ -281,6 +281,7 @@
                             orderName: result.orderName,
                             customerName: result.customerName || receiverName,
                             customerEmail: receiverEmail,
+                            amount: result.amount,
 
                             successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/success.do",
                             failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
