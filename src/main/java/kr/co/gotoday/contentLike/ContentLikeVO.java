@@ -1,8 +1,11 @@
 package kr.co.gotoday.contentLike;
 
+import lombok.Data;
+
+@Data
 public class ContentLikeVO {
-	private String content_like_id;
-	private String user_id;
-	private String content_id;
+	private int content_like_id;
+	private int user_id;
+	private int content_id;
 	
 }

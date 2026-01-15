@@ -49,7 +49,7 @@ public class VendorController {
 			) {
 //		HttpSession sess = request.getSession();
 //		UserVo login = (UserVo)sess.getAttribute("loginSess");
-//		contentVo.setUser_id(login.getUser_id());
+//		ContentVO.setUser_id(login.getUser_id());
 		
 		contentVo.setUser_id(1); //임시 로그인
 		contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());

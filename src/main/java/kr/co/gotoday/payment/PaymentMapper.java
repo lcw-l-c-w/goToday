@@ -1,5 +1,5 @@
 package kr.co.gotoday.payment;
 
-public class PaymentMapper {
+public interface PaymentMapper {
 
 }

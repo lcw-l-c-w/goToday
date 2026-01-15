@@ -1,9 +1,7 @@
 package kr.co.gotoday.content;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-import kr.co.gotoday.user.UserVO;
 import lombok.Data;
 
 @Data

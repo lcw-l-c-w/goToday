@@ -1,5 +1,5 @@
 package kr.co.gotoday.review;
 
-public class ReviewMapper {
+public interface ReviewMapper {
 
 }
