@@ -7,11 +7,11 @@
 		INSERT INTO content (
 			user_id, content_kind, category, location, title, description, reservation_type,
 			start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
-			is_active, is_delete, content_time, instagram_url, x_url, content_status
+			is_active, is_delete, content_time, instagram_url, x_url, content_status, place_tag
 		) VALUES (
 			#{user_id}, #{content_kind}, #{category}, #{location}, #{title}, #{description}, #{reservation_type},
 			#{start_at}, #{end_at}, #{adult_price}, #{teen_price}, #{child_price}, #{main_image_path}, #{detail_description},
-			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}
+			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}, #{place_tag}
 		)
 	</insert>
 	<insert id="createSchedule" parameterType="kr.co.gotoday.content.ContentScheduleVO">

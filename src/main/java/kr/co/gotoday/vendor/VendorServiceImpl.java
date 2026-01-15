@@ -24,7 +24,13 @@ public class VendorServiceImpl implements VendorService {
 	
 	@Override
 	public int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 
-			MultipartFile file, HttpServletRequest request, List<String> timeList, int total_ticket) {
+			MultipartFile file, HttpServletRequest request, List<String> timeList, Integer total_ticket) {
+		//상시전시 에러 예방 코드
+		if (contentScheduleVO == null) {
+		    contentScheduleVO = new ContentScheduleVO();
+		}
+
+		
 		if(file !=null  && !file.isEmpty()) {
 			//파일 명명
 			String uploadDir = request.getServletContext().getRealPath("/upload/poster");
@@ -45,6 +51,8 @@ public class VendorServiceImpl implements VendorService {
 		}
 		int r = vendorMapper.createContent(contentVo);
 		
+		if (timeList == null || timeList.isEmpty() || total_ticket == null) return r;
+
 		int contentId = contentVo.getContent_id();
 
 	    // 시간대가 있을 때만 반복

@@ -12,7 +12,7 @@ import kr.co.gotoday.content.ContentVO;
 
 public interface VendorService {
 	int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 
-			MultipartFile file, HttpServletRequest request, List<String> timeList, int total_ticket);
+			MultipartFile file, HttpServletRequest request, List<String> timeList, Integer total_ticket);
 	
 	Map<String, Object> list(ContentVO contentVo);
 

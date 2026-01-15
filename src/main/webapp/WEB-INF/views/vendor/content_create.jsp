@@ -451,57 +451,87 @@ $(function() {
                 </label>
             </div>
         </div>
-		<div class="form-group">
-            <label>카테고리 *</label>
-            <div class="radio-group">
-                 <select name="category" required>
-			        <option value="">카테고리를 선택하세요</option>
-			        <option value="식품"
-			            <c:if test="${contentVo.category eq '식품'}">selected</c:if>>
-			            식품
-			        </option>
-			
-			        <option value="캐릭터"
-			            <c:if test="${contentVo.category eq '캐릭터'}">selected</c:if>>
-			            캐릭터
-			        </option>
-			
-			        <option value="화장품"
-			            <c:if test="${contentVo.category eq '화장품'}">selected</c:if>>
-			            화장품
-			        </option>
-			
-			        <option value="미디어"
-			            <c:if test="${contentVo.category eq '미디어'}">selected</c:if>>
-			            미디어
-			        </option>
-			
-			        <option value="미술"
-			            <c:if test="${contentVo.category eq '미술'}">selected</c:if>>
-			            미술
-			        </option>
-			
-			        <option value="패션"
-			            <c:if test="${contentVo.category eq '패션'}">selected</c:if>>
-			            패션
-			        </option>
-			
-			        <option value="디지털/테크"
-			            <c:if test="${contentVo.category eq '디지털/테크'}">selected</c:if>>
-			            디지털/테크
-			        </option>
-			
-			        <option value="키즈/반려동물"
-			            <c:if test="${contentVo.category eq '키즈/반려동물'}">selected</c:if>>
-			            키즈/반려동물
-			        </option>
-			
-			        <option value="etc"
-			            <c:if test="${contentVo.category eq 'etc'}">selected</c:if>>
-			            기타 (etc)
-			        </option>
-			    </select>
-            </div>
+        <div class="form-row">
+			<div class="form-group">
+	            <label>카테고리 *</label>
+	            <div class="radio-group">
+	                 <select name="category" required>
+				        <option value="">카테고리를 선택하세요</option>
+				        <option value="식품"
+				            <c:if test="${contentVo.category eq '식품'}">selected</c:if>>
+				            식품
+				        </option>
+				        <option value="캐릭터"
+				            <c:if test="${contentVo.category eq '캐릭터'}">selected</c:if>>
+				            캐릭터
+				        </option>
+				        <option value="화장품"
+				            <c:if test="${contentVo.category eq '화장품'}">selected</c:if>>
+				            화장품
+				        </option>
+				        <option value="미디어"
+				            <c:if test="${contentVo.category eq '미디어'}">selected</c:if>>
+				            미디어
+				        </option>
+				        <option value="미술"
+				            <c:if test="${contentVo.category eq '미술'}">selected</c:if>>
+				            미술
+				        </option>
+				        <option value="패션"
+				            <c:if test="${contentVo.category eq '패션'}">selected</c:if>>
+				            패션
+				        </option>
+				        <option value="디지털/테크"
+				            <c:if test="${contentVo.category eq '디지털/테크'}">selected</c:if>>
+				            디지털/테크
+				        </option>
+				        <option value="키즈/반려동물"
+				            <c:if test="${contentVo.category eq '키즈/반려동물'}">selected</c:if>>
+				            키즈/반려동물
+				        </option>
+				        <option value="etc"
+				            <c:if test="${contentVo.category eq 'etc'}">selected</c:if>>
+				            기타 (etc)
+				        </option>
+				    </select>
+	            </div>
+	        </div>
+			<div class="form-group">
+	            <label>장소 태그 *</label>
+	            <div class="radio-group">
+	                 <select name="place_tag" required>
+				        <option value="">장소 태그를 선택하세요</option>
+				        <option value="성수"
+				            <c:if test="${contentVo.place_tag eq '성수'}">selected</c:if>>
+				            성수
+				        </option>
+				        <option value="홍대"
+				            <c:if test="${contentVo.place_tag eq '홍대'}">selected</c:if>>
+				            홍대
+				        </option>
+				        <option value="여의도"
+				            <c:if test="${contentVo.place_tag eq '여의도'}">selected</c:if>>
+				            여의도
+				        </option>
+				        <option value="강남"
+				            <c:if test="${contentVo.place_tag eq '강남'}">selected</c:if>>
+				            강남
+				        </option>
+				        <option value="혜화"
+				            <c:if test="${contentVo.place_tag eq '혜화'}">selected</c:if>>
+				            혜화
+				        </option>
+				        <option value="한남"
+				            <c:if test="${contentVo.place_tag eq '한남'}">selected</c:if>>
+				            한남
+				        </option>
+				        <option value="etc"
+				            <c:if test="${contentVo.place_tag eq 'etc'}">selected</c:if>>
+				            기타 (etc)
+				        </option>
+				    </select>
+	            </div>
+	        </div>
         </div>
         <div class="form-group">
             <label>전시명 *</label>
@@ -559,14 +589,14 @@ $(function() {
 			<div class="form-group">	
 	            <div id="scheduleList">
 	       			<div class="schedule-item">
-					    <input type="text" name="Time[]" placeholder="시간대 (예 : 10:00 ~ 11:00)" required>
+					    <input type="text" name="Time[]" placeholder="시간대 (예 : 10:00 ~ 11:00)">
 					    <button type="button" class="remove-btn">삭제</button>
 					</div>
     			</div>
 	        </div>
 	        <div class="form-group">
 	        	<label>시간당 티켓 수</label>
-	        	<input type="number" name="total_ticket" value="${contentScheduleVO.content_id eq contentVo.content_id && contentScheduleVO.total_ticket}" min="0" required>
+	        	<input type="number" name="total_ticket" value="<c:out value='${contentScheduleVO.total_ticket}'/>" min="0">
 	        </div>
 		</div>
         <div class="form-group">
@@ -830,6 +860,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // 유효성 검사 통과 시 폼 제출
             if (confirm('전시를 등록하시겠습니까?')) {
             	oEditors.getById["detail_description"].exec("UPDATE_CONTENTS_FIELD", []);
+            	 const always = document.querySelector('input[name="always"]:checked').value;
+
+            	    if (always === 'always') {
+            	        document.querySelector('input[name="total_ticket"]')?.remove();
+            	        document.querySelectorAll('input[name="Time[]"]').forEach(e => e.remove());
+            	    }
             	document.getElementById("frm").submit();
             }
         });
