@@ -127,12 +127,12 @@
 
                 <div>
                     <label>
-                        <input type="radio" name="receive_type" value="ONSITE" checked />
+                        <input type="radio" name="reservation_type" value="onsite" checked />
                         현장수령
                     </label>
 
                     <label>
-                        <input type="radio" name="receive_type" value="MOBILE" />
+                        <input type="radio" name="reservation_type" value="advance" />
                         모바일 티켓
                     </label>
                 </div>
