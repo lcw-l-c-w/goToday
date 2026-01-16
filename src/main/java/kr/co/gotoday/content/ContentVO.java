@@ -29,4 +29,21 @@ public class ContentVO {
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
     private int user_id;
+    
+    private int like_count;// 각 content에 대한 like수
+    
+    public String getReservationTypeLabel() {
+        if (reservation_type == null) return "";
+
+        switch (reservation_type) {
+            case "true":
+                return "사전 예매";
+            case "false":
+                return "현장 대기 ";
+            default:
+                return reservation_type; // 혹시 모를 값
+        }
+    }
+
+    
 }

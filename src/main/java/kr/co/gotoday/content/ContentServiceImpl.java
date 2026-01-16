@@ -3,8 +3,6 @@ package kr.co.gotoday.content;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 @Service
@@ -33,7 +31,7 @@ public class ContentServiceImpl implements ContentService{
 	@Override
 	public List<MainContentViewDTO> getRecommandContents(MainContentDTO mcd) {
 		// TODO Auto-generated method stub
-	      List<ContentVO> list = contentMapper.recommandContent(mcd);
+	      List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
 
 	        return list.stream()
 	                   .map(vo -> applyViewPolicy(vo, mcd))
@@ -78,6 +76,19 @@ public class ContentServiceImpl implements ContentService{
 	        mcv.setBlur(false);
 	        return mcv;
 
+	}
+	// 날짜 조회
+	@Override
+	public List<String> getAvailableDatesByContent(Integer content_id) {
+		// TODO Auto-generated method stub
+		
+		return contentMapper.selectDateByID(content_id);
+	}
+	//시간 조회
+	@Override
+	public List<ContentScheduleVO> getAvailableTimesByContent(Integer content_id, String scheduled_at) {
+		// TODO Auto-generated method stub
+		return contentMapper.selectTimeByID(content_id, scheduled_at);
 	}
 
 }
