@@ -219,7 +219,8 @@ $(document).ready(function() {
     </p>
 
     <div id="socialLogin">
-	    <a href="/kakao">카카오 로그인</a>
+	    <a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=account_email,profile_nickname">
+		    카카오 로그인</a>
 	    <br>
 	    <a href="/naver">네이버 로그인</a>
 	</div>

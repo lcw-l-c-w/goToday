@@ -2,6 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.user.UserMapper">
 	
+	<!-- 카카오 -->
+	<insert id="insertKakaoUser" parameterType="kr.co.gotoday.user.UserVO" useGeneratedKeys="true" keyProperty="user_id">
+	    INSERT INTO user(
+	    	email, name, registered_at, role, login_type
+	    ) VALUES(#{kakao_email}, #{kakao_nickname}, NOW(), 0, 'K')
+    </insert>
+	
+	<!-- 카카오 DB 중복 체크-->
+	<select id="loginByEmail" parameterType="String" resultType="kr.co.gotoday.user.UserVO">
+    	SELECT * FROM user WHERE email = #{email}
+	</select>
+
 	<!-- 로그인 -->
     <select id="login" parameterType="kr.co.gotoday.user.UserVO" resultType="kr.co.gotoday.user.UserVO">
         SELECT * FROM user WHERE email = #{email} AND password = MD5(#{password})

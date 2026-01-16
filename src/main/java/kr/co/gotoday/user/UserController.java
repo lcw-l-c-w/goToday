@@ -5,12 +5,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -19,10 +21,17 @@ public class UserController {
 	
 	private final UserService userService;
 
+	@Value("${kakao.rest-api-key}")
+    private String kakaoRestApiKey;
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+    
     // 로그인 폼
     @GetMapping("/member/login")
-	public void login() {
-			
+	public String login(Model model) {
+    	model.addAttribute("REST_API_KEY", kakaoRestApiKey);
+        model.addAttribute("REDIRECT_URI", kakaoRedirectUri);
+        return "member/login";		
 	}
     
     // 로그인 처리
@@ -154,6 +163,43 @@ public class UserController {
     @ResponseBody
     public int emailCheck(@RequestParam String email) {
         return userService.emailCheck(email);
+    }
+    
+    
+    // 카카오톡 로그인 확인
+    @GetMapping("/kakaoLogin")
+    public String kakaoCallback(@RequestParam("code") String code
+    		, HttpSession session) {
+    	// Access Token 받기
+        String accessToken = userService.getKakaoAccessToken(code);      
+        // 카카오로부터 사용자 정보 가져오기
+        UserVO kakaoUser = userService.getKakaoUserInfo(accessToken);
+        // DB에 해당 이메일로 가입된 유저가 있는지 확인
+        UserVO dbUser = userService.loginByEmail(kakaoUser.getKakao_email());
+        
+        
+        if (dbUser == null) {
+            // 신규 회원) DB에 저장
+            userService.insertKakaoUser(kakaoUser);
+            dbUser = kakaoUser; 
+            System.out.println("신규 카카오 유저 등록 완료: " + dbUser.getKakao_email());
+        } else {
+            // 기존 회원) 이미 DB에 있으므로 insert 과정 건너뜀
+            System.out.println("기존 카카오 유저 로그인: " + dbUser.getEmail());
+        }
+        
+        session.setAttribute("loginSess", dbUser); 
+        
+        return "redirect:/";
+
+	}
+    
+    // 로그아웃 처리
+    @GetMapping("/member/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        System.out.println("로그아웃 성공");
+        return "redirect:/";
     }
     
 }

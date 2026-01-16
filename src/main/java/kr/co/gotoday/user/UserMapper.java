@@ -9,4 +9,8 @@ public interface UserMapper {
     void createUserTags(UserTagVO vo);
     Long findTagIdByName(String tagName);
     Integer emailCheck(String email);
+    
+    // 카카오 로그인 
+    int insertKakaoUser(UserVO vo);
+    UserVO loginByEmail(String email);
 }

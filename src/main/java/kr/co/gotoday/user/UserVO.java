@@ -19,4 +19,8 @@ public class UserVO {
     private String phone_number;
     
     private List<UserTagVO> userTagList;
+    
+    // 카카오 로그인   
+    private String kakao_email; 
+    private String kakao_nickname;
 }
