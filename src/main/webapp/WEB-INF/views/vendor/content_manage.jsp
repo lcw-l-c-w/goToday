@@ -7,19 +7,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>전시 게시물 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 <style>
 /* 기본 초기화 */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+	body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: #333; }
 
-body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-}
 
 /* 레이아웃 구성 */
 .admin-layout {
@@ -41,28 +34,20 @@ body {
 
 /* 로고 영역 */
 .sidebar-top {
-    padding: 30px 25px;
+     padding: 40px 25px; 
 }
 
 .logo {
-    font-size: 20px;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.5px;
+     font-size: 20px; font-weight: 800; color: #5d5dff; 
 }
 
 .subtitle {
-    font-size: 10px;
-    color: #8a94ad;
-    text-transform: uppercase;
-    margin-top: 4px;
-    font-weight: 600;
+    font-size: 10px; opacity: 0.6; letter-spacing: 1px; margin-top: 5px;
 }
 
 /* 메뉴 영역 */
 .sidebar-menu {
-    flex: 1;
-    padding: 10px 15px;
+     flex: 1; padding: 0 15px; 
 }
 
 .sidebar-menu ul {
@@ -70,19 +55,18 @@ body {
 }
 
 .sidebar-menu li {
-    margin-bottom: 8px;
+     margin-bottom: 5px; 
 }
 
 .sidebar-menu li a {
     display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    color: #ffffff; /* 글자색 강제 지정 */
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+	    align-items: center;
+	    padding: 12px 15px;
+	    color: #8a94ad;
+	    text-decoration: none;
+	    border-radius: 8px;
+	    transition: 0.3s;
+	    font-size: 15px;
 }
 
 /* 마우스 올렸을 때 */
@@ -92,25 +76,22 @@ body {
 
 /* 활성화된 메뉴 (콘텐츠 관리) */
 .sidebar-menu li.active a {
-    background-color: #5d5dff; /* 보라빛 도는 블루 */
-    color: #ffffff;
+     background-color: #4d4dff; color: white; 
 }
 
 .sidebar-menu .icon {
     margin-right: 12px;
     font-size: 18px;
 }
+.material-symbols-outlined { margin-right: 12px; font-size: 20px; }
 
 /* 하단 관리자 정보 */
 .sidebar-bottom {
     padding: 20px;
-    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .admin-info {
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+    background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; 
 }
 
 .admin-info .role {
@@ -120,9 +101,7 @@ body {
 }
 
 .admin-info .name {
-    font-size: 13px;
-    display: block;
-    color: #ffffff;
+     display: block; font-size: 13px; color: #fff; margin-bottom: 3px; 
 }
 
 /* 메인 콘텐츠 영역 */
@@ -177,14 +156,14 @@ body {
     border: 1px solid #eee;
     border-bottom: none;
 }
+.search-box {
+	    display: flex; align-items: center; background: #f5f6f8;
+	    padding: 10px 15px; border-radius: 10px; width: 320px;
+	}
 
 .search-box input {
-    width: 300px;
-    padding: 10px 15px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background-color: #fcfcfc;
-    outline: none;
+    border: none; background: transparent; outline: none;
+	    margin-left: 10px; width: 100%; font-size: 14px;
 }
 
 .filter-btn {
@@ -272,10 +251,40 @@ body {
     display: inline-block;
 }
 
-/* 예시 상태별 색상 (JS에서 클래스 추가 시 활용) */
-.STATUS_OPEN { background: #eef2ff; color: #4d4dff; }       /* 활성화/진행중 */
-.STATUS_REQUESTED { background: #fff8e6; color: #ffa000; }  /* 수정요청/승인요청 */
-.STATUS_REJECTED { background: #fff1f0; color: #ff4d4f; }   /* 거절 */
+/* 진행중 (진한 블루 - 활기찬 느낌) */
+.STATUS_OPEN { 
+    background: #eef2ff; 
+    color: #4d4dff; 
+    border: 1px solid #dadaff;
+}
+
+/* 승인요청 (오렌지/옐로우 - 주의/대기 느낌) */
+.STATUS_REQUESTED { 
+    background: #fff8e6; 
+    color: #ffa000; 
+    border: 1px solid #ffeeba;
+}
+
+/* 거절 (레드 - 경고/중단 느낌) */
+.STATUS_REJECTED { 
+    background: #fff1f0; 
+    color: #ff4d4f; 
+    border: 1px solid #ffccc7;
+}
+
+/* 오픈예정 (그린/민트 - 신선하고 긍정적인 느낌) */
+.STATUS_SCHEDULED { 
+    background: #e6fffa; 
+    color: #00b5ad; 
+    border: 1px solid #b2f5ea;
+}
+
+/* 종료 (그레이 - 비활성/과거 느낌) */
+.STATUS_CLOSED { 
+    background: #f5f5f5; 
+    color: #8c8c8c; 
+    border: 1px solid #d9d9d9;
+}
 
 /* 관리하기 링크 버튼 */
 .col-manage a {
@@ -313,9 +322,9 @@ body {
 
     <nav class="sidebar-menu">
         <ul>
-            <li class="active"><a href="#"><span class="icon">📋</span> 콘텐츠 관리</a></li>
-            <li><a href="${ctx}/vendor/reserve_pay_manage"><span class="icon">📊</span> 예약 관리</a></li>
-            <li><a href="${ctx}/reply/index.jsp"><span class="icon">💬</span> 관리자 문의하기</a></li>
+            <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
+            <li><a href="${ctx}/vendor/reserve_pay_manage"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
+            <li><a href="${ctx}/reply/index.jsp"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
         </ul>
     </nav>
 
