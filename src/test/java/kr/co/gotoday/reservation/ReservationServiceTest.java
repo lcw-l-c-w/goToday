@@ -47,11 +47,12 @@ public class ReservationServiceTest {
 		testDTO.setChild_qty(0);
 		testDTO.setTotal_price(26000);
 
-		// 테스트용 VO 생성
+		// 테스트용 VO 생성 (화면에서 사용자가 입력/선택하는 값들)
 		testVO = new ReservationVO();
 		testVO.setUser_id(1);
 		testVO.setReceiver_name("테스트유저");
 		testVO.setReceiver_phone("010-1234-5678");
+		testVO.setReservation_type("onsite"); // 현장수령 (advance: 모바일티켓)
 
 		// 테스트용 ContentVO 생성
 		testContent = new ContentVO();
@@ -130,7 +131,6 @@ public class ReservationServiceTest {
 		assertEquals(5, result.getContent_id());
 		assertEquals(26000, result.getTotal_price());
 		assertEquals("PENDING", result.getReservation_status());
-		assertEquals("onsite", result.getReservation_type());
 		assertTrue(result.getReservation_code().startsWith("RES_"));
 	}
 
@@ -238,25 +238,95 @@ public class ReservationServiceTest {
 	}
 
 	@Test
-	@DisplayName("통합 메서드 테스트 - 토스 승인 성공 후 DB 실패 시 토스 취소 호출")
+	@DisplayName("통합 메서드 테스트 - 토스 승인 성공 후 DB 실패 시 토스 취소 호출 검증")
 	void testConfirmAndCreateReservation_DbFailThenCancelToss() {
 		// given
 		String paymentKey = "test_payment_key";
 		String orderId = "ORDER_test123";
 		int amount = 26000;
 
+		// 1. 토스 결제 승인 성공 mock
 		doReturn(testPayment).when(reservationService).confirmTossPayment(paymentKey, orderId, amount);
-		when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(0); // DB 실패
 
-		// cancelTossPayment도 mock 처리 (private 메서드지만 spy로 가능)
-		// private 메서드는 직접 verify 불가하므로 예외 메시지로 확인
+		// 2. DB 저장 실패
+		when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(0);
+
+		// 3. 토스 취소 API 호출 mock (실제 API 호출 방지)
+		doNothing().when(reservationService).cancelTossPayment(eq(paymentKey), anyString());
 
 		// when & then
 		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
 			reservationService.confirmAndCreateReservation(testVO, paymentKey, orderId, amount);
 		});
 
+		// 검증: 예외 메시지 확인
 		assertTrue(exception.getMessage().contains("예약 처리 중 오류 발생"));
+
+		// 검증: cancelTossPayment가 호출되었는지 확인
+		verify(reservationService, times(1)).cancelTossPayment(eq(paymentKey), contains("DB 저장 실패"));
+	}
+
+	@Test
+	@DisplayName("통합 메서드 테스트 - 결제 저장 실패 시에도 토스 취소 호출")
+	void testConfirmAndCreateReservation_PaymentSaveFailThenCancelToss() {
+		// given
+		String paymentKey = "test_payment_key";
+		String orderId = "ORDER_test123";
+		int amount = 26000;
+
+		// 1. 토스 결제 승인 성공
+		doReturn(testPayment).when(reservationService).confirmTossPayment(paymentKey, orderId, amount);
+
+		// 2. 예약 저장 성공
+		when(reservationMapper.createReservation(any(ReservationVO.class))).thenAnswer(invocation -> {
+			ReservationVO vo = invocation.getArgument(0);
+			vo.setReservation_id(100);
+			return 1;
+		});
+
+		// 3. 결제 저장 실패
+		when(paymentMapper.createPayment(any(PaymentVO.class))).thenReturn(0);
+
+		// 4. 토스 취소 API mock
+		doNothing().when(reservationService).cancelTossPayment(eq(paymentKey), anyString());
+
+		// when & then
+		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+			reservationService.confirmAndCreateReservation(testVO, paymentKey, orderId, amount);
+		});
+
+		// 검증: cancelTossPayment 호출 확인
+		verify(reservationService, times(1)).cancelTossPayment(eq(paymentKey), contains("DB 저장 실패"));
+	}
+
+	@Test
+	@DisplayName("통합 메서드 테스트 - 토스 취소도 실패하는 경우")
+	void testConfirmAndCreateReservation_CancelAlsoFails() {
+		// given
+		String paymentKey = "test_payment_key";
+		String orderId = "ORDER_test123";
+		int amount = 26000;
+
+		// 1. 토스 결제 승인 성공
+		doReturn(testPayment).when(reservationService).confirmTossPayment(paymentKey, orderId, amount);
+
+		// 2. DB 저장 실패
+		when(reservationMapper.createReservation(any(ReservationVO.class))).thenReturn(0);
+
+		// 3. 토스 취소도 실패 (실제 운영에서 발생할 수 있는 시나리오)
+		doThrow(new RuntimeException("토스 결제 취소 실패: 네트워크 오류"))
+			.when(reservationService).cancelTossPayment(eq(paymentKey), anyString());
+
+		// when & then
+		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+			reservationService.confirmAndCreateReservation(testVO, paymentKey, orderId, amount);
+		});
+
+		// 검증: 원래 예외가 전파됨 (취소 실패는 로그만 남기고 원래 예외 throw)
+		assertTrue(exception.getMessage().contains("예약 처리 중 오류 발생"));
+
+		// 검증: cancelTossPayment 호출 시도는 됨
+		verify(reservationService, times(1)).cancelTossPayment(eq(paymentKey), anyString());
 	}
 
 	@Test

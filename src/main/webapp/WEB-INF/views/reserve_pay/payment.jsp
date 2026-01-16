@@ -218,33 +218,8 @@
             const button = document.getElementById("payment-button");
 
             // 결제위젯 초기화
-            const clientKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN";
+            const clientKey = "test_ck_Z1aOwX7K8mv4q4Qap4q03yQxzvNP";
             const tossPayments = TossPayments(clientKey);
-
-            const customerKey = "gotoday_xcvul8W8I_rktuXVZPPHS";
-            const widgets = tossPayments.widgets({
-                customerKey
-            });
-
-            // 결제 금액 설정
-            const amount = parseInt("${paymentDTO.amount}") || 0;
-
-            await widgets.setAmount({
-                currency: "KRW",
-                value: amount,
-            });
-
-            // 결제 위젯 렌더링
-            await Promise.all([
-                widgets.renderPaymentMethods({
-                    selector: "#payment-method",
-                    variantKey: "DEFAULT",
-                }),
-                widgets.renderAgreement({
-                    selector: "#agreement",
-                    variantKey: "AGREEMENT"
-                }),
-            ]);
 
             // '결제하기' 버튼 클릭
             button.addEventListener("click", async function () {
@@ -253,9 +228,9 @@
                 const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
                 const receiverPhone = document.querySelector('input[name="receiver_phone"]').value;
                 const receiverEmail = document.querySelector('input[name="receiver_email"]').value;
-                const receiveType = document.querySelector('input[name="receive_type"]:checked').value;
+                const reservationType = document.querySelector('input[name="reservation_type"]:checked').value;
 
-                // 1. 먼저 서버에 예약 정보 저장 요청 (POST /reserve/payment.do)
+                // 1. 먼저 서버에 예약 정보 저장 요청
                 try {
                     const response = await fetch("${pageContext.request.contextPath}/reserve/payment.do", {
                         method: "POST",
@@ -266,7 +241,7 @@
                             receiver_name: receiverName,
                             receiver_birth: receiverBirth,
                             receiver_phone: receiverPhone,
-                            receive_type: receiveType
+                            reservation_type: reservationType
                         })
                     });
 
@@ -276,15 +251,15 @@
                     if (result.success) {
                         console.log("예약 정보 저장 성공, 토스 결제 요청 시작");
 
-                        await widgets.requestPayment({
+                        tossPayments.requestPayment('카드', { 
+                            amount: result.amount,
                             orderId: result.orderId,
                             orderName: result.orderName,
                             customerName: result.customerName || receiverName,
                             customerEmail: receiverEmail,
-                            amount: result.amount,
 
-                            successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/success.do",
-                            failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
+                            successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve_pay/success",
+                            failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve_pay/fail",
                         });
                     } else {
                         alert("예약 처리 실패: " + result.msg);

@@ -185,6 +185,8 @@ public class ReservationController {
 	        result.put("orderName", paymentDTO.getOrderName());
 	        result.put("amount", reservationVO.getTotal_price());
 	        result.put("customerName", reservationVO.getReceiver_name());
+	        result.put("user_id", reservationVO.getUser_id());
+	        result.put("reservation_type", reservationVO.getReservation_type());
 
 			return ResponseEntity.ok(result);
 

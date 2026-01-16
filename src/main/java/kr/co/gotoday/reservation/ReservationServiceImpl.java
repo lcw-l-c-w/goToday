@@ -51,12 +51,15 @@ public class ReservationServiceImpl implements ReservationService{
 			if(reservationResult <= 0 ) {
 				throw new Exception("에약 정보 저장에 실패했습니다.");
 			}
-			
+			// 결제 정보 저장 
 			paymentVO.setReservation_id(reservationVO.getReservation_id());
 			int paymentResult = paymentMapper.createPayment(paymentVO);//			
 			if (paymentResult ==0) {
 				throw new Exception("결제 정보 저장에 실패했습니다.");
 			}
+			// 티켓 수 카운팅 
+			
+			
 			// 5. 저장된 예약 정보 반환
 			return reservationVO;
 			
@@ -86,7 +89,7 @@ public class ReservationServiceImpl implements ReservationService{
 			requestBody.put("paymentKey", paymentKey);
 
 			// Secret Key 인코딩-> 설정 파일로 분리 필요)
-			String secretKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN";
+			String secretKey = "test_sk_DpexMgkW36ym117LE2x48GbR5ozO";
 			Base64.Encoder encoder = Base64.getEncoder();
 			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 			String authorization = "Basic " + new String(encodedBytes);
@@ -162,7 +165,6 @@ public class ReservationServiceImpl implements ReservationService{
 		// 예약 코드 생성
 		reservationVO.setReservation_code("RES_" + System.currentTimeMillis());
 		reservationVO.setReservation_status("PENDING");
-		reservationVO.setReservation_type("onsite");
 
 		return reservationVO;
 	}
@@ -177,7 +179,7 @@ public class ReservationServiceImpl implements ReservationService{
 			paymentVO = confirmTossPayment(paymentKey, orderId, amount);
 
 			// 2. 예약 상태 변경
-			reservationVO.setReservation_status("RESERVED");
+			reservationVO.setReservation_status("DONE");
 
 			// 3. DB 저장 (예약 + 결제)
 			return createReservationWithPaymentent(reservationVO, paymentVO);
@@ -199,7 +201,7 @@ public class ReservationServiceImpl implements ReservationService{
 
 	//토스 결제 취소 API 호출
 	@SuppressWarnings("unchecked")
-	private void cancelTossPayment(String paymentKey, String cancelReason) {
+	public void cancelTossPayment(String paymentKey, String cancelReason) {
 		HttpURLConnection connection = null;
 		OutputStream outputStream = null;
 		InputStream responseStream = null;
@@ -211,7 +213,7 @@ public class ReservationServiceImpl implements ReservationService{
 			requestBody.put("cancelReason", cancelReason);
 
 			// Secret Key 인코딩
-			String secretKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN";
+			String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 			Base64.Encoder encoder = Base64.getEncoder();
 			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 			String authorization = "Basic " + new String(encodedBytes);
