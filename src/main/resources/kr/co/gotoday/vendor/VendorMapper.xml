@@ -21,6 +21,19 @@
 			#{schedule_id}, #{scheduled_at}, #{time_zone}, #{total_ticket}, #{current_ticket}, #{content_id}
 		)
 	</insert>
+	
+	<select id="selectContentList" resultType="kr.co.gotoday.content.ContentVO">
+		SELECT * FROM content WHERE user_id = #{user_id}
+		<if test="keyword != null and keyword != ''">
+			AND title LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		
+		<if test="status != null and status != ''">
+			AND content_status = #{status}
+		</if>
+		
+		ORDER BY content_id DESC
+	</select>
 
 
 </mapper>

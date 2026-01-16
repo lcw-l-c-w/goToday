@@ -16,4 +16,6 @@ public interface VendorService {
 	
 	Map<String, Object> list(ContentVO contentVo);
 
+	Map<String, Object> getFilterList(int user_id, String keyword, String status);
+
 }

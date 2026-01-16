@@ -1,215 +1,483 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>전시 게시물 관리</title>
+    <meta charset="UTF-8" />
+    <title>전시 게시물 관리</title>
+<style>
+/* 기본 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* 레이아웃 구성 */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 사이드바 전체 컨테이너 */
+.sidebar {
+    width: 260px;
+    background-color: #1a1f33; /* 다크 네이비 */
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+/* 로고 영역 */
+.sidebar-top {
+    padding: 30px 25px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 10px;
+    color: #8a94ad;
+    text-transform: uppercase;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* 메뉴 영역 */
+.sidebar-menu {
+    flex: 1;
+    padding: 10px 15px;
+}
+
+.sidebar-menu ul {
+    list-style: none;
+}
+
+.sidebar-menu li {
+    margin-bottom: 8px;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #ffffff; /* 글자색 강제 지정 */
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+/* 마우스 올렸을 때 */
+.sidebar-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 활성화된 메뉴 (콘텐츠 관리) */
+.sidebar-menu li.active a {
+    background-color: #5d5dff; /* 보라빛 도는 블루 */
+    color: #ffffff;
+}
+
+.sidebar-menu .icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+/* 하단 관리자 정보 */
+.sidebar-bottom {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.admin-info {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.admin-info .role {
+    font-size: 11px;
+    color: #8a94ad;
+    margin-bottom: 4px;
+}
+
+.admin-info .name {
+    font-size: 13px;
+    display: block;
+    color: #ffffff;
+}
+
+/* 메인 콘텐츠 영역 */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    background-color: #f8f9fa;
+}
+
+/* 헤더 영역 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.page-title h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.page-title p {
+    color: #888;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #4d4dff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #3b3bff;
+}
+
+/* 필터 & 검색바 */
+.filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px 25px;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #eee;
+    border-bottom: none;
+}
+
+.search-box input {
+    width: 300px;
+    padding: 10px 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    outline: none;
+}
+
+.filter-btn {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    margin-left: 5px;
+    color: #888;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filter-btn.active {
+    background-color: #1a1f33;
+    color: #fff;
+}
+
+/* 리스트 섹션 */
+.content-list {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+}
+
+/* 리스트 헤더 */
+.list-header {
+    display: flex;
+    padding: 15px 25px;
+    background-color: #fafafa;
+    border-bottom: 1px solid #eee;
+    color: #888;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* 리스트 로우(Row) */
+.content-row {
+    display: flex;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background 0.2s;
+}
+
+.content-row:hover {
+    background-color: #fcfcfc;
+}
+
+/* 컬럼 너비 설정 (flex 비율) */
+.col-info { flex: 4; display: flex; align-items: center; }
+.col-period { flex: 3; color: #666; font-size: 14px; }
+.col-status { flex: 2; text-align: center; }
+.col-manage { flex: 1; text-align: right; }
+
+/* 전시 정보 셀 내부 */
+.thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px;
+    background-color: #eee;
+}
+
+.text .title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.text .location {
+    color: #888;
+    font-size: 13px;
+}
+
+/* 상태 뱃지 스타일 */
+.col-status span, /* 직접 텍스트인 경우 */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* 예시 상태별 색상 (JS에서 클래스 추가 시 활용) */
+.STATUS_OPEN { background: #eef2ff; color: #4d4dff; }       /* 활성화/진행중 */
+.STATUS_REQUESTED { background: #fff8e6; color: #ffa000; }  /* 수정요청/승인요청 */
+.STATUS_REJECTED { background: #fff1f0; color: #ff4d4f; }   /* 거절 */
+
+/* 관리하기 링크 버튼 */
+.col-manage a {
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+    border: 1px solid #eee;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.col-manage a:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+/* 데이터 없음/로딩중 */
+.empty, .loading {
+    padding: 50px;
+    text-align: center;
+    color: #bbb;
+}
+</style>    
 </head>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <body>
 
 <div class="admin-layout">
-
-  <!-- ================= 사이드바 ================= -->
-  <aside class="sidebar">
+    <aside class="sidebar">
     <div class="sidebar-top">
-      <h1 class="logo">ExhibiReserve</h1>
-      <p class="subtitle">VENDOR MANAGEMENT</p>
+        <h1 class="logo">ExhibiReserve</h1>
+        <p class="subtitle">VENDOR MANAGEMENT</p>
     </div>
 
     <nav class="sidebar-menu">
-      <ul>
-        <li>
-          <a href="#">대시보드</a>
-        </li>
-        <li class="active">
-          <a href="#">콘텐츠 관리</a>
-        </li>
-        <li>
-          <a href="#">정산 내역</a>
-        </li>
-      </ul>
+        <ul>
+            <li class="active"><a href="#"><span class="icon">📋</span> 콘텐츠 관리</a></li>
+            <li><a href="${ctx}/vendor/reserve_pay_manage"><span class="icon">📊</span> 예약 관리</a></li>
+            <li><a href="${ctx}/reply/index.jsp"><span class="icon">💬</span> 관리자 문의하기</a></li>
+        </ul>
     </nav>
 
     <div class="sidebar-bottom">
-      <div class="admin-info">
-        <span class="role">Signed in as</span>
-        <strong class="name">상수전시관 관리자</strong>
-      </div>
+    <div class="admin-info">
+        <p class="role">Signed in as</p>
+
+        <strong class="name">
+            <c:choose>
+                <c:when test="${not empty loginSess}">
+                    ${loginSess.name}
+                </c:when>
+                <c:otherwise>
+                    잘못된 접근입니다.
+                </c:otherwise>
+            </c:choose>
+        </strong>
     </div>
-  </aside>
+</div>
+</aside>
 
-
-  <!-- ================= 메인 콘텐츠 ================= -->
-  <main class="main-content">
-
-    <!-- 상단 헤더 -->
-    <div class="page-header">
-      <div class="page-title">
-        <h2>전시 게시물 관리</h2>
-        <p>등록하신 전시의 상태를 확인하고 관리하세요.</p>
-      </div>
-
-      <div class="page-actions">
-        <button class="btn-primary">+ 게시글 등록하기</button>
-      </div>
-    </div>
-
-    <!-- 필터 & 검색 -->
-    <div class="filter-bar">
-
-      <div class="search-box">
-        <input type="text" placeholder="전시 명으로 검색..." />
-      </div>
-
-      <div class="filter-buttons">
-        <button class="active">전체</button>
-        <button>승인대기</button>
-        <button>승인</button>
-        <button>거절</button>
-        <button>오픈예정</button>
-        <button>현재진행중</button>
-        <button>종료</button>
-        <button>활성화</button>
-        <button>비활성화</button>
-      </div>
-
-    </div>
-
-    <!-- ================= 전시 리스트 ================= -->
-    <section class="exhibit-list">
-
-      <!-- 리스트 헤더 -->
-      <div class="list-header">
-        <span class="col-info">전시 정보</span>
-        <span class="col-period">기간</span>
-        <span class="col-status">상태</span>
-        <span class="col-manage">관리</span>
-      </div>
-
-      <!-- 리스트 아이템 -->
-      <ul class="list-body">
-
-        <!-- item 1: 현재진행중 -->
-        <li class="list-item">
-          <div class="exhibit-info">
-            <img src="#" alt="전시 이미지" class="thumb" />
-            <div class="text">
-              <strong class="title">서울 미디어아트 판타지아</strong>
-              <p class="place">서울숲 갤러리 1관</p>
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-title">
+                <h2>전시 게시물 관리</h2>
+                <p>등록하신 전시의 상태를 확인하고 관리하세요.</p>
             </div>
-          </div>
+            <button class="btn-primary" onclick="location.href='${ctx}/vendor/content_create'">+ 게시글 등록하기</button>
+        </div>
 
-          <div class="exhibit-period">
-            2024-05-01 ~ 2024-08-31
-          </div>
-
-          <div class="exhibit-status">
-            <span class="status ongoing">현재진행중</span>
-          </div>
-
-          <div class="exhibit-manage">
-            <!-- 현재진행중 상태는 관리하기 버튼 없음 -->
-          </div>
-        </li>
-
-        <!-- item 2: 승인대기 -->
-        <li class="list-item">
-          <div class="exhibit-info">
-            <img src="#" alt="전시 이미지" class="thumb" />
-            <div class="text">
-              <strong class="title">근현대 미술의 발자취</strong>
-              <p class="place">동대문 디자인 플라자(DDP)</p>
+        <div class="filter-bar">
+            <div class="search-box">
+                <input type="text" class="searchInput" id="searchInput" placeholder="전시명으로 검색..."  />
             </div>
-          </div>
+            <div class="filter-button" id="filterGroup">
+                <button class="filter-btn active" data-status="">전체</button>
+                <button class="filter-btn" data-status="STATUS_REQUESTED">승인요청</button>
+                <button class="filter-btn" data-status="STATUS_REJECTED">거절</button>
+                <button class="filter-btn" data-status="STATUS_SCHEDULED">오픈예정</button>
+                <button class="filter-btn" data-status="STATUS_OPEN">진행중</button>
+                <button class="filter-btn" data-status="STATUS_CLOSED">종료</button>
+           </div>
+        </div>
 
-          <div class="exhibit-period">
-            2024-06-15 ~ 2024-07-15
-          </div>
-
-          <div class="exhibit-status">
-            <span class="status pending">승인대기</span>
-          </div>
-
-          <div class="exhibit-manage">
-            <!-- 승인대기 상태는 관리하기 버튼 없음 -->
-          </div>
-        </li>
-
-        <!-- item 3: 거절 (관리하기 버튼 표시) -->
-        <li class="list-item">
-          <div class="exhibit-info">
-            <img src="#" alt="전시 이미지" class="thumb" />
-            <div class="text">
-              <strong class="title">디지털 네이처: 숨쉬는 숲</strong>
-              <p class="place">제주 누아 아트홀</p>
+        <section class="content-list">
+            <div class="list-header">
+                <span class="col-info">전시 정보</span>
+                <span class="col-period">기간</span>
+                <span class="col-status">상태</span>
+                <span class="col-manage">관리</span>
             </div>
-          </div>
-
-          <div class="exhibit-period">
-            2024-03-01 ~ 2024-04-30
-          </div>
-
-          <div class="exhibit-status">
-            <span class="status reject">거절</span>
-          </div>
-
-          <div class="exhibit-manage">
-            <a href="content/edit?id=3">수정하기</a>
-          </div>
-        </li>
-
-        <!-- item 4: 오픈예정 -->
-        <li class="list-item">
-          <div class="exhibit-info">
-            <img src="#" alt="전시 이미지" class="thumb" />
-            <div class="text">
-              <strong class="title">빛의 예술: 이머시브 전시</strong>
-              <p class="place">코엑스 전시홀</p>
+            <div class="contentList" id="contentList">
+            	<c:if test=""></c:if>
+                <div class="loading">데이터를 불러오는 중입니다...</li>
             </div>
-          </div>
-
-          <div class="exhibit-period">
-            2024-09-01 ~ 2024-12-31
-          </div>
-
-          <div class="exhibit-status">
-            <span class="status upcoming">오픈예정</span>
-          </div>
-
-          <div class="exhibit-manage">
-            <!-- 오픈예정 상태는 관리하기 버튼 없음 -->
-          </div>
-        </li>
-
-        <!-- item 5: 종료 -->
-        <li class="list-item">
-          <div class="exhibit-info">
-            <img src="#" alt="전시 이미지" class="thumb" />
-            <div class="text">
-              <strong class="title">봄의 정원 특별전</strong>
-              <p class="place">국립현대미술관</p>
-            </div>
-          </div>
-
-          <div class="exhibit-period">
-            2024-01-01 ~ 2024-02-28
-          </div>
-
-          <div class="exhibit-status">
-            <span class="status ended">종료</span>
-          </div>
-
-          <div class="exhibit-manage">
-            <!-- 종료 상태는 관리하기 버튼 없음 -->
-          </div>
-        </li>
-
-      </ul>
-      
-    </section>
-  </main>
+        </section>
+    </main>
 </div>
 
 </body>
+
+<script>
+const ctx = '${pageContext.request.contextPath}';
+
+const STATUS_MAP = {
+	    STATUS_REQUESTED: { text: '승인요청', className: 'STATUS_REQUESTED' },
+	    STATUS_REJECTED:  { text: '거절',     className: 'STATUS_REJECTED' },
+	    STATUS_SCHEDULED: { text: '오픈예정', className: 'STATUS_SCHEDULED' },
+	    STATUS_OPEN:      { text: '진행중',   className: 'STATUS_OPEN' },
+	    STATUS_CLOSED:    { text: '종료',     className: 'STATUS_CLOSED' }
+	};
+
+
+$(function () {
+    loadContentList(); // 최초 전체 목록
+});
+
+function loadContentList() {
+	const keyword = $('#searchInput').val();
+	const status = $('.filter-btn.active').data('status');
+	
+	$.ajax({
+		url: ctx +'/vendor/content_manage/list',
+		type:'get',
+		data: {
+			keyword: keyword,
+			status: status
+		},
+		success: function(res){
+			console.log(res);
+		    console.log(res.list);
+			renderList(res.list);
+		},
+        error: function () {
+            alert('목록을 불러오지 못했습니다.');
+        }
+	});
+}
+//필터 클릭 시
+$('.filter-btn').on('click', function() {
+	$('.filter-btn').removeClass('active');
+	$(this).addClass('active');
+	loadContentList();
+});
+
+//검색 서치 시
+$('#searchInput').on('keyup', function(e){
+	if(e.key ==='Enter'){
+		loadContentList();
+	}
+});
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    return dateStr.split(' ')[0]; // yyyy-MM-dd
+}
+
+function renderList(list) {
+    const $list = $('#contentList');
+    $list.empty();
+
+    if (list.length === 0) {
+        $list.append('<div class="empty">검색 결과가 없습니다.</div>');
+        return;
+    }
+
+    list.forEach(item => {
+        const statusInfo = STATUS_MAP[item.content_status] 
+            || { text: item.content_status, className: '' };
+
+        $list.append(
+            '<div class="content-row">' +
+
+                '<div class="col-info">' +
+                    '<img src="' + ctx + item.main_image_path + '" class="thumb">' +
+                    '<div class="text">' +
+                        '<div class="title">' + item.title + '</div>' +
+                        '<div class="location">' + item.location + '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="col-period">' +
+                    formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) +
+                '</div>' +
+
+                '<div class="col-status">' +
+                    '<span class="' + statusInfo.className + '">' +
+                        statusInfo.text +
+                    '</span>' +
+                '</div>' +
+
+                '<div class="col-manage">' +
+                    '<a href="' + ctx + '/vendor/content_create?content_id=' + item.content_id + '">' +
+                        '관리하기' +
+                    '</a>' +
+                '</div>' +
+
+            '</div>'
+        );
+    });
+}
+
+
+</script>
 </html>

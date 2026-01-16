@@ -1,6 +1,7 @@
 package kr.co.gotoday.vendor;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -11,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.gotoday.content.ContentEnum;
@@ -25,10 +27,30 @@ public class VendorController {
 	private VendorService vendorService;
 	
 	//content 관리 페이지
-	@GetMapping("vendor/content_manage")
-	public String contentManage(Model model, ContentVO contentVo) {
-		model.addAttribute("map", vendorService.list(contentVo));
+	@GetMapping("/vendor/content_manage")
+	public String contentManage() {
+		
 		return "vendor/content_manage";
+	}
+	
+	//content list 별도
+	@GetMapping("/vendor/content_manage/list")
+	@ResponseBody
+	public Map<String, Object> contentList(
+			@RequestParam(required = false) String keyword,
+			@RequestParam(required = false) String status,
+			HttpSession session
+			){
+		UserVO login = (UserVO) session.getAttribute("loginSess");
+		if (login == null) {
+		    return Map.of("list", List.of());
+		}
+		if (keyword != null) keyword = keyword.trim();
+	    if (status != null && status.trim().isEmpty()) status = null;
+		
+		Map<String, Object> map = vendorService.getFilterList(login.getUser_id(), keyword, status);
+		
+		return map;
 	}
 	
 	//content 등록 폼
@@ -75,6 +97,12 @@ public class VendorController {
 		}
 		
 		return "common/return";
+	}
+	
+	@GetMapping("/vendor/reserve_pay_manage")
+	public String contentReserve() {
+		
+		return "vendor/reserve_pay_manage";
 	}
 	
 	
