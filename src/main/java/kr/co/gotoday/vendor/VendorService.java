@@ -11,11 +11,21 @@ import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 
 public interface VendorService {
+	//content 추가
 	int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 
 			MultipartFile file, HttpServletRequest request, List<String> timeList, Integer total_ticket);
-	
-	Map<String, Object> list(ContentVO contentVo);
+	int updateContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, MultipartFile file,
+			HttpServletRequest request, List<String> timeList, Integer total_ticket);
 
+	//content 관리 리스트
 	Map<String, Object> getFilterList(int user_id, String keyword, String status);
+
+	//수정요청 여부 판단 
+	ContentVO getContent(Integer content_id);
+	List<ContentScheduleVO> getContentSchedule(Integer content_id);
+	
+	//수정시 이전 스케줄 삭제
+	int deleteContentSchedule(Integer content_id);
+
 
 }

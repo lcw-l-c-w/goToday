@@ -272,10 +272,35 @@ body {
     display: inline-block;
 }
 
-/* 예시 상태별 색상 (JS에서 클래스 추가 시 활용) */
-.STATUS_OPEN { background: #eef2ff; color: #4d4dff; }       /* 활성화/진행중 */
-.STATUS_REQUESTED { background: #fff8e6; color: #ffa000; }  /* 수정요청/승인요청 */
-.STATUS_REJECTED { background: #fff1f0; color: #ff4d4f; }   /* 거절 */
+.STATUS_OPEN { 
+    background: #eef2ff; 
+    color: #4d4dff; 
+    border: 1px solid #dadaff;
+}
+
+.STATUS_REQUESTED { 
+    background: #fff8e6; 
+    color: #ffa000; 
+    border: 1px solid #ffeeba;
+}
+
+.STATUS_REJECTED { 
+    background: #fff1f0; 
+    color: #ff4d4f; 
+    border: 1px solid #ffccc7;
+}
+
+.STATUS_SCHEDULED { 
+    background: #e6fffa; 
+    color: #00b5ad; 
+    border: 1px solid #b2f5ea;
+}
+
+.STATUS_CLOSED { 
+    background: #f5f5f5; 
+    color: #8c8c8c; 
+    border: 1px solid #d9d9d9;
+}
 
 /* 관리하기 링크 버튼 */
 .col-manage a {
@@ -368,7 +393,6 @@ body {
                 <span class="col-manage">관리</span>
             </div>
             <div class="contentList" id="contentList">
-            	<c:if test=""></c:if>
                 <div class="loading">데이터를 불러오는 중입니다...</li>
             </div>
         </section>
