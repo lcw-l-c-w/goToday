@@ -22,5 +22,16 @@
 	    SELECT * FROM reservation 
 	    WHERE reservation_id = #{reservation_id}
 	</select>
+	
+	<select id="findReservationByVendor" parameterType="int" resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
+		SELECT r.reservation_id, r.reservation_code, r.reserved_for_at, r.adult_qty, r.child_qty, r.teen_qty, r.reservation_status, 
+		 	   r.receiver_name, r.receiver_birth, r.receiver_phone,
+			   p.payment_id, p.payment_status, 
+			   c.content_id, c.title 
+		FROM content c
+		JOIN reservation r ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		WHERE c.user_id = #{user_id}
+	</select>
 
 </mapper>
