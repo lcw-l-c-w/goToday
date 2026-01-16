@@ -108,7 +108,7 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
-
+		
 		<!-- lombok -->
 		<dependency>
 		    <groupId>org.projectlombok</groupId>
@@ -185,13 +185,6 @@
 		    <artifactId>cos</artifactId>
 		    <version>05Nov2002</version>
 		</dependency>    
-		
-		<!--json-->
-		<dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20230227</version>
-		</dependency>
 		
 		<!--  
 		Test

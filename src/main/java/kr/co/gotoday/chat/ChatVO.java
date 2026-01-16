@@ -1,9 +1,6 @@
 package kr.co.gotoday.chat;
 import java.sql.Timestamp;
 
-import lombok.Data;
-
-@Data
 public class ChatVO {
 	private int chat_id;
     private int user_id;

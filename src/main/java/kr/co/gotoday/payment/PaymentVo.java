@@ -2,10 +2,7 @@ package kr.co.gotoday.payment;
 
 import java.sql.Timestamp;
 
-import lombok.Data;
-
-@Data
-public class PaymentVO {
+public class PaymentVo {
 	private int payment_id;
     private String payment_method;
     private String payment_status;

@@ -14,11 +14,14 @@
         <span class="step active">가입완료</span>
     </div>
 
-        <p>
-            ${user.name}님의 가입이 완료되었습니다~
+    <div class="complete-content">
+        <p class="welcome-msg">
+            <span class="user-name">${user.name}</span>님의 가입이 완료되었습니다~
         </p>
-        <a href="/gotoday/member/login" >로그인하러 가기</a>
-		<a href="/gotoday/member/logout">로그아웃</a>
+    </div>
+    <div class="footer">
+        <a href="//loginUser" class="login-btn">로그인하러 가기</a>
+    </div>
 </div>
 </body>
 </html>
