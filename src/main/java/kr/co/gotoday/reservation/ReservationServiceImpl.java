@@ -8,6 +8,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
+import kr.co.gotoday.user.CalendarVO;
 
 @Service
 public class ReservationServiceImpl implements ReservationService{
@@ -149,7 +153,7 @@ public class ReservationServiceImpl implements ReservationService{
 
 	@Override
 	public ReservationVO convertToVO(ReservationDTO dto, ReservationVO reservationVO) {
-		// 날짜 + 시간대 합치기
+		// [수정해라 가빈아]날짜 + 시간대 합치기
 		String reservedForAt = dto.getReserved_for_at() + " " + dto.getTime_zone();
 		reservationVO.setReserved_for_at(reservedForAt);
 
@@ -181,7 +185,10 @@ public class ReservationServiceImpl implements ReservationService{
 			// 2. 예약 상태 변경
 			reservationVO.setReservation_status("DONE");
 
-			// 3. DB 저장 (예약 + 결제)
+			// 3. 잔여 확인 후 티켓 차감 
+			
+			
+			// 4. DB 저장 (예약 + 결제)
 			return createReservationWithPaymentent(reservationVO, paymentVO);
 
 		} catch (Exception e) {
@@ -255,4 +262,45 @@ public class ReservationServiceImpl implements ReservationService{
 			if (connection != null) connection.disconnect();
 		}
 	}
+
+	@Override
+	public int createScheduleByReservation(ReservationVO reservationVO, int user_id, int content_id) {
+		
+		CalendarVO calendarVO = new CalendarVO();
+		calendarVO.setSelected_at(reservationVO.getReserved_for_at());
+
+		
+		try {
+			int result = reservationMapper.createScheduleByReservation(map);
+			if(result < 0) {
+				throw new Exception("캘린더에 예약 일정을 저장하는데 오류 발생");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+
+	@Override
+	public void subCurrentTicket(ReservationVO reservationVO, int content_id) {
+		Map< String, Object> map = new HashMap<String, Object>();
+		
+		String reservedDate = reservationVO.getReserved_for_at();
+		String selected_at = reservedDate.split(" ")[0];
+		String time_zone = reservedDate.split(" ")[1];
+		
+		map.put("content_id", reservationVO.getContent_id());
+		map.put("selected_at", selected_at);
+		map.put("time_zone", time_zone);
+		
+		
+		
+		
+	}
+	
+	 
+
+	
+	
 }

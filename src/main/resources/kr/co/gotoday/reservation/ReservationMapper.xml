@@ -32,6 +32,27 @@
 		JOIN reservation r ON r.content_id = c.content_id
 		JOIN payment p ON r.reservation_id = p.reservation_id
 		WHERE c.user_id = #{user_id}
+	</select>	
+	
+	<select id="findCurrentTicketByTime" parameterType="map" resultType="kr.co.gotoday.content.ContentScheduleVO">  
+		SELECT content_id, current_ticket, total_ticket 
+		FROM content_schedule
+		WHERE content_id = #{content_id} AND scheduled_at = #{scheduled_at} AND time_zone = #{time_zone} 
 	</select>
-
+	
+	<update id="updateCurrentTicket" parameterType="map">
+		UPDATE SET content_schedule
+			current_ticket = #{ticketCount}
+		WHERE schedule_at = #{schedule_at} AND time_zone = #{time_zone} AND content_id = #{content_id}
+	</update>
+	
+	<insert id = "createScheduleByReservation" parameterType="kr.co.gotoday.user.CalendarVO" >
+		INSERT INTO calendar(
+			selected_at, type, content_id, user_id, reservation_id
+		) VALUES(
+			#{selected_at}, #{type}, #{content_id}, #{user_id}, #{reservation_id}
+		)
+	</insert>
+	
+	
 </mapper>

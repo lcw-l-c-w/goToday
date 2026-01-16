@@ -32,6 +32,7 @@ public class ReservationController {
 	@PostMapping("/reserve/schedule.do")
 	public String selctSchedule(HttpSession session, ReservationDTO dto, @RequestParam int content_id) {
 		ReservationDTO reservation = new ReservationDTO();
+		//[수정]
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());
 		reservation.setContent_id(content_id);
