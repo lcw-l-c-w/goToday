@@ -1,18 +1,20 @@
 package kr.co.gotoday.content;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-public class ContentVo {
+import lombok.Data;
+
+@Data
+public class ContentVO {
 	private int content_id;
-    private String contentkind;
+    private String content_kind;
     private String category;
     private String location;
     private String title;
     private String description;
     private String reservation_type;
-    private Timestamp start_at;
-    private Timestamp end_at;
+    private String  start_at;
+    private String  end_at;
     private int adult_price;
     private int teen_price;
     private int child_price;
@@ -26,4 +28,6 @@ public class ContentVo {
     private int admin_id;
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
+    private int user_id;
+    private String place_tag;
 }

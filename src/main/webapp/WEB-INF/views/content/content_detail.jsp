@@ -106,19 +106,19 @@
 
         <!-- 날짜 선택 -->
         <label>날짜 선택</label>
-        <input type="date" id="dateInput" />
+        <input type="date" id="dateInput" name = "scheduled_at"/>
 
         <!-- 시간대 선택 -->
         <div id="timeSlotArea" class="hidden">
           <label>시간대</label>
-          <select>
-            <option value="1">
+          <select name = "time_zone">
+            <option value="10:00-12:00">
               10 : 00 ~ 12 : 00
             </option>
-            <option value="2">
+            <option value="12:00-14:00"> <!-- value는 DB 시간 테이블 value로 조정 부탁 -->
               12 : 00 ~ 14 : 00
             </option>
-            <option value="3">
+            <option value="14:00-16:00">
               14 : 00 ~ 16 : 00
             </option>
           </select>

@@ -3,10 +3,13 @@ package kr.co.gotoday.user;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class UserVo {
+import lombok.Data;
+
+@Data
+public class UserVO {
 	private int user_id;
     private String email;
-    private int role; //0:유저 1:관리자
+    private int role; //0:유저 1:관리자(업체)
     private String password;
     private String login_type;
     private String name;
@@ -16,4 +19,8 @@ public class UserVo {
     private String phone_number;
     
     private List<UserTagVO> userTagList;
+    
+    // 카카오 로그인   
+    private String kakao_email; 
+    private String kakao_nickname;
 }
