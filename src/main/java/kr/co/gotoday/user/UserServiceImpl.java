@@ -119,5 +119,33 @@ public class UserServiceImpl implements UserService{
     public UserVO loginByEmail(String email) {
     	return userMapper.loginByEmail(email);
     }
+    
+    @Override
+    public UserVO adminLogin(UserVO vo) {
+        return userMapper.adminLogin(vo);
+    }
+    
+    // 관심사 수정
+    @Override
+    public List<String> getUserTagNames(int userId) {
+        return userMapper.getUserTagNames(userId);
+    }
 
+    @Override
+    @Transactional
+    public boolean updateUserTags(int userId, List<String> tagNames) {
+    	// 기존 태그 삭제
+        userMapper.deleteUserTags(userId);
+        // 새로운 태그 추가
+        for (String tagName : tagNames) {
+            Long tagId = userMapper.findTagIdByName(tagName);
+            // 태그가 존재하지 않는 경우 스킵
+            if (tagId == null) continue;
+            UserTagVO ut = new UserTagVO();
+            ut.setUser_id(userId);
+            ut.setTag_id(tagId.intValue());
+            userMapper.insertUserTag(ut);
+        }
+        return true;
+    }
 }

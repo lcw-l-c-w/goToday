@@ -202,4 +202,63 @@ public class UserController {
         return "redirect:/";
     }
     
+
+    // 관리자 로그인
+    @GetMapping("/member/loginForAdmin")
+    public void loginForAdmin() {
+       
+    }
+  
+    @PostMapping("/member/loginForAdmin")
+    public String loginForAdmin(HttpSession session
+    		, UserVO vo, Model model) {
+
+        UserVO userVO = userService.adminLogin(vo);
+        if (userVO == null) {
+            model.addAttribute("msg", "관리자 아이디 또는 비밀번호가 올바르지 않습니다.");
+            model.addAttribute("cmd", "back");
+            return "common/return";
+        }
+
+        session.setAttribute("loginSess", userVO);
+        return "redirect:/";
+    }
+    
+    // 관심사 수정
+    @GetMapping("/member/userLikeEdit")
+    public String userLikeEdit(HttpSession session, Model model) {
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+
+        // 유저가 가진 태그 이름 목록
+        List<String> userTags = userService.getUserTagNames(loginUser.getUser_id());
+        model.addAttribute("userTags", userTags);
+        return "member/userLikeEdit";
+    }
+    
+    @PostMapping("/member/userLikeEdit")
+    public String userLikeChange(
+            HttpSession session,
+            @RequestParam(required = false) String event,
+            @RequestParam(required = false) String[] location,
+            @RequestParam(required = false) String[] interest) {
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        int userId = loginUser.getUser_id();
+
+        List<String> tagNames = new ArrayList<>();
+
+        if (event != null) tagNames.add(event);
+        if (location != null) for (String l : location) tagNames.add(l);
+        if (interest != null) for (String i : interest) tagNames.add(i);
+
+        userService.updateUserTags(userId, tagNames);
+
+        return "redirect:/gotoday/mypage";
+    }
 }

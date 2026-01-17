@@ -19,5 +19,12 @@ public interface UserService {
     boolean insertKakaoUser(UserVO vo);
     
 	UserVO loginByEmail(String email);
+	
+	// 관리자 로그인
+	UserVO adminLogin(UserVO vo);
+	
+	// 관심사 수정
+	List<String> getUserTagNames(int userId);
+	boolean updateUserTags(int userId, List<String> tagNames);
 
 }
