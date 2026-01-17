@@ -27,4 +27,7 @@ public interface UserService {
 	List<String> getUserTagNames(int userId);
 	boolean updateUserTags(int userId, List<String> tagNames);
 
+	// 회원 정보 수정
+	UserVO getUserById(int userId);
+	boolean updateUserInfo(UserVO vo);
 }

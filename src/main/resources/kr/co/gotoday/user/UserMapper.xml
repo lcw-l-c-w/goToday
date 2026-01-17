@@ -70,4 +70,24 @@
 	    INSERT INTO user_tag (user_id, tag_id)
 	    VALUES (#{user_id}, #{tag_id})
 	</insert>
+	
+	<!-- 회원정보 조회 -->
+	<select id="getUserById" parameterType="int" resultType="kr.co.gotoday.user.UserVO">
+	    SELECT * FROM user WHERE user_id = #{userId}
+	</select>
+
+	<!-- 회원정보 수정 -->
+	<update id="updateUserInfo" parameterType="kr.co.gotoday.user.UserVO">
+	    UPDATE user
+	    <set>
+	        <if test="password != null and password != ''">
+	            password = MD5(#{password}),
+	        </if>
+	        name = #{name},
+	        birthday = #{birthday},
+	        gender = #{gender},
+	        phone_number = #{phone_number}
+	    </set>
+	    WHERE user_id = #{user_id}
+	</update>
 </mapper>

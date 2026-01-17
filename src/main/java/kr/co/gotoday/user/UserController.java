@@ -261,4 +261,60 @@ public class UserController {
 
         return "redirect:/gotoday/mypage";
     }
+    
+    // 회원 정보 수정
+    @GetMapping("/member/userInfoEdit")
+    public String userInfoEdit(HttpSession session, Model model) {
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+
+        // DB에서 최신 정보 가져오기
+        UserVO dbUser = userService.getUserById(loginUser.getUser_id());
+        model.addAttribute("user", dbUser);
+        return "member/userInfoEdit";
+    }
+    
+    @PostMapping("/member/userInfoEdit")
+    public String userInfoEdit(HttpSession session, UserVO vo, 
+            @RequestParam(required = false) String confirmPassword,
+            Model model) {
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/member/login");
+            return "common/return";
+        }
+
+        // 패스워드 확인
+        if (vo.getPassword() != null && !vo.getPassword().isEmpty()) {
+            if (!vo.getPassword().equals(confirmPassword)) {
+                model.addAttribute("msg", "비밀번호와 확인이 일치하지 않습니다.");
+                model.addAttribute("cmd", "back");
+                return "common/return";
+            }
+        }
+
+        vo.setUser_id(loginUser.getUser_id());
+
+        boolean result = userService.updateUserInfo(vo);
+
+        if (result) {
+            // 세션 최신화: userMapper → userService
+            UserVO updatedUser = userService.loginByEmail(loginUser.getEmail());
+            session.setAttribute("loginSess", updatedUser);
+            return "redirect:/gotoday/mypage";
+        } else {
+            model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
+            model.addAttribute("cmd", "back");
+            return "common/return";
+        }
+    }
+    
 }

@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService{
     public List<String> getUserTagNames(int userId) {
         return userMapper.getUserTagNames(userId);
     }
-
+    // 관심사 수정
     @Override
     @Transactional
     public boolean updateUserTags(int userId, List<String> tagNames) {
@@ -147,5 +147,22 @@ public class UserServiceImpl implements UserService{
             userMapper.insertUserTag(ut);
         }
         return true;
+    }
+    
+    //회원정보 수정
+    @Override
+    public UserVO getUserById(int userId) {
+        return userMapper.getUserById(userId);
+    }
+    //회원정보 수정
+    @Override
+    @Transactional
+    public boolean updateUserInfo(UserVO vo) {
+    	// 패스워드 입력 안 하면 null로 두기 → XML에서 처리
+        if (vo.getPassword() != null && vo.getPassword().isEmpty()) {
+            vo.setPassword(null);
+        }
+        int result = userMapper.updateUserInfo(vo);
+        return result > 0;
     }
 }

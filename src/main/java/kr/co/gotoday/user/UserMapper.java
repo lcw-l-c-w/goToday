@@ -23,4 +23,8 @@ public interface UserMapper {
     List<String> getUserTagNames(int userId);
     void deleteUserTags(int userId);
     void insertUserTag(UserTagVO vo);
+    
+    // 회원정보 수정
+    UserVO getUserById(int userId);
+    int updateUserInfo(UserVO vo);
 }
