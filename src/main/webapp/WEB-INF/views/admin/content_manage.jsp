@@ -163,7 +163,7 @@
 
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="#"><span class="material-symbols-outlined">dashboard</span> 승인요청</a></li>
+                <li><a href="#"><span class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
                 <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
                 <li><a href="#"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
                 <li><a href="#"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
@@ -184,21 +184,18 @@
                 <h2>전시 관리</h2>
                 <p>등록하신 전시회의 상태를 확인하고 관리하세요.</p>
             </div>
-            <button class="btn-register">+ 게시글 등록하기</button>
         </header>
 
         <div class="content-card">
             <div class="toolbar">
                 <div class="search-box">
                     <span class="material-symbols-outlined">search</span>
-                    <input type="text" placeholder="전시회 명으로 검색..." />
+                    <input type="text"  class="searchInput" id="searchInput" placeholder="전시회 명으로 검색..."  />
                 </div>
                 <div class="filter-tabs">
-                    <button class="active">전체</button>
-                    <button>활성화</button>
-                    <button>비활성화</button>
-                    <button>수정요청</button>
-                    <button>거절</button>
+                    <button class="filter-btn active">전체</button>
+                    <button class="filter-btn" data-status="activate">활성화</button>
+                    <button class="filter-btn" data-status="deactivate">비활성화</button>
                 </div>
             </div>
 
@@ -211,35 +208,9 @@
                     <span>가격</span>
                     <span class="text-right">관리</span>
                 </div>
-
-                <ul class="table-body">
-                    <li class="table-row">
-                        <div class="col-status"><span class="badge active">활성</span></div>
-                        <div class="col-title">모던 아트 익스피리언스 2026</div>
-                        <div class="col-date">2026.01.15 ~ 2026.03.30</div>
-                        <div class="col-place">서울 시립미술관 본관 2층</div>
-                        <div class="col-price">15,000원</div>
-                        <div class="col-actions">
-                            <button class="action-btn approve" title="승인">✅</button>
-                            <button class="action-btn reject" title="거절">❌</button>
-                            <button class="action-btn disable" title="비활성">⛔</button>
-                            <button class="action-btn delete" title="삭제">🗑</button>
-                        </div>
-                    </li>
-                    <li class="table-row">
-                        <div class="col-status"><span class="badge inactive">비활성</span></div>
-                        <div class="col-title">미디어 아트: 빛과 공간</div>
-                        <div class="col-date">2026.02.01 ~ 2026.04.01</div>
-                        <div class="col-place">DDP 전시관</div>
-                        <div class="col-price">18,000원</div>
-                        <div class="col-actions">
-                            <button class="action-btn approve">✅</button>
-                            <button class="action-btn reject">❌</button>
-                            <button class="action-btn disable">⛔</button>
-                            <button class="action-btn delete">🗑</button>
-                        </div>
-                    </li>
-                </ul>
+				<div class="contentList" id="contentList">
+					 <div class="loading">데이터를 불러오는 중입니다...</li>
+				</div>	
             </section>
 
             <div class="pagination">
@@ -254,4 +225,16 @@
 </div>
 
 </body>
+<script>
+const ACTIVATE_MAP = {
+		activate: { text: '활성화', className: 'activate' },
+		deactivate:  { text: '비활성화',     className: 'deactivate' }
+	};
+</script>
 </html>
+
+
+
+
+
+
