@@ -185,8 +185,8 @@ public class ReservationController {
 			result.put("success", true);
 	        result.put("orderId", paymentDTO.getOrderId());
 	        result.put("orderName", paymentDTO.getOrderName());
-	        result.put("amount", reservationVO.getTotal_price());
-	        result.put("customerName", reservationVO.getReceiver_name());
+	        result.put("amount", paymentDTO.getAmount());
+	        result.put("customerName", paymentDTO.getCustomerName());
 	        result.put("user_id", reservationVO.getUser_id());
 	        result.put("receive_type", reservationVO.getReceive_type());
 
@@ -269,7 +269,7 @@ public class ReservationController {
 		}
 
 		try {
-			// 4. 토스 결제 승인 + DB 저장 (하나의 트랜잭션)
+			// 4. 예약 프로세스 
 			ReservationVO result = reservationService.confirmAndCreateReservation(
 					reservationVO, paymentKey, orderId, amount);
 

@@ -34,7 +34,7 @@ public class ReservationServiceImpl implements ReservationService{
 	PaymentMapper paymentMapper;
 
 	private static final Logger log =
-	        LoggerFactory.getLogger(ReservationService.class);
+	        LoggerFactory.getLogger(ReservationServiceImpl.class);
 	
 	@Override
 	public int calculate(ReservationDTO reservationDTO, ContentVO contentVO) {
@@ -181,7 +181,7 @@ public class ReservationServiceImpl implements ReservationService{
 			requestBody.put("paymentKey", paymentKey);
 
 			// Secret Key 인코딩-> 설정 파일로 분리 필요)
-			String secretKey = "test_sk_DpexMgkW36ym117LE2x48GbR5ozO";
+			String secretKey = "test_sk_Poxy1XQL8Rakdljp5v4Zr7nO5Wml";
 			Base64.Encoder encoder = Base64.getEncoder();
 			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 			String authorization = "Basic " + new String(encodedBytes);
@@ -214,14 +214,15 @@ public class ReservationServiceImpl implements ReservationService{
 				String errorMessage = (String) tossResponse.get("message");
 				throw new RuntimeException("토스 결제 승인 실패: " + errorMessage);
 			}
-
+			System.out.println(tossResponse);
 			// 성공 시 PaymentVO 생성 및 반환
 			PaymentVO paymentVO = new PaymentVO();
 			paymentVO.setPayment_key((String) tossResponse.get("paymentKey"));
 			paymentVO.setOrder_key((String) tossResponse.get("orderId"));
 			paymentVO.setPayment_method((String) tossResponse.get("method"));
 			paymentVO.setPayment_status((String) tossResponse.get("status"));
-			paymentVO.setAmount_price((int) tossResponse.get("amo"));
+			Number totalAmount = (Number) tossResponse.get("totalAmount");
+			paymentVO.setAmount_price(totalAmount.intValue());
 			paymentVO.setRefund_status("NONE");
 
 			return paymentVO;
