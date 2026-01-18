@@ -12,12 +12,15 @@ public interface ReservationService {
 
 	//예약 프로세스
 	ReservationVO confirmAndCreateReservation(ReservationVO reservationVO, String paymentKey, String orderId, int amount);
-	//1. 티켓 차감
+	
+	//티켓 차감/복구
 	int trySubCurrentTicket(ReservationVO reservationVO) throws Exception;
-	//2. 토스 결제 승인 API 호출 -> 승인된 결제 정보 리턴 
-	PaymentVO confirmTossPayment(String paymentKey, String orderId, int amount);
-	//3. 예약+결제
+	int tryAddCurrentTicket(ReservationVO reservationVO) throws Exception;
+
+	//예약+결제
 	ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, PaymentVO paymentVO) throws Exception;	
 
-	int createScheduleByReservation(ReservationVO reservationVO, int user_id, int content_id);
+	void createScheduleByReservation(ReservationVO reservationVO);
+
+	void updatePaymentStatus(String order_key);
 }

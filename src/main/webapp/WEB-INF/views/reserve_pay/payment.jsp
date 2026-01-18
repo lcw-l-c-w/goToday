@@ -208,15 +208,14 @@
 
     <script>
         const button = document.getElementById("payment-button");
-        const method = document.querySelector(
-        		  'input[name="payMethod"]:checked'
-        		).value;
-        
-        // [수정완료] 내 API 개별 연동 클라이언트 키 (test_ck_Z...)
+       
+        //클라이언트 키 -> 가빈 테스트 중 
         const clientKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN"; 
         const tossPayments = TossPayments(clientKey);
 
         button.addEventListener("click", async function () {
+        	const method = document.querySelector('input[name="payMethod"]:checked').value;
+           
             // 수령인 정보 가져오기
             const receiverName = document.querySelector('input[name="receiver_name"]').value;
             const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
@@ -240,38 +239,48 @@
                 });
 
                 const result = await response.json();
-		        const commonOptions = {
-		        		  amount: result.amount,
-		        		  orderId: result.orderId,
-		        		  orderName: result.orderName,
-		        		  customerName: receiverName,
-		        		  customerEmail: receiverEmail,
-		        		// 성공/실패 시 이동할 URL (Context Path 포함)
-		                  successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/success.do",
-		                  failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
-		        		};
 
                 // 2. 서버 응답이 성공이면 토스 결제창 호출 (일반 결제창 방식)
-                if (result.success) {
-                    console.log("예약 정보 저장 성공, 토스 결제창 호출");
+                if (!result.success) {
+                                alert("예약 처리 실패: " + result.msg);
+                                button.disabled = false;
+                                button.textContent = "총 ${reservation.total_price}원 결제하기";
+                                return;
+                            }
+
+                console.log("예약 정보 저장 성공, 토스 결제창 호출")
+                
+                //공통옵션
+                const commonOptions = {
+			       		  amount: result.amount,
+			       		  orderId: result.orderId,
+			       		  orderName: result.orderName,
+			       		  customerName: result.customerName,
+			       		  customerEmail: receiverEmail,
+			       		  
+  		                  successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/success.do",
+  		                  failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
+  		        	};
                     
-	                if (method === "CARD") {
-					  tossPayments.requestPayment("카드", commonOptions);
-					}
-					
-					if (method === "EASY_PAY") {
-					  tossPayments.requestPayment("간편결제", commonOptions);
-					}
-					
-					if (method === "VIRTUAL_ACCOUNT") {
-					  tossPayments.requestPayment("가상계좌", {
-					    ...commonOptions,
-					    validHours: 24, // 가상계좌 필수 옵션
-					  });
-					}
-                } else {
-                    alert("예약 처리 실패: " + result.msg);
+                if (method === "CARD") {
+                    tossPayments.requestPayment("카드", commonOptions);
+                } else if (method === "EASY_PAY") {
+                    tossPayments.requestPayment("간편결제", commonOptions);
+                } else if (method === "VIRTUAL_ACCOUNT") {
+                    // 가상계좌는 validHours 추가
+                    var virtualOptions = {
+                        amount: commonOptions.amount,
+                        orderId: commonOptions.orderId,
+                        orderName: commonOptions.orderName,
+                        customerName: commonOptions.customerName,
+                        customerEmail: commonOptions.customerEmail,
+                        successUrl: commonOptions.successUrl,
+                        failUrl: commonOptions.failUrl,
+                        validHours: 24
+                    };
+                    tossPayments.requestPayment("가상계좌", virtualOptions);
                 }
+                
             } catch (error) {
                 console.error("예약 요청 오류:", error);
                 alert("예약 처리 중 오류가 발생했습니다.");

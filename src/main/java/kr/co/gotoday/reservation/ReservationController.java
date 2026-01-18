@@ -1,14 +1,20 @@
 package kr.co.gotoday.reservation;
 
+import java.io.BufferedReader;
+import java.security.DrbgParameters.Reseed;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +34,9 @@ public class ReservationController {
 
 	@Autowired
 	ReservationService reservationService;
+	
+	private static final Logger log =
+	        LoggerFactory.getLogger(ReservationController.class);
 
 	@PostMapping("/reserve/schedule.do")
 	public String selctSchedule(HttpSession session, ReservationDTO dto) {
@@ -173,8 +182,8 @@ public class ReservationController {
 			reservationService.convertToVO(reservation, reservationVO);
 
 			// 예약자 설정
-			UserVO userVo = (UserVO) session.getAttribute("loginSess");
-			reservationVO.setUser_id(userVo.getUser_id());
+			UserVO userVO = (UserVO) session.getAttribute("loginSess");
+			reservationVO.setUser_id(userVO.getUser_id());
 
 			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
 			session.setAttribute("pendingReservation", reservationVO);
@@ -186,7 +195,7 @@ public class ReservationController {
 	        result.put("orderId", paymentDTO.getOrderId());
 	        result.put("orderName", paymentDTO.getOrderName());
 	        result.put("amount", paymentDTO.getAmount());
-	        result.put("customerName", paymentDTO.getCustomerName());
+	        result.put("customerName", userVO.getName());
 	        result.put("user_id", reservationVO.getUser_id());
 	        result.put("receive_type", reservationVO.getReceive_type());
 
@@ -290,4 +299,51 @@ public class ReservationController {
 			return ResponseEntity.status(500).body(response);
 		}
 	}
+	
+	@PostMapping("/webhook/toss")
+	public ResponseEntity<Map<String, Object>> handleTossWebhook(HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			//요청 본문 읽기
+			StringBuilder requestBody = new StringBuilder();
+			BufferedReader reader = request.getReader();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				requestBody.append(line);
+			}
+			
+			String body = requestBody.toString();
+			log.info("========================================");
+			log.info("[WEBHOOK 수신] {}", body);
+			log.info("========================================");
+			
+			//JSON 파싱
+			JSONParser parser = new JSONParser();
+			JSONObject webhookData = (JSONObject) parser.parse(body);
+				
+			String order_key = (String) webhookData.get("orderId");           // ✅
+			String status = (String) webhookData.get("status");    
+			
+			log.info("[WEBHOOK] orderId={},status={}", 
+					order_key, status);
+			
+			//상태가 DONE 상태면 DB도 입금 완료 처리
+			if ("DONE".equals(status)) {
+				reservationService.updatePaymentStatus(order_key);
+			}
+			
+			//성공 응답 (토스에게 200 응답 필수)
+			response.put("success", true);
+			response.put("message", "Webhook 처리 완료");
+			return ResponseEntity.ok(response);
+			
+		} catch (Exception e) {
+			log.error("[WEBHOOK 처리 실패]", e);
+			response.put("success", false);
+			response.put("message", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+
 }

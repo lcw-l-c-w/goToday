@@ -1,26 +1,15 @@
 package kr.co.gotoday.reservation;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
@@ -32,10 +21,13 @@ public class ReservationServiceImpl implements ReservationService{
 	ReservationMapper reservationMapper;
 	@Autowired
 	PaymentMapper paymentMapper;
-
+	@Autowired
+	TossPaymentClient tossPaymentClient;
+	
 	private static final Logger log =
 	        LoggerFactory.getLogger(ReservationServiceImpl.class);
 	
+
 	@Override
 	public int calculate(ReservationDTO reservationDTO, ContentVO contentVO) {
 		if (reservationDTO == null || contentVO == null) {
@@ -87,18 +79,39 @@ public class ReservationServiceImpl implements ReservationService{
 			ticketSucceed = true;
 			
 			// 토스 결제 승인
-			paymentVO = confirmTossPayment(paymentKey, orderId, amount);
+			paymentVO = tossPaymentClient.confirmPayment(paymentKey, orderId, amount);
 			
 			// DB 저장 (예약 + 결제)-> 트랜잭션
-			return createReservationWithPaymentent(reservationVO, paymentVO);
+			ReservationVO savedReservation = 
+		            createReservationWithPaymentent(reservationVO, paymentVO);
 			
+			// 캘린더 저장 (비동기)
+			CompletableFuture.runAsync(() -> {
+				try {
+					createScheduleByReservation(savedReservation);
+					log.info(
+						"[CALENDAR_SUCCESS] reservationId={}, userId={}", 
+						savedReservation.getReservation_id(),
+						savedReservation.getUser_id()
+					);
+				} catch (Exception e) {
+					//로그만 남기고 별도 에러 던지지는 않음 -> 캘린더 저장 실패했다고 토스 결제 취소하면 X 되기 때문
+					log.error(
+						"[CALENDAR_FAILED] reservationId={}, userId={}",
+						savedReservation.getReservation_id(),
+						savedReservation.getUser_id()
+					);
+				}
+			});
+			
+			return savedReservation;
 		} catch (Exception e) {
 			if (paymentVO != null) {
 				try {
 					//결제 승인 후 DB저장 실패 로그
 					log.error("[예약결제 DB저장 실패]",e);
 					// 토스 결제 취소
-					cancelTossPayment(paymentKey, "DB 저장 실패로 인한 취소");
+					tossPaymentClient.cancelPayment(paymentKey, "DB 저장 실패로 인한 취소");
 				} catch (Exception cancelException) {
 					log.error("[토스 결제 취소 실패] paymentKey={}, orderId={}", 
 							paymentKey,
@@ -109,7 +122,7 @@ public class ReservationServiceImpl implements ReservationService{
 			//티켓 선차감 했는데 에러가 난 경우 -> 티켓 복구 
 			if (ticketSucceed) {
 				try {
-//					tryAddCurrentTicket();
+					tryAddCurrentTicket(reservationVO);
 				} catch (Exception cancelException) {
 					log.error("[티켓 복구 실패] scheduleId={},total_qty={}", 
 							reservationVO.getSchedule_id(),
@@ -132,14 +145,42 @@ public class ReservationServiceImpl implements ReservationService{
 		map.put("total_qty", total_qty);
 		map.put("schedule_id", reservationVO.getSchedule_id());
 		
-		int result = reservationMapper.updateCurrentTicket(map);
+		int result = reservationMapper.subCurrentTicket(map);
 		
 		if (result < 1) {
-			// CAS 실패 = 재고 부족
+			log.error(
+		            "[TICKET_SUB_FAILED] scheduleId={}, requestQty={}",
+		            reservationVO.getSchedule_id(),
+		            total_qty
+					);
 			throw new Exception("잔여 티켓 수량이 부족합니다.");
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public int tryAddCurrentTicket(ReservationVO reservationVO) throws Exception {
+	    int total_qty = reservationVO.getAdult_qty()
+	            + reservationVO.getTeen_qty()
+	            + reservationVO.getChild_qty();
+	    
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("total_qty", total_qty);
+	    map.put("schedule_id", reservationVO.getSchedule_id());
+	    
+	    int result = reservationMapper.addCurrentTicket(map);
+	    
+	    if (result < 1) {
+	        log.error(
+	            "[TICKET_ADD_FAILED] scheduleId={}, qty={} - 복구 후 total_ticket 초과 가능성",
+	            reservationVO.getSchedule_id(),
+	            total_qty
+	        );
+	        throw new Exception("티켓 복구에 실패했습니다. (최대 티켓 수 초과)");
+	    }
+	    
+	    return result;
 	}
 
 	@Override
@@ -165,163 +206,42 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public PaymentVO confirmTossPayment(String paymentKey, String orderId, int amount) {
-		HttpURLConnection connection = null;
-		OutputStream outputStream = null;
-		InputStream responseStream = null;
-		Reader reader = null;
-
-		try {
-			// 토스페이먼츠 승인 API 요청 데이터
-			JSONObject requestBody = new JSONObject();
-			requestBody.put("orderId", orderId);
-			requestBody.put("amount", String.valueOf(amount));
-			requestBody.put("paymentKey", paymentKey);
-
-			// Secret Key 인코딩-> 설정 파일로 분리 필요)
-			String secretKey = "test_sk_Poxy1XQL8Rakdljp5v4Zr7nO5Wml";
-			Base64.Encoder encoder = Base64.getEncoder();
-			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-			String authorization = "Basic " + new String(encodedBytes);
-
-			// HTTP 연결 설정
-			URL url = new URL("https://api.tosspayments.com/v1/payments/confirm");
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty("Authorization", authorization);
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestMethod("POST");
-			connection.setDoOutput(true);
-
-			// 요청 전송
-			outputStream = connection.getOutputStream();
-			outputStream.write(requestBody.toString().getBytes("UTF-8"));
-			outputStream.flush();
-
-			// 응답 처리
-			int responseCode = connection.getResponseCode();
-			boolean isSuccess = responseCode == 200;
-
-			responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
-			reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-
-			JSONParser parser = new JSONParser();
-			JSONObject tossResponse = (JSONObject) parser.parse(reader);
-
-			// 실패 시 예외 발생
-			if (!isSuccess) {
-				String errorMessage = (String) tossResponse.get("message");
-				throw new RuntimeException("토스 결제 승인 실패: " + errorMessage);
-			}
-			System.out.println(tossResponse);
-			// 성공 시 PaymentVO 생성 및 반환
-			PaymentVO paymentVO = new PaymentVO();
-			paymentVO.setPayment_key((String) tossResponse.get("paymentKey"));
-			paymentVO.setOrder_key((String) tossResponse.get("orderId"));
-			paymentVO.setPayment_method((String) tossResponse.get("method"));
-			paymentVO.setPayment_status((String) tossResponse.get("status"));
-			Number totalAmount = (Number) tossResponse.get("totalAmount");
-			paymentVO.setAmount_price(totalAmount.intValue());
-			paymentVO.setRefund_status("NONE");
-
-			return paymentVO;
-
-		} catch (Exception e) {
-			throw new RuntimeException("토스 결제 승인 중 오류 발생: " + e.getMessage(), e);
-		} finally {
-			// 리소스 정리
-			if (reader != null) try { reader.close(); } catch (Exception ignored) {}
-			if (responseStream != null) try { responseStream.close(); } catch (Exception ignored) {}
-			if (outputStream != null) try { outputStream.close(); } catch (Exception ignored) {}
-			if (connection != null) connection.disconnect();
-		}
+	public void createScheduleByReservation(ReservationVO reservationVO){
+		
+		String selectedAt = reservationVO.getReserved_for_at()+" "+reservationVO.getTime_zone();
+		
+		CalendarVO calendarVO = new CalendarVO();
+		calendarVO.setSelected_at(selectedAt);
+		calendarVO.setContent_id(reservationVO.getContent_id());
+		calendarVO.setType("reserve");
+		calendarVO.setUser_id(reservationVO.getUser_id());
+		calendarVO.setReservation_id(reservationVO.getReservation_id());
+		
+		reservationMapper.createScheduleByReservation(calendarVO);
 	}
-
-
-
-	//토스 결제 취소 API 호출
-	@SuppressWarnings("unchecked")
-	public void cancelTossPayment(String paymentKey, String cancelReason) {
-		HttpURLConnection connection = null;
-		OutputStream outputStream = null;
-		InputStream responseStream = null;
-		Reader reader = null;
-
-		try {
-			// 취소 요청 데이터
-			JSONObject requestBody = new JSONObject();
-			requestBody.put("cancelReason", cancelReason);
-
-			// Secret Key 인코딩
-			String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-			Base64.Encoder encoder = Base64.getEncoder();
-			byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-			String authorization = "Basic " + new String(encodedBytes);
-
-			// HTTP 연결 설정
-			URL url = new URL("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty("Authorization", authorization);
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestMethod("POST");
-			connection.setDoOutput(true);
-
-			// 요청 전송
-			outputStream = connection.getOutputStream();
-			outputStream.write(requestBody.toString().getBytes("UTF-8"));
-			outputStream.flush();
-
-			// 응답 처리
-			int responseCode = connection.getResponseCode();
-			responseStream = (responseCode == 200) ? connection.getInputStream() : connection.getErrorStream();
-			reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-
-			JSONParser parser = new JSONParser();
-			JSONObject tossResponse = (JSONObject) parser.parse(reader);
-
-			if (responseCode != 200) {
-				String errorMessage = (String) tossResponse.get("message");
-				throw new RuntimeException("토스 결제 취소 실패: " + errorMessage);
-			}
-
-			System.out.println("토스 결제 취소 성공: " + paymentKey);
-
-		} catch (Exception e) {
-			throw new RuntimeException("토스 결제 취소 중 오류: " + e.getMessage(), e);
-		} finally {
-			if (reader != null) try { reader.close(); } catch (Exception ignored) {}
-			if (responseStream != null) try { responseStream.close(); } catch (Exception ignored) {}
-			if (outputStream != null) try { outputStream.close(); } catch (Exception ignored) {}
-			if (connection != null) connection.disconnect();
-		}
-	}
-
-//	@Override
-//	public int createScheduleByReservation(ReservationVO reservationVO, int user_id, int content_id) {
-//		
-//		CalendarVO calendarVO = new CalendarVO();
-//		calendarVO.setSelected_at(reservationVO.getReserved_for_at());
-//
-//		
-//		try {
-//			int result = reservationMapper.createScheduleByReservation(map);
-//			if(result < 0) {
-//				throw new Exception("캘린더에 예약 일정을 저장하는데 오류 발생");
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return 0;
-//	}
 
 	@Override
-	public int createScheduleByReservation(ReservationVO reservationVO, int user_id, int content_id) {
-		// TODO Auto-generated method stub
-		return 0;
+	public void updatePaymentStatus(String order_key) {
+		try {
+			PaymentVO payment = reservationMapper.findByOrderId(order_key);
+			
+			if (payment == null || "DONE".equals(payment.getPayment_status())) {
+				return; // 결제 정보 없거나 이미 완료면 스킵
+			}
+			
+			Map<String, Object> map = new HashMap<>();
+			map.put("order_key", order_key);
+			map.put("payment_status", "DONE");
+			
+			reservationMapper.updatePaymentStatus(map);
+			
+		} catch (Exception e) {
+			log.error("[결제 상태 업데이트 실패] order_key={}", order_key, e);
+		}
+		
 	}
-	
+
 	 
 
 	

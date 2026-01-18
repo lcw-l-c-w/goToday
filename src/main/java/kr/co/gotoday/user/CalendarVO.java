@@ -1,7 +1,5 @@
 package kr.co.gotoday.user;
 
-import java.sql.Timestamp;
-
 import lombok.Data;
 
 @Data
@@ -11,4 +9,5 @@ public class CalendarVO {
     private String type;
     private int content_id;
     private int user_id;
+    private int reservation_id;
 }

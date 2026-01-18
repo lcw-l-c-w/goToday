@@ -18,6 +18,14 @@
 		</selectKey>
 	</insert>
 	
+	<insert id = "createScheduleByReservation" parameterType="kr.co.gotoday.user.CalendarVO" >
+		INSERT INTO calendar(
+			selected_at, type, content_id, user_id, reservation_id
+		) VALUES(
+			#{selected_at}, #{type}, #{content_id}, #{user_id}, #{reservation_id}
+		)
+	</insert>
+
 	<select id="findByReservationId" parameterType="int"  resultType="kr.co.gotoday.reservation.ReservationVO">
 	    SELECT * FROM reservation 
 	    WHERE reservation_id = #{reservation_id}
@@ -34,20 +42,41 @@
 		WHERE c.user_id = #{user_id}
 	</select>	
 	
-	<update id="updateCurrentTicket" parameterType="map">
+	<select id="findByOrderId" parameterType="string" resultType="kr.co.gotoday.payment.PaymentVO">
+		SELECT 
+			payment_id,
+			reservation_id,
+			payment_key,
+			order_key,
+			payment_method,
+			payment_status,
+			amount_price,
+			refund_status,
+			paid_at
+		FROM payment
+		WHERE order_key = #{order_key}
+	</select>
+	
+	
+	<update id="subCurrentTicket" parameterType="map">
 		UPDATE content_schedule
 		SET current_ticket = current_ticket - #{total_qty}
 		WHERE schedule_id = #{schedule_id} 
 			AND current_ticket >= #{total_qty} 
 	</update>
 	
-	<insert id = "createScheduleByReservation" parameterType="kr.co.gotoday.user.CalendarVO" >
-		INSERT INTO calendar(
-			selected_at, type, content_id, user_id, reservation_id
-		) VALUES(
-			#{selected_at}, #{type}, #{content_id}, #{user_id}, #{reservation_id}
-		)
-	</insert>
+	<update id="addCurrentTicket" parameterType="map">
+	    UPDATE content_schedule
+	    SET current_ticket = LEAST(current_ticket + #{total_qty}, total_ticket)
+	    WHERE schedule_id = #{schedule_id}
+	</update>
+	
+	<update id="updatePaymentStatus" parameterType="map">
+		UPDATE payment
+		SET payment_status = #{payment_status}
+		WHERE order_key = #{order_key}
+	</update>
+
 	
 	
 </mapper>
