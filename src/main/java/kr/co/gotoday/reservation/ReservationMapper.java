@@ -14,7 +14,6 @@ public interface ReservationMapper {
 	int createPayment(PaymentVO paymentVO);
 	ReservationVO findByReservationId(int reservation_id);
 	List<VendorReservationListDTO> findReservationByVendor(int user_id);
-	ContentScheduleVO findCurrentTicketByTime(Map<String, Object> map);
 	int updateCurrentTicket(Map<String, Object> map);
 	int createScheduleByReservation(Map<String, Object> map);
 	

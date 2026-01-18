@@ -228,7 +228,7 @@
                 const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
                 const receiverPhone = document.querySelector('input[name="receiver_phone"]').value;
                 const receiverEmail = document.querySelector('input[name="receiver_email"]').value;
-                const reservationType = document.querySelector('input[name="reservation_type"]:checked').value;
+                const receiveType = document.querySelector('input[name="receive_type"]:checked').value;
 
                 // 1. 먼저 서버에 예약 정보 저장 요청
                 try {
@@ -241,7 +241,7 @@
                             receiver_name: receiverName,
                             receiver_birth: receiverBirth,
                             receiver_phone: receiverPhone,
-                            reservation_type: reservationType
+                            receive_type: receive_type
                         })
                     });
 

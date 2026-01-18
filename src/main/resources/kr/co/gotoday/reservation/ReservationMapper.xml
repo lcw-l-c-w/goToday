@@ -4,11 +4,11 @@
 
 	<insert id="createReservation" parameterType="kr.co.gotoday.reservation.ReservationVO">
 		INSERT INTO reservation(
-			reservation_code, reserved_for_at, reservation_status, total_price, adult_qty,
+			reservation_code, reserved_for_at, time_zone, reservation_status, total_price, adult_qty,
 		    child_qty, teen_qty, user_id, content_id, reservation_type, receiver_name,
 		    receiver_birth, receiver_phone, reserve_visit, receive_type, created_at
 		) VALUES (
-			#{reservation_code}, #{reserved_for_at}, #{reservation_status}, #{total_price}, #{adult_qty},
+			#{reservation_code}, #{reserved_for_at}, #{time_zone}, #{reservation_status}, #{total_price}, #{adult_qty},
 			#{child_qty}, #{teen_qty}, #{user_id}, #{content_id}, #{reservation_type}, #{receiver_name},
 			#{receiver_birth}, #{receiver_phone}, #{reserve_visit}, #{receive_type}, NOW()
 		)
@@ -24,7 +24,7 @@
 	</select>
 	
 	<select id="findReservationByVendor" parameterType="int" resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
-		SELECT r.reservation_id, r.reservation_code, r.reserved_for_at, r.adult_qty, r.child_qty, r.teen_qty, r.reservation_status, 
+		SELECT r.reservation_id, r.reservation_code, r.reserved_for_at, r.time_zone, r.adult_qty, r.child_qty, r.teen_qty, r.reservation_status, 
 		 	   r.receiver_name, r.receiver_birth, r.receiver_phone,
 			   p.payment_id, p.payment_status, 
 			   c.content_id, c.title 
@@ -34,16 +34,11 @@
 		WHERE c.user_id = #{user_id}
 	</select>	
 	
-	<select id="findCurrentTicketByTime" parameterType="map" resultType="kr.co.gotoday.content.ContentScheduleVO">  
-		SELECT content_id, current_ticket, total_ticket 
-		FROM content_schedule
-		WHERE content_id = #{content_id} AND scheduled_at = #{scheduled_at} AND time_zone = #{time_zone} 
-	</select>
-	
 	<update id="updateCurrentTicket" parameterType="map">
-		UPDATE SET content_schedule
-			current_ticket = #{ticketCount}
-		WHERE schedule_at = #{schedule_at} AND time_zone = #{time_zone} AND content_id = #{content_id}
+		UPDATE content_schedule
+		SET current_ticket = current_ticket - #{total_qty}
+		WHERE schedule_id = #{schedule_id} 
+			AND current_ticket >= #{total_qty} 
 	</update>
 	
 	<insert id = "createScheduleByReservation" parameterType="kr.co.gotoday.user.CalendarVO" >

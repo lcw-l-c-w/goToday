@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
@@ -30,6 +33,9 @@ public class ReservationServiceImpl implements ReservationService{
 	@Autowired
 	PaymentMapper paymentMapper;
 
+	private static final Logger log =
+	        LoggerFactory.getLogger(ReservationService.class);
+	
 	@Override
 	public int calculate(ReservationDTO reservationDTO, ContentVO contentVO) {
 		if (reservationDTO == null || contentVO == null) {
@@ -42,42 +48,124 @@ public class ReservationServiceImpl implements ReservationService{
 		
 		return adultPrice + teenPrice + childPrice;
 	}
-
+	
 	@Override
-	@Transactional
-	public ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, PaymentVO paymentVO) {
-		try {
-			//예약 상태를 완료로 변경
-			reservationVO.setReservation_status("DONE");
-			
-			// 예약 정보 저장
-			int reservationResult = reservationMapper.createReservation(reservationVO);
-			if(reservationResult <= 0 ) {
-				throw new Exception("에약 정보 저장에 실패했습니다.");
-			}
-			// 결제 정보 저장 
-			paymentVO.setReservation_id(reservationVO.getReservation_id());
-			int paymentResult = paymentMapper.createPayment(paymentVO);//			
-			if (paymentResult ==0) {
-				throw new Exception("결제 정보 저장에 실패했습니다.");
-			}
-			// 티켓 수 카운팅 
-			
-			
-			// 5. 저장된 예약 정보 반환
-			return reservationVO;
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("예약 및 결제 처리 중 오류가 발생했습니다.", e);
-		}
+	public ReservationVO convertToVO(ReservationDTO dto, ReservationVO reservationVO) {
+		// 시간정보
+		reservationVO.setReserved_for_at(dto.getReserved_for_at());
+		reservationVO.setTime_zone(dto.getTime_zone());
+		reservationVO.setSchedule_id(dto.getSchedule_id());
+		
+		// 수량 및 금액 정보
+		reservationVO.setAdult_qty(dto.getAdult_qty());
+		reservationVO.setTeen_qty(dto.getTeen_qty());
+		reservationVO.setChild_qty(dto.getChild_qty());
+		reservationVO.setTotal_price(dto.getTotal_price());
+		
+		// 콘텐츠 정보
+		reservationVO.setContent_id(dto.getContent_id());
+		
+		// 임시 예약 생성
+		reservationVO.setReservation_code("RES_" + System.currentTimeMillis());
+		reservationVO.setReservation_status("PENDING");
+		
+		return reservationVO;
 	}
-
+	
 	@Override
 	public ReservationVO findByReservationId(int reservation_id) {
 		return reservationMapper.findByReservationId(reservation_id);
 	}
+	
+	@Override
+	public ReservationVO confirmAndCreateReservation(ReservationVO reservationVO, String paymentKey, String orderId, int amount) {
+		PaymentVO paymentVO = null;
+		boolean ticketSucceed = false; 
+		try {
+			// 잔여 확인 후 티켓 선차감 (중복 결제 방지)
+			trySubCurrentTicket(reservationVO);
+			ticketSucceed = true;
+			
+			// 토스 결제 승인
+			paymentVO = confirmTossPayment(paymentKey, orderId, amount);
+			
+			// DB 저장 (예약 + 결제)-> 트랜잭션
+			return createReservationWithPaymentent(reservationVO, paymentVO);
+			
+		} catch (Exception e) {
+			if (paymentVO != null) {
+				try {
+					//결제 승인 후 DB저장 실패 로그
+					log.error("[예약결제 DB저장 실패]",e);
+					// 토스 결제 취소
+					cancelTossPayment(paymentKey, "DB 저장 실패로 인한 취소");
+				} catch (Exception cancelException) {
+					log.error("[토스 결제 취소 실패] paymentKey={}, orderId={}", 
+							paymentKey,
+							orderId
+							);
+				}
+			}
+			//티켓 선차감 했는데 에러가 난 경우 -> 티켓 복구 
+			if (ticketSucceed) {
+				try {
+//					tryAddCurrentTicket();
+				} catch (Exception cancelException) {
+					log.error("[티켓 복구 실패] scheduleId={},total_qty={}", 
+							reservationVO.getSchedule_id(),
+							(reservationVO.getAdult_qty() +reservationVO.getTeen_qty() +reservationVO.getChild_qty())
+							);
+				}
+			}
+			throw new RuntimeException("예약 처리 중 오류 발생: " + e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	public int trySubCurrentTicket(ReservationVO reservationVO) throws Exception {
+		
+		int total_qty = reservationVO.getAdult_qty()
+				+reservationVO.getTeen_qty()
+				+ reservationVO.getChild_qty();
+		
+		Map< String, Object> map = new HashMap<String, Object>();
+		map.put("total_qty", total_qty);
+		map.put("schedule_id", reservationVO.getSchedule_id());
+		
+		int result = reservationMapper.updateCurrentTicket(map);
+		
+		if (result < 1) {
+			// CAS 실패 = 재고 부족
+			throw new Exception("잔여 티켓 수량이 부족합니다.");
+		}
+		
+		return result;
+	}
 
+	@Override
+	@Transactional
+	public ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, PaymentVO paymentVO) throws Exception {
+		//예약 상태를 완료로 변경
+		reservationVO.setReservation_status("DONE");
+		
+		// 예약 정보 저장
+		int reservationResult = reservationMapper.createReservation(reservationVO);
+		if(reservationResult <= 0 ) {
+			throw new Exception("에약 정보 저장에 실패했습니다.");
+		}
+		// 결제 정보 저장 
+		paymentVO.setReservation_id(reservationVO.getReservation_id());
+		int paymentResult = paymentMapper.createPayment(paymentVO);//			
+		if (paymentResult ==0) {
+			throw new Exception("결제 정보 저장에 실패했습니다.");
+		}
+		
+		// 저장된 예약 정보 반환
+		return reservationVO;
+	}
+
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	public PaymentVO confirmTossPayment(String paymentKey, String orderId, int amount) {
 		HttpURLConnection connection = null;
@@ -133,13 +221,11 @@ public class ReservationServiceImpl implements ReservationService{
 			paymentVO.setOrder_key((String) tossResponse.get("orderId"));
 			paymentVO.setPayment_method((String) tossResponse.get("method"));
 			paymentVO.setPayment_status((String) tossResponse.get("status"));
-			paymentVO.setAmount_price(amount);
+			paymentVO.setAmount_price((int) tossResponse.get("amo"));
 			paymentVO.setRefund_status("NONE");
 
 			return paymentVO;
 
-		} catch (RuntimeException e) {
-			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException("토스 결제 승인 중 오류 발생: " + e.getMessage(), e);
 		} finally {
@@ -151,60 +237,7 @@ public class ReservationServiceImpl implements ReservationService{
 		}
 	}
 
-	@Override
-	public ReservationVO convertToVO(ReservationDTO dto, ReservationVO reservationVO) {
-		// [수정해라 가빈아]날짜 + 시간대 합치기
-		String reservedForAt = dto.getReserved_for_at() + " " + dto.getTime_zone();
-		reservationVO.setReserved_for_at(reservedForAt);
 
-		// 수량 정보
-		reservationVO.setAdult_qty(dto.getAdult_qty());
-		reservationVO.setTeen_qty(dto.getTeen_qty());
-		reservationVO.setChild_qty(dto.getChild_qty());
-
-		// 금액 및 콘텐츠 정보
-		reservationVO.setContent_id(dto.getContent_id());
-		reservationVO.setTotal_price(dto.getTotal_price());
-
-		// 예약 코드 생성
-		reservationVO.setReservation_code("RES_" + System.currentTimeMillis());
-		reservationVO.setReservation_status("PENDING");
-
-		return reservationVO;
-	}
-
-	@Override
-	@Transactional
-	public ReservationVO confirmAndCreateReservation(ReservationVO reservationVO, String paymentKey, String orderId, int amount) {
-		PaymentVO paymentVO = null;
-
-		try {
-			// 1. 토스 결제 승인
-			paymentVO = confirmTossPayment(paymentKey, orderId, amount);
-
-			// 2. 예약 상태 변경
-			reservationVO.setReservation_status("DONE");
-
-			// 3. 잔여 확인 후 티켓 차감 
-			
-			
-			// 4. DB 저장 (예약 + 결제)
-			return createReservationWithPaymentent(reservationVO, paymentVO);
-
-		} catch (Exception e) {
-			// 토스 승인은 성공했는데 DB 저장 실패한 경우 → 토스 결제 취소
-			if (paymentVO != null) {
-				try {
-					cancelTossPayment(paymentKey, "DB 저장 실패로 인한 취소");
-				} catch (Exception cancelException) {
-					// 취소도 실패하면 로그 남기고 관리자에게 알림 필요
-					System.err.println("토스 결제 취소 실패! paymentKey: " + paymentKey);
-					cancelException.printStackTrace();
-				}
-			}
-			throw new RuntimeException("예약 처리 중 오류 발생: " + e.getMessage(), e);
-		}
-	}
 
 	//토스 결제 취소 API 호출
 	@SuppressWarnings("unchecked")
@@ -263,40 +296,29 @@ public class ReservationServiceImpl implements ReservationService{
 		}
 	}
 
+//	@Override
+//	public int createScheduleByReservation(ReservationVO reservationVO, int user_id, int content_id) {
+//		
+//		CalendarVO calendarVO = new CalendarVO();
+//		calendarVO.setSelected_at(reservationVO.getReserved_for_at());
+//
+//		
+//		try {
+//			int result = reservationMapper.createScheduleByReservation(map);
+//			if(result < 0) {
+//				throw new Exception("캘린더에 예약 일정을 저장하는데 오류 발생");
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return 0;
+//	}
+
 	@Override
 	public int createScheduleByReservation(ReservationVO reservationVO, int user_id, int content_id) {
-		
-		CalendarVO calendarVO = new CalendarVO();
-		calendarVO.setSelected_at(reservationVO.getReserved_for_at());
-
-		
-		try {
-			int result = reservationMapper.createScheduleByReservation(map);
-			if(result < 0) {
-				throw new Exception("캘린더에 예약 일정을 저장하는데 오류 발생");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public void subCurrentTicket(ReservationVO reservationVO, int content_id) {
-		Map< String, Object> map = new HashMap<String, Object>();
-		
-		String reservedDate = reservationVO.getReserved_for_at();
-		String selected_at = reservedDate.split(" ")[0];
-		String time_zone = reservedDate.split(" ")[1];
-		
-		map.put("content_id", reservationVO.getContent_id());
-		map.put("selected_at", selected_at);
-		map.put("time_zone", time_zone);
-		
-		
-		
-		
 	}
 	
 	 
