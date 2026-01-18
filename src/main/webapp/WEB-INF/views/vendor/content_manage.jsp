@@ -372,7 +372,7 @@
                 <span class="col-manage">관리</span>
             </div>
             <div class="contentList" id="contentList">
-                <div class="loading">데이터를 불러오는 중입니다...</li>
+                <div class="loading">데이터를 불러오는 중입니다...
             </div>
         </section>
     </main>
