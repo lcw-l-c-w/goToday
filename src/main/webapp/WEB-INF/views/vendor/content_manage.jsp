@@ -251,35 +251,30 @@
     display: inline-block;
 }
 
-/* 진행중 (진한 블루 - 활기찬 느낌) */
 .STATUS_OPEN { 
     background: #eef2ff; 
     color: #4d4dff; 
     border: 1px solid #dadaff;
 }
 
-/* 승인요청 (오렌지/옐로우 - 주의/대기 느낌) */
 .STATUS_REQUESTED { 
     background: #fff8e6; 
     color: #ffa000; 
     border: 1px solid #ffeeba;
 }
 
-/* 거절 (레드 - 경고/중단 느낌) */
 .STATUS_REJECTED { 
     background: #fff1f0; 
     color: #ff4d4f; 
     border: 1px solid #ffccc7;
 }
 
-/* 오픈예정 (그린/민트 - 신선하고 긍정적인 느낌) */
 .STATUS_SCHEDULED { 
     background: #e6fffa; 
     color: #00b5ad; 
     border: 1px solid #b2f5ea;
 }
 
-/* 종료 (그레이 - 비활성/과거 느낌) */
 .STATUS_CLOSED { 
     background: #f5f5f5; 
     color: #8c8c8c; 
@@ -377,7 +372,6 @@
                 <span class="col-manage">관리</span>
             </div>
             <div class="contentList" id="contentList">
-            	<c:if test=""></c:if>
                 <div class="loading">데이터를 불러오는 중입니다...</li>
             </div>
         </section>
