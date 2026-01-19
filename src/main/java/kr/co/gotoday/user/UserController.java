@@ -170,6 +170,12 @@ public class UserController {
     @GetMapping("/kakaoLogin")
     public String kakaoCallback(@RequestParam("code") String code
     		, HttpSession session) {
+    	
+    	// 이미 로그인된 경우 → 재호출 방지
+        if (session.getAttribute("loginSess") != null) {
+            return "redirect:/main";
+        }
+        
     	// Access Token 받기
         String accessToken = userService.getKakaoAccessToken(code);      
         // 카카오로부터 사용자 정보 가져오기
@@ -181,7 +187,7 @@ public class UserController {
         if (dbUser == null) {
             // 신규 회원) DB에 저장
             userService.insertKakaoUser(kakaoUser);
-            dbUser = kakaoUser; 
+            dbUser = userService.loginByEmail(kakaoUser.getKakao_email());
             System.out.println("신규 카카오 유저 등록 완료: " + dbUser.getKakao_email());
         } else {
             // 기존 회원) 이미 DB에 있으므로 insert 과정 건너뜀
