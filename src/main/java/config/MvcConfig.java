@@ -62,9 +62,7 @@ public class MvcConfig implements WebMvcConfigurer{
 	@Primary
 	public HikariDataSource dataSource() {
 		HikariDataSource dataSource = new HikariDataSource();
-//		dataSource.setDriverClassName("org.mariadb.jdbc.Driver");
 		dataSource.setDriverClassName(driver);
-//		dataSource.setJdbcUrl("jdbc:mariadb://localhost:3306/study");
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);

@@ -53,6 +53,279 @@
 	
 	</select>
 
+	<sql id="USER_VISIBLE_CONTENT">
+		c.is_delete = 0
+		AND c.is_active = 1
+		AND c.content_status IN
+		('STATUS_SCHEDULED','STATUS_OPEN','STATUS_CLOSED')
+	</sql>
+
+
+	<select id="selectPopularContent" parameterType="int"
+		resultType="kr.co.gotoday.content.MainContentViewDTO">
+		SELECT
+		c.content_id AS content_id,
+		c.title AS title,
+		c.main_image_path AS
+		main_image_path,
+		c.category AS category,
+		c.location AS location,
+		c.start_at AS start_at,
+		c.end_at AS end_at
+		FROM content c
+		LEFT JOIN (
+		SELECT content_id, COUNT(*) AS res_cnt
+		FROM reservation
+		WHERE created_at
+		>= DATE_SUB(NOW(), INTERVAL 30 DAY)
+		AND reservation_status IN
+		('PAID','CONFIRMED')  <!-- 실제 값으로 바꿔 -->
+		GROUP BY content_id
+		) r ON r.content_id = c.content_id
+		LEFT JOIN (
+		SELECT content_id, COUNT(*) AS like_cnt
+		FROM content_like
+		GROUP BY
+		content_id
+		) l ON l.content_id = c.content_id
+		WHERE
+		<include refid="USER_VISIBLE_CONTENT" />
+		AND c.content_status IN ('STATUS_SCHEDULED','STATUS_OPEN')
+		<if test="kind != null and kind != ''">
+			AND c.content_kind = #{kind}
+		</if>
+		ORDER BY
+		(COALESCE(r.res_cnt,0)*3 +
+		COALESCE(l.like_cnt,0)) DESC,
+		c.start_at ASC
+		LIMIT #{limit}
+	</select>
+	<select id="selectUpcomingContent" parameterType="int"
+		resultType="kr.co.gotoday.content.MainContentViewDTO">
+		SELECT
+		c.content_id AS content_id,
+		c.title AS title,
+		c.main_image_path AS
+		main_image_path,
+		c.category AS category,
+		c.content_kind AS content_kind,
+		c.location AS location,
+		c.start_at AS start_at,
+		c.end_at AS end_at
+		FROM
+		content c
+		WHERE
+		<include refid="USER_VISIBLE_CONTENT" />
+		AND c.content_status = 'STATUS_SCHEDULED'
+		<if test="kind != null and kind != ''">
+			AND c.content_kind = #{kind}
+		</if>
+		ORDER BY c.start_at ASC
+		LIMIT
+		#{limit}
+	</select>
+	<select id="search"
+		resultType="kr.co.gotoday.content.MainContentViewDTO">
+		SELECT
+		c.content_id AS content_id,
+		c.title AS title,
+		c.main_image_path AS
+		main_image_path,
+		c.category AS category,
+		c.content_kind AS content_kind,
+		c.location AS location,
+		c.start_at AS start_at,
+		c.end_at AS end_at
+
+		<!-- popular일 때만 like_cnt select -->
+		<if test="dto.sort == 'popular'">
+			, COALESCE(pl.like_cnt, 0) AS like_cnt
+		</if>
+
+		<!-- relevance일 때만 relevance_score select -->
+		<if
+			test="dto.sort == null or dto.sort == '' or dto.sort == 'relevance'">
+			, CASE
+			WHEN #{dto.q} IS NULL OR #{dto.q} = '' THEN 0
+			WHEN c.title
+			= #{dto.q} THEN 100
+			WHEN c.title LIKE CONCAT('%', #{dto.q}, '%') THEN
+			70
+			WHEN c.description LIKE CONCAT('%', #{dto.q}, '%') THEN 40
+			WHEN
+			c.location LIKE CONCAT('%', #{dto.q}, '%') THEN 20
+			ELSE 0
+			END AS
+			relevance_score
+		</if>
+
+		FROM content c
+
+		<!-- 인기순일 때만 좋아요 집계 JOIN -->
+		<if test="dto.sort == 'popular'">
+			LEFT JOIN (
+			SELECT cl.content_id, COUNT(*) AS like_cnt
+			FROM
+			content_like cl
+			GROUP BY cl.content_id
+			) pl ON pl.content_id =
+			c.content_id
+		</if>
+
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<!-- ✅ 유저 노출 공통 조건 -->
+			<include refid="USER_VISIBLE_CONTENT" />
+
+			<!-- ✅ 종료 안보기: status로 판단 -->
+			<if test="dto.hideEnded != null and dto.hideEnded == true">
+				AND c.content_status != 'STATUS_CLOSED'
+			</if>
+			<!-- ✅ 무료만 보기 -->
+			<if test="dto.onlyFree != null and dto.onlyFree == true">
+				AND c.adult_price = 0
+			</if>
+
+			<!-- 검색어 -->
+			<if test="dto.q != null and dto.q != ''">
+				AND (
+				c.title LIKE CONCAT('%', #{dto.q}, '%')
+				OR
+				c.description LIKE CONCAT('%', #{dto.q}, '%')
+				OR c.location LIKE
+				CONCAT('%', #{dto.q}, '%')
+				)
+			</if>
+
+			<!-- popup/exhibition -->
+			<if test="dto.content_kind != null and dto.content_kind != ''">
+				AND c.content_kind = #{dto.content_kind}
+			</if>
+
+			<!-- category 다중 -->
+			<if test="dto.category != null and dto.category.size() &gt; 0">
+				AND c.category IN
+				<foreach collection="dto.category" item="cat" open="("
+					separator="," close=")">
+					#{cat}
+				</foreach>
+			</if>
+
+			<!-- place_tag 다중 -->
+			<if test="dto.place_tag != null and dto.place_tag.size() &gt; 0">
+				AND c.place_tag IN
+				<foreach collection="dto.place_tag" item="pt" open="("
+					separator="," close=")">
+					#{pt}
+				</foreach>
+			</if>
+
+			<!-- reservation_type -->
+			<if
+				test="dto.reservation_type != null and dto.reservation_type != ''">
+				AND c.reservation_type = #{dto.reservation_type}
+			</if>
+
+			<!-- 날짜 범위(이건 status랑 별개로 "기간필터"니까 유지 가능) -->
+			<if test="dto.start_at != null and dto.start_at != ''">
+				AND c.start_at &gt;= STR_TO_DATE(CONCAT(#{dto.start_at},
+				' 00:00:00'),
+				'%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="dto.end_at != null and dto.end_at != ''">
+				AND c.end_at &lt;= STR_TO_DATE(CONCAT(#{dto.end_at}, '
+				23:59:59'),
+				'%Y-%m-%d %H:%i:%s')
+			</if>
+		</trim>
+
+		<!-- 정렬 -->
+		<choose>
+			<when test="dto.sort == 'popular'">
+				ORDER BY COALESCE(pl.like_cnt, 0) DESC, c.start_at
+				DESC
+			</when>
+			<when test="dto.sort == 'newest'">
+				ORDER BY c.start_at DESC
+			</when>
+			<otherwise>
+				<choose>
+					<when test="dto.q != null and dto.q != ''">
+						ORDER BY relevance_score DESC, c.start_at DESC
+					</when>
+					<otherwise>
+						ORDER BY c.start_at DESC
+					</otherwise>
+				</choose>
+			</otherwise>
+		</choose>
+
+		LIMIT #{offset}, #{size}
+	</select>
+
+	<select id="countSearch" resultType="int">
+		SELECT COUNT(*)
+		FROM content c
+
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<include refid="USER_VISIBLE_CONTENT" />
+
+			<if test="dto.hideEnded != null and dto.hideEnded == true">
+				AND c.content_status != 'STATUS_CLOSED'
+			</if>
+
+			<if test="dto.q != null and dto.q != ''">
+				AND (
+				c.title LIKE CONCAT('%', #{dto.q}, '%')
+				OR
+				c.description LIKE CONCAT('%', #{dto.q}, '%')
+				OR c.location LIKE
+				CONCAT('%', #{dto.q}, '%')
+				)
+			</if>
+
+			<if test="dto.content_kind != null and dto.content_kind != ''">
+				AND c.content_kind = #{dto.content_kind}
+			</if>
+
+			<if test="dto.category != null and dto.category.size() &gt; 0">
+				AND c.category IN
+				<foreach collection="dto.category" item="cat" open="("
+					separator="," close=")">
+					#{cat}
+				</foreach>
+			</if>
+
+			<if test="dto.place_tag != null and dto.place_tag.size() &gt; 0">
+				AND c.place_tag IN
+				<foreach collection="dto.place_tag" item="pt" open="("
+					separator="," close=")">
+					#{pt}
+				</foreach>
+			</if>
+
+			<if
+				test="dto.reservation_type != null and dto.reservation_type != ''">
+				AND c.reservation_type = #{dto.reservation_type}
+			</if>
+			<if test="dto.onlyFree != null and dto.onlyFree == true">
+				AND c.adult_price = 0
+			</if>
+
+
+			<if test="dto.start_at != null and dto.start_at != ''">
+				AND c.start_at &gt;= STR_TO_DATE(CONCAT(#{dto.start_at},
+				' 00:00:00'),
+				'%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="dto.end_at != null and dto.end_at != ''">
+				AND c.end_at &lt;= STR_TO_DATE(CONCAT(#{dto.end_at}, '
+				23:59:59'),
+				'%Y-%m-%d %H:%i:%s')
+			</if>
+		</trim>
+	</select>
+
+
 	<select id="selectByID" resultType="kr.co.gotoday.content.ContentVO">
 SELECT
     (SELECT COUNT(*)

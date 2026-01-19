@@ -2,6 +2,7 @@ package kr.co.gotoday.content;
 
 import java.util.List;
 
+import lombok.Data;
 import kr.co.gotoday.user.UserTagVO;
 import lombok.AllArgsConstructor;
 import lombok.Data;

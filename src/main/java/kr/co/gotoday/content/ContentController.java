@@ -2,6 +2,7 @@ package kr.co.gotoday.content;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import kr.co.gotoday.user.UserVO;
 public class ContentController {
 	//주입
 	@Autowired
-	ContentService contentService;
+	private ContentService contentService;
 	
 	
 	//상세보기 
@@ -68,5 +69,6 @@ public class ContentController {
 		model.addAttribute("time_zone",sess.getAttribute("reservation_time"));
 		return "redirect:/reserve/quantity.do";
 	}
+	
 	
 }
