@@ -2,4 +2,56 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.admin.AdminMapper">
 
+<select id="selectContentList" resultType="kr.co.gotoday.content.ContentVO">
+    SELECT *
+    FROM content
+    <where>
+    	is_delete = 0
+    	AND content_status NOT IN ('STATUS_REQUESTED', 'STATUS_REJECTED')
+        <if test="keyword != null and keyword != ''">
+            AND title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="is_active != null">
+            AND is_active = #{is_active}
+        </if>
+        
+    </where>
+    ORDER BY content_id DESC
+</select>
+
+<select id="requestContentList" resultType="kr.co.gotoday.content.ContentVO">
+    SELECT *
+    FROM content
+    <where>
+    	is_delete = 0
+        <if test="keyword != null and keyword != ''">
+            AND title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+            AND content_status = #{content_status}
+    </where>
+    ORDER BY content_id DESC
+</select>
+
+<update id="updateActive" parameterType="int">
+	UPDATE content
+	SET is_active = CASE
+        WHEN is_active = 1 THEN 0
+        ELSE 1
+    END
+	WHERE content_id = #{content_id}
+</update>
+	
+<update id="updateDelete" parameterType="int">
+	UPDATE content
+	SET is_delete = 1
+	WHERE content_id = #{content_id}
+</update>
+
+<update id="updateContentStatus">
+    UPDATE content
+    SET content_status = #{content_status}
+    WHERE content_id = #{content_id}
+</update>
+
+
 </mapper>
