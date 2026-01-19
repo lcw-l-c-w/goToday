@@ -42,57 +42,30 @@
 	      </c:when>
       <c:otherwise>
 
-        <c:forEach var="VO" items="${reservationList}">
-          <div class="reserve-item ${vo.reservation_status}">
-            <!-- 상단 상태 바 (CANCEL 전용) -->
-            <c:if test="${vo.reservation_status eq 'CANCELED'}">
-              <div class="cancel-bar">CANCELED</div>
-            </c:if>
-
-            <!-- 좌측 정보 -->
-            <div class="info">
-
-            <!-- D-Day / END 배지 -->
-            <div class="badge ${r.statusBadge}">
-              ${r.statusBadge}
-            </div>
-
-            <!-- 제목 -->
-            <div class="title">
-              ${r.contentTitle}
-            </div>
-
-            <!-- 날짜 + 상태 -->
-            <div class="datetime">
-              ${r.displayDate}
-              <span class="state">${r.statusLabel}</span>
-            </div>
-
-            <!-- 취소 카드 상세 영역 -->
-            <c:if test="${r.statusBadge eq 'CANCELED'}">
-              <div class="cancel-info">
-                <div>예약번호 <span>${r.reservationCode}</span></div>
-                <div>전시회 이름 <span>${r.contentTitle}</span></div>
-                <div>날짜 <span>${r.displayDate}</span></div>
-              </div>
-            </c:if>
-
-            <!-- 버튼 영역 -->
-            <div class="btn-group">
-				<button onclick="location.href='/mypage/reservation/${r.reservationId}'">
-               		예약정보
-              	</button>
-
-              	<c:if test="${r.statusBadge eq 'END'}">
-                	<button onclick="location.href='/review/write?reservationId=${r.reservationId}'">
-                  		리뷰쓰기
-                	</button>
-              	</c:if>
-
-              	<c:if test="${r.statusBadge eq 'CANCELED'}">
-                	<button>모바일 티켓</button>
-                	<button>상세내역</button>
-              	</c:if>
+        <c:forEach var="r" items="${reservationList}">
+			<div class="reserve-item">
+			
+			  <!-- D-Day / END / CANCEL -->
+			  <div class="badge ${r.dDay}">
+			    ${r.dDay}
+			  </div>
+			
+			  <!-- 날짜 + 상태 -->
+			  <div class="datetime">
+			    ${r.reserved_for_at} ${r.time_zone}
+			    <span class="state">${r.reservation_status}</span>
+			  </div>
+			
+			  <!-- 버튼 -->
+			  <button>예약정보</button>
+			
+			  <c:if test="${r.dDay eq 'END'}">
+			    <button>리뷰쓰기</button>
+			  </c:if>
+			
+			</div>
+			
+			</c:forEach>
            	</div>
         </div>
 
