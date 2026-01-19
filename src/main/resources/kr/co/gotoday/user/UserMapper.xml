@@ -33,6 +33,15 @@
         VALUES(#{user_id}, #{tag_id})
     </insert>
 
+	<!-- 사용자 관심사 선택(새로 추가) -->
+	<insert id="createUserTagsBatch">
+		  INSERT INTO user_tag (user_id, tag_id)
+		  VALUES
+		  <foreach collection="list" item="item" separator=",">
+		    (#{item.user_id}, #{item.tag_id})
+		  </foreach>
+	</insert>
+
     <!-- 태그 이름으로 태그 id 찾기 -->
     <select id="findTagIdByName" parameterType="String" resultType="long">
         SELECT tag_id FROM tag WHERE tag_name = #{tagName}

@@ -44,7 +44,7 @@ public class UserController {
             return "common/return";
         } else {
             sess.setAttribute("loginSess", userVO);
-            return "redirect:/";
+            return "redirect:/main";
         }
     }
     
@@ -170,6 +170,12 @@ public class UserController {
     @GetMapping("/kakaoLogin")
     public String kakaoCallback(@RequestParam("code") String code
     		, HttpSession session) {
+    	
+    	// 이미 로그인된 경우 → 재호출 방지
+        if (session.getAttribute("loginSess") != null) {
+            return "redirect:/main";
+        }
+        
     	// Access Token 받기
         String accessToken = userService.getKakaoAccessToken(code);      
         // 카카오로부터 사용자 정보 가져오기
@@ -181,7 +187,7 @@ public class UserController {
         if (dbUser == null) {
             // 신규 회원) DB에 저장
             userService.insertKakaoUser(kakaoUser);
-            dbUser = kakaoUser; 
+            dbUser = userService.loginByEmail(kakaoUser.getKakao_email());
             System.out.println("신규 카카오 유저 등록 완료: " + dbUser.getKakao_email());
         } else {
             // 기존 회원) 이미 DB에 있으므로 insert 과정 건너뜀
@@ -190,7 +196,7 @@ public class UserController {
         
         session.setAttribute("loginSess", dbUser); 
         
-        return "redirect:/";
+        return "redirect:/main";
 
 	}
     
@@ -199,7 +205,7 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         System.out.println("로그아웃 성공");
-        return "redirect:/";
+        return "redirect:/main";
     }
     
 
@@ -221,100 +227,100 @@ public class UserController {
         }
 
         session.setAttribute("loginSess", userVO);
-        return "redirect:/";
+        return "redirect:/admin/content_manage";
     }
     
-    // 관심사 수정
-    @GetMapping("/member/userLikeEdit")
-    public String userLikeEdit(HttpSession session, Model model) {
-        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
-        if (loginUser == null) {
-            model.addAttribute("msg", "로그인이 필요합니다.");
-            model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
-            return "common/return";
-        }
-
-        // 유저가 가진 태그 이름 목록
-        List<String> userTags = userService.getUserTagNames(loginUser.getUser_id());
-        model.addAttribute("userTags", userTags);
-        return "member/userLikeEdit";
-    }
+//    // 관심사 수정
+//    @GetMapping("/member/userLikeEdit")
+//    public String userLikeEdit(HttpSession session, Model model) {
+//        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+//        if (loginUser == null) {
+//            model.addAttribute("msg", "로그인이 필요합니다.");
+//            model.addAttribute("cmd", "move");
+//            model.addAttribute("url", "/gotoday/member/login");
+//            return "common/return";
+//        }
+//
+//        // 유저가 가진 태그 이름 목록
+//        List<String> userTags = userService.getUserTagNames(loginUser.getUser_id());
+//        model.addAttribute("userTags", userTags);
+//        return "member/userLikeEdit";
+//    }
+//    
+//    @PostMapping("/member/userLikeEdit")
+//    public String userLikeChange(
+//            HttpSession session,
+//            @RequestParam(required = false) String event,
+//            @RequestParam(required = false) String[] location,
+//            @RequestParam(required = false) String[] interest) {
+//
+//        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+//        int userId = loginUser.getUser_id();
+//
+//        List<String> tagNames = new ArrayList<>();
+//
+//        if (event != null) tagNames.add(event);
+//        if (location != null) for (String l : location) tagNames.add(l);
+//        if (interest != null) for (String i : interest) tagNames.add(i);
+//
+//        userService.updateUserTags(userId, tagNames);
+//
+//        return "redirect:/gotoday/mypage";
+//    }
     
-    @PostMapping("/member/userLikeEdit")
-    public String userLikeChange(
-            HttpSession session,
-            @RequestParam(required = false) String event,
-            @RequestParam(required = false) String[] location,
-            @RequestParam(required = false) String[] interest) {
-
-        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
-        int userId = loginUser.getUser_id();
-
-        List<String> tagNames = new ArrayList<>();
-
-        if (event != null) tagNames.add(event);
-        if (location != null) for (String l : location) tagNames.add(l);
-        if (interest != null) for (String i : interest) tagNames.add(i);
-
-        userService.updateUserTags(userId, tagNames);
-
-        return "redirect:/gotoday/mypage";
-    }
-    
-    // 회원 정보 수정
-    @GetMapping("/member/userInfoEdit")
-    public String userInfoEdit(HttpSession session, Model model) {
-        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
-        if (loginUser == null) {
-            model.addAttribute("msg", "로그인이 필요합니다.");
-            model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
-            return "common/return";
-        }
-
-        // DB에서 최신 정보 가져오기
-        UserVO dbUser = userService.getUserById(loginUser.getUser_id());
-        model.addAttribute("user", dbUser);
-        return "member/userInfoEdit";
-    }
-    
-    @PostMapping("/member/userInfoEdit")
-    public String userInfoEdit(HttpSession session, UserVO vo, 
-            @RequestParam(required = false) String confirmPassword,
-            Model model) {
-
-        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
-        if (loginUser == null) {
-            model.addAttribute("msg", "로그인이 필요합니다.");
-            model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/member/login");
-            return "common/return";
-        }
-
-        // 패스워드 확인
-        if (vo.getPassword() != null && !vo.getPassword().isEmpty()) {
-            if (!vo.getPassword().equals(confirmPassword)) {
-                model.addAttribute("msg", "비밀번호와 확인이 일치하지 않습니다.");
-                model.addAttribute("cmd", "back");
-                return "common/return";
-            }
-        }
-
-        vo.setUser_id(loginUser.getUser_id());
-
-        boolean result = userService.updateUserInfo(vo);
-
-        if (result) {
-            // 세션 최신화: userMapper → userService
-            UserVO updatedUser = userService.loginByEmail(loginUser.getEmail());
-            session.setAttribute("loginSess", updatedUser);
-            return "redirect:/gotoday/mypage";
-        } else {
-            model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
-            model.addAttribute("cmd", "back");
-            return "common/return";
-        }
-    }
+//    // 회원 정보 수정
+//    @GetMapping("/member/userInfoEdit")
+//    public String userInfoEdit(HttpSession session, Model model) {
+//        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+//        if (loginUser == null) {
+//            model.addAttribute("msg", "로그인이 필요합니다.");
+//            model.addAttribute("cmd", "move");
+//            model.addAttribute("url", "/gotoday/member/login");
+//            return "common/return";
+//        }
+//
+//        // DB에서 최신 정보 가져오기
+//        UserVO dbUser = userService.getUserById(loginUser.getUser_id());
+//        model.addAttribute("user", dbUser);
+//        return "member/userInfoEdit";
+//    }
+//    
+//    @PostMapping("/member/userInfoEdit")
+//    public String userInfoEdit(HttpSession session, UserVO vo, 
+//            @RequestParam(required = false) String confirmPassword,
+//            Model model) {
+//
+//        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+//        if (loginUser == null) {
+//            model.addAttribute("msg", "로그인이 필요합니다.");
+//            model.addAttribute("cmd", "move");
+//            model.addAttribute("url", "/member/login");
+//            return "common/return";
+//        }
+//
+//        // 패스워드 확인
+//        if (vo.getPassword() != null && !vo.getPassword().isEmpty()) {
+//            if (!vo.getPassword().equals(confirmPassword)) {
+//                model.addAttribute("msg", "비밀번호와 확인이 일치하지 않습니다.");
+//                model.addAttribute("cmd", "back");
+//                return "common/return";
+//            }
+//        }
+//
+//        vo.setUser_id(loginUser.getUser_id());
+//
+//        boolean result = userService.updateUserInfo(vo);
+//
+//        if (result) {
+//            // 세션 최신화: userMapper → userService
+//            UserVO updatedUser = userService.loginByEmail(loginUser.getEmail());
+//            session.setAttribute("loginSess", updatedUser);
+//            return "redirect:/gotoday/mypage";
+//        } else {
+//            model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
+//            model.addAttribute("cmd", "back");
+//            return "common/return";
+//        }
+//    }
     
 }
