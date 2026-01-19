@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import kr.co.gotoday.reservation.ReservationListDTO;
+import kr.co.gotoday.reservation.ReservationService;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class MypageController {
 
 	private final UserService userService;
+	private final ReservationService reservationService;
 	
 	// 관심사 수정
     @GetMapping("/mypage/user_like_edit")
@@ -113,5 +116,18 @@ public class MypageController {
             model.addAttribute("cmd", "back");
             return "common/return";
         }
+    }
+    
+    @GetMapping("/mypage/reservation")
+    public String showReservationList(HttpSession sess, Model model) {
+    	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
+    	
+    	if (userVO == null) {
+            return "redirect:/member/login";  
+        }
+    	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id());
+    	model.addAttribute("reservationList", reservationList);
+    	
+    	return "mypage/reserve_list";
     }
 }

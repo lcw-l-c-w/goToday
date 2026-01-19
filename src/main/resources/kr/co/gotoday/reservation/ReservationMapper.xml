@@ -179,17 +179,13 @@
 		WHERE order_key = #{order_key}
 	</update>
 	
-	<select id="findReservationListByUserId" parameterType="int" resultType="">
-		SELECT  
-			CASE 
-				WHEN DATEDIFF(start_at, NOW()) > 0 THEN CONCAT('D-', DATEDIFF(start_at, NOW()))
-				WHEN DATEDIFF(start_at, NOW()) = 0 THEN 'D-Day'
-				ELSE '진행중'
-			END AS d_day,
-			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, c.content_id
+	<select id="findReservationListByUserId" parameterType="int" resultType="kr.co.gotoday.reservation.ReservationListDTO">
+		SELECT r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, 
+			c.content_id, c.title, c.main_image_path
 		FROM content c 
 		JOIN reservation r ON r.content_id = c.content_id
-		WHERE 
+		WHERE r.user_id = #{user_id}
+		ORDER BY r.reserved_for_at DESC
 	</select>
 	
 	

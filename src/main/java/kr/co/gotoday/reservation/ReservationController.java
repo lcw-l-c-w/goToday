@@ -1,7 +1,6 @@
 package kr.co.gotoday.reservation;
 
 import java.io.BufferedReader;
-import java.security.DrbgParameters.Reseed;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import kr.co.gotoday.content.ContentMapper;
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.TossInputDTO;

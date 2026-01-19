@@ -1,6 +1,10 @@
 package kr.co.gotoday.reservation;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -245,6 +249,22 @@ public class ReservationServiceImpl implements ReservationService{
 	@Override
 	public int updateReservationStatusById(int reservation_id) {
 		return reservationMapper.updateReservationStatusById(reservation_id);
+	}
+
+	@Override
+	public List<ReservationListDTO> findReservationListByUserId(int user_id) {
+		List<ReservationListDTO> listDto = reservationMapper.findReservationListByUserId(user_id);
+		
+		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+		
+		for(ReservationListDTO dto : listDto) {
+			long diff = ChronoUnit.DAYS.between(today, dto.getReserved_for_at());
+			
+			if (diff > 0) dto.setDDay("D-" + diff);
+			else if (diff == 0) dto.setDDay("D-Day");
+			else dto.setDDay("D+" + Math.abs(diff));
+		}
+		return listDto;
 	}
 
 	 
