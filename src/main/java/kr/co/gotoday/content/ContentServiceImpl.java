@@ -1,25 +1,90 @@
 package kr.co.gotoday.content;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import util.PageInfo;
+
 @Service
-public class ContentServiceImpl implements ContentService{
+public class ContentServiceImpl implements ContentService {
+	
+	private static final int PAGE_SIZE = 3;
+	private static final int BLOCK_SIZE = 10;
 
 	@Autowired
 	private ContentMapper contentMapper;
+
 	
-	@Override
-	public List<MainContentViewDTO> getPopularContent(int limit, String kind) {
-		
-		return contentMapper.selectPopularContent(limit, kind);
-	}
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    private static final DateTimeFormatter YY_DOT = DateTimeFormatter.ofPattern("yy.MM.dd");
+
+    private void fillViewFields(List<MainContentViewDTO> list) {
+        if (list == null) return;
+
+        LocalDate today = LocalDate.now(KST);
+
+        for (MainContentViewDTO dto : list) {
+            LocalDate start = toLocalDate(dto.getStart_at());
+            LocalDate end = toLocalDate(dto.getEnd_at());
+
+            // 1) 운영기간 텍스트
+            if (start != null && end != null) {
+                dto.setPeriodText(start.format(YY_DOT) + "~" + end.format(YY_DOT));
+            } else if (start != null) {
+                dto.setPeriodText(start.format(YY_DOT));
+            } else {
+                dto.setPeriodText("");
+            }
+
+            // 2) D-day (시작일까지 남은 일수)
+            if (start != null) {
+                long diff = ChronoUnit.DAYS.between(today, start); // 오늘->시작일
+                dto.setDday((int) diff);
+            } else {
+                dto.setDday(null);
+            }
+        }
+    }
+
+    private LocalDate toLocalDate(Timestamp ts) {
+        if (ts == null) return null;
+        return ts.toInstant().atZone(KST).toLocalDate();
+    }
+	
+    @Override
+    public List<MainContentViewDTO> getPopularContent(int limit, String kind) {
+        List<MainContentViewDTO> list = contentMapper.selectPopularContent(limit, kind);
+        fillViewFields(list);
+        return list;
+    }
+
+    @Override
+    public List<MainContentViewDTO> getUpcomingContent(int limit, String kind) {
+        List<MainContentViewDTO> list = contentMapper.selectUpcomingContent(limit, kind);
+        fillViewFields(list);
+        return list;
+    }
+
+    @Override
+    public List<MainContentViewDTO> getSearchList(ContentSearchDTO dto) {
+        int offset = PageInfo.offset(dto.getPage(), PAGE_SIZE);
+        List<MainContentViewDTO> list = contentMapper.search(dto, offset, PAGE_SIZE);
+        fillViewFields(list); // 검색결과에도 기간 표시를 원하면
+        return list;
+    }
+
 
 	@Override
-	public List<MainContentViewDTO> getUpcomingContent(int limit, String kind) {
-		return contentMapper.selectUpcomingContent(limit, kind);
+	public PageInfo getSearchPageInfo(ContentSearchDTO dto) {
+		int count = contentMapper.countSearch(dto);
+		return PageInfo.of(count, dto.getPage(), PAGE_SIZE, BLOCK_SIZE);
 	}
 
 }

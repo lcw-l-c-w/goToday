@@ -19,13 +19,9 @@ public class ContentController {
 	 public String main(Model model, UserVO vo, HttpServletRequest request) {
 		 HttpSession session = request.getSession();
 		 UserVO login = (UserVO)session.getAttribute("loginSess");
-		 if(login == null) { // 비회원인 경우
+		 if(login != null) { // 비회원인 경우
 			 
-		 } else if(login.getUserTagList() == null) { // 회원이지만 태그가 없는 경우
-			 
-		 } else { // 회원이고 태그도 있는 경우
-			 
-		 }
+		 } 
 		 
 		 
 		 model.addAttribute("popularList", contentService.getPopularContent(7, null));
