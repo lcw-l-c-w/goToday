@@ -3,10 +3,8 @@ package kr.co.gotoday.vendor;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,12 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.reservation.ReservationMapper;
+import kr.co.gotoday.reservation.VendorReservationListDTO;
+import kr.co.gotoday.reservation.VendorReservationSearchDTO;
 
 @Service
 public class VendorServiceImpl implements VendorService {
 	
 	@Autowired
 	private VendorMapper vendorMapper;
+	@Autowired
+	private ReservationMapper reservationMapper; 
 	
 	@Override
 	public int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 
@@ -94,6 +97,16 @@ public class VendorServiceImpl implements VendorService {
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("list", list);
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> findReservationByVendor(VendorReservationSearchDTO dto){
+		List<VendorReservationListDTO> list = reservationMapper.findReservationByVendor(dto);
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("list", list);
+		
 		return result;
 	}
 	
@@ -178,6 +191,11 @@ public class VendorServiceImpl implements VendorService {
 	    }
 
 	    return r;
+	}
+	
+	@Override
+	public int updateReservationStatus(int reserve_id) { // 여기에 int가 중복되진 않았나요?
+	    return reservationMapper.updateReservationStatusById(reserve_id);
 	}
 
 

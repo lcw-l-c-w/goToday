@@ -32,53 +32,65 @@
 	</select>
 	
 	<select id="findReservationByVendor"
-        parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
-        resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
-        
-		SELECT r.reservation_id, r.reservation_code, r.reserved_for_at, r.time_zone, r.adult_qty, r.child_qty, r.teen_qty, r.reservation_status, 
-		 	   r.receiver_name, r.receiver_birth, r.receiver_phone,
-			   p.payment_id, p.payment_status,
-			   c.content_id, c.title 
-		FROM content c
-		JOIN reservation r ON r.content_id = c.content_id
-		JOIN payment p ON r.reservation_id = p.reservation_id
-		<where>
-        	c.user_id = #{user_id}
-	
-	        <!-- 검색어 (예약번호 or 예약자 명) -->
-	        <if test="keyword != null and keyword != ''">
-	            AND (
-	                r.reservation_code LIKE CONCAT('%', #{keyword}, '%')
-	                OR r.receiver_name LIKE CONCAT('%', #{keyword}, '%')
-	            )
-	        </if>
-	        <!-- 콘텐츠 별 --> -->
-	        <if test="content_id != null">
-	            AND c.content_id = #{content_id}
-	        </if>
-	        <!-- 예약 상태 -->
-	        <if test="reservation_status != null and reservation_status != ''">
-	            AND r.reservation_status = #{reservation_status}
-	        </if>
-	        <!-- 결제 상태 -->
-	        <if test="payment_status != null and payment_status != ''">
-	            AND p.payment_status = #{payment_status}
-	        </if>
-	
-	        <!-- 결제 수단 -->
-	        <if test="payment_method != null and payment_method != ''">
-	            AND p.payment_method = #{payment_method}
-	        </if>
-	
-	        <!-- 날짜 범위 -->
-	        <if test="reserved_for_at != null">
-	            AND r.reserved_for_at = #{reserved_for_at}
-	        </if>
-	
-	    </where>
-	    ORDER BY r.reserved_for_at DESC
-	    
-	</select>	
+    parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
+    resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
+
+    SELECT
+	    r.reservation_id AS reserve_id,
+	    r.reservation_code,
+	    r.reserved_for_at AS visit_date,
+	    r.time_zone AS visit_time,
+	    (r.adult_qty + r.child_qty + r.teen_qty) AS person_count,
+	    r.reservation_status AS reserve_status,
+	    p.payment_status AS pay_status,
+	    r.receiver_name,
+	    r.receiver_phone,
+	    c.title AS content_title
+    FROM content c
+    JOIN reservation r ON r.content_id = c.content_id
+    LEFT JOIN payment p ON r.reservation_id = p.reservation_id
+
+    <where>
+        c.user_id = #{user_id}
+
+        <!-- 검색어 -->
+        <if test="keyword != null and keyword != ''">
+		    AND (
+		        CAST(r.reservation_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+		        OR r.receiver_name LIKE CONCAT('%', #{keyword}, '%')
+		    )
+		</if>
+
+
+        <!-- 콘텐츠 -->
+        <if test="content_id != null">
+            AND c.content_id = #{content_id}
+        </if>
+
+        <!-- 예약 상태 -->
+        <if test="reservation_status != null and reservation_status != ''">
+            AND r.reservation_status = #{reservation_status}
+        </if>
+
+        <!-- 결제 상태 -->
+        <if test="payment_status != null and payment_status != ''">
+            AND p.payment_status = #{payment_status}
+        </if>
+
+        <!-- 결제 수단 -->
+        <if test="payment_method != null and payment_method != ''">
+            AND p.payment_method = #{payment_method}
+        </if>
+
+        <!-- 방문 날짜 -->
+        <if test="reserved_for_at != null and reserved_for_at != ''">
+            AND r.reserved_for_at = #{reserved_for_at}
+        </if>
+    </where>
+
+    ORDER BY r.reserved_for_at DESC
+</select>
+
 	
 	<update id="updateReservationStatusById" parameterType="int">
 		UPDATE reservation

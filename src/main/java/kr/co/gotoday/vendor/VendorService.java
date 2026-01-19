@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.reservation.VendorReservationSearchDTO;
 
 public interface VendorService {
 	//content 추가
@@ -26,6 +27,10 @@ public interface VendorService {
 	
 	//수정시 이전 스케줄 삭제
 	int deleteContentSchedule(Integer content_id);
+	
+	//예약 확인
+	Map<String, Object> findReservationByVendor(VendorReservationSearchDTO dto);
+	int updateReservationStatus(int reserve_id);
 
 
 }

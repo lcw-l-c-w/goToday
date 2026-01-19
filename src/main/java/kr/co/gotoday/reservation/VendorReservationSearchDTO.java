@@ -1,19 +1,16 @@
 package kr.co.gotoday.reservation;
 
+import lombok.Data;
+
+@Data
 public class VendorReservationSearchDTO {
-
-    private int userId;
-
-    private Integer contentId;
-
+    private Integer user_id;           // ★ 필수
     private String keyword;
-    private String reservationStatus;
-    private String paymentStatus;
-    private String paymentMethod;
-
-    private String reservation_for_at;
-
-    private int limit;
-    private int offset;
+    private Integer content_id;
+    private String reservation_status;
+    private String payment_status;
+    private String payment_method;
+    private String reserved_for_at;
 }
+
 
