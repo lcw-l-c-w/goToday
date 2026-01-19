@@ -27,4 +27,6 @@ public interface UserMapper {
     // 회원정보 수정
     UserVO getUserById(int userId);
     int updateUserInfo(UserVO vo);
+    
+    void createUserTagsBatch(List<UserTagVO> list);
 }

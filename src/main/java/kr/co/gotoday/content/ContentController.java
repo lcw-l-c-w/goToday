@@ -27,8 +27,11 @@ public class ContentController {
 	@GetMapping("/detail/{content_id}") // @pathVariable @RequestParam 햇갈려...
 	public String contentDetail(Model model, @PathVariable("content_id") int content_id, HttpSession session) {
 		System.out.println("▶ Controller 진입, content_id = " + content_id);
-		UserVO user = (UserVO) session.getAttribute("loginUser");
-
+		UserVO user = (UserVO) session.getAttribute("loginSess");
+//		if (user == null) {
+//			sysout
+//		    return "member/login";
+//		}
 		Integer user_id = (user != null) ? user.getUser_id() : null;
 		//content 
 		Object result = contentService.getDetailContents(content_id, user_id);

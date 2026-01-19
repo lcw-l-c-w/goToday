@@ -35,13 +35,16 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public boolean registerUserTags(List<UserTagVO> tagList) {
-    	try {
-    	    if (tagList != null) tagList.forEach(userMapper::createUserTags);
-    	    return true;
-    	} catch (Exception e) {
-    	    e.printStackTrace();
-    	    return false;
-    	}
+//    	try {
+//    	    if (tagList != null) tagList.forEach(userMapper::createUserTags);
+//    	    return true;
+//    	} catch (Exception e) {
+//    	    e.printStackTrace();
+//    	    return false;
+//    	}
+        if (tagList == null || tagList.isEmpty()) return true;
+        userMapper.createUserTagsBatch(tagList); // 단 한 번
+        return true;
     }
 
     @Override
