@@ -23,8 +23,14 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserVO login(UserVO vo) {
-        return userMapper.login(vo);
+        try {
+            return userMapper.login(vo); // MyBatis/Mapper 호출
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // 에러 발생 시 null 반환
+        }
     }
+
 
     @Override
     @Transactional
