@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.gotoday.cancel.CancelMapper">
+
+	<select id="findPaymentByOrderId"
+		resultType="kr.co.gotoday.payment.PaymentVO">
+		SELECT * FROM payment WHERE order_key = #{orderId}
+	</select>
+
+	<select id="findReservationByReservationId"
+		resultType="kr.co.gotoday.reservation.ReservationVO">
+		SELECT * FROM reservation WHERE reservation_id =
+		#{reservationId}
+	</select>
+
+	<select id="findContentScheduleByScheduleId"
+		resultType="kr.co.gotoday.content.ContentScheduleVO">
+		SELECT * FROM content_schedule WHERE schedule_id =
+		#{scheduleId}
+	</select>
+
+	<update id="updatePaymentStatusToCancel">
+		UPDATE payment
+		SET payment_status = 'CANCELED',
+		refund_status = 'REFUND_COMPLETED'
+		WHERE order_key = #{orderId}
+	</update>
+
+	<update id="updateReservationStatusToCancel">
+		UPDATE reservation
+		SET reservation_status = 'CANCELED'
+		WHERE reservation_id = #{reservationId}
+	</update>
+
+	<update id="increaseTicketStock">
+		UPDATE content_schedule
+		SET total_ticket =
+		total_ticket + #{count}
+		WHERE schedule_id = #{scheduleId}
+	</update>
+
+	<delete id="deleteCalendarByReservationId">
+		DELETE FROM calendar
+		WHERE reservation_id = #{reservationId}
+	</delete>
+
+</mapper>
