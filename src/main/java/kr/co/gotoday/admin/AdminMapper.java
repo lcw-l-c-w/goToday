@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.user.UserVO;
 
 @Mapper
 public interface AdminMapper {
@@ -18,5 +19,6 @@ public interface AdminMapper {
             @Param("content_status") String content_status);
 
 	List<ContentVO> requestContentList(Map<String, Object> param);
+	List<UserVO> userList(Map<String, Object> param);
 
 }

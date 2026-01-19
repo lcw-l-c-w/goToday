@@ -72,6 +72,14 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
     align-items: center;
     gap: 12px;
 }
+.title-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.title-link:hover .title {
+    text-decoration: underline;
+}
 .table-header { border-bottom: 1px solid #eee; color: #aaa; font-size: 12px; font-weight: 600; }
 .table-row { border-bottom: 1px solid #f8f8f8; font-size: 14px; }
 .table-row .title { font-weight: 600; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -137,8 +145,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
             <ul>
 				<li><a href="${ctx}/admin/content_request"><span class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
                 <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
-                <li><a href="#"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
-                <li><a href="#"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+                <li><a href="${ctx}/admin/user_manage"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
+                <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
             </ul>
         </nav>
 
@@ -317,7 +325,9 @@ function renderList(list) {
         $list.append(
         		'<li class="table-row">' +
 	                '<div><span class="badge ' + activateInfo.className + '">' + activateInfo.text + '</span></div>' + 
-	                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
+	                '<a href="' + ctx + '/detail/' + item.content_id + '" class="title-link">' +
+		                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
+		            '</a>' +
 	                '<span class="date" style="color:#666;">' + formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) + '</span>' +
 	                '<span class="location" style="color:#666;">' + item.location + '</span>' +
 	                '<span class="user_id">' + item.user_id + '</span>' +

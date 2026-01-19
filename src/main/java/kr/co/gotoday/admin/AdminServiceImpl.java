@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.user.UserVO;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -45,6 +46,24 @@ public class AdminServiceImpl implements AdminService {
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("list", list);
 	    return result;
+	}
+	
+	@Override
+	public Map<String, Object> getUserList(
+			int user_id, 
+			String keyword, 
+			Integer role
+			){
+		Map<String, Object> param = new HashMap<>();
+		param.put("user_id", user_id);
+		param.put("keyword", keyword);
+		param.put("role", role);
+		
+		List<UserVO> userList = adminMapper.userList(param);
+		Map<String, Object> result = new HashMap<>();
+		result.put("userList", userList);
+		return result;
+		
 	}
 
 	

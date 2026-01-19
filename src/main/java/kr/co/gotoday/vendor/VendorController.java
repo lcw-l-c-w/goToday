@@ -167,8 +167,5 @@ public class VendorController {
 		
 		return "vendor/reserve_pay_manage";
 	}
-	
-	
-	
 
 }

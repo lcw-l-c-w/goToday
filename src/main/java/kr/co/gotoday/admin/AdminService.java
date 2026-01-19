@@ -13,5 +13,6 @@ public interface AdminService {
 	int updateRejected(int content_id);
 
 	Map<String, Object> getRequestList(int user_id, String keyword, String content_status);
+	Map<String, Object> getUserList(int user_id, String keyword, Integer role);
 
 }
