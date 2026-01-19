@@ -69,7 +69,10 @@ SELECT
     c.child_price      AS child_price,
     c.main_image_path  AS main_image_path,
     c.detail_description as detail_description,
-    c.reservation_type AS reservation_type
+    c.reservation_type AS reservation_type,
+    c.category 			AS category,
+    c.content_time 		AS 	content_time,
+    c.content_kind		AS content_kind
    
 FROM content c
 WHERE c.content_id = #{content_id};

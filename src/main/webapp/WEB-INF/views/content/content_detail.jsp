@@ -105,6 +105,18 @@
     .detail-section h2 { font-size: 22px; margin-bottom: 20px; }
     .detail-content { line-height: 1.8; color: #444; }
     .detail-img { width: 100%; margin-top: 20px; border-radius: 8px; }
+  
+  	.poster-side {
+  width: 350px;
+}
+
+.poster-img {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+  	
   </style>
 
   <script>
@@ -203,7 +215,7 @@
   </header>
 
   <div class="container">
-    <div class="breadcrumb">콘텐츠 > 팝업 > <span>#미디어</span></div>
+    <div class="breadcrumb">콘텐츠 > ${content.contentKindName } > <span>#${content.category }</span></div>
     
     <div class="content-title-area">
       <div>
@@ -219,16 +231,16 @@
 
     <div class="main-box">
       <section class="poster-side">
-        <img src="${content.main_image_path}" class="poster-img" alt="Poster">
-        <div class="like-count">💙 ${content.like_count}</div>
+<img class="poster-img" src="${pageContext.request.contextPath}${content.main_image_path}">
+	 <div class="like-count">💙 ${content.like_count}</div>
       </section>
 
       <section class="info-side">
         <table class="info-table">
           <tr><th>소개</th><td>${content.description}</td></tr>
           <tr><th>관람료</th><td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원 / 어린이 ${content.child_price}원</td></tr>
-          <tr><th>운영시간</th><td>10:00 ~ 18:00 (월요일 휴관)</td></tr>
-          <tr><th>예약방식</th><td>${content.reservationTypeLabel} (QR 입장)</td></tr>
+          <tr><th>운영시간</th><td> ${content.content_time }</td></tr>
+          <tr><th>예약방식</th><td>${content.reservationTypeLabel}</td></tr>
         </table>
 
         <div class="reserve-section">
