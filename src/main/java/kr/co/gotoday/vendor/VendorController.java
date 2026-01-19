@@ -148,8 +148,6 @@ public class VendorController {
 		if (contentScheduleVO != null && contentScheduleVO.getTotal_ticket() != null) {
 		    contentScheduleVO.setCurrent_ticket(contentScheduleVO.getTotal_ticket());
 		}
-		System.out.println("content_id = " + contentVo.getContent_id());
-
 		
 		if(r > 0) {
 			model.addAttribute("cmd", "move");
