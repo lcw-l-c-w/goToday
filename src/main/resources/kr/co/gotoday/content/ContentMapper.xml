@@ -84,7 +84,7 @@ WHERE c.content_id = #{content_id};
 	</select>
 	
 	<select id="selectTimeByID" resultType="kr.co.gotoday.content.ContentScheduleVO">
-	SELECT time_zone, current_ticket
+	SELECT time_zone, current_ticket, schedule_id
 	FROM content_schedule
 	WHERE content_id=#{content_id}
 	AND scheduled_at= #{scheduled_at}

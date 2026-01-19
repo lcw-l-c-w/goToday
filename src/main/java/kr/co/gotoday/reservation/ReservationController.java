@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import kr.co.gotoday.content.ContentMapper;
+import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.TossInputDTO;
 import kr.co.gotoday.user.UserVO;
@@ -34,12 +36,14 @@ public class ReservationController {
 
 	@Autowired
 	ReservationService reservationService;
+	@Autowired
+	ContentService contentService;
 	
 	private static final Logger log =
 	        LoggerFactory.getLogger(ReservationController.class);
 
 	@PostMapping("/reserve/schedule.do")
-	public String selctSchedule(HttpSession session, ReservationDTO dto) {
+	public String selectSchedule(HttpSession session, ReservationDTO dto) {
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());
@@ -56,23 +60,16 @@ public class ReservationController {
 
 		 // [테스트용] 세션에 schedule이 없으면 임시 데이터 생성
 		 if (dto == null) {
-			 dto = new ReservationDTO();
-			 dto.setContent_id(5);
-			 dto.setSchedule_id(1);
-			 dto.setReserved_for_at("2025-02-15");
-			 dto.setTime_zone("14:00");
-			 session.setAttribute("schedule", dto);
+			 model.addAttribute("cmd", "back");
+			 model.addAttribute("msg", "예약정보가 누락되었습니다.");
 		 }
+		 
 		 model.addAttribute("reservationDTO", dto);
 
-		 //컨텐츠 없어서 임시 생성
-		 //ContentVO contentVO = contentService.findContentById(reservation.getContent_id());
-		 ContentVO contentVO = new ContentVO();
-		 contentVO.setTitle("무한도전 특별전");
-		 contentVO.setAdult_price(1);
-		 contentVO.setTeen_price(12000);
-		 contentVO.setChild_price(8000);
-		 model.addAttribute("contentVo",contentVO);
+		 UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		 
+		 ContentVO contentVO = contentService.getDetailContents(dto.getContent_id(), userVO.getUser_id());
+		 model.addAttribute("contentVO",contentVO);
 
 		return "reserve_pay/reservation";
 	}
@@ -89,12 +86,8 @@ public class ReservationController {
 		reservation.setTeen_qty(dto.getTeen_qty());
 		reservation.setChild_qty(dto.getChild_qty());
 
-		//ContentVo contentVo = contentService.findContentById(reservation.getContent_id());
-		ContentVO contentVO = new ContentVO();
-		contentVO.setAdult_price(1);
-		contentVO.setTeen_price(12000);
-		contentVO.setChild_price(8000);
-
+		UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
 
 		int total_price = reservationService.calculate(reservation, contentVO);
 		reservation.setTotal_price(total_price);
@@ -117,12 +110,9 @@ public class ReservationController {
 		model.addAttribute("reservation", reservation);
 
 		//컨텐츠 정보를 모델에 저장.
-		//ContentVo contentVo = contentService.findContentById(reservation.getContent_id());
-		ContentVO contentVO = new ContentVO();
-		contentVO.setTitle("무한도전 특별전");
-		contentVO.setAdult_price(1);
-		contentVO.setTeen_price(12000);
-		contentVO.setChild_price(8000);
+		UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
+		
 		model.addAttribute("contentVo",contentVO);
 
 		//기본적으로 세션에 있는 유저의 정보를 가져다가 수령인 란에 저장하기 위해 정보를 모델에 저장
