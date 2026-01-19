@@ -78,7 +78,14 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
 .table-row .title { font-weight: 600; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .table-row .date, .table-row .location { font-size: 13px; color: #666; line-height: 1.4; }
 .text-right { text-align: right; }
+.title-link {
+    color: inherit;
+    text-decoration: none;
+}
 
+.title-link:hover .title {
+    text-decoration: underline;
+}
 /* 6. 뱃지 (Status Badge) */
 .badge {
     display: inline-flex;
@@ -147,8 +154,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
             <ul>
                 <li class="active"><a href="#"><span class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
                 <li><a href="${ctx}/admin/content_manage"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
-                <li><a href="#"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
-                <li><a href="#"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+                <li><a href="${ctx}/admin/user_manage"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
+                <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
             </ul>
         </nav>
 
@@ -235,7 +242,7 @@ function loadContentList() {
     
     // status가 빈 문자열("")이 아닐 때만 파라미터에 추가 (전체 선택 시 제외)
     if (status !== "" && status !== undefined) {
-        searchData.is_active = status;
+        searchData.content_status = status;
     }
 
     $.ajax({
@@ -312,7 +319,9 @@ function renderList(list) {
         $list.append(
             '<li class="table-row">' +
                 '<div><span class="badge ' + statusInfo.className + '">' + statusInfo.text + '</span></div>' +
-                '<span class="title">' + item.title + '</span>' +
+                '<a href="' + ctx + '/detail/' + item.content_id + '" class="title-link">' +
+	                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
+	            '</a>' +
                 '<span class="date">' + formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) + '</span>' +
                 '<span class="location">' + item.location + '</span>' +
                 '<span class="user_id">' + item.user_id + '</span>' +

@@ -71,7 +71,29 @@ public class AdminController {
 	            content_status
 	    );
 	}
-
+	
+	@GetMapping("/admin/user_manage/list")
+	@ResponseBody
+	public Map<String, Object> userList(
+			@RequestParam(required = false) String keyword,
+			@RequestParam(required = false) Integer role,
+			HttpSession session
+			) {
+		UserVO login = (UserVO) session.getAttribute("loginSess");
+		if (login == null) {
+			return Map.of("list", List.of());
+		}
+		
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+		
+		return adminService.getUserList(
+				login.getUser_id(),
+				keyword,
+				role
+				);
+	}
 	
 	//활성화 상태 변경
 	@GetMapping("/admin/content_manage/act")
@@ -106,6 +128,17 @@ public class AdminController {
 	public int updateReject(@RequestParam int content_id) {
 		
 		return adminService.updateRejected(content_id);
+	}
+
+	//user 관리 페이지
+	@GetMapping("/admin/user_manage")
+	public String userManage() {
+		return "admin/user_manage";
+	}
+	
+	@GetMapping("/reply/index")
+	public String reply() {
+		return"reply/index";
 	}
 	
 	
