@@ -168,13 +168,13 @@
           return;
         }
         
-        $.post("${pageContext.request.contextPath}/reservation/select", {
+        $.post("${pageContext.request.contextPath}/reserve/schedule.do", {
           content_id: $("#content_id").val(),
-          date: selectedDate,
-          time: selectedTime,
+          reserved_for_at: selectedDate,
+          time_zone: selectedTime,
           schedule_id: scheduleId
         }).done(function(){
-          location.href = "${pageContext.request.contextPath}/reservation/select";
+          location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
         }).fail(function(){
           alert("예약 요청 중 오류가 발생했습니다.");
         });
