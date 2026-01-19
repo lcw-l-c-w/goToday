@@ -31,16 +31,98 @@
 	    WHERE reservation_id = #{reservation_id}
 	</select>
 	
-	<select id="findReservationByVendor" parameterType="int" resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
+	<select id="findReservationByVendor"
+        parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
+        resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
+        
 		SELECT r.reservation_id, r.reservation_code, r.reserved_for_at, r.time_zone, r.adult_qty, r.child_qty, r.teen_qty, r.reservation_status, 
 		 	   r.receiver_name, r.receiver_birth, r.receiver_phone,
-			   p.payment_id, p.payment_status, 
+			   p.payment_id, p.payment_status,
 			   c.content_id, c.title 
 		FROM content c
 		JOIN reservation r ON r.content_id = c.content_id
 		JOIN payment p ON r.reservation_id = p.reservation_id
-		WHERE c.user_id = #{user_id}
+		<where>
+        	c.user_id = #{user_id}
+	
+	        <!-- 검색어 (예약번호 or 예약자 명) -->
+	        <if test="keyword != null and keyword != ''">
+	            AND (
+	                r.reservation_code LIKE CONCAT('%', #{keyword}, '%')
+	                OR r.receiver_name LIKE CONCAT('%', #{keyword}, '%')
+	            )
+	        </if>
+	        <!-- 콘텐츠 별 --> -->
+	        <if test="content_id != null">
+	            AND c.content_id = #{content_id}
+	        </if>
+	        <!-- 예약 상태 -->
+	        <if test="reservation_status != null and reservation_status != ''">
+	            AND r.reservation_status = #{reservation_status}
+	        </if>
+	        <!-- 결제 상태 -->
+	        <if test="payment_status != null and payment_status != ''">
+	            AND p.payment_status = #{payment_status}
+	        </if>
+	
+	        <!-- 결제 수단 -->
+	        <if test="payment_method != null and payment_method != ''">
+	            AND p.payment_method = #{payment_method}
+	        </if>
+	
+	        <!-- 날짜 범위 -->
+	        <if test="reserved_for_at != null">
+	            AND r.reserved_for_at = #{reserved_for_at}
+	        </if>
+	
+	    </where>
+	    ORDER BY r.reserved_for_at DESC
+	    LIMIT #{limit} OFFSET #{offset}
+	    
 	</select>	
+	
+	<select id="countReservationByVendor"
+        parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
+        resultType="int">
+        
+	    SELECT COUNT(*)
+	    FROM content c
+	    JOIN reservation r ON r.content_id = c.content_id
+	    LEFT JOIN payment p ON r.reservation_id = p.reservation_id
+	
+	    <where>
+	        c.user_id = #{userId}
+	
+	        <if test="contentId != null">
+	            AND c.content_id = #{contentId}
+	        </if>
+	
+	        <if test="keyword != null and keyword != ''">
+	            AND (
+	                r.reservation_code LIKE CONCAT('%', #{keyword}, '%')
+	                OR c.title LIKE CONCAT('%', #{keyword}, '%')
+	            )
+	        </if>
+	
+	        <if test="reservationStatus != null and reservationStatus != ''">
+	            AND r.reservation_status = #{reservationStatus}
+	        </if>
+	
+	        <if test="paymentStatus != null and paymentStatus != ''">
+	            AND p.payment_status = #{paymentStatus}
+	        </if>
+	
+	        <if test="paymentMethod != null and paymentMethod != ''">
+	            AND p.payment_method = #{paymentMethod}
+	        </if>
+	
+	        <if test="startDate != null and endDate != null">
+	            AND r.reserved_for_at BETWEEN #{startDate} AND #{endDate}
+	        </if>
+	    </where>
+	
+	</select>
+	
 	
 	<select id="findByOrderId" parameterType="string" resultType="kr.co.gotoday.payment.PaymentVO">
 		SELECT 
