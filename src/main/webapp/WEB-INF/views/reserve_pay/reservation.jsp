@@ -48,10 +48,10 @@
     <p><strong>reservationDTO.reserved_for_at:</strong> ${reservationDTO.reserved_for_at}</p>
     <p><strong>reservationDTO.time_zone:</strong> ${reservationDTO.time_zone}</p>
     <hr/>
-    <p><strong>contentVo.title:</strong> ${contentVo.title}</p>
-    <p><strong>contentVo.adult_price:</strong> ${contentVo.adult_price}원</p>
-    <p><strong>contentVo.teen_price:</strong> ${contentVo.teen_price}원</p>
-    <p><strong>contentVo.child_price:</strong> ${contentVo.child_price}원</p>
+    <p><strong>contentVO.title:</strong> ${contentVO.title}</p>
+    <p><strong>contentVO.adult_price:</strong> ${contentVO.adult_price}원</p>
+    <p><strong>contentVO.teen_price:</strong> ${contentVO.teen_price}원</p>
+    <p><strong>contentVO.child_price:</strong> ${contentVO.child_price}원</p>
 </div>
 
 <!-- ===================== MAIN ===================== -->
@@ -71,7 +71,7 @@
             <div class="ticket-item">
                 <div class="ticket-info">
                     <p>성인 (만 19세 이상)</p>
-                    <strong>${contentVo.adult_price}원</strong>
+                    <strong>${contentVO.adult_price}원</strong>
                 </div>
                 <div class="qty-control">
                     <button type="button" onclick="changeQty('adult_qty', -1)">-</button>
@@ -84,7 +84,7 @@
             <div class="ticket-item">
                 <div class="ticket-info">
                     <p>청소년 (만 13~18세)</p>
-                    <strong>${contentVo.teen_price}원</strong>
+                    <strong>${contentVO.teen_price}원</strong>
                 </div>
                 <div class="qty-control">
                     <button type="button" onclick="changeQty('teen_qty', -1)">-</button>
@@ -97,7 +97,7 @@
             <div class="ticket-item">
                 <div class="ticket-info">
                     <p>어린이 (만 4~12세)</p>
-                    <strong>${contentVo.child_price}원</strong>
+                    <strong>${contentVO.child_price}원</strong>
                 </div>
                 <div class="qty-control">
                     <button type="button" onclick="changeQty('child_qty', -1)">-</button>
@@ -130,9 +130,9 @@
 <script>
     // 가격 정보 (서버에서 받은 값)
     const prices = {
-        adult: parseInt("${contentVo.adult_price}") || 0,
-        teen: parseInt("${contentVo.teen_price}") || 0,
-        child: parseInt("${contentVo.child_price}") || 0
+        adult: parseInt("${contentVO.adult_price}") || 0,
+        teen: parseInt("${contentVO.teen_price}") || 0,
+        child: parseInt("${contentVO.child_price}") || 0
     };
 
     // 수량 변경 함수

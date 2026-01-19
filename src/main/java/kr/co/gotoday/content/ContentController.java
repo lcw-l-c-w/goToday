@@ -64,7 +64,7 @@ public class ContentController {
 		model.addAttribute("content_id",sess.getAttribute("reservation_contentID"));
 		model.addAttribute("scheduled_at",sess.getAttribute("reservation_date"));
 		model.addAttribute("time_zone",sess.getAttribute("reservation_time"));
-		return "/reserve_pay/reservation";
+		return "redirect:/reserve/quantity.do";
 	}
 	
 }
