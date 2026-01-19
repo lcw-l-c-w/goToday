@@ -91,12 +91,13 @@
     ORDER BY r.reserved_for_at DESC
 </select>
 
-	
 	<update id="updateReservationStatusById" parameterType="int">
-		UPDATE reservation
+		UPDATE reservation r
+		JOIN payment p ON r.reservation_id = p.reservation_id
 		SET reservation_status = "VISITED"
-		WHERE reservation_id = #{reservation_id} 
-			AND ( reservation_status NOT IN ('CANCELED','PENDING')
+		WHERE r.reservation_id = #{reservation_id}
+			AND payment_status = "DONE"
+			AND ( reservation_status NOT IN ("CANCELED","PENDING")
 				OR reservation_status IS NULL );
 	</update>
 	
