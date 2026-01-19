@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.content.ContentMapper">
+<!--  random 제일 위에꺼 -->
+	<select id="randomContent" parameterType="kr.co.gotoday.content.MainContentDTO" resultType="kr.co.gotoday.content.ContentVO">
+	SELECT
+        c.content_id        AS content_id,
+        c.title             AS title,
+        c.main_image_path   AS main_image_path,
+        c.location          AS location,
+        c.start_at          AS start_at,
+        c.end_at            AS end_at
+    FROM content c
+    WHERE c.is_active = true
+      AND c.is_delete = false
+      AND c.content_status IN ('STATUS_OPEN', 'STATUS_SCHEDULED')
+      <if test="content_kind != null">
+      	AND c.content_kind=#{content_kind}
+      </if>	  
+    ORDER BY RAND()
+    LIMIT #{limit}
+	
+	</select>
+	
+	<select id="findRecommendedContents" parameterType="kr.co.gotoday.content.MainContentDTO" resultType="kr.co.gotoday.content.ContentVO">
+	SELECT 
+		c. content_id 		AS content_id,
+		c. title 			AS title,
+		c. main_image_path 	AS main_image_path,
+		c. location 		AS location,
+		c.start_at			AS start_at,
+		c.end_at			AS end_at
+		FROM content c
+		WHERE c.is_active=true
+		AND	  c.is_delete=false
+		AND c.content_status = 'STATUS_OPEN' 
+		 <if test="content_kind !=null and user_tag_id.size > 0">
+      	 AND c.content_id IN (
+    SELECT DISTINCT ct.content_id
+    FROM content_tag ct
+    WHERE ct.tag_id IN
+    <foreach collection="user_tag_id"
+             item="ut"
+             open="("
+             separator=","
+             close=")">
+      #{ut.tag_id}
+    </foreach>
+  )
+      </if>	 
+      	
+		LIMIT #{limit}	
+	
+	</select>
 
 	<sql id="USER_VISIBLE_CONTENT">
 		c.is_delete = 0
@@ -275,4 +326,41 @@
 	</select>
 
 
+	<select id="selectByID" resultType="kr.co.gotoday.content.ContentVO">
+SELECT
+    (SELECT COUNT(*)
+     FROM content_like
+     WHERE content_id = #{content_id}) AS like_count,
+    c.title            AS title,
+    c.content_id       AS content_id,
+    c.start_at         AS start_at,
+    c.end_at           AS end_at,
+    c.location         AS location,
+    c.description      AS description,
+    c.adult_price      AS adult_price,
+    c.teen_price       AS teen_price,
+    c.child_price      AS child_price,
+    c.main_image_path  AS main_image_path,
+    c.detail_description as detail_description,
+    c.reservation_type AS reservation_type
+   
+FROM content c
+WHERE c.content_id = #{content_id};
+
+	</select>
+	
+	<select id="selectDateByID" parameterType="int" resultType="string">
+	SELECT DISTINCT scheduled_at
+	FROM content_schedule
+	WHERE content_id=#{content_id}
+	ORDER BY scheduled_at 
+	</select>
+	
+	<select id="selectTimeByID" resultType="kr.co.gotoday.content.ContentScheduleVO">
+	SELECT time_zone, current_ticket, schedule_id
+	FROM content_schedule
+	WHERE content_id=#{content_id}
+	AND scheduled_at= #{scheduled_at}
+	ORDER BY time_zone
+	</select>
 </mapper>

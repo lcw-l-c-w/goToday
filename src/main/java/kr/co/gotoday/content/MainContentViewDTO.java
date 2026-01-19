@@ -2,22 +2,41 @@ package kr.co.gotoday.content;
 
 import java.sql.Timestamp;
 
-import lombok.Data;
-@Data
-public class MainContentViewDTO {
-	//화면에 표현할 상태 (화면 표현 상태)
+//화면에 표현할 상태 (화면 표현 상태)
 	
 	//일단 띄워야할 것 
 	private long contentId;
+=======
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class MainContentViewDTO {
+	//화면에 표현할 상태 (화면 표현 상태)
+
+    public MainContentViewDTO(ContentVO vo) {
+        this.content_id = vo.getContent_id();
+        this.title = vo.getTitle();
+        this.main_image_path = vo.getMain_image_path();
+        this.category = vo.getCategory();
+        this.location = vo.getLocation();
+        this.start_at = vo.getStart_at();
+        this.end_at = vo.getEnd_at();
+    }
+	//일단 띄워야할 것 
+	private long content_id;
 	private String title;
 	private String main_image_path;
 	private String category; // 태그 관련 
 	private String location; //장소
 	private String content_kind;
-	// 날짜 25.12.22~ 26.01.31 
-	private Timestamp start_at;
-	private Timestamp end_at;
 	
+	// 날짜 25.12.22~ 26.01.31 
+	private String start_at;
+	private String end_at;
 	
 	
 	//화면 표현용
@@ -30,3 +49,5 @@ public class MainContentViewDTO {
 	private Integer dday;      // 시작일까지 남은 일수 (0이면 D-0, 음수면 이미 시작)
 
 }
+
+

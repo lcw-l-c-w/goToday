@@ -1,16 +1,31 @@
 package kr.co.gotoday.vendor;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 
 public interface VendorService {
-	int createContent(ContentVO contentVo, MultipartFile file, HttpServletRequest request);
+	//content 추가
+	int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 
+			MultipartFile file, HttpServletRequest request, List<String> timeList, Integer total_ticket);
+	int updateContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, MultipartFile file,
+			HttpServletRequest request, List<String> timeList, Integer total_ticket);
+
+	//content 관리 리스트
+	Map<String, Object> getFilterList(int user_id, String keyword, String status);
+
+	//수정요청 여부 판단 
+	ContentVO getContent(Integer content_id);
+	List<ContentScheduleVO> getContentSchedule(Integer content_id);
 	
-	Map<String, Object> list(ContentVO contentVo);
+	//수정시 이전 스케줄 삭제
+	int deleteContentSchedule(Integer content_id);
+
 
 }

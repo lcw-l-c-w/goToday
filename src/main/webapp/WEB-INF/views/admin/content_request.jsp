@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="ctx" value="${pageContext.request.contextPath}" />    
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+    
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <title>ExhibiReserve - 전시 관리</title>
+    <title>ExhibiReserve - 승인 요청</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
     /* 1. 기본 초기화 및 폰트 */
@@ -72,6 +73,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
     align-items: center;
     gap: 12px;
 }
+.table-header { border-bottom: 1px solid #eee; color: #aaa; font-size: 12px; font-weight: 600; }
+.table-row { border-bottom: 1px solid #f8f8f8; font-size: 14px; }
+.table-row .title { font-weight: 600; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table-row .date, .table-row .location { font-size: 13px; color: #666; line-height: 1.4; }
+.text-right { text-align: right; }
 .title-link {
     color: inherit;
     text-decoration: none;
@@ -80,12 +86,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
 .title-link:hover .title {
     text-decoration: underline;
 }
-.table-header { border-bottom: 1px solid #eee; color: #aaa; font-size: 12px; font-weight: 600; }
-.table-row { border-bottom: 1px solid #f8f8f8; font-size: 14px; }
-.table-row .title { font-weight: 600; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.table-row .date, .table-row .location { font-size: 13px; color: #666; line-height: 1.4; }
-.text-right { text-align: right; }
-
 /* 6. 뱃지 (Status Badge) */
 .badge {
     display: inline-flex;
@@ -98,8 +98,17 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
     font-weight: 700;
     white-space: nowrap;
 }
-.badge.active { background: #eef2ff; color: #4d4dff; }
-.badge.inactive { background: #f5f5f5; color: #999; }
+.STATUS_REJECTED { 
+    background: #fff1f0; 
+    color: #ff4d4f; 
+    border: 1px solid #ffccc7;
+}
+
+.STATUS_REQUESTED { 
+    background: #fff8e6; 
+    color: #ffa000; 
+    border: 1px solid #ffeeba;
+}
 
 /* 7. 관리 버튼 (Action Buttons) */
 .actions { display: flex; gap: 8px; justify-content: flex-end; }
@@ -143,8 +152,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
 
         <nav class="sidebar-nav">
             <ul>
-				<li><a href="${ctx}/admin/content_request"><span class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
-                <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
+                <li class="active"><a href="#"><span class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
+                <li><a href="${ctx}/admin/content_manage"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
                 <li><a href="${ctx}/admin/user_manage"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
                 <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
             </ul>
@@ -161,8 +170,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
     <main class="main-content">
         <header class="content-header">
             <div class="title-group">
-                <h2>전시 관리</h2>
-                <p>등록된 게시글의 상태를 확인하고 관리하세요.</p>
+                <h2>승인 요청</h2>
+                <p>승인 요청된 게시글을 확인해보세요.</p>
             </div>
         </header>
 
@@ -173,10 +182,10 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
                     <input type="text"  class="searchInput" id="searchInput" placeholder="전시회 명으로 검색..."  />
                 </div>
                 <div class="filter-tabs">
-                    <button class="filter-btn active" data-status="">전체</button>
-                    <button class="filter-btn" data-status="1">활성화</button>
-                    <button class="filter-btn" data-status="0">비활성화</button>
-                </div>
+				    <button class="filter-btn active" data-status="STATUS_REQUESTED">승인요청</button>
+				    <button class="filter-btn" data-status="STATUS_REJECTED">거절</button>
+				</div>
+                
             </div>
 
             <section class="table-section">
@@ -210,10 +219,10 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: 
 <script>
 const ctx = '${pageContext.request.contextPath}';
 
-const ACTIVATE_MAP = {
-		  1:  { text: '활성화', className: 'active' },
-		  0: { text: '비활성화', className: 'inactive' }
-		};
+const STATUS_MAP = {
+	    STATUS_REQUESTED: { text: '승인요청', className: 'STATUS_REQUESTED' },
+	    STATUS_REJECTED:  { text: '거절',     className: 'STATUS_REJECTED' },
+	};
 
 $(function () {
 	loadContentList();
@@ -226,15 +235,18 @@ function loadContentList() {
     let status = $('.filter-btn.active').data('status');
     
     // 데이터 전송 객체 구성
-    const searchData = { keyword };
+    const searchData = {
+        keyword: keyword,
+        content_status: status
+    };
     
     // status가 빈 문자열("")이 아닐 때만 파라미터에 추가 (전체 선택 시 제외)
     if (status !== "" && status !== undefined) {
-        searchData.is_active = status;
+        searchData.content_status = status;
     }
 
     $.ajax({
-        url: ctx + '/admin/content_manage/list',
+        url: ctx + '/admin/content_request/list',
         type: 'get',
         data: searchData,
         success(res) {
@@ -246,13 +258,6 @@ function loadContentList() {
     });
 }
 
-//필터 클릭 시
-$('.filter-btn').on('click', function() {
-	$('.filter-btn').removeClass('active');
-	$(this).addClass('active');
-	loadContentList();
-});
-
 //검색 서치 시
 $('#searchInput').on('keyup', function(e){
 	if(e.key ==='Enter'){
@@ -260,41 +265,24 @@ $('#searchInput').on('keyup', function(e){
 	}
 });
 
-$(document).on('click', '.btn-act', function () {
-    const contentId = $(this).data('id');
-
-    $.ajax({
-        url: ctx + '/admin/content_manage/act',
-        type: 'get',
-        data: { content_id: contentId },
-        success() {
-            loadContentList(); // 다시 로드
-        },
-        error() {
-            alert('상태 변경 실패');
-        }
-    });
+$('.filter-btn').on('click', function () {
+    $('.filter-btn').removeClass('active');
+    $(this).addClass('active');
+    loadContentList();
 });
 
-$(document).on('click', '.btn-delete', function () {
-    const contentId = $(this).data('id');
-    
-    if (!confirm('삭제하시겠습니까?')) {
-        return; // 취소 누르면 아무것도 안 함
-    }
-
-    $.ajax({
-        url: ctx + '/admin/content_manage/delete',
-        type: 'get',
-        data: { content_id: contentId },
-        success() {
-            loadContentList(); // 다시 로드
-        },
-        error() {
-            alert('삭제 실패');
-        }
-    });
+$(document).on('click', '.btn-approve', function () {
+    $.post(ctx + '/admin/content_request/approve', {
+        content_id: $(this).data('id')
+    }, loadContentList);
 });
+
+$(document).on('click', '.btn-reject', function () {
+    $.post(ctx + '/admin/content_request/reject', {
+        content_id: $(this).data('id')
+    }, loadContentList);
+});
+
 
 
 function formatDate(dateStr) {
@@ -312,34 +300,32 @@ function renderList(list) {
     }
 
     list.forEach(item => {
+    	const statusInfo = STATUS_MAP[item.content_status] 
+        || { text: item.content_status, className: '' };
     	
-    	const isActive = (item.is_active === true || item.is_active === 1 || item.is_active === "1");
-        const statusVal = isActive ? 1 : 0;
-        const activateInfo = ACTIVATE_MAP[statusVal] || { text: '알수없음', className: 'inactive' };
+        let actionHtml = '';
+        if (item.content_status === 'STATUS_REQUESTED') {
+            actionHtml =
+                '<div class="actions">' +
+                    '<button class="btn-icon btn-approve" data-id="' + item.content_id + '" title="승인">' +
+                        '<span class="material-symbols-outlined">check</span>' +
+                    '</button>' +
+                    '<button class="btn-icon btn-reject" data-id="' + item.content_id + '" title="거절">' +
+                        '<span class="material-symbols-outlined">close</span>' +
+                    '</button>' +
+                '</div>';
+        }
 
-        // 상태에 따른 아이콘 및 타이틀 설정
-        // 활성 상태면 '비가시성(눈가림)' 아이콘, 비활성 상태면 '가시성(눈뜸)' 아이콘
-        const actIcon = isActive ? 'visibility' : 'visibility_off';
-        const actTitle = isActive ? '비활성화 하기' : '활성화 하기';
-        
         $list.append(
-        		'<li class="table-row">' +
-	                '<div><span class="badge ' + activateInfo.className + '">' + activateInfo.text + '</span></div>' + 
-	                '<a href="' + ctx + '/detail/' + item.content_id + '" class="title-link">' +
-		                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
-		            '</a>' +
-	                '<span class="date" style="color:#666;">' + formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) + '</span>' +
-	                '<span class="location" style="color:#666;">' + item.location + '</span>' +
-	                '<span class="user_id">' + item.user_id + '</span>' +
-	                '<div class="actions">' +
-		             // Material Symbols를 사용하여 아이콘 처리
-	                    '<button class="btn-icon btn-act" data-id="' + item.content_id + '" title="' + actTitle + '">' +
-	                        '<span class="material-symbols-outlined" style="font-size:18px;">' + actIcon + '</span>' +
-	                    '</button>' +
-	                    '<button class="btn-icon btn-delete" data-id="' + item.content_id + '" title="삭제">' +
-	                        '<span class="material-symbols-outlined" style="font-size:18px;">delete</span>' +
-	                    '</button>' +
-	                '</div>' +
+            '<li class="table-row">' +
+                '<div><span class="badge ' + statusInfo.className + '">' + statusInfo.text + '</span></div>' +
+                '<a href="' + ctx + '/detail/' + item.content_id + '" class="title-link">' +
+	                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
+	            '</a>' +
+                '<span class="date">' + formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) + '</span>' +
+                '<span class="location">' + item.location + '</span>' +
+                '<span class="user_id">' + item.user_id + '</span>' +
+                actionHtml +
             '</li>'
         );
     });
