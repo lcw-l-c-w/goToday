@@ -28,6 +28,7 @@ public class ContentVO {
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
     private int user_id;
+    private String place_tag;
     
     private int like_count;// 각 content에 대한 like수
     
