@@ -3,7 +3,7 @@ package kr.co.gotoday.payment;
 import lombok.Data;
 
 @Data
-public class PaymentDTO {
+public class TossInputDTO {
 	private String orderId;      // 주문 번호
     private String orderName;    // 주문 상품명
     private Integer amount;      // 결제 금액
