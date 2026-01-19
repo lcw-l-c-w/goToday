@@ -51,12 +51,11 @@ public class ContentController {
 	//예약 post 보내기
 	@PostMapping("/reservation/select")
 	@ResponseBody
-	public void selectReservation(@RequestParam Integer content_id, @RequestParam String date, @RequestParam String time, HttpSession sess) {
+	public void selectReservation(@RequestParam Integer content_id, @RequestParam String date, @RequestParam String time,@RequestParam Integer schedule_id, HttpSession sess) {
 		sess.setAttribute("reservation_contentID", content_id);
 	    sess.setAttribute("reservation_date", date);
 	    sess.setAttribute("reservation_time", time);
-	    
-	}
+	    	}
 	
 	//예약 페이지 보내기
 	@GetMapping("/reservation/select")

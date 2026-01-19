@@ -43,6 +43,7 @@ public class ReservationController {
 	        LoggerFactory.getLogger(ReservationController.class);
 
 	@PostMapping("/reserve/schedule.do")
+	@ResponseBody
 	public String selectSchedule(HttpSession session, ReservationDTO dto) {
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
@@ -51,7 +52,7 @@ public class ReservationController {
 		reservation.setSchedule_id(dto.getSchedule_id());
 
 		session.setAttribute("schedule", reservation);
-		return "redirect:/reserve/quantity.do";
+		return "ok";
 	}
 
 	@GetMapping("/reserve/quantity.do")
