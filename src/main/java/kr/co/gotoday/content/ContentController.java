@@ -71,21 +71,4 @@ public class ContentController {
 	}
 	
 	
-	 @GetMapping("/main")
-	 public String main(Model model, UserVO vo, HttpServletRequest request) {
-		 HttpSession session = request.getSession();
-		 UserVO login = (UserVO)session.getAttribute("loginSess");
-		 if(login != null) { // 비회원인 경우
-			 
-		 } 
-		 
-		 
-		 model.addAttribute("popularList", contentService.getPopularContent(7, null));
-		 model.addAttribute("upcomingList", contentService.getUpcomingContent(10, null));
-
-		 return "main/main";
-		 
-		 
-	 }
-	
 }

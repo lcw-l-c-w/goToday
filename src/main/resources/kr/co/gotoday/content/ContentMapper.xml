@@ -64,7 +64,7 @@
 	<select id="selectPopularContent" parameterType="int"
 		resultType="kr.co.gotoday.content.MainContentViewDTO">
 		SELECT
-		c.content_id AS contentId,
+		c.content_id AS content_id,
 		c.title AS title,
 		c.main_image_path AS
 		main_image_path,
@@ -103,7 +103,7 @@
 	<select id="selectUpcomingContent" parameterType="int"
 		resultType="kr.co.gotoday.content.MainContentViewDTO">
 		SELECT
-		c.content_id AS contentId,
+		c.content_id AS content_id,
 		c.title AS title,
 		c.main_image_path AS
 		main_image_path,
@@ -127,7 +127,7 @@
 	<select id="search"
 		resultType="kr.co.gotoday.content.MainContentViewDTO">
 		SELECT
-		c.content_id AS contentId,
+		c.content_id AS content_id,
 		c.title AS title,
 		c.main_image_path AS
 		main_image_path,

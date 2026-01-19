@@ -211,12 +211,12 @@
 
     <c:forEach var="item" items="${searchList}">
         <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
-            <div><b>${item.title}</b> (id: ${item.contentId})</div>
+            <div><b>${item.title}</b> (id: ${item.content_id})</div>
             <div>종류: ${item.content_kind} / 카테고리: ${item.category}</div>
             <div>기간: ${item.start_at} ~ ${item.end_at}</div>
             <div>장소: ${item.location}</div>
 
-            <a href="${pageContext.request.contextPath}/content/detail?content_id=${item.contentId}">
+            <a href="${pageContext.request.contextPath}/content/detail?content_id=${item.content_id}">
                 상세 보기
             </a>
         </div>

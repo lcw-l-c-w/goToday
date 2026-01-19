@@ -1,7 +1,7 @@
 package kr.co.gotoday.content;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -95,6 +95,7 @@ public class ContentServiceImpl implements ContentService {
 	public List<ContentScheduleVO> getAvailableTimesByContent(Integer content_id, String scheduled_at) {
 		// TODO Auto-generated method stub
 		return contentMapper.selectTimeByID(content_id, scheduled_at);
+	}
 
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 	private static final DateTimeFormatter YY_DOT = DateTimeFormatter.ofPattern("yy.MM.dd");
@@ -128,11 +129,14 @@ public class ContentServiceImpl implements ContentService {
 		}
 	}
 
-	private LocalDate toLocalDate(Timestamp ts) {
-		if (ts == null)
-			return null;
-		return ts.toInstant().atZone(KST).toLocalDate();
-	}
+	private static final DateTimeFormatter DB_FMT =
+		    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		private LocalDate toLocalDate(String dateTime) {
+		    if (dateTime == null || dateTime.isEmpty()) return null;
+		    return LocalDateTime.parse(dateTime, DB_FMT).toLocalDate();
+		}
+
 
 	@Override
 	public List<MainContentViewDTO> getPopularContent(int limit, String kind) {
