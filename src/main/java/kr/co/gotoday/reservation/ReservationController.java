@@ -63,6 +63,7 @@ public class ReservationController {
 		 if (dto == null) {
 			 model.addAttribute("cmd", "back");
 			 model.addAttribute("msg", "예약정보가 누락되었습니다.");
+			 return "common/return";
 		 }
 		 
 		 model.addAttribute("reservationDTO", dto);
