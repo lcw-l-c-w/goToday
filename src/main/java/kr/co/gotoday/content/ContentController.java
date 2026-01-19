@@ -37,7 +37,6 @@ public class ContentController {
 		return "content/content_detail";
 	}
 	//날짜 조회(.ajax)
-	
 	@GetMapping("/schedule/date")
 	@ResponseBody
 	public List<String> dateReservation(@RequestParam Integer content_id){

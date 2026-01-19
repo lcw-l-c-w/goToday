@@ -6,22 +6,39 @@
 <head>
 <meta charset="UTF-8">
 <title>Main</title>
+
 <link rel="stylesheet" href="/resources/css/main.css">
+
 <style>
+/* ================= 카드 기본 ================= */
 .content-card {
-  position: relative;
   width: 9rem;
   height: 12rem;
   overflow: hidden;
 }
 
-/* 카드 본문 블러 */
-.content-card.is-blur img,
-.content-card.is-blur .content-body {
-  filter: blur(8px);
+.content-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* 🔥 오버레이 */
+.content-body {
+  padding: 4px;
+  font-size: 0.85rem;
+}
+
+/* ================= 추천 영역 블러 ================= */
+.content-list.is-blur {
+  position: relative;
+}
+
+.content-list.is-blur .content-card {
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* ================= 오버레이 ================= */
 .content-overlay {
   position: absolute;
   inset: 0;
@@ -36,7 +53,6 @@
   z-index: 10;
 }
 
-/* 오버레이 텍스트 */
 .overlay-title {
   font-weight: bold;
   margin-bottom: 8px;
@@ -47,9 +63,8 @@
   margin-bottom: 12px;
 }
 
-/* 버튼 */
 .overlay-btn {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   background: #7b61ff;
   color: #fff;
@@ -61,97 +76,95 @@
 
 <body>
 
-	<main class="main">
+<main class="main">
 
-		<!-- ================= 메인 배너 ================= -->
-		<section class="main-banner">
-			<button class="banner-prev">&lt;</button>
+  <!-- ================= 메인 배너 ================= -->
+  <section class="main-banner">
+    <button class="banner-prev">&lt;</button>
 
-			<ul class="banner-list">
-				<c:forEach var="item" items="${random}">
-					<li class="banner-card">
-					<img src="${item.main_image_path}"	alt="">
-						<div class="banner-info">
-							<h3>${item.title}</h3>
-							<p>${item.start_at}~ ${item.end_at}</p>
-						</div></li>
-				</c:forEach>
-			</ul>
+    <ul class="banner-list">
+      <c:forEach var="item" items="${random}">
+        <li class="banner-card">
+          <img src="${item.main_image_path}" alt="">
+          <div class="banner-info">
+            <h3>${item.title}</h3>
+            <p>${item.start_at} ~ ${item.end_at}</p>
+          </div>
+        </li>
+      </c:forEach>
+    </ul>
 
-			<button class="banner-next">&gt;</button>
-		</section>
+    <button class="banner-next">&gt;</button>
+  </section>
 
+  <!-- ================= 추천 콘텐츠 ================= -->
+  <section class="content-section recommend">
+    <h2>추천 콘텐츠</h2>
 
-		<!-- ================= 추천 콘텐츠 ================= -->
-		<section class="content-section recommend">
-			<h2>추천 콘텐츠</h2>
+    <!-- 🔥 블러 대상은 content-list -->
+    <div class="content-list horizontal ${needBlur ? 'is-blur' : ''}">
 
-			<div class="content-list horizontal">
-				<c:forEach var="item" items="${recommand}">
-<article class="content-card ${item.blur ? 'is-blur' : ''}">
-  <img src="${item.main_image_path}" alt="">
+      <c:forEach var="item" items="${recommand}">
+        <article class="content-card">
+          <img src="${item.main_image_path}" alt="">
+          <div class="content-body">
+            <div class="title">${item.title}</div>
+          </div>
+        </article>
+      </c:forEach>
 
-  <div class="content-body">
-    <div class="title">${item.title}</div>
-  </div>
+      <!-- 🔥 오버레이는 딱 1개 -->
+      <c:if test="${needBlur}">
+        <div class="content-overlay">
+          <p class="overlay-title">관심사 등록 전이신가요?</p>
+          <p class="overlay-desc">
+            관심사를 설정하면 맞춤 콘텐츠를 추천해드려요
+          </p>
+          <a href="/mypage/interest" class="overlay-btn">
+            관심사 설정하기
+          </a>
+        </div>
+      </c:if>
 
-  <!-- 🔥 블러일 때만 뜨는 오버레이 -->
-  <c:if test="${item.blur}">
-    <div class="content-overlay">
-      <p class="overlay-title">관심사 등록 전이신가요?</p>
-      <p class="overlay-desc">
- 			${item.ctaMessage}
-      </p>
-      <a href="${item.ctaUrl}" class="overlay-btn">관심사 설정하기</a>
     </div>
-  </c:if>
-</article>
+  </section>
 
-				</c:forEach>
-			</div>
-		</section>
+  <!-- ================= HOT 콘텐츠 ================= -->
+  <section class="content-section hot">
+    <h2>HOT 콘텐츠</h2>
 
+    <div class="content-list grid">
+      <c:forEach var="item" items="${random}">
+        <article class="content-hot">
+          <img src="${item.main_image_path}" alt="">
+          <div class="content-body">
+            <div class="title">${item.title}</div>
+          </div>
+        </article>
+      </c:forEach>
+    </div>
+  </section>
 
-		<!-- ================= HOT 콘텐츠 ================= -->
-		<section class="content-section hot">
-			<h2>HOT 콘텐츠</h2>
+  <!-- ================= 오픈 예정 콘텐츠 ================= -->
+  <section class="content-section upcoming">
+    <h2>오픈 예정 콘텐츠</h2>
 
-			<div class="content-list grid">
-				<c:forEach var="item" items="${random}">
-					<article class="content-hot">
-						<img src="${item.main_image_path}" alt="">
+    <button class="slide-prev">&lt;</button>
 
-						<div class="content-body">
-							<div class="title">${item.title}</div>
-						</div>
+    <div class="content-list horizontal">
+      <c:forEach var="item" items="${upcoming}">
+        <article class="content-card">
+          <img src="${item.main_image_path}" alt="">
+          <h4>${item.title}</h4>
+          <p>D-${item.dday}</p>
+        </article>
+      </c:forEach>
+    </div>
 
+    <button class="slide-next">&gt;</button>
+  </section>
 
-					</article>
-				</c:forEach>
-			</div>
-		</section>
-
-
-		<!-- ================= 오픈 예정 콘텐츠 ================= -->
-		<section class="content-section upcoming">
-			<h2>오픈 예정 콘텐츠</h2>
-
-			<button class="slide-prev">&lt;</button>
-
-			<div class="content-list horizontal">
-				<c:forEach var="item" items="${upcoming}">
-					<article class="content-card">
-						<img src="${item.main_image_path}" alt="">
-						<h4>${item.title}</h4>
-						<p>D-${item.dday}</p>
-					</article>
-				</c:forEach>
-			</div>
-
-			<button class="slide-next">&gt;</button>
-		</section>
-
-	</main>
+</main>
 
 </body>
 </html>
