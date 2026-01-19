@@ -77,7 +77,6 @@
 	
 	    </where>
 	    ORDER BY r.reserved_for_at DESC
-	    LIMIT #{limit} OFFSET #{offset}
 	    
 	</select>	
 	
