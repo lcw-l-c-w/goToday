@@ -24,7 +24,7 @@
             --font-family: 'Roboto', sans-serif;
             --font-size-nav: 24px;
             --font-size-title: 36px;
-            --font-size-button: 24px; /* 너무 커서 약간 조정 */
+            --font-size-button: 24px;
             --font-size-sidebar: 20px;
             
             --border-radius-sidebar: 30px;
@@ -148,38 +148,53 @@
             cursor: pointer;
             padding: 5px 0;
             transition: color 0.2s;
+            display: block;          /* a 태그 block화 */
+		    text-decoration: none;   /* 밑줄 제거 */
+		    color: inherit;          /* 기본 글자색 유지 */
         }
 
-        .sidebar-item:hover, .sidebar-item.active {
-            color: var(--color-primary);
-            font-weight: 700;
-        }
+        /* hover 시 회색 */
+		.sidebar-item:hover {
+		    color: #999;           /* 원하는 회색 */
+		    font-weight: 400;      /* 필요하면 유지 */
+		}
+		
+		/* 현재 페이지(active) */
+		.sidebar-item.active {
+		    color: var(--color-primary);
+		    font-weight: 700;
+		}
 
         /* Content Area */
         .content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .page-title {
             font-size: var(--font-size-title);
             font-weight: 700;
             margin-bottom: 50px;
+            align-self: flex-start;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 700px;
         }
 
         .form-section {
             margin-bottom: 60px;
-            background: var(--color-white);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
         .section-title {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 30px;
-            text-align: left;
-            color: var(--color-text-light);
+            text-align: center;
+            color: var(--color-text);
         }
 
         /* Button Grid */
@@ -187,7 +202,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            justify-content: flex-start;
+            justify-content: center;
         }
 
         /* Custom Radio/Checkbox Buttons */
@@ -225,16 +240,17 @@
         /* Submit Button */
         .submit-container {
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             margin-top: 50px;
             margin-bottom: 100px;
+            width: 100%;
         }
 
         .btn-submit {
             font-size: 24px;
             font-weight: 700;
-            width: 250px;
-            padding: 15px 0;
+            width: 200px;
+            padding: 12px 0;
             background-color: var(--color-white);
             border: 3px solid var(--color-border);
             cursor: pointer;
@@ -251,7 +267,7 @@
             .container { flex-direction: column; padding: 20px; }
             .sidebar { width: 100%; display: flex; overflow-x: auto; gap: 20px; padding: 20px; }
             .sidebar-section { margin-bottom: 0; min-width: 150px; }
-            .nav { display: none; } /* 모바일에서 네비 숨김 */
+            .nav { display: none; }
         }
     </style>
 </head>
@@ -273,29 +289,30 @@
 
     <div class="container">
         <aside class="sidebar">
-            <div class="sidebar-section">
-                <h2 class="sidebar-title">주문관리</h2>
-                <div class="sidebar-item">예약관리</div>
-                <div class="sidebar-item">나의리뷰</div>
-                <div class="sidebar-item">찜관리</div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h2 class="sidebar-title">문의내역</h2>
-                <div class="sidebar-item">1:1문의</div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h2 class="sidebar-title">회원관리</h2>
-                <div class="sidebar-item active">관심사수정</div>
-                <div class="sidebar-item">내정보수정</div>
-            </div>
-        </aside>
+		    <div class="sidebar-section">
+		        <h2 class="sidebar-title">주문관리</h2>
+		        <a href="/gotoday/mypage/reservation" class="sidebar-item">예약관리</a>
+		        <a href="/gotoday/mypage/review" class="sidebar-item">나의리뷰</a>
+		        <a href="/gotoday/mypage/wishlist" class="sidebar-item">찜관리</a>
+		    </div>
+		    
+		    <div class="sidebar-section">
+		        <h2 class="sidebar-title">문의내역</h2>
+		        <a href="/gotoday/mypage/qna" class="sidebar-item">1:1문의</a>
+		    </div>
+		    
+		    <div class="sidebar-section">
+		        <h2 class="sidebar-title">회원관리</h2>
+		        <a href="/gotoday/mypage/user_like_edit" class="sidebar-item active">관심사수정</a>
+		        <a href="/gotoday/mypage/user_info"
+		           class="sidebar-item">내정보수정</a>
+		    </div>
+		</aside>
 
         <main class="content">
             <h1 class="page-title">관심사 수정</h1>
             
-            <form id="frm" action="/gotoday/mypage/user_like_edit" method="POST">
+            <form id="frm" action="/gotoday/mypage/user_like_edit" method="POST" class="form-wrapper">
                 <div class="form-section">
                     <h2 class="section-title">전시 or 팝업</h2>
                     <div class="button-grid">
