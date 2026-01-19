@@ -99,7 +99,7 @@ public class MvcConfig implements WebMvcConfigurer{
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer config = new PropertyPlaceholderConfigurer();
 		config.setLocations(
-				new ClassPathResource("db.properties"), 
+				new ClassPathResource("db.properties"),
 				new ClassPathResource("api.properties")
 			);
 		return config;

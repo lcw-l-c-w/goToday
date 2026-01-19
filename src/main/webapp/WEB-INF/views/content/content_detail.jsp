@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,118 +17,122 @@
 <div class="page-wrapper">
   <div class="content-container">
     <section class="top-area">
-      <div class="content-info">
-        <span>컨텐츠 &gt; 팝업</span>
-        <a href="#" class="tag">#미디어</a>
-        <h1>팝업 제목 : 치이카와 베이비 팝업</h1>
-        <p class="period">2026.01.01 ~ 2026.03.02</p>
-        <a href = "#" class="search-location">
-          <p class="location">홍대 어딘가</p>
-        </a>
-      </div>
+		<div class="content-info">
+		  <span>컨텐츠 &gt; 팝업</span>
+		  <a href="#" class="tag">#미디어</a>
+		  <h1>팝업 제목 : 치이카와 베이비 팝업</h1>
+		  <p class="period">2026.01.01 ~ 2026.03.02</p>
+		  <p class="location"><a href = "#" class="search-location">홍대 어딘가</a></p>
+		</div>
 
-      <!-- 공유 버튼 그룹 -->
-      <div class="share-group">
-        <button class="share-btn" aria-label="인스타그램 링크">
-          <img src="icon-share.svg" alt="링크">
-        </button>
-        <button class="share-btn" aria-label="엑스 링크">
-          <img src="icon-share.svg" alt="링크">
-        </button>
-        <button class="share-btn" aria-label="공유">
-          <img src="icon-share.svg" alt="공유">
-        </button>
-
-        <ul class="share-list">
-          <li>
-            <a href="#" class="share-item instagram">
-              <img src="icon-instagram.svg" alt="카카오톡 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item instagram">
-              <img src="icon-instagram.svg" alt="인스타그램 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item facebook">
-              <img src="icon-facebook.svg" alt="엑스 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item link">
-              <img src="icon-link.svg" alt="URL">
-            </a>
-          </li>
-        </ul>
-        
-      </div>
+		<!-- 공유 버튼 그룹 -->
+		<div class="share-group">
+		  <button class="share-btn" aria-label="인스타그램 링크">
+		    <img src="icon-share.svg" alt="링크">
+		  </button>
+		  <button class="share-btn" aria-label="엑스 링크">
+		    <img src="icon-share.svg" alt="링크">
+		  </button>
+		  <button class="share-btn" aria-label="공유">
+		    <img src="icon-share.svg" alt="공유">
+		  </button>
+		  
+		  <ul class="share-list">
+		    <li>
+		      <a href="#" class="share-item instagram">
+		        <img src="icon-instagram.svg" alt="카카오톡 공유">
+		      </a>
+		    </li>
+		    <li>
+		      <a href="#" class="share-item instagram">
+		        <img src="icon-instagram.svg" alt="인스타그램 공유">
+		      </a>
+		    </li>
+		    <li>
+		      <a href="#" class="share-item facebook">
+		        <img src="icon-facebook.svg" alt="엑스 공유">
+		      </a>
+		    </li>
+		    <li>
+		      <a href="#" class="share-item link">
+		        <img src="icon-link.svg" alt="URL">
+		      </a>
+		    </li>
+		  </ul>
+		  
+		</div>
 
     </section>
+    
     <!-- 좌측 영역 -->
     <section class="left-area">
-      <div>
-        <img src="poster.jpg" alt="포스터" class="poster" />
-      </div>
-      <button class="like-btn" aria-label="좋아요">
-        <img src="icon-heart.svg" alt="좋아요">
-        <span class="like-count">123</span>
-      </button>
+		<div>
+		  <img src="poster.jpg" alt="포스터" class="poster" />
+		</div>
+		<button class="like-btn" aria-label="좋아요">
+		  <img src="icon-heart.svg" alt="좋아요">
+		  <span class="like-count">123</span>
+		</button>
     </section>
 
     <!-- 우측 영역 -->
     <section class="right-area">
-      <div class="info-box">
-        <p>소개</p>
-        <span>어쩌고 저쩌고 간략하게 소개하는 란</span>
-      </div>
+		<div class="info-box">
+		  <p>소개</p>
+		  <span>어쩌고 저쩌고 간략하게 소개하는 란</span>
+		</div>
       
-      <div class="price-box">
-        <p>관람료</p>
-        <ul>
-          <li>성인 17,000원</li>
-          <li>청소년 17,000원</li>
-        </ul>
-      </div>
+		<div class="price-box">
+		  <p>관람료</p>
+		  <ul>
+		    <li>성인 17,000원</li>
+		    <li>청소년 17,000원</li>
+		  </ul>
+		</div>
 
-      <div class="operating-hours">
-        <p>운영시간</p>
-        <span>10 : 00 ~ 18 : 00</span>
-      </div>
-
-      <div class="receive-method">
-        <p>수령방법</p>
-        <span>사전예매</span>
-      </div>
-
-
-      <!-- 예약 영역 -->
-      <div class="reservation-box">
-
-        <!-- 날짜 선택 -->
-        <label>날짜 선택</label>
-        <input type="date" id="dateInput" name = "scheduled_at"/>
-
-        <!-- 시간대 선택 -->
-        <div id="timeSlotArea" class="hidden">
-          <label>시간대</label>
-          <select name = "time_zone">
-            <option value="10:00-12:00">
-              10 : 00 ~ 12 : 00
-            </option>
-            <option value="12:00-14:00"> <!-- value는 DB 시간 테이블 value로 조정 부탁 -->
-              12 : 00 ~ 14 : 00
-            </option>
-            <option value="14:00-16:00">
-              14 : 00 ~ 16 : 00
-            </option>
-          </select>
-          <ul id="timeSlotList"></ul>
-        </div>
-
-        <button class="reserve-btn">예매하기</button>
-        <button class="calendar-btn">캘린더에 저장하기</button>
-      </div>
+		<div class="operating-hours">
+		  <p>운영시간</p>
+		  <span>10 : 00 ~ 18 : 00</span>
+		</div>
+		
+		<div class="receive-method">
+		  <p>수령방법</p>
+		  <span>사전예매</span>
+		</div>
+		
+		
+		<!-- 예약 영역 -->
+		<div class="reservation-box">
+			<form action="/reserve/schedule.do" method="post">
+			
+			<input type="hidden" name="content_id" value="${content.content_id}" />
+			
+			<!-- 스케쥴리스트가 있으면 시간대 선택해야 함.  -->
+			<c:if test="${ !empty content.contentScheduleList}">
+			
+				<label>날짜 선택</label>
+				<input type="date" name="scheduled_at" />
+				
+				<label>시간대 선택</label>
+				<select name="time_zone">
+					<c:forEach var="vo" items="${contentSchedulVO}">
+						<option value="${vo.start_at} ~ ${vo.end_At}">
+							${vo.start_at} ~ ${vo.end_At}
+						</option>
+					</c:forEach>
+				</select>
+			
+			</c:if>
+			
+			<!-- 상시 전시의 경우 스케쥴리스트가 null임 -->
+			<c:if test="${empty content.contentScheduleList}">
+				<p>현장 수령 상품입니다. 방문 후 바로 이용 가능합니다.</p>
+			</c:if>
+			
+			  <button type="submit" class="reserve-btn">예매하기</button>
+			
+			</form>
+	    </div>
     </section>
 
     <!-- 탭 영역 -->

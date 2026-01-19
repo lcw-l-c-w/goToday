@@ -15,4 +15,5 @@ public class ReservationDTO {
 	private int child_qty;
 	private int teen_qty;
 	private int total_price;
+	private int schedule_id;
 }
