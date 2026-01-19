@@ -80,6 +80,14 @@
 	    
 	</select>	
 	
+	<update id="updateReservationStatusById" parameterType="int">
+		UPDATE reservation
+		SET reservation_status = "VISITED"
+		WHERE reservation_id = #{reservation_id} 
+			AND ( reservation_status NOT IN ('CANCELED','PENDING')
+				OR reservation_status IS NULL );
+	</update>
+	
 	<select id="countReservationByVendor"
         parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
         resultType="int">

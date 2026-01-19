@@ -20,4 +20,5 @@ public interface ReservationMapper {
 	int createScheduleByReservation(CalendarVO calendarVO);
 	PaymentVO findByOrderId(String order_key);
 	int updatePaymentStatus(Map<String, Object> map);
+	int updateReservationStatusById(int reservation_id);
 }
