@@ -4,9 +4,13 @@ import lombok.Data;
 
 @Data
 public class VendorReservationListDTO {
+	private int user_id;
+	
+	private String keyword; //예약번호/예약자명
 	private int reservation_id;
 	private String reservation_code;
 	private String reserved_for_at;
+	private String time_zone;
 	private int adult_qty;
 	private int child_qty;
 	private int teen_qty;
@@ -16,6 +20,7 @@ public class VendorReservationListDTO {
 	private String receiver_phone;
 	private int payment_id;
 	private String payment_status;
+	private String payment_method;
 	private int content_id;
 	private String title;
 
