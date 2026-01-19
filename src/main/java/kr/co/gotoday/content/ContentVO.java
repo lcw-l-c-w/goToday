@@ -3,7 +3,6 @@ package kr.co.gotoday.content;
 import java.util.List;
 
 import lombok.Data;
-
 @Data
 public class ContentVO {
 	private int content_id;
