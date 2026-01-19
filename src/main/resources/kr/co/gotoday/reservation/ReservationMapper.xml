@@ -91,7 +91,6 @@
     ORDER BY r.reserved_for_at DESC
 </select>
 
-	
 	<update id="updateReservationStatusById" parameterType="int">
 		UPDATE reservation r
 		JOIN payment p ON r.reservation_id = p.reservation_id
