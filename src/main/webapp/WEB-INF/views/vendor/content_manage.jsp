@@ -73,6 +73,14 @@
 .sidebar-menu li a:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
+.title-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.title-link:hover .title {
+    text-decoration: underline;
+}
 
 /* 활성화된 메뉴 (콘텐츠 관리) */
 .sidebar-menu li.active a {
@@ -319,7 +327,7 @@
         <ul>
             <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
             <li><a href="${ctx}/vendor/reserve_pay_manage"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
-            <li><a href="${ctx}/reply/index.jsp"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+            <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
         </ul>
     </nav>
 
@@ -455,7 +463,9 @@ function renderList(list) {
                 '<div class="col-info">' +
                     '<img src="' + ctx + item.main_image_path + '" class="thumb">' +
                     '<div class="text">' +
-                        '<div class="title">' + item.title + '</div>' +
+                    '<a href="' + ctx + '/detail/' + item.content_id + '" class="title-link">' +
+		                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
+		            '</a>' +
                         '<div class="location">' + item.location + '</div>' +
                     '</div>' +
                 '</div>' +
