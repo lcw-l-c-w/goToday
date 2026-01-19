@@ -10,4 +10,10 @@ public class ContentScheduleVO {
     private Integer total_ticket;
     private int current_ticket;
     private int content_id;
+	public String getTime_zone() {
+		return time_zone;
+	}
+	public int getCurrent_ticket() {
+		return current_ticket;
+	}
 }
