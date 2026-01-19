@@ -86,11 +86,11 @@ body { font-family: 'Roboto', sans-serif; background-color: var(--color-bg-prima
           </button>
         </div>
       </div>
+      
       <button type="submit" class="btn btn-primary">LOGIN</button>
-
-      회원이 아니신가요?
+      회원이 아니신가요? 
       <button type="button" id="btnRegister" class="btn btn-secondary">SIGN IN</button>
-
+      
       <div id="socialLogin" class="social-login">
         <a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=account_email,profile_nickname" class="btn-social btn-kakao">
           <span class="kakao-icon"></span> 카카오 로그인

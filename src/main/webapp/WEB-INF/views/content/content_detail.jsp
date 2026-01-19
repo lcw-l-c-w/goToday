@@ -12,55 +12,43 @@
     :root { --main-color: #4dc3ff; --border-color: #eee; --text-gray: #666; }
     body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: #333; }
 
-    /* --- Navigation Bar --- */
-    .navbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 50px; height: 70px; border-bottom: 1px solid #eee; background: #fff;
-    }
-    .nav-left { display: flex; align-items: center; gap: 40px; }
-    .nav-logo img { height: 35px; cursor: pointer; }
-    
-    .nav-menu { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; height: 100%; }
-    .nav-menu li { position: relative; display: flex; align-items: center; height: 70px; } /* 네비바 높이에 맞춤 */
-    
-    .nav-menu a { 
-      text-decoration: none; 
-      color: #333; 
-      font-weight: 500; 
-      font-size: 16px; 
-      transition: color 0.2s ease;
-      display: block;
-    }
-
-    /* 마우스 호버 및 활성화 상태 스타일 */
-    .nav-menu li:hover a, 
-    .nav-menu li.active a { 
-      color: var(--main-color); 
-    }
-
-    /* 하단 파란색 선 애니메이션 */
-    .nav-menu li::after {
-      content: "";
-      position: absolute;
-      bottom: -1px; /* 네비바 하단 보더와 맞춤 */
-      left: 0;
-      width: 0;
-      height: 3px;
-      background-color: var(--main-color);
-      transition: width 0.3s ease;
-    }
-
-    /* 호버하거나 active 클래스가 있을 때 선이 늘어남 */
-    .nav-menu li:hover::after,
-    .nav-menu li.active::after {
-      width: 100%;
-    }
-    
-    .nav-right { display: flex; align-items: center; gap: 25px; }
-    .search-bar { position: relative; border-bottom: 1px solid #333; display: flex; align-items: center; }
-    .search-bar input { border: none; outline: none; padding: 5px 25px 5px 5px; width: 180px; font-size: 14px; }
-    .search-bar i { position: absolute; right: 5px; cursor: pointer; }
-    .user-icon img { width: 24px; cursor: pointer; }
+    /* --- Navigation Bar (통합 버전) --- */
+	:root { 
+	    --main-color: #4dc3ff; /* 파란색 포인트 컬러 */
+	}
+	
+	.navbar {
+	    display: flex; align-items: center; justify-content: space-between;
+	    padding: 0 50px; height: 70px; border-bottom: 1px solid #eee; background: #fff;
+	    position: sticky; top: 0; z-index: 1000;
+	}
+	.nav-left { display: flex; align-items: center; gap: 40px; }
+	.nav-logo img { height: 35px; cursor: pointer; }
+	
+	.nav-menu { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; height: 100%; }
+	.nav-menu li { position: relative; display: flex; align-items: center; height: 70px; }
+	
+	.nav-menu a { 
+	    text-decoration: none; color: #333; font-weight: 500; font-size: 16px; 
+	    transition: color 0.2s ease; display: block;
+	}
+	
+	/* 마우스 호버 및 활성화 상태 */
+	.nav-menu li:hover a, .nav-menu li.active a { color: var(--main-color); }
+	
+	/* 하단 파란색 선 애니메이션 */
+	.nav-menu li::after {
+	    content: ""; position: absolute; bottom: -1px; left: 0;
+	    width: 0; height: 3px; background-color: var(--main-color);
+	    transition: width 0.3s ease;
+	}
+	.nav-menu li:hover::after, .nav-menu li.active::after { width: 100%; }
+	
+	.nav-right { display: flex; align-items: center; gap: 25px; }
+	.search-bar { position: relative; border-bottom: 1px solid #333; display: flex; align-items: center; }
+	.search-bar input { border: none; outline: none; padding: 5px 25px 5px 5px; width: 180px; font-size: 14px; }
+	.search-bar i { position: absolute; right: 5px; cursor: pointer; }
+	.user-icon img { width: 24px; cursor: pointer; }
 
     /* --- Content Layout --- */
     .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
@@ -184,23 +172,27 @@
 </head>
 <body>
 
-  <header class="navbar">
+<header class="navbar">
     <div class="nav-left">
-      <a href="/gotoday/main" class="nav-logo"><img src="https://via.placeholder.com/120x40?text=GoToday" alt="Logo"></a>
-      <ul class="nav-menu">
-        <li><a href="#">Q&A</a></li>
-        <li><a href="/gotoday/popup">PopUp</a></li>
-        <li><a href="/gotoday/exhibition">Exhibition</a></li>
-      </ul>
+        <a href="${pageContext.request.contextPath}/main" class="nav-logo">
+            <img src="${pageContext.request.contextPath}/img/logo.svg" alt="GoToday">
+        </a>
+        <ul class="nav-menu">
+            <li><a href="#">Q&A</a></li>
+            <li class="active"><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
+            <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
+        </ul>
     </div>
     <div class="nav-right">
-      <div class="search-bar">
-        <input type="text" placeholder="검색어를 입력하세요">
-        <i>🔍</i>
-      </div>
-      <div class="user-icon"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="User"></div>
+        <div class="search-bar">
+            <input type="text" placeholder="검색어를 입력하세요">
+            <i>🔍</i>
+        </div>
+        <div class="user-icon">
+            <img src="${pageContext.request.contextPath}/img/user-icon.svg" alt="User">
+        </div>
     </div>
-  </header>
+</header>
 
   <div class="container">
     <div class="breadcrumb">콘텐츠 > 팝업 > <span>#미디어</span></div>
