@@ -34,7 +34,7 @@
 		WHERE c.is_active=true
 		AND	  c.is_delete=false
 		AND c.content_status = 'STATUS_OPEN' 
-		 <if test="content_kind !=null and !user_tag_id.isEmpty()">
+		 <if test="content_kind !=null and user_tag_id.size > 0">
       	 AND c.content_id IN (
     SELECT DISTINCT ct.content_id
     FROM content_tag ct

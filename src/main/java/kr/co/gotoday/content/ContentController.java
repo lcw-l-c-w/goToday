@@ -26,8 +26,11 @@ public class ContentController {
 	@GetMapping("/detail/{content_id}") // @pathVariable @RequestParam 햇갈려...
 	public String contentDetail(Model model, @PathVariable("content_id") int content_id, HttpSession session) {
 		System.out.println("▶ Controller 진입, content_id = " + content_id);
-		UserVO user = (UserVO) session.getAttribute("loginUser");
-
+		UserVO user = (UserVO) session.getAttribute("loginSess");
+//		if (user == null) {
+//			sysout
+//		    return "member/login";
+//		}
 		Integer user_id = (user != null) ? user.getUser_id() : null;
 		//content 
 		Object result = contentService.getDetailContents(content_id, user_id);
@@ -51,12 +54,11 @@ public class ContentController {
 	//예약 post 보내기
 	@PostMapping("/reservation/select")
 	@ResponseBody
-	public void selectReservation(@RequestParam Integer content_id, @RequestParam String date, @RequestParam String time, HttpSession sess) {
+	public void selectReservation(@RequestParam Integer content_id, @RequestParam String date, @RequestParam String time,@RequestParam Integer schedule_id, HttpSession sess) {
 		sess.setAttribute("reservation_contentID", content_id);
 	    sess.setAttribute("reservation_date", date);
 	    sess.setAttribute("reservation_time", time);
-	    
-	}
+	    	}
 	
 	//예약 페이지 보내기
 	@GetMapping("/reservation/select")
