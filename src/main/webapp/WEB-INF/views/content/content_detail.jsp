@@ -9,139 +9,104 @@
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
   
   <style>
+    /* 1. 기본 및 네비게이션 스타일 (메인과 100% 일치) */
     :root { --main-color: #4dc3ff; --border-color: #eee; --text-gray: #666; }
-    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: #333; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Pretendard', sans-serif; color: #333; background-color: #fff; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
 
-    /* --- Navigation Bar --- */
-    .navbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 50px; height: 70px; border-bottom: 1px solid #eee; background: #fff;
-    }
-    .nav-left { display: flex; align-items: center; gap: 40px; }
-    .nav-logo img { height: 35px; cursor: pointer; }
+    .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
+    .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
+    .logo img { height: 32px; cursor: pointer; display: block; }
     
-    .nav-menu { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; height: 100%; }
-    .nav-menu li { position: relative; display: flex; align-items: center; height: 70px; } /* 네비바 높이에 맞춤 */
-    
-    .nav-menu a { 
-      text-decoration: none; 
-      color: #333; 
-      font-weight: 500; 
-      font-size: 16px; 
-      transition: color 0.2s ease;
-      display: block;
-    }
+    .nav-menu { display: flex; gap: 35px; list-style: none; align-items: center; height: 100%; }
+    .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
+    .nav-menu a { font-weight: 600; font-size: 15px; transition: color 0.3s ease; height: 100%; display: flex; align-items: center; padding: 0 5px; }
+    .nav-menu li:hover a { color: var(--main-color); }
+    .nav-menu li::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 3px; background-color: var(--main-color); transition: width 0.3s ease; }
+    .nav-menu li:hover::after { width: 100%; }
 
-    /* 마우스 호버 및 활성화 상태 스타일 */
-    .nav-menu li:hover a, 
-    .nav-menu li.active a { 
-      color: var(--main-color); 
-    }
+    /* 우측 아이콘 섹션 (검색창 복구) */
+    .nav-icons { display: flex; gap: 20px; align-items: center; }
+    .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
+    .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
+    .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
+    .user-icon:hover { color: var(--main-color); }
 
-    /* 하단 파란색 선 애니메이션 */
-    .nav-menu li::after {
-      content: "";
-      position: absolute;
-      bottom: -1px; /* 네비바 하단 보더와 맞춤 */
-      left: 0;
-      width: 0;
-      height: 3px;
-      background-color: var(--main-color);
-      transition: width 0.3s ease;
-    }
-
-    /* 호버하거나 active 클래스가 있을 때 선이 늘어남 */
-    .nav-menu li:hover::after,
-    .nav-menu li.active::after {
-      width: 100%;
-    }
-    
-    .nav-right { display: flex; align-items: center; gap: 25px; }
-    .search-bar { position: relative; border-bottom: 1px solid #333; display: flex; align-items: center; }
-    .search-bar input { border: none; outline: none; padding: 5px 25px 5px 5px; width: 180px; font-size: 14px; }
-    .search-bar i { position: absolute; right: 5px; cursor: pointer; }
-    .user-icon img { width: 24px; cursor: pointer; }
-
-    /* --- Content Layout --- */
+    /* 2. 상단 레이아웃 */
     .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-    .breadcrumb { font-size: 13px; color: var(--text-gray); margin-bottom: 15px; }
-    .breadcrumb span { color: var(--main-color); }
-
+    .breadcrumb { font-size: 13px; color: var(--text-gray); margin-bottom: 10px; }
     .content-title-area { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
     .content-title-area h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
-    .sns-group { display: flex; gap: 12px; }
-    .sns-group img { width: 22px; cursor: pointer; opacity: 0.8; }
+    .sns-group { display: flex; gap: 10px; }
+    .sns-group img { width: 22px; cursor: pointer; opacity: 0.7; }
 
     .main-box { display: flex; gap: 50px; align-items: flex-start; margin-bottom: 60px; }
+    .poster-side { flex: 0 0 350px; } 
+    .poster-img { width: 100%; height: 480px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
     
-    /* Left: Poster */
-    .poster-side { flex: 0 0 400px; }
-    .poster-img { width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-    .like-count { display: flex; align-items: center; gap: 5px; margin-top: 15px; font-weight: bold; color: #444; }
+    .poster-like-btn { display: flex; align-items: center; gap: 8px; margin-top: 15px; font-weight: bold; color: #444; background: none; border: none; cursor: pointer; font-size: 18px; }
+    .poster-like-btn .heart-icon { color: var(--main-color); font-size: 20px; }
 
-    /* Right: Info & Reservation */
     .info-side { flex: 1; }
     .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
     .info-table th { text-align: left; width: 100px; padding: 12px 0; color: #333; font-size: 15px; vertical-align: top; }
     .info-table td { padding: 12px 0; font-size: 15px; color: #555; line-height: 1.6; }
 
     .reserve-section { display: flex; gap: 20px; border-top: 1px solid #eee; padding-top: 30px; }
-    #calendar { flex: 1.2; border: 1px solid #eee; border-radius: 10px; padding: 10px; background: #fff; font-size: 12px; }
-    
+    #calendar { flex: 1.2; border: 1px solid #eee; border-radius: 10px; padding: 10px; font-size: 12px; }
     .time-selector { flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 15px; background: #fafafa; }
     .time-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; display: block; }
-    .time-option { display: flex; align-items: center; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
-    .time-option:hover { border-color: var(--main-color); }
-    .time-option input { margin-right: 12px; accent-color: var(--main-color); }
-    .time-val { flex: 1; font-size: 14px; }
-    .seat-val { font-size: 12px; color: var(--text-gray); }
+    .time-option { display: flex; align-items: center; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
 
-    .action-btns { display: flex; gap: 10px; margin-top: 25px; }
-    .btn-reserve { flex: 1; background: var(--main-color); color: #fff; border: none; padding: 16px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    .btn-share { width: 55px; background: #fff; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 20px; }
+    .action-btns { display: flex; gap: 10px; margin-top: 25px; align-items: stretch; }
+    .btn-reserve { flex: 2; background: var(--main-color); color: #fff; border: none; padding: 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-save-cal { flex: 1; background: #f8f9fa; border: 1px solid #ddd; color: #444; padding: 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
 
-    /* 상세 정보 섹션 */
-    .detail-section { border-top: 1px solid #eee; padding-top: 40px; margin-top: 40px; }
-    .detail-section h2 { font-size: 22px; margin-bottom: 20px; }
-    .detail-content { line-height: 1.8; color: #444; }
-    .detail-img { width: 100%; margin-top: 20px; border-radius: 8px; }
-  
-  	.poster-side {
-  width: 350px;
-}
+    /* 3단계 탭 메뉴 비율 조정 */
+    .tab-wrapper { margin-top: 50px; }
+    .tab-menu { display: flex; list-style: none; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+    .tab-item { flex: 1; padding: 18px 0; cursor: pointer; font-weight: bold; color: #999; text-align: center; transition: 0.3s; }
+    .tab-item.active { color: #333; border-bottom: 3px solid var(--main-color); }
+    
+    .tab-panel { display: none; padding: 20px 0; }
+    .tab-panel.active { display: block; }
+    .detail-content { line-height: 1.8; color: #444; font-size: 16px; margin-bottom: 20px; }
+    .detail-img { width: 100%; border-radius: 8px; }
 
-.poster-img {
-  width: 100%;
-  height: 480px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-  	
+    /* 리뷰 및 문의사항 스타일 */
+    .review-summary { display: flex; gap: 40px; background: #fcfcfc; padding: 30px; border-radius: 12px; margin-bottom: 40px; }
+    .rating-bars { list-style: none; flex: 1; }
+    .rating-bars li { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-size: 13px; }
+    .bar { flex: 1; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+    .fill { height: 100%; background: var(--main-color); }
+    .review-list, .qna-list { list-style: none; }
+    .review-item, .qna-item { padding: 20px 0; border-bottom: 1px solid #eee; }
   </style>
 
   <script>
     $(function() {
-      let selectedDate = null;
-      let selectedTime = null;
-      let scheduleId = null;
-
-      // 1. 달력 설정
-      const calendarEl = document.getElementById('calendar');
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'ko',
-        height: 'auto',
-        headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-        dateClick: function(info) {
-          $(".fc-daygrid-day").css("background", ""); 
-          $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
-          selectedDate = info.dateStr;
-          fetchTimes(selectedDate);
-        }
+      // 1. 3단계 탭 전환
+      $(".tab-item").click(function() {
+        $(".tab-item").removeClass("active");
+        $(this).addClass("active");
+        $(".tab-panel").removeClass("active").eq($(this).index()).addClass("active");
       });
-      calendar.render();
 
-      // 2. 시간 데이터 가져오기 (AJAX)
+      // 2. 달력 및 AJAX
+      const calendarEl = document.getElementById('calendar');
+      if (calendarEl) {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth', locale: 'ko', height: 'auto',
+          dateClick: function(info) {
+            $(".fc-daygrid-day").css("background", ""); 
+            $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
+            fetchTimes(info.dateStr);
+          }
+        });
+        calendar.render();
+      }
+
       function fetchTimes(date) {
         $.ajax({
           url: "${pageContext.request.contextPath}/schedule/time",
@@ -149,78 +114,77 @@
           success: function(res) {
             let html = `<span class="time-title">\${date} 시간 선택</span>`;
             if(!res || res.length === 0) {
-              html += "<p style='font-size:12px; color:#999;'>예정된 회차가 없습니다.</p>";
+              html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
             } else {
               res.forEach(sch => {
                 html += `
                   <label class="time-option">
-                    <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}" data-time="\${sch.time_zone}">
-                    <span class="time-val">\${sch.time_zone}</span>
-                    <span class="seat-val">\${sch.current_ticket}석</span>
+                    <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}">
+                    <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
+                    <span style="font-size:12px;">\${sch.current_ticket}석</span>
                   </label>`;
               });
             }
             $(".reservation_timezone").html(html);
-            selectedTime = null;
-            scheduleId = null;
           }
         });
       }
 
-      // 3. 시간 선택 시 변수 저장
-      $(document).on("change", "input[name='sch_radio']", function() {
-        selectedTime = $(this).data("time");
-        scheduleId = $(this).data("id");
+      // 3. 좋아요 토글
+      $("#likeBtn").click(function() {
+          const heart = $(this).find(".heart-icon");
+          const count = $(this).find(".like-count-num");
+          let num = parseInt(count.text());
+          if(heart.text() === "🤍") { heart.text("💙"); count.text(num + 1); } 
+          else { heart.text("🤍"); count.text(num - 1); }
       });
 
-      // 4. 예매하기 버튼 클릭
-      $(".btn-reserve").click(function() {
-        if(!selectedDate || !selectedTime || !scheduleId) {
-          alert("날짜와 시간을 선택해주세요.");
-          return;
-        }
-        
-        $.post("${pageContext.request.contextPath}/reserve/schedule.do", {
-          content_id: $("#content_id").val(),
-          reserved_for_at: selectedDate,
-          time_zone: selectedTime,
-          schedule_id: scheduleId
-        }).done(function(){
-          location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
-        }).fail(function(){
-          alert("예약 요청 중 오류가 발생했습니다.");
-        });
+      // 4. 마이페이지 로그인 체크
+      $("#myPageBtn").click(function() {
+          const isLoggedIn = ${not empty loginSess};
+          if (!isLoggedIn) {
+              alert("로그인이 필요한 서비스입니다.");
+              location.href = "${pageContext.request.contextPath}/member/login";
+          } else {
+              location.href = "${pageContext.request.contextPath}/member/mypage";
+          }
       });
     });
   </script>
 </head>
 <body>
 
-  <header class="navbar">
-    <div class="nav-left">
-      <a href="/gotoday/main" class="nav-logo"><img src="https://via.placeholder.com/120x40?text=GoToday" alt="Logo"></a>
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        <a href="${pageContext.request.contextPath}/main">
+          <img src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
+        </a>
+      </div>
+      
       <ul class="nav-menu">
         <li><a href="#">Q&A</a></li>
-        <li><a href="/gotoday/popup">PopUp</a></li>
-        <li><a href="/gotoday/exhibition">Exhibition</a></li>
+        <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li> 
+        <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
       </ul>
-    </div>
-    <div class="nav-right">
-      <div class="search-bar">
-        <input type="text" placeholder="검색어를 입력하세요">
-        <i>🔍</i>
+
+      <div class="nav-icons">
+        <div class="search-bar">
+          <input type="text" placeholder="검색">
+          <span>🔍</span>
+        </div>
+        <span class="user-icon" id="myPageBtn">👤</span>
       </div>
-      <div class="user-icon"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="User"></div>
     </div>
   </header>
 
   <div class="container">
-    <div class="breadcrumb">콘텐츠 > ${content.contentKindName } > <span>#${content.category }</span></div>
+    <div class="breadcrumb">콘텐츠 > ${content.contentKindName} > <span>#${content.category}</span></div>
     
     <div class="content-title-area">
       <div>
-        <h1>컨텐츠명 : ${content.title}</h1>
-        <p style="margin:8px 0 0; color:#666;">${content.start_at} ~ ${content.end_at} &nbsp;|&nbsp; ${content.location} 📍</p>
+        <h1>${content.title}</h1>
+        <p style="margin-top:8px; color:var(--text-gray);">${content.start_at} ~ ${content.end_at} &nbsp;|&nbsp; ${content.location} 📍</p>
       </div>
       <div class="sns-group">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X">
@@ -231,16 +195,18 @@
 
     <div class="main-box">
       <section class="poster-side">
-<img class="poster-img" src="${pageContext.request.contextPath}${content.main_image_path}">
-	 <div class="like-count">💙 ${content.like_count}</div>
+        <img class="poster-img" src="${pageContext.request.contextPath}${content.main_image_path}">
+        <button type="button" class="poster-like-btn" id="likeBtn">
+          <span class="heart-icon">🤍</span> <span class="like-count-num">${content.like_count}</span>
+        </button>
       </section>
 
       <section class="info-side">
         <table class="info-table">
           <tr><th>소개</th><td>${content.description}</td></tr>
-          <tr><th>관람료</th><td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원 / 어린이 ${content.child_price}원</td></tr>
-          <tr><th>운영시간</th><td> ${content.content_time }</td></tr>
-          <tr><th>예약방식</th><td>${content.reservationTypeLabel}</td></tr>
+          <tr><th>관람료</th><td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원</td></tr>
+          <tr><th>운영시간</th><td>${content.content_time}</td></tr>
+          <tr><th>수령방법</th><td>${content.reservationTypeLabel}</td></tr>
         </table>
 
         <div class="reserve-section">
@@ -256,21 +222,59 @@
         <div class="action-btns">
           <input type="hidden" id="content_id" value="${content.content_id}">
           <button class="btn-reserve">예매하기</button>
-          <button class="btn-share">🤍</button>
+          <button class="btn-save-cal">캘린더 저장하기</button>
         </div>
       </section>
     </div>
 
-    <section class="detail-section">
-      <h2>상세 정보</h2>
-      <div class="detail-content">
-        ${content.detail_description}
-      </div>
-      <c:if test="${not empty content.main_image_path}">
-        <img src="${content.main_image_path}" class="detail-img" alt="상세이미지">
-      </c:if>
-    </section>
-  </div>
+    <div class="tab-wrapper">
+      <ul class="tab-menu">
+        <li class="tab-item active">상세정보</li>
+        <li class="tab-item">리뷰</li>
+        <li class="tab-item">문의사항</li>
+      </ul>
 
+      <div class="tab-content">
+        <section class="tab-panel active">
+          <div class="detail-content">${content.detail_description}</div>
+          <c:if test="${not empty content.main_image_path}">
+            <img src="${pageContext.request.contextPath}${content.main_image_path}" class="detail-img">
+          </c:if>
+        </section>
+
+        <section class="tab-panel">
+          <div class="review-summary">
+            <div style="flex:0.4; text-align:center; border-right:1px solid #eee;">
+              <h3 style="font-size:45px; color:var(--main-color);">4.7</h3>
+              <p style="color:#ffd700; font-size:18px;">★★★★★</p>
+              <p style="font-size:13px; color:#999; margin-top:5px;">총 34개 리뷰</p>
+            </div>
+            <ul class="rating-bars" style="margin-left:40px;">
+              <li>5점 <div class="bar"><div class="fill" style="width:80%;"></div></div> 24</li>
+              <li>4점 <div class="bar"><div class="fill" style="width:15%;"></div></div> 7</li>
+              <li>3점 <div class="bar"><div class="fill" style="width:5%;"></div></div> 3</li>
+            </ul>
+          </div>
+          <ul class="review-list">
+            <li class="review-item"><strong>김*님</strong> <span style="float:right; color:#ccc;">2026.01.13</span><p style="margin-top:10px;">전시가 너무 예쁘네요!</p></li>
+          </ul>
+        </section>
+
+        <section class="tab-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <p style="color:var(--text-gray);">컨텐츠에 대해 궁금한 점을 문의해 주세요.</p>
+            <button style="padding:8px 16px; background:#333; color:#fff; border:none; border-radius:4px; cursor:pointer;">문의하기</button>
+          </div>
+          <ul class="qna-list">
+            <li class="qna-item">
+              <span style="background:#eee; padding:2px 6px; font-size:12px; border-radius:3px;">답변대기</span>
+              <span style="margin-left:10px;">재입장이 가능한가요?</span>
+              <span style="float:right; color:#ccc;">이*님 | 2026.01.19</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

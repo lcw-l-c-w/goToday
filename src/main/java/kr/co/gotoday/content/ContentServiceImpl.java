@@ -59,27 +59,29 @@ public class ContentServiceImpl implements ContentService {
 	}
 
 	// 핵심 메서드
-
 	private MainContentViewDTO applyViewPolicy(ContentVO vo, MainContentDTO mcd) {
-		MainContentViewDTO mcv = new MainContentViewDTO(vo);
-		if (mcd.getUser_id() == null) {
-			mcv.setBlur(true);
-			mcv.setCtaMessage("로그인하시면 볼 수 있습니다!");
-			mcv.setCtaUrl("/member/login");
-			return mcv;
-		}
+	    MainContentViewDTO mcv = new MainContentViewDTO(vo);
+	    
+	    // 1. 비로그인 유저 처리 (mcd 자체가 null이거나 user_id가 null인 경우)
+	    if (mcd == null || mcd.getUser_id() == null) {
+	        mcv.setBlur(true);
+	        mcv.setCtaMessage("로그인하시면 볼 수 있습니다!");
+	        mcv.setCtaUrl("/member/login");
+	        return mcv;
+	    }
 
-		// 회원 + 관심사 없음
-		if (mcd.getUser_tag_id().isEmpty() && mcd.getUser_id() != null) {
-			mcv.setBlur(true);
-			mcv.setCtaMessage("관심사 설정하시면 볼 수 있습니다!");
-			mcv.setCtaUrl("/mypage/like_list");
-			return mcv;
-		}
-		// 정상인 경우
-		mcv.setBlur(false);
-		return mcv;
-
+	    // 2. 회원인 경우: 관심사 리스트(user_tag_id)가 null이거나 비어있는지 체크
+	    // 수정 포인트: mcd.getUser_tag_id() == null 조건을 반드시 앞에 추가
+	    if (mcd.getUser_tag_id() == null || mcd.getUser_tag_id().isEmpty()) {
+	        mcv.setBlur(true);
+	        mcv.setCtaMessage("관심사 설정하시면 볼 수 있습니다!");
+	        mcv.setCtaUrl("/mypage/like_list");
+	        return mcv;
+	    }
+	    
+	    // 3. 정상인 경우
+	    mcv.setBlur(false);
+	    return mcv;
 	}
 
 	// 날짜 조회

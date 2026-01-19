@@ -24,7 +24,7 @@ public class ExhibitionController {
 		mcd.setContent_kind("exhibition");
 		
 		//로그인 정보 처리 (웹 책임)
-		UserVO user= (UserVO) sess.getAttribute("loginUser");
+		UserVO user= (UserVO) sess.getAttribute("loginSess");
 		if(user!=null) {
 			mcd.setUser_id(user.getUser_id());
 			mcd.setUser_tag_id(user.getUserTagList());
@@ -34,7 +34,7 @@ public class ExhibitionController {
 		model.addAttribute("recommand",contentService.getRecommandContents(mcd));
 	
 		
-		model.addAttribute("popupList", contentService.getPopularContent(7, "exhibition"));
+		model.addAttribute("popularList", contentService.getPopularContent(7, "exhibition"));
 		model.addAttribute("upcomingList", contentService.getUpcomingContent(10, "exhibition"));
 		return "main/exhibition";
 	}
