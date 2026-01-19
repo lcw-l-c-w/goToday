@@ -17,25 +17,17 @@
         .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
         .logo img { height: 32px; cursor: pointer; display: block; }
         
-        /* 네비게이션 메뉴 스타일 */
         .nav-menu { display: flex; gap: 35px; height: 100%; list-style: none; align-items: center; }
         .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
-        .nav-menu a { 
-            font-weight: 600; font-size: 15px; color: #333; 
-            transition: color 0.3s ease; height: 100%; 
-            display: flex; align-items: center; padding: 0 5px; 
-        }
+        .nav-menu a { font-weight: 600; font-size: 15px; color: #333; transition: color 0.3s ease; height: 100%; display: flex; align-items: center; padding: 0 5px; }
 
-        /* [수정] 호버 시 글자색 변경 및 아래 강조선 등장 */
-        .nav-menu li:hover a { color: var(--main-color); }
+        /* 네비게이션 호버 및 활성 페이지 강조선 */
+        .nav-menu li:hover a, .nav-menu li.active-page a { color: var(--main-color); }
         .nav-menu li::after { 
             content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 3px; 
             background-color: var(--main-color); transition: width 0.3s ease; z-index: 5; 
         }
-        .nav-menu li:hover::after { width: 100%; }
-
-        /* [수정] 현재 페이지는 글자만 파란색 (강조선 width는 기본 0이므로 나타나지 않음) */
-        .nav-menu li.active-page a { color: var(--main-color); }
+        .nav-menu li:hover::after, .nav-menu li.active-page::after { width: 100%; }
 
         .nav-icons { display: flex; gap: 20px; align-items: center; }
         .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
@@ -98,7 +90,7 @@
         .recommend-btn:hover { background: var(--main-color); color: white; border-color: var(--main-color); }
         .rec-prev { left: -5px; } .rec-next { right: -5px; }
 
-        .blur-container { filter: blur(12px); pointer-events: none; user-select: none; opacity: 0.5; }
+        .blur-container { filter: blur(15px); pointer-events: none; user-select: none; opacity: 0.5; }
         .cta-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 120;
             background: rgba(255, 255, 255, 0.95); padding: 50px 60px; border-radius: 30px;
@@ -109,14 +101,14 @@
         .cta-btn { display: inline-block; background-color: var(--main-color); color: white; padding: 14px 35px; border-radius: 12px; font-weight: bold; font-size: 16px; transition: 0.3s; }
         .cta-btn:hover { background-color: #38b2f0; transform: scale(1.05); }
 
-        /* 4. HOT & 오픈 예정 */
+        /* 4. HOT & 오픈 예정 콘텐츠 스타일 */
         .section-title { font-size: 26px; font-weight: bold; margin: 60px 0 30px; text-align: center; }
         .hot-grid-container { display: grid; grid-template-columns: 1.3fr 2fr; gap: 15px; height: 550px; margin-bottom: 80px; }
-        .hot-main { border-radius: 18px; overflow: hidden; position: relative; cursor: pointer; }
+        .hot-main { border-radius: 18px; overflow: hidden; position: relative; cursor: pointer; background: #eee; }
         .hot-main img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .hot-main:hover img { transform: scale(1.05); }
         .hot-sub-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 12px; }
-        .sub-card { border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .sub-card { border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; background: #eee; }
         .sub-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .sub-card img { width: 100%; height: 100%; object-fit: cover; }
         .d-day { position: absolute; top: 12px; left: 12px; background: #ff4d4d; color: white; padding: 5px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; z-index: 10; }
@@ -146,7 +138,7 @@
             <div class="banner-container">
                 <button class="slide-btn btn-l" id="exPrev">〈</button>
                 <ul class="banner-track" id="exTrack">
-                    <c:forEach var="item" items="${random}" varStatus="status">
+                    <c:forEach var="item" items="${random}">
                         <li class="exhibit-banner-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
                             <img src="<c:url value='${item.main_image_path}'/>" alt="${item.title}">
                             <div class="banner-overlay">
@@ -198,16 +190,56 @@
                                 </div>
                             </article>
                         </c:forEach>
+                        <c:if test="${empty recommand}">
+                            <div style="height:280px; width:100%;"></div>
+                        </c:if>
                     </div>
                 </div>
                 <button class="recommend-btn rec-next" id="recNext">&gt;</button>
             </div>
         </section>
+
+        <h2 class="section-title">지금 가장 HOT한 팝업</h2>
+        <section>
+            <div class="hot-grid-container">
+                <c:if test="${not empty popularList}">
+                    <div class="hot-main" onclick="location.href='${pageContext.request.contextPath}/detail/${popularList[0].content_id}'">
+                        <img src="<c:url value='${popularList[0].main_image_path}'/>">
+                        <div style="position:absolute; bottom:0; left:0; width:100%; padding: 25px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color:white;">
+                            <h3 style="font-size:22px;">${popularList[0].title}</h3>
+                        </div>
+                    </div>
+                    <div class="hot-sub-grid">
+                        <c:forEach var="item" items="${popularList}" begin="1" end="6">
+                            <div class="sub-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
+                                <img src="<c:url value='${item.main_image_path}'/>">
+                            </div>
+                        </c:forEach>
+                    </div>
+                </c:if>
+            </div>
+        </section>
+
+        <h2 class="section-title">오픈 예정 콘텐츠</h2>
+        <section style="padding-bottom: 100px;">
+            <div class="content-list horizontal" style="overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                <c:forEach var="item" items="${upcomingList}">
+                    <article class="content-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
+                        <div class="card-img-wrap">
+                            <c:if test="${not empty item.dday}"><span class="d-day">D-${item.dday}</span></c:if>
+                            <img src="<c:url value='${item.main_image_path}'/>">
+                        </div>
+                        <h4 style="margin: 8px 0 4px; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</h4>
+                        <p style="font-size: 13px; color: #999;">${item.periodText}</p>
+                    </article>
+                </c:forEach>
+            </div>
+        </section>
     </main>
 
     <script>
-        // 스크립트 로직 생략 (원본과 동일)
         window.addEventListener("load", function() {
+            // --- 1. 입체 캐러셀 배너 로직 ---
             const track = document.getElementById('exTrack');
             const cards = track ? track.querySelectorAll('.exhibit-banner-card') : [];
             const dotContainer = document.getElementById('exDots');
@@ -246,8 +278,32 @@
                 updateCards();
                 autoSlide = setInterval(nextSlide, 5000);
             }
-            
-            // 추천 슬라이더 등 기타 로직 생략
+
+            // --- 2. 추천 콘텐츠 슬라이더 로직 ---
+            const recList = document.getElementById('recList');
+            const recCards = recList ? recList.querySelectorAll('.content-card') : [];
+            let recPosition = 0;
+            const cardWidth = 210 + 20; 
+            const view = document.querySelector('.recommend-view');
+            if (recCards.length > 0 && view) {
+                const containerWidth = view.offsetWidth;
+                const visibleCount = Math.floor(containerWidth / cardWidth);
+                document.getElementById('recPrev').onclick = () => { recPosition = Math.min(recPosition + cardWidth, 0); recList.style.transform = `translateX(${recPosition}px)`; };
+                document.getElementById('recNext').onclick = () => { recPosition = Math.max(recPosition - cardWidth, -(cardWidth * recCards.length - containerWidth + 10)); recList.style.transform = `translateX(${recPosition}px)`; };
+                if (recCards.length <= visibleCount) {
+                    document.getElementById('recPrev').style.display = 'none';
+                    document.getElementById('recNext').style.display = 'none';
+                }
+            }
+
+            // --- 3. 마이페이지 이동 ---
+            const myBtn = document.getElementById('myPageBtn');
+            if(myBtn) {
+                myBtn.onclick = () => {
+                    const isLoggedIn = ${not empty loginSess};
+                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
+                };
+            }
         });
     </script>
 </body>
