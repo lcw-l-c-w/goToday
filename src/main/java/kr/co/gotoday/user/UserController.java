@@ -44,7 +44,7 @@ public class UserController {
             return "common/return";
         } else {
             sess.setAttribute("loginSess", userVO);
-            return "redirect:/";
+            return "redirect:/main";
         }
     }
     
@@ -190,7 +190,7 @@ public class UserController {
         
         session.setAttribute("loginSess", dbUser); 
         
-        return "redirect:/";
+        return "redirect:/main";
 
 	}
     
@@ -199,7 +199,7 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         System.out.println("로그아웃 성공");
-        return "redirect:/";
+        return "redirect:/main";
     }
     
 
@@ -221,7 +221,7 @@ public class UserController {
         }
 
         session.setAttribute("loginSess", userVO);
-        return "redirect:/";
+        return "redirect:/admin/content_manage";
     }
     
 //    // 관심사 수정

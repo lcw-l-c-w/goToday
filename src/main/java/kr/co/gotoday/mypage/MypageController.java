@@ -22,7 +22,7 @@ public class MypageController {
 	private final UserService userService;
 	
 	// 관심사 수정
-    @GetMapping("/mypage/like_list")
+    @GetMapping("/mypage/user_like_edit")
     public String userLikeEdit(HttpSession session, Model model) {
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
         if (loginUser == null) {
@@ -32,13 +32,13 @@ public class MypageController {
             return "common/return";
         }
 
-        // 유저가 가진 태그 이름 목록
+        // 유저가 가진 태그 목록
         List<String> userTags = userService.getUserTagNames(loginUser.getUser_id());
         model.addAttribute("userTags", userTags);
-        return "mypage/like_list";
+        return "mypage/user_like_edit";
     }
     // 관심사 수정
-    @PostMapping("/mypage/like_list")
+    @PostMapping("/mypage/user_like_edit")
     public String userLikeChange(
             HttpSession session,
             @RequestParam(required = false) String event,
@@ -56,7 +56,7 @@ public class MypageController {
 
         userService.updateUserTags(userId, tagNames);
 
-        return "/gotoday/mypage";
+        return "redirect:/mypage/main";
     }
     
     // 회원 정보 수정
@@ -73,7 +73,7 @@ public class MypageController {
         // DB에서 최신 정보 가져오기
         UserVO dbUser = userService.getUserById(loginUser.getUser_id());
         model.addAttribute("user", dbUser);
-        return "member/userInfoEdit";
+        return "mypage/user_info";
     }
     
     // 회원 정보 수정
@@ -107,7 +107,7 @@ public class MypageController {
             // 세션 최신화: userMapper → userService
             UserVO updatedUser = userService.loginByEmail(loginUser.getEmail());
             session.setAttribute("loginSess", updatedUser);
-            return "/gotoday/mypage";
+            return "redirect:/mypage/main";
         } else {
             model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
             model.addAttribute("cmd", "back");

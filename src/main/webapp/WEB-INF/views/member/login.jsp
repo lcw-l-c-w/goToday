@@ -49,7 +49,6 @@ $(function () {
 	    
 	    회원이 아니신가요?
 	    <button type="button" id="btnRegister">SIGN IN</button>
-	    <!-- <a href="/gotoday/member/register1">SIGN IN</a>  -->
 	    <br>
 	    
 	    <div id="socialLogin">
