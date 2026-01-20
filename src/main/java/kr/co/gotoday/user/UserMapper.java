@@ -24,8 +24,9 @@ public interface UserMapper {
     void deleteUserTags(int userId);
     void insertUserTag(UserTagVO vo);
     
-    // 회원정보 수정
+    // 마이페이지 회원정보 수정 및 마이페이지 사이드바
     UserVO getUserById(int userId);
+    // 마이페이지 회원정보 수정
     int updateUserInfo(UserVO vo);
     
     void createUserTagsBatch(List<UserTagVO> list);

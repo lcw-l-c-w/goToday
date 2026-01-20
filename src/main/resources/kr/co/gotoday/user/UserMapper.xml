@@ -61,7 +61,7 @@
         FROM admin WHERE email = #{email} AND password = #{password}
     </select>
     
-    <!-- 관심사 수정(사용자 태그 목록 확인) -->
+    <!-- 마이페이지 관심사 수정(사용자 태그 목록 확인) -->
 	<select id="getUserTagNames" resultType="String">
 	    SELECT t.tag_name
 	    FROM user_tag ut
@@ -69,23 +69,23 @@
 	    WHERE ut.user_id = #{userId}
 	</select>
 
-	<!-- 관심사 수정(사용자 태그 전체 삭제) -->
+	<!-- 마이페이지 관심사 수정(사용자 태그 전체 삭제) -->
 	<delete id="deleteUserTags">
 	    DELETE FROM user_tag WHERE user_id = #{userId}
 	</delete>
 	
-	<!-- 관심사 수정(사용자 태그 추가) -->
+	<!-- 마이패이지 관심사 수정(사용자 태그 추가) -->
 	<insert id="insertUserTag" parameterType="kr.co.gotoday.user.UserTagVO">
 	    INSERT INTO user_tag (user_id, tag_id)
 	    VALUES (#{user_id}, #{tag_id})
 	</insert>
 	
-	<!-- 회원정보 조회 -->
+	<!-- 마이페이지 회원정보 조회 -->
 	<select id="getUserById" parameterType="int" resultType="kr.co.gotoday.user.UserVO">
 	    SELECT * FROM user WHERE user_id = #{userId}
 	</select>
 
-	<!-- 회원정보 수정 -->
+	<!-- 마이페이지 회원정보 수정 -->
 	<update id="updateUserInfo" parameterType="kr.co.gotoday.user.UserVO">
 	    UPDATE user
 	    <set>

@@ -61,6 +61,13 @@ public class MvcConfig implements WebMvcConfigurer{
 		registry.jsp("/WEB-INF/views/", ".jsp");
 	}
 	
+	// 1. 상단에 변수 추가
+	@Value("${spring.datasource.hikari.maximum-pool-size}")
+	private int maxPoolSize;
+
+	@Value("${spring.datasource.hikari.minimum-idle}")
+	private int minIdle;
+	
 	// hikaricp
 	@Bean
 	@Primary
@@ -70,6 +77,13 @@ public class MvcConfig implements WebMvcConfigurer{
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);
+		
+		// 이 코드들을 추가해야 프로퍼티 설정이 적용
+	    dataSource.setMaximumPoolSize(maxPoolSize); // 3으로 설정됨
+	    dataSource.setMinimumIdle(minIdle);         // 1로 설정됨
+	    dataSource.setIdleTimeout(10000);           // 10초
+	    dataSource.setMaxLifetime(30000);           // 30초v
+	    
 		return dataSource;
 	}
 	// mybatis
