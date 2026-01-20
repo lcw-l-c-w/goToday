@@ -194,8 +194,8 @@ public class VendorServiceImpl implements VendorService {
 	}
 	
 	@Override
-	public int updateReservationStatus(int reserve_id) { // 여기에 int가 중복되진 않았나요?
-	    return reservationMapper.updateReservationStatusById(reserve_id);
+	public int updateReservationStatus(int reservation_id) { // 여기에 int가 중복되진 않았나요?
+	    return reservationMapper.updateReservationStatusById(reservation_id);
 	}
 
 
