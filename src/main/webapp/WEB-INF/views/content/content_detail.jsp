@@ -213,7 +213,7 @@
         <span class="user-icon" id="myPageBtn">👤</span>
       </div>
     </div>
-  </header>
+</header>
 
   <div class="container">
     <div class="breadcrumb">콘텐츠 > ${content.contentKindName} > <span>#${content.category}</span></div>
