@@ -40,44 +40,40 @@
 	          	예약 내역이 없습니다.
 	        </div>
 	      </c:when>
-      <c:otherwise>
-
+   		<c:otherwise>
         <c:forEach var="r" items="${reservationList}">
+        	<p>${r}</p>
+			
 			<div class="reserve-item">
-			
-			  <!-- D-Day / END / CANCEL -->
-			  <div class="badge ${r.dDay}">
-			    ${r.dDay}
-			  </div>
-			
-			  <!-- 날짜 + 상태 -->
-			  <div class="datetime">
-			    ${r.reserved_for_at} ${r.time_zone}
-			    <span class="state">${r.reservation_status}</span>
-			  </div>
-			
-			  <!-- 버튼 -->
-			  <button>예약정보</button>
-			
-			  <c:if test="${r.dDay eq 'END'}">
-			    <button>리뷰쓰기</button>
-			  </c:if>
-			
+				<input type="hidden" name="reservation_id" value ="${r.reservation_id}">
+				<!-- badge: D-Day / END / CANCEL -->
+				<div class="badge">
+					${r.dday}
+				</div>
+				
+				<!-- 날짜 + 상태 -->
+				<div class="datetime">
+				    <span>${r.reserved_for_at}</span> 
+				    <span>${r.time_zone}</-span>
+				    <span class="state">${r.reservation_status}</span>
+				</div>
+				
+				<!-- 버튼 -->
+				<button class="info-btn" data-reservation-id="${r.reservation_id}">예약정보</button>
+				
+				<c:if test="${r.reservation_status eq 'VISITED'}">
+				    <button class="review-btn" 
+				    	data-reservation-id="${r.reservation_id}"
+				    	data-content-id = "${r.content_id }" >
+				    	리뷰쓰기</button>
+				</c:if>
 			</div>
 			
-			</c:forEach>
-           	</div>
+		</c:forEach>
+        <!-- 우측 포스터 -->
+        <div class="poster">
+          <img src="/upload/poster/${r.main_image_path}" alt="포스터">
         </div>
-
-            <!-- 우측 포스터 -->
-            <div class="poster">
-              <img src="/upload/poster/${r.posterImg}" alt="포스터">
-            </div>
-
-          </div>
-
-        </c:forEach>
-
       </c:otherwise>
     </c:choose>
 
@@ -98,6 +94,17 @@
             $(this).addClass("active");
             // 탭 클릭시 AJAX로 데이터를 다시 불러오거나 섹션을 숨길 수 있습니다.
         });
+        
+        $(".info-btn").click(function () {
+        	const reservationId = $(this).data("reservation-id");
+            window.location.href = "/gotoday/reservation/detail/" + reservationId;
+		});
+		
+		$(".review-btn").click(function () {
+			const reservationId = $(this).data("reservation-id");
+			const contentId = $(this).data("content-id");
+			window.location.href = "/gotoday/review/write?reservationId="+reservationId+"&contentId="+contentId;
+		});
     });
 </script>
 

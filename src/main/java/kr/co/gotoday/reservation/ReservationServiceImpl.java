@@ -253,22 +253,38 @@ public class ReservationServiceImpl implements ReservationService{
 
 	@Override
 	public List<ReservationListDTO> findReservationListByUserId(int user_id) {
-		List<ReservationListDTO> listDto = reservationMapper.findReservationListByUserId(user_id);
+		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(user_id);
 		
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		
-		for(ReservationListDTO dto : listDto) {
+		for(ReservationListDTO dto : listDTO) {
 			if ("CANCEL".equals(dto.getReservation_status())) {
-	            dto.setDDay("CANCELED");
+	            dto.setDday("CANCELED");
 	            continue;
 	        }
 			long diff = ChronoUnit.DAYS.between(today, dto.getReserved_for_at());
 			
-			if (diff > 0) dto.setDDay("D-" + diff);
-			else if (diff == 0) dto.setDDay("D-Day");
-			else dto.setDDay(END));
+			if (diff > 0) dto.setDday("D-" + diff);
+			else if (diff == 0) dto.setDday("D-Day");
+			else dto.setDday("END");
 		}
-		return listDto;
+		
+		listDTO.sort((a,b)->{
+			boolean aEnd = "END".equals(a.getDday()) || "CANCELED".equals(a.getDday());
+			boolean bEnd = "END".equals(b.getDday()) || "CANCELED".equals(b.getDday());
+			
+			//END 아닌 거가 먼저 오게 
+			if (aEnd && !bEnd) return 1; 
+			if (!aEnd && bEnd) return -1; 
+			//둘 다 END면 최근으로 정렬 
+			if (aEnd && bEnd) {
+	            return b.getReserved_for_at().compareTo(a.getReserved_for_at());
+	        }
+			//둘 다 진행중이면 가까운 날짜순
+	        return a.getReserved_for_at().compareTo(b.getReserved_for_at());
+		});
+		
+		return listDTO;
 	}
 
 	 

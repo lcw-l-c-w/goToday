@@ -12,6 +12,6 @@ public class ReservationListDTO {
 	private String time_zone;
 	private int content_id;
 	
-	private String dDay;
+	private String dday;
 
 }

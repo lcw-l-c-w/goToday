@@ -185,7 +185,7 @@
 		FROM content c 
 		JOIN reservation r ON r.content_id = c.content_id
 		WHERE r.user_id = #{user_id}
-		ORDER BY r.reserved_for_at DESC
+		ORDER BY r.reserved_for_at, r.time_zone
 	</select>
 	
 	
