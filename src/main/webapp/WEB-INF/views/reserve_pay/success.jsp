@@ -19,6 +19,15 @@
     <div id="result" class="result-box" style="display:none;">
       <p id="message"></p>
       <p id="reservationCode"></p>
+      <div class="actions" style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+		  <button id="btn-mypage" style="padding: 10px 18px; border-radius: 6px; border: none; background: #2c7be5; color: #fff; cursor: pointer;">
+		  	예약 내역 확인하기
+		  </button>
+		
+		  <button id="btn-home" style="padding: 10px 18px; border-radius: 6px; border: none; background: #6c757d; color: #fff; cursor: pointer;">
+		    메인으로 가기
+		  </button>
+		</div>
     </div>
 
     <script>
@@ -82,8 +91,46 @@
         }
       }
 
-      // 페이지 로드 시 자동 실행
-      confirm();
+      function bindActionButtons() {
+   	    const mypageBtn = document.getElementById("btn-mypage");
+   	    const homeBtn = document.getElementById("btn-home");
+
+   	    if (mypageBtn) {
+   	      mypageBtn.addEventListener("click", function () {
+   	        window.location.href = contextPath + "/mypage/reservation";
+   	      });
+   	    }
+
+   	    if (homeBtn) {
+   	      homeBtn.addEventListener("click", function () {
+   	        window.location.href = contextPath + "/main.do";
+   	      });
+   	    }
+   	  }
+      
+      const isFreePayment = (amount === "0" || amount === 0 || amount === "");
+
+      if (isFreePayment) {
+        //0원 결제: 서버에서 이미 처리 끝난 상태
+        const titleEl = document.getElementById("title");
+        const resultEl = document.getElementById("result");
+        const messageEl = document.getElementById("message");
+        const codeEl = document.getElementById("reservationCode");
+
+        titleEl.textContent = "예약이 완료되었습니다!";
+        titleEl.className = "success";
+        resultEl.className = "result-box success";
+        resultEl.style.display = "block";
+
+        messageEl.textContent = "무료 전시 예약이 정상적으로 완료되었습니다.";
+        codeEl.textContent = "예약코드: ${reservationCode}";
+
+        bindActionButtons();
+      } else {
+        //유료 결제만 토스 승인 호출
+        confirm();
+      }
+      
     </script>
   </body>
 </html>

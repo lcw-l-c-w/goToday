@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.payment.TossInputDTO;
 import kr.co.gotoday.user.UserVO;
 
@@ -112,26 +113,14 @@ public class ReservationController {
 		//컨텐츠 정보를 모델에 저장.
 		UserVO userVO = (UserVO) session.getAttribute("loginSess");
 		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
-		
 		model.addAttribute("contentVo",contentVO);
 
 		//기본적으로 세션에 있는 유저의 정보를 가져다가 수령인 란에 저장하기 위해 정보를 모델에 저장
 		UserVO userInfo = (UserVO)session.getAttribute("loginSess");
-
-		// [테스트용] 로그인 안 된 경우 임시 사용자 정보 생성
-		if (userInfo == null) {
-			userInfo = new UserVO();
-			userInfo.setUser_id(1);
-			userInfo.setName("테스트유저");
-			userInfo.setEmail("test@test.com");
-			userInfo.setBirthday("20200505");
-			userInfo.setPhone_number("01064542020");
-		}
 		model.addAttribute("receiver_info", userInfo);
 
 		//금액 정보를 모델에 저장
 		model.addAttribute("total_price", reservation.getTotal_price());
-
 
 		// 토스 요청 정보 생성
 		TossInputDTO paymentDTO = new TossInputDTO();
@@ -174,6 +163,23 @@ public class ReservationController {
 			// 예약자 설정
 			UserVO userVO = (UserVO) session.getAttribute("loginSess");
 			reservationVO.setUser_id(userVO.getUser_id());
+			
+			//0원일 때 서비스 분기
+			int total_price = reservation.getTotal_price();
+			if (total_price == 0) {
+				ReservationVO resultVO = reservationService.confirmAndCreateReservation(reservationVO, null, null, 0);
+				
+				// 세션 정리
+	            session.removeAttribute("schedule");
+	            session.removeAttribute("pendingReservation");
+	            session.removeAttribute("paymentDTO");
+
+	            result.put("success", true);
+	            result.put("free", true);   // ⭐ 프론트 분기용
+	            result.put("reservationCode", resultVO.getReservation_code());
+
+	            return ResponseEntity.ok(result);
+			}
 
 			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
 			session.setAttribute("pendingReservation", reservationVO);
@@ -202,15 +208,16 @@ public class ReservationController {
 	//토스 페이먼츠 결제 성공 콜백 -> success.jsp 렌더링 (실제 승인은 /reserve/confirm에서 처리)
 	@GetMapping("/reserve/success.do")
 	public String paymentSuccess(
-			@RequestParam String paymentKey,
-			@RequestParam String orderId,
-			@RequestParam int amount,
+			@RequestParam(required=false) String paymentKey,
+			@RequestParam(required=false) String orderId,
+			@RequestParam(required=false) Integer amount,
+			@RequestParam(required=false) String reservation_code,
 			Model model) {
 
 		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
 		model.addAttribute("paymentKey", paymentKey);
-		model.addAttribute("orderId", orderId);
-		model.addAttribute("amount", amount);
+		model.addAttribute("amount", amount ==null ? 0 : amount);
+		model.addAttribute("reservation_code", reservation_code);
 
 		return "reserve_pay/success";
 	}
@@ -312,7 +319,7 @@ public class ReservationController {
 			JSONParser parser = new JSONParser();
 			JSONObject webhookData = (JSONObject) parser.parse(body);
 				
-			String order_key = (String) webhookData.get("orderId");           // ✅
+			String order_key = (String) webhookData.get("orderId");          
 			String status = (String) webhookData.get("status");    
 			
 			log.info("[WEBHOOK] orderId={},status={}", 

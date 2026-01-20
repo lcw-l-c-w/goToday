@@ -208,8 +208,15 @@
 
     <script>
         const button = document.getElementById("payment-button");
-       
-        //클라이언트 키 -> 가빈 테스트 중 
+
+        const totalPrice = Number("${reservation.total_price}");
+	
+	    if (totalPrice === 0) {
+	      document.querySelector('[aria-label="결제 수단 선택"]').style.display = "none";
+	      button.textContent = "무료 전시 예약하기";
+	    }
+      
+        //클라이언트 키
         const clientKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN"; 
         const tossPayments = TossPayments(clientKey);
 
@@ -238,16 +245,23 @@
                     })
                 });
 
-                const result = await response.json();
+                const result = await response.json();             
 
-                // 2. 서버 응답이 성공이면 토스 결제창 호출 (일반 결제창 방식)
+                // 서버 응답이 성공이면 토스 결제창 호출 (일반 결제창 방식)
                 if (!result.success) {
-                                alert("예약 처리 실패: " + result.msg);
-                                button.disabled = false;
-                                button.textContent = "총 ${reservation.total_price}원 결제하기";
-                                return;
-                            }
+                    alert("예약 처리 실패: " + result.msg);
+                    button.disabled = false;
+                    button.textContent = "총 ${reservation.total_price}원 결제하기";
+                    return;
+                }
 
+				if(result.free) {
+					alert("예약 및 결제가 완료되었습니다.");
+					location.href = "${pageContext.request.contextPath}/reserve/success.do"
+					      + "?reservation_code=" + result.reservationCode;
+					return;
+				}                
+                
                 console.log("예약 정보 저장 성공, 토스 결제창 호출")
                 
                 //공통옵션
