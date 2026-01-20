@@ -30,8 +30,9 @@
 	
 	.main-content iframe {
 	    width: 100%;
-	    min-height: 1000px; /* 상세페이지 길이에 맞춰 넉넉히 설정 */
+	    min-height: 2000px; /* 상세페이지 길이에 맞춰 넉넉히 설정 */
 	    border: none;
+	    overflow: hidden; /* iframe 자체 스크롤바 방지 */
 	}
 	
 	@media (max-width: 1024px) {

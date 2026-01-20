@@ -4,10 +4,23 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관심사 수정 | GoToday</title>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#frm').on('submit', function(e) {
+        const eventSelected = $('input[name="event"]:checked').length > 0;
+        if(!eventSelected) {
+            alert('전시 또는 팝업 중 하나를 선택해주세요.');
+            e.preventDefault();
+            return false;
+        }
+        alert('관심사가 성공적으로 수정되었습니다.');
+    });
+});
+</script>
 
 <style>
 	 :root { --main-color: #4dc3ff; --color-button-inactive: #d9d9d9; }
@@ -33,10 +46,11 @@
 	 }
 	 input:checked + .btn-option { background: var(--main-color); color: white; }
 	 
-	 .btn-submit {
-	     width: 100%; max-width: 300px; padding: 15px; background: #333; color: #fff;
-	     border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px;
+   	 .btn-submit {
+     width: 100%; max-width: 300px; padding: 15px; background: #333; color: #fff;
+     border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px;
 	 }
+	 .btn-submit:hover { background: #000; }
 </style>
 </head>
 <body>
@@ -107,9 +121,9 @@
 	        </div>
 	    </div>
 	
-	    <div class="submit-container">
-	        <button type="submit" class="btn-submit">수정 완료</button>
-	    </div>
+		<div style="text-align: center;">
+			<button type="submit" class="btn-submit">수정 완료</button>
+		</div>
 	</form>
 </body>
 </html>

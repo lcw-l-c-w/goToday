@@ -104,21 +104,21 @@
     </div>
 
     <div class="sidebar-section">
-        <h2 class="sidebar-title">주문관리</h2>
-        <a href="${pageContext.request.contextPath}/mypage/reservation" class="sidebar-item" target="mainFrame">예약관리</a>
-        <a href="#" class="sidebar-item" target="mainFrame">나의리뷰</a>
-        <a href="#" class="sidebar-item" target="mainFrame">찜관리</a>
+        <h2 class="sidebar-title">주문 관리</h2>
+        <a href="${pageContext.request.contextPath}/mypage/reservation" class="sidebar-item" target="mainFrame">예약 관리</a>
+        <a href="#" class="sidebar-item" target="mainFrame">나의 리뷰</a>
+        <a href="#" class="sidebar-item" target="mainFrame">찜 관리</a>
     </div>
 
     <div class="sidebar-section">
-        <h2 class="sidebar-title">문의내역</h2>
+        <h2 class="sidebar-title">문의 내역</h2>
         <a href="${pageContext.request.contextPath}/mypage/qna" class="sidebar-item" target="mainFrame">1:1문의</a>
     </div>
 
     <div class="sidebar-section">
-        <h2 class="sidebar-title">회원관리</h2>
-        <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="sidebar-item" target="mainFrame">관심사수정</a>
-        <a href="${pageContext.request.contextPath}/mypage/user_info" class="sidebar-item" target="mainFrame">내정보수정</a>
+        <h2 class="sidebar-title">회원 관리</h2>
+        <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="sidebar-item" target="mainFrame">관심사 수정</a>
+        <a href="${pageContext.request.contextPath}/mypage/user_info" class="sidebar-item" target="mainFrame">내정보 수정</a>
     </div>
 </aside>
 

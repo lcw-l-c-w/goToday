@@ -1,12 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
+
+<body>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>1:1 문의</title>
 </head>
-<body>
+<h2>1:1 문의</h2>
+<hr>
 
+
+<td><a href="reply_detail.html">예약 취소 환불 규정이 궁금합니다.</a></td>
 </body>
+
 </html>

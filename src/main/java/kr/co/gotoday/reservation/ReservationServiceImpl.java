@@ -258,10 +258,11 @@ public class ReservationServiceImpl implements ReservationService{
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		
 		for(ReservationListDTO dto : listDTO) {
-			if ("CANCEL".equals(dto.getReservation_status())) {
+			if ("CANCELED".equals(dto.getReservation_status())) {
 	            dto.setDday("CANCELED");
 	            continue;
 	        }
+				
 			long diff = ChronoUnit.DAYS.between(today, dto.getReserved_for_at());
 			
 			if (diff > 0) dto.setDday("D-" + diff);
@@ -287,8 +288,52 @@ public class ReservationServiceImpl implements ReservationService{
 		return listDTO;
 	}
 
-	 
-
+	@Override
+	public ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("reservation_id", reservation_id);
+		map.put("user_id", user_id);
+		
+		ReservationDetailDTO dto = reservationMapper.findReservationDetailById(map);
+		
+    	String birth = dto.getReceiver_birth();
+    	if (birth != null && birth.length() >= 10) {
+    	    birth = birth.substring(0, 10); //yyyy-MM-dd
+    	}
+    	dto.setReceiver_birth(birth);
+    	
+    	String hp = dto.getReceiver_phone();
+    	dto.setReceiver_phone(formatPhone(hp));
+		
+		return dto;
+	}
 	
+	//별도의 휴대폰번호 파싱 메서드
+	public String formatPhone(String phone) {
+	    if (phone == null) return "";
+
+	    // 숫자만 남기기 (혹시 - 들어온 경우 대비)
+	    phone = phone.replaceAll("[^0-9]", "");
+
+	    // 010xxxxxxxx (11자리)만 포맷
+	    if (phone.length() == 11) {
+	        return phone.replaceFirst(
+	            "(\\d{3})(\\d{4})(\\d{4})",
+	            "$1-$2-$3"
+	        );
+	    }
+
+	    // 집 전화의 경우
+	    if (phone.length() == 10) {
+	        return phone.replaceFirst(
+	            "(\\d{3})(\\d{3})(\\d{4})",
+	            "$1-$2-$3"
+	        );
+	    }
+
+	    // 그 외는 원본 그대로
+	    return phone;
+	}
+
 	
 }

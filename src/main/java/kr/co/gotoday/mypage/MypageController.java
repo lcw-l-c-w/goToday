@@ -8,11 +8,14 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
 import kr.co.gotoday.reservation.ReservationService;
+import kr.co.gotoday.reservation.ReservationVO;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +94,7 @@ public class MypageController {
 
         userService.updateUserTags(userId, tagNames);
 
-        return "redirect:/mypage/main";
+        return "redirect:/mypage/calender";
     }
     
     // 회원 정보 수정
@@ -146,7 +149,7 @@ public class MypageController {
             session.setAttribute("userEmail", updatedUser.getEmail());
             // 전체 객체 세션 최신화
             session.setAttribute("loginSess", updatedUser);
-            return "redirect:/mypage/main";
+            return "redirect:/mypage/calender";
             
         } else {
             model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
@@ -158,13 +161,21 @@ public class MypageController {
     @GetMapping("/mypage/reservation")
     public String showReservationList(HttpSession sess, Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-    	
-    	if (userVO == null) {
-            return "redirect:/member/login";  
-        }
+
     	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id());
     	model.addAttribute("reservationList", reservationList);
     	
     	return "mypage/reserve_list";
+    }
+    
+    @GetMapping("/mypage/reservations/{reservation_id}")
+    public String showReservationDetail(HttpSession sess, Model model, @PathVariable("reservation_id") int reservation_id) {
+    	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
+    	
+    	ReservationDetailDTO reservationDetailDTO = reservationService.findReservationDetailById(reservation_id, userVO.getUser_id());
+    	model.addAttribute("reservationDetailDTO", reservationDetailDTO);
+    	
+    	return "mypage/reserve_detail";
+    	
     }
 }
