@@ -85,71 +85,108 @@
   </style>
 
   <script>
-    $(function() {
-      // 1. 3단계 탭 전환
-      $(".tab-item").click(function() {
-        $(".tab-item").removeClass("active");
-        $(this).addClass("active");
-        $(".tab-panel").removeClass("active").eq($(this).index()).addClass("active");
-      });
+  $(function() {
+	    // 선택된 데이터를 저장할 변수 (추가됨)
+	    let selectedDate = null;
+	    let selectedTime = null;
+	    let scheduleId = null;
 
-      // 2. 달력 및 AJAX
-      const calendarEl = document.getElementById('calendar');
-      if (calendarEl) {
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth', locale: 'ko', height: 'auto',
-          dateClick: function(info) {
-            $(".fc-daygrid-day").css("background", ""); 
-            $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
-            fetchTimes(info.dateStr);
-          }
-        });
-        calendar.render();
-      }
+	    // 1. 3단계 탭 전환
+	    $(".tab-item").click(function() {
+	        $(".tab-item").removeClass("active");
+	        $(this).addClass("active");
+	        $(".tab-panel").removeClass("active").eq($(this).index()).addClass("active");
+	    });
 
-      function fetchTimes(date) {
-        $.ajax({
-          url: "${pageContext.request.contextPath}/schedule/time",
-          data: { content_id: $("#content_id").val(), scheduled_at: date },
-          success: function(res) {
-            let html = `<span class="time-title">\${date} 시간 선택</span>`;
-            if(!res || res.length === 0) {
-              html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
-            } else {
-              res.forEach(sch => {
-                html += `
-                  <label class="time-option">
-                    <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}">
-                    <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
-                    <span style="font-size:12px;">\${sch.current_ticket}석</span>
-                  </label>`;
-              });
-            }
-            $(".reservation_timezone").html(html);
-          }
-        });
-      }
+	    // 2. 달력 및 AJAX
+	    const calendarEl = document.getElementById('calendar');
+	    if (calendarEl) {
+	        const calendar = new FullCalendar.Calendar(calendarEl, {
+	            initialView: 'dayGridMonth', 
+	            locale: 'ko', 
+	            height: 'auto',
+	            headerToolbar: { left: 'prev', center: 'title', right: 'next' }, // 헤더 복구
+	            dateClick: function(info) {
+	                $(".fc-daygrid-day").css("background", ""); 
+	                $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
+	                selectedDate = info.dateStr; // 선택 날짜 저장
+	                fetchTimes(selectedDate);
+	            }
+	        });
+	        calendar.render();
+	    }
 
-      // 3. 좋아요 토글
-      $("#likeBtn").click(function() {
-          const heart = $(this).find(".heart-icon");
-          const count = $(this).find(".like-count-num");
-          let num = parseInt(count.text());
-          if(heart.text() === "🤍") { heart.text("💙"); count.text(num + 1); } 
-          else { heart.text("🤍"); count.text(num - 1); }
-      });
+	    function fetchTimes(date) {
+	        $.ajax({
+	            url: "${pageContext.request.contextPath}/schedule/time",
+	            data: { content_id: $("#content_id").val(), scheduled_at: date },
+	            success: function(res) {
+	                let html = `<span class="time-title">\${date} 시간 선택</span>`;
+	                if(!res || res.length === 0) {
+	                    html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
+	                } else {
+	                    res.forEach(sch => {
+	                        html += `
+	                            <label class="time-option">
+	                                <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}" data-time="\${sch.time_zone}">
+	                                <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
+	                                <span style="font-size:12px;">\${sch.current_ticket}석</span>
+	                            </label>`;
+	                    });
+	                }
+	                $(".reservation_timezone").html(html);
+	                // 날짜가 바뀌면 선택 정보 초기화
+	                selectedTime = null;
+	                scheduleId = null;
+	            }
+	        });
+	    }
 
-      // 4. 마이페이지 로그인 체크
-      $("#myPageBtn").click(function() {
-          const isLoggedIn = ${not empty loginSess};
-          if (!isLoggedIn) {
-              alert("로그인이 필요한 서비스입니다.");
-              location.href = "${pageContext.request.contextPath}/member/login";
-          } else {
-              location.href = "${pageContext.request.contextPath}/member/mypage";
-          }
-      });
-    });
+	    // 3. 시간 선택 시 변수 저장 (누락되었던 부분)
+	    $(document).on("change", "input[name='sch_radio']", function() {
+	        selectedTime = $(this).data("time");
+	        scheduleId = $(this).data("id");
+	    });
+
+	    // 4. 예매하기 버튼 클릭 로직 (누락되었던 부분)
+	    $(".btn-reserve").click(function() {
+	        if(!selectedDate || !selectedTime || !scheduleId) {
+	            alert("날짜와 시간을 선택해주세요.");
+	            return;
+	        }
+	        
+	        $.post("${pageContext.request.contextPath}/reserve/schedule.do", {
+	            content_id: $("#content_id").val(),
+	            reserved_for_at: selectedDate,
+	            time_zone: selectedTime,
+	            schedule_id: scheduleId
+	        }).done(function(){
+	            location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+	        }).fail(function(){
+	            alert("예약 요청 중 오류가 발생했습니다.");
+	        });
+	    });
+
+	    // 5. 좋아요 토글
+	    $("#likeBtn").click(function() {
+	        const heart = $(this).find(".heart-icon");
+	        const count = $(this).find(".like-count-num");
+	        let num = parseInt(count.text());
+	        if(heart.text() === "🤍") { heart.text("💙"); count.text(num + 1); } 
+	        else { heart.text("🤍"); count.text(num - 1); }
+	    });
+
+	    // 6. 마이페이지 로그인 체크
+	    $("#myPageBtn").click(function() {
+	        const isLoggedIn = ${not empty loginSess};
+	        if (!isLoggedIn) {
+	            alert("로그인이 필요한 서비스입니다.");
+	            location.href = "${pageContext.request.contextPath}/member/login";
+	        } else {
+	            location.href = "${pageContext.request.contextPath}/member/mypage";
+	        }
+	    });
+	});
   </script>
 </head>
 <body>
