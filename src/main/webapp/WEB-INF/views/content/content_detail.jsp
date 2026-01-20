@@ -183,7 +183,7 @@
 	            alert("로그인이 필요한 서비스입니다.");
 	            location.href = "${pageContext.request.contextPath}/member/login";
 	        } else {
-	            location.href = "${pageContext.request.contextPath}/member/mypage";
+	            location.href = "${pageContext.request.contextPath}/mypage/main";
 	        }
 	    });
 	});
