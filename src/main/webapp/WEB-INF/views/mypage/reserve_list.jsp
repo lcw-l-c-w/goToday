@@ -45,17 +45,54 @@
         	<p>${r}</p>
 			
 			<div class="reserve-item">
-				<input type="hidden" name="reservation_id" value ="${r.reservation_id}">
 				<!-- badge: D-Day / END / CANCEL -->
 				<div class="badge">
 					${r.dday}
 				</div>
 				
-				<!-- 날짜 + 상태 -->
+				<!-- 예약 정보 + 날짜 + 상태 -->
 				<div class="datetime">
-				    <span>${r.reserved_for_at}</span> 
-				    <span>${r.time_zone}</-span>
-				    <span class="state">${r.reservation_status}</span>
+				    <p class="reserve-code">${r.reservation_code}</p>
+				
+				    <span class="date">${r.reserved_for_at}</span>
+				    <span class="time">${r.time_zone}</span>
+				
+				    <!-- 예약 상태 -->
+				    <c:choose>
+				        <c:when test="${r.reservation_status eq  'DONE'}">
+				            <p class="state done">예약 완료</p>
+				        </c:when>
+				        <c:when test="${r.reservation_status eq  'CANCELED'}">
+				            <p class="state canceled">예약 취소</p>
+				        </c:when>
+				        <c:when test="${r.reservation_status eq  'VISITED'}">
+				            <p class="state visited">이용 완료</p>
+				        </c:when>
+				        <c:otherwise>
+				            <p class="state">${r.reservation_status}</p>
+				        </c:otherwise>
+				    </c:choose>
+				
+				    <!-- 결제 상태: 입금 대기만 노출 -->
+				    <c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
+				        <p class="payment-type waiting">입금 대기</p>
+				    </c:if>
+				
+				    <!-- 수령 방식: MOBILE일 때만 버튼 -->
+				    <c:if test="${r.receive_type eq  'MOBILE'}">
+				        <button class="ticket-btn"
+				                data-reservation-id="${r.reservation_id}">
+				            모바일 티켓
+				        </button>
+				    </c:if>
+				
+				    <input type="hidden" name="reservation_id" value="${r.reservation_id}">
+				</div>
+				
+				<!-- 콘텐츠 정보 -->
+				<div class="reserve-content">
+					<p>${r.title}</p>
+					<img src="${r.main_image_path }">
 				</div>
 				
 				<!-- 버튼 -->

@@ -180,10 +180,12 @@
 	</update>
 	
 	<select id="findReservationListByUserId" parameterType="int" resultType="kr.co.gotoday.reservation.ReservationListDTO">
-		SELECT r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, 
-			c.content_id, c.title, c.main_image_path
+		SELECT r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
+			c.content_id, c.title, c.main_image_path,
+			p.payment_status
 		FROM content c 
 		JOIN reservation r ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
 		WHERE r.user_id = #{user_id}
 		ORDER BY r.reserved_for_at, r.time_zone
 	</select>

@@ -258,10 +258,11 @@ public class ReservationServiceImpl implements ReservationService{
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		
 		for(ReservationListDTO dto : listDTO) {
-			if ("CANCEL".equals(dto.getReservation_status())) {
+			if ("CANCELED".equals(dto.getReservation_status())) {
 	            dto.setDday("CANCELED");
 	            continue;
 	        }
+				
 			long diff = ChronoUnit.DAYS.between(today, dto.getReserved_for_at());
 			
 			if (diff > 0) dto.setDday("D-" + diff);

@@ -130,4 +130,6 @@ public class MypageController {
     	
     	return "mypage/reserve_list";
     }
+    
+//    @GetMapping("/mypage/d")
 }
