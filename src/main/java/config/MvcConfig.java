@@ -44,24 +44,6 @@ public class MvcConfig implements WebMvcConfigurer{
     private String kakaoRestApiKey;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
-    
-	@Value("${spring.datasource.hikari.maximum-pool-size}")
-	private int maxPool;
-
-	@Value("${spring.datasource.hikari.minimum-idle}")
-	private int minIdle;
-
-	@Value("${spring.datasource.hikari.idle-timeout}")
-	private long idleTimeout;
-
-	@Value("${spring.datasource.hikari.max-lifetime}")
-	private long maxLifetime;
-	
-	@Value("${spring.datasource.hikari.connection-timeout}")
-	private long connectionTimeout;
-
-	@Value("${spring.datasource.hikari.leak-detection-threshold}")
-	private long leakThreshold;
 	
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
@@ -82,12 +64,6 @@ public class MvcConfig implements WebMvcConfigurer{
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);
-		dataSource.setMaximumPoolSize(maxPool);
-		dataSource.setMinimumIdle(minIdle);
-		dataSource.setIdleTimeout(idleTimeout);
-		dataSource.setMaxLifetime(maxLifetime);
-		dataSource.setConnectionTimeout(connectionTimeout);
-		dataSource.setLeakDetectionThreshold(leakThreshold);
 		return dataSource;
 	}
 
