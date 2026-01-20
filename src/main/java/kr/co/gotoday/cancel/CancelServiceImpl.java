@@ -21,7 +21,7 @@ public class CancelServiceImpl implements CancelService{
     CancelMapper cancelMapper;
 
     // 토스페이먼츠 시크릿 키 (개발자센터에서 확인, "test_sk_..." 형태)
-    private final String TOSS_SECRET_KEY = "test_sk_DpexMgkW36ym117LE2x48GbR5ozO"; 
+    private final String TOSS_SECRET_KEY = "test_sk_Poxy1XQL8Rakdljp5v4Zr7nO5Wml"; 
     
 
     @Override

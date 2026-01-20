@@ -21,7 +21,7 @@
     LIMIT #{limit}
 	
 	</select>
-	
+
 	<select id="findRecommendedContents" parameterType="kr.co.gotoday.content.MainContentDTO" resultType="kr.co.gotoday.content.ContentVO">
 	SELECT 
 		c. content_id 		AS content_id,
@@ -34,6 +34,9 @@
 		WHERE c.is_active=true
 		AND	  c.is_delete=false
 		AND c.content_status = 'STATUS_OPEN' 
+		<if test="content_kind != null and content_kind != ''">
+            AND c.content_kind = #{content_kind}
+        </if>
 		 <if test="content_kind !=null and user_tag_id.size > 0">
       	 AND c.content_id IN (
     SELECT DISTINCT ct.content_id
@@ -52,6 +55,7 @@
 		LIMIT #{limit}	
 	
 	</select>
+
 
 	<sql id="USER_VISIBLE_CONTENT">
 		c.is_delete = 0
@@ -342,7 +346,10 @@ SELECT
     c.child_price      AS child_price,
     c.main_image_path  AS main_image_path,
     c.detail_description as detail_description,
-    c.reservation_type AS reservation_type
+    c.reservation_type AS reservation_type,
+    c.category 			AS category,
+    c.content_time 		AS 	content_time,
+    c.content_kind		AS content_kind
    
 FROM content c
 WHERE c.content_id = #{content_id};

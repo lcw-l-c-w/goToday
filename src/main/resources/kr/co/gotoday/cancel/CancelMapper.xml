@@ -34,8 +34,8 @@
 
 	<update id="increaseTicketStock">
 		UPDATE content_schedule
-		SET total_ticket =
-		total_ticket + #{count}
+		SET current_ticket =
+		current_ticket + #{count}
 		WHERE schedule_id = #{scheduleId}
 	</update>
 

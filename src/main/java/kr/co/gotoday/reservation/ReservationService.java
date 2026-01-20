@@ -23,4 +23,6 @@ public interface ReservationService {
 	void createScheduleByReservation(ReservationVO reservationVO);
 
 	void updatePaymentStatus(String order_key);
+	
+	int updateReservationStatusById(int reservation_id);
 }

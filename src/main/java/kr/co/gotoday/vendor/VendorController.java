@@ -1,5 +1,6 @@
 package kr.co.gotoday.vendor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.co.gotoday.content.ContentEnum;
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.reservation.VendorReservationSearchDTO;
 import kr.co.gotoday.user.UserVO;
 
 @Controller
@@ -49,6 +51,25 @@ public class VendorController {
 	    if (status != null && status.trim().isEmpty()) status = null;
 		
 		Map<String, Object> map = vendorService.getFilterList(login.getUser_id(), keyword, status);
+		
+		return map;
+	}
+
+	//content list 별도
+	@GetMapping("/vendor/reserve_pay_manage/list")
+	@ResponseBody
+	public Map<String, Object> reserveList(
+			VendorReservationSearchDTO dto,
+			HttpSession session
+			){
+		UserVO login = (UserVO) session.getAttribute("loginSess");
+		if (login == null) {
+			return Map.of("list", List.of());
+		}
+		
+		dto.setUser_id(login.getUser_id());
+		Map<String, Object> map = vendorService.findReservationByVendor(dto);
+		System.out.println("DTO = " + dto);
 		
 		return map;
 	}
@@ -159,6 +180,31 @@ public class VendorController {
 		}
 		
 		return "common/return";
+	}
+	
+	// 수정한 컨트롤러 코드
+	@PostMapping("/vendor/reserve_pay_manage/update_status")
+	@ResponseBody
+	public Map<String, Object> updateStatus(
+	    @RequestParam("reserve_id") int reserve_id, // "reserve_id"라고 명시
+	    @RequestParam("status") String status          // "status"라고 명시
+	) {
+	    Map<String, Object> resultMap = new HashMap<>();
+	    try {
+	        int result = vendorService.updateReservationStatus(reserve_id);
+	        
+	        if(result > 0) {
+	            resultMap.put("success", true);
+	        } else {
+	            resultMap.put("success", false);
+	            resultMap.put("message", "해당 예약 건을 찾을 수 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        resultMap.put("success", false);
+	        resultMap.put("message", e.getMessage());
+	    }
+	    return resultMap;
 	}
 	
 	

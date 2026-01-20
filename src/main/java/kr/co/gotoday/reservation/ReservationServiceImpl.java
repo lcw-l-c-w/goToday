@@ -242,6 +242,11 @@ public class ReservationServiceImpl implements ReservationService{
 		
 	}
 
+	@Override
+	public int updateReservationStatusById(int reservation_id) {
+		return reservationMapper.updateReservationStatusById(reservation_id);
+	}
+
 	 
 
 	

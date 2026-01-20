@@ -28,6 +28,7 @@ public class ContentVO {
     private String content_status;
     private List<ContentScheduleVO> contentScheduleList;
     private int user_id;
+    private String place_tag;
     
     private int like_count;// 각 content에 대한 like수
     
@@ -43,6 +44,17 @@ public class ContentVO {
                 return reservation_type; // 혹시 모를 값
         }
     }
-
+    
+    
+    public String getContentKindName() {
+    	if (content_kind == null) return "";
+    	if(content_kind.equals("popup")) {
+    		return "팝업";
+    	}
+    	else if( content_kind.equals("exhibition"))
+    		return "전시";
+    
+    	return "";
+    }
     
 }
