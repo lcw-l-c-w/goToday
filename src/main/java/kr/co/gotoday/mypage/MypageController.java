@@ -121,15 +121,16 @@ public class MypageController {
     @GetMapping("/mypage/reservation")
     public String showReservationList(HttpSession sess, Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-    	
-    	if (userVO == null) {
-            return "redirect:/member/login";  
-        }
+
     	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id());
     	model.addAttribute("reservationList", reservationList);
     	
     	return "mypage/reserve_list";
     }
     
-//    @GetMapping("/mypage/d")
+    @GetMapping("/mypage/reservations/{reservation_id}")
+    public String showReservationDetail() {
+    	return "mypage/reserve_detail";
+    	
+    }
 }
