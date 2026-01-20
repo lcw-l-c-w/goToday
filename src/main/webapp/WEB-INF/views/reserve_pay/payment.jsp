@@ -59,7 +59,18 @@
         /* 라디오 선택 카드 */
         .radio-group { display: flex; gap: 10px; }
         .radio-option { flex: 1; position: relative; }
-        .radio-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .radio-option input {
+		    position: absolute;
+		    opacity: 0;
+		    width: 0;
+		    height: 0;
+		}
+        .radio-option input:checked + .radio-box {
+			border-color: var(--main-color);
+			background: #eef9ff;
+			color: var(--main-color);
+			box-shadow: 0 0 0 3px rgba(77, 195, 255, 0.15);
+		}
         .radio-box { 
             display: block; padding: 15px; text-align: center; 
             border: 1px solid #ddd; border-radius: 10px; cursor: pointer; 
@@ -156,32 +167,34 @@
             <h2 class="section-title">수령 및 결제 선택</h2>
             <div class="card-box">
                 <label class="form-label" style="margin-bottom:10px;">티켓 수령 방법</label>
-                <div class="radio-group" style="margin-bottom: 20px;">
-                    <label class="radio-option">
-                        <input type="radio" name="receive_type" value="ONSITE" checked>
-                        <span class="radio-box">현장 수령</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="receive_type" value="MOBILE">
-                        <span class="radio-box">모바일 티켓</span>
-                    </label>
-                </div>
-
-                <label class="form-label" style="margin-bottom:10px;">결제 수단</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="payMethod" value="CARD" checked>
-                        <span class="radio-box">신용/체크카드</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="payMethod" value="EASY_PAY">
-                        <span class="radio-box">간편결제</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="payMethod" value="VIRTUAL_ACCOUNT">
-                        <span class="radio-box">가상계좌</span>
-                    </label>
-                </div>
+					<div class="radio-group" style="margin-bottom: 20px;">
+					  <label class="radio-option">
+					    <input type="radio" name="receive_type" value="ONSITE" checked>
+					    <span class="radio-box">현장 수령</span>
+					  </label>
+					  <label class="radio-option">
+					    <input type="radio" name="receive_type" value="MOBILE">
+					    <span class="radio-box">모바일 티켓</span>
+					  </label>
+					</div>
+					
+					<div id="payment-method-section">
+					  <label class="form-label" style="margin-bottom:10px;">결제 수단</label>
+					  <div class="radio-group">
+					    <label class="radio-option">
+					      <input type="radio" name="payMethod" value="CARD" checked>
+					      <span class="radio-box">신용/체크카드</span>
+					    </label>
+					    <label class="radio-option">
+					      <input type="radio" name="payMethod" value="EASY_PAY">
+					      <span class="radio-box">간편결제</span>
+					    </label>
+					    <label class="radio-option">
+					      <input type="radio" name="payMethod" value="VIRTUAL_ACCOUNT">
+					      <span class="radio-box">가상계좌</span>
+					    </label>
+					  </div>
+					</div>
             </div>
 
             <h2 class="section-title">약관 동의</h2>
@@ -207,7 +220,19 @@
 
     <script>
         const button = document.getElementById("payment-button");
-        const clientKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN"; // 클라이언트 키
+        const totalPrice = Number("${reservation.total_price}");
+	
+	    const paymentMethodSection = document.getElementById("payment-method-section");
+
+	    if (totalPrice === 0) {
+	        if (paymentMethodSection) {
+	            paymentMethodSection.style.display = "none";
+	        }
+	        button.textContent = "무료 전시 예약하기";
+	    }
+      
+        //클라이언트 키
+        const clientKey = "test_ck_mBZ1gQ4YVXgBY9gRN47j3l2KPoqN"; 
         const tossPayments = TossPayments(clientKey);
 
         // 전체 동의 스크립트 추가 (UX 개선)
@@ -227,7 +252,11 @@
 
         // 결제 버튼 클릭 이벤트
         button.addEventListener("click", async function () {
-            const method = document.querySelector('input[name="payMethod"]:checked').value;
+        	var method = null;
+        	const payMethodEl = document.querySelector('input[name="payMethod"]:checked');
+        	if (payMethodEl) {
+        	    method = payMethodEl.value;
+        	}
             const receiverName = document.querySelector('input[name="receiver_name"]').value;
             const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
             const receiverPhone = document.querySelector('input[name="receiver_phone"]').value;
@@ -257,14 +286,27 @@
                         receive_type: receiveType
                     })
                 });
-                const result = await response.json();
 
+                const result = await response.json();             
+
+                // 서버 응답이 성공이면 토스 결제창 호출 (일반 결제창 방식)
                 if (!result.success) {
                     alert("예약 처리 실패: " + result.msg);
+                    button.disabled = false;
+                    button.textContent = "총 ${reservation.total_price}원 결제하기";
                     return;
                 }
 
-                // 2. 토스 결제창 호출
+				if(result.free) {
+					alert("예약 및 결제가 완료되었습니다.");
+					location.href = "${pageContext.request.contextPath}/reserve/success.do"
+					      + "?reservation_code=" + result.reservationCode;
+					return;
+				}                
+                
+                console.log("예약 정보 저장 성공, 토스 결제창 호출")
+                
+                //공통옵션
                 const commonOptions = {
                     amount: result.amount,
                     orderId: result.orderId,
