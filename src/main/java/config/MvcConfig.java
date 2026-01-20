@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -17,15 +18,18 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import util.LoginInterceptor;
+
 @Configuration
 @MapperScan(annotationClass = Mapper.class, basePackages = "kr.co.gotoday")
-@ComponentScan(basePackages = {"kr.co.gotoday"})
+@ComponentScan(basePackages = {"kr.co.gotoday", "util"})
 @EnableWebMvc
 @EnableTransactionManagement
 public class MvcConfig implements WebMvcConfigurer{
@@ -105,6 +109,22 @@ public class MvcConfig implements WebMvcConfigurer{
 		return config;
 	}
 	
+
+	//로그인 인터셉터 설정
+	@Autowired
+	private LoginInterceptor loginInterceptor;
+	
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(loginInterceptor)
+			.addPathPatterns(
+					"/reserve/**",
+					"/payment/**",
+					"/admin/**",
+					"/vendor/**",
+					"/mypage/**"
+			);
+			
+	}
 	
 }
 

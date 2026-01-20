@@ -80,7 +80,7 @@ public class ReservationController {
 		if (reservation == null) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "예약정보가 누락되었습니다.");
-		    return "redirect:/reserve/schedule.do";
+			return "common/return";
 		}
 		reservation.setAdult_qty(dto.getAdult_qty());
 		reservation.setTeen_qty(dto.getTeen_qty());
@@ -104,7 +104,7 @@ public class ReservationController {
 		if (reservation == null) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "예약정보가 누락되었습니다.");
-		    return "redirect:/reserve/schedule.do";
+			return "common/return";
 		}
 		//스케줄 관련 세션 정보를 예약 정보로 모델에 저장
 		model.addAttribute("reservation", reservation);
