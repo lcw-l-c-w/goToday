@@ -216,7 +216,7 @@
             <div>기간: ${item.start_at} ~ ${item.end_at}</div>
             <div>장소: ${item.location}</div>
 
-            <a href="${pageContext.request.contextPath}/content/detail?content_id=${item.content_id}">
+            <a href="${pageContext.request.contextPath}/detail/${item.content_id}">
                 상세 보기
             </a>
         </div>

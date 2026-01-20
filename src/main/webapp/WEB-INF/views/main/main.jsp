@@ -96,7 +96,7 @@
 
                 <!-- ✅ 상세 페이지 이동(테스트용) -->
                 <div class="detail-link">
-                    <a href="${pageContext.request.contextPath}/content/detail?content_id=${item.content_id}">
+                    <a href="${pageContext.request.contextPath}/detail/${item.content_id}">
                         상세보기
                     </a>
                 </div>
@@ -133,7 +133,7 @@
 
                 <!-- ✅ 상세 페이지 이동(테스트용) -->
                 <div class="detail-link">
-                    <a href="${pageContext.request.contextPath}/content/detail?content_id=${item.content_id}">
+                    <a href="${pageContext.request.contextPath}/detail/${item.content_id}">
                         상세보기
                     </a>
                 </div>
