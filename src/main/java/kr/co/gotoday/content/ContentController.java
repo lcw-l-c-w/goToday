@@ -18,7 +18,7 @@ import kr.co.gotoday.user.UserVO;
 
 @Controller
 public class ContentController {
-	//주입
+	// 주입
 	@Autowired
 	private ContentService contentService;
 	@Autowired
@@ -44,33 +44,38 @@ public class ContentController {
 		model.addAttribute("content", result);
 		return "content/content_detail";
 	}
-	//날짜 조회(.ajax)
+
+	// 날짜 조회(.ajax)
 	@GetMapping("/schedule/date")
 	@ResponseBody
-	public List<String> dateReservation(@RequestParam Integer content_id){
-		return contentService.getAvailableDatesByContent(content_id) ;
+	public List<String> dateReservation(@RequestParam Integer content_id) {
+		return contentService.getAvailableDatesByContent(content_id);
 	}
-	//시간 조회 (.ajax)
+
+	// 시간 조회 (.ajax)
 	@GetMapping("/schedule/time")
 	@ResponseBody
-	public List<ContentScheduleVO> timeReservation(@RequestParam Integer content_id, @RequestParam String scheduled_at){
-		return contentService.getAvailableTimesByContent(content_id,scheduled_at);
+	public List<ContentScheduleVO> timeReservation(@RequestParam Integer content_id,
+			@RequestParam String scheduled_at) {
+		return contentService.getAvailableTimesByContent(content_id, scheduled_at);
 	}
-	//예약 post 보내기
+
+	// 예약 post 보내기
 	@PostMapping("/reservation/select")
 	@ResponseBody
-	public void selectReservation(@RequestParam Integer content_id, @RequestParam String date, @RequestParam String time,@RequestParam Integer schedule_id, HttpSession sess) {
+	public void selectReservation(@RequestParam Integer content_id, @RequestParam String date,
+			@RequestParam String time, @RequestParam Integer schedule_id, HttpSession sess) {
 		sess.setAttribute("reservation_contentID", content_id);
-	    sess.setAttribute("reservation_date", date);
-	    sess.setAttribute("reservation_time", time);
-	    	}
-	
-	//예약 페이지 보내기
+		sess.setAttribute("reservation_date", date);
+		sess.setAttribute("reservation_time", time);
+	}
+
+	// 예약 페이지 보내기
 	@GetMapping("/reservation/select")
-	public String selectTicket(HttpSession sess,Model model) {
-		model.addAttribute("content_id",sess.getAttribute("reservation_contentID"));
-		model.addAttribute("scheduled_at",sess.getAttribute("reservation_date"));
-		model.addAttribute("time_zone",sess.getAttribute("reservation_time"));
+	public String selectTicket(HttpSession sess, Model model) {
+		model.addAttribute("content_id", sess.getAttribute("reservation_contentID"));
+		model.addAttribute("scheduled_at", sess.getAttribute("reservation_date"));
+		model.addAttribute("time_zone", sess.getAttribute("reservation_time"));
 		return "redirect:/reserve/quantity.do";
 	}
 	

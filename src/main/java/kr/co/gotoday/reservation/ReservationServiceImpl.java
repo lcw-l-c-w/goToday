@@ -1,7 +1,12 @@
 package kr.co.gotoday.reservation;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,9 +83,22 @@ public class ReservationServiceImpl implements ReservationService{
 			trySubCurrentTicket(reservationVO);
 			ticketSucceed = true;
 			
-			// 토스 결제 승인
-			paymentVO = tossPaymentClient.confirmPayment(paymentKey, orderId, amount);
-			
+			// 유, 무료에 의해 분기됨
+			if (amount == 0) {
+	            // 🔥 무료 결제 로직
+	            paymentVO = new PaymentVO();
+	            paymentVO.setOrder_key("FREE_" + UUID.randomUUID());
+	            paymentVO.setAmount_price(0);
+	            paymentVO.setPayment_method("FREE");
+	            paymentVO.setPayment_status("DONE");
+	            paymentVO.setRefund_status("NONE");
+	            
+	        } else {
+	            // 🔥 유료 결제 로직
+	            paymentVO = tossPaymentClient.confirmPayment(
+	                paymentKey, orderId, amount
+	            );
+	        }
 			// DB 저장 (예약 + 결제)-> 트랜잭션
 			ReservationVO savedReservation = 
 		            createReservationWithPaymentent(reservationVO, paymentVO);
@@ -105,6 +123,7 @@ public class ReservationServiceImpl implements ReservationService{
 			});
 			
 			return savedReservation;
+			
 		} catch (Exception e) {
 			if (paymentVO != null) {
 				try {
@@ -247,8 +266,89 @@ public class ReservationServiceImpl implements ReservationService{
 		return reservationMapper.updateReservationStatusById(reservation_id);
 	}
 
-	 
+	@Override
+	public List<ReservationListDTO> findReservationListByUserId(int user_id) {
+		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(user_id);
+		
+		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+		
+		for(ReservationListDTO dto : listDTO) {
+			if ("CANCELED".equals(dto.getReservation_status())) {
+	            dto.setDday("CANCELED");
+	            continue;
+	        }
+				
+			long diff = ChronoUnit.DAYS.between(today, dto.getReserved_for_at());
+			
+			if (diff > 0) dto.setDday("D-" + diff);
+			else if (diff == 0) dto.setDday("D-Day");
+			else dto.setDday("END");
+		}
+		
+		listDTO.sort((a,b)->{
+			boolean aEnd = "END".equals(a.getDday()) || "CANCELED".equals(a.getDday());
+			boolean bEnd = "END".equals(b.getDday()) || "CANCELED".equals(b.getDday());
+			
+			//END 아닌 거가 먼저 오게 
+			if (aEnd && !bEnd) return 1; 
+			if (!aEnd && bEnd) return -1; 
+			//둘 다 END면 최근으로 정렬 
+			if (aEnd && bEnd) {
+	            return b.getReserved_for_at().compareTo(a.getReserved_for_at());
+	        }
+			//둘 다 진행중이면 가까운 날짜순
+	        return a.getReserved_for_at().compareTo(b.getReserved_for_at());
+		});
+		
+		return listDTO;
+	}
 
+	@Override
+	public ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("reservation_id", reservation_id);
+		map.put("user_id", user_id);
+		
+		ReservationDetailDTO dto = reservationMapper.findReservationDetailById(map);
+		
+    	String birth = dto.getReceiver_birth();
+    	if (birth != null && birth.length() >= 10) {
+    	    birth = birth.substring(0, 10); //yyyy-MM-dd
+    	}
+    	dto.setReceiver_birth(birth);
+    	
+    	String hp = dto.getReceiver_phone();
+    	dto.setReceiver_phone(formatPhone(hp));
+		
+		return dto;
+	}
 	
+	//별도의 휴대폰번호 파싱 메서드
+	public String formatPhone(String phone) {
+	    if (phone == null) return "";
+
+	    // 숫자만 남기기 (혹시 - 들어온 경우 대비)
+	    phone = phone.replaceAll("[^0-9]", "");
+
+	    // 010xxxxxxxx (11자리)만 포맷
+	    if (phone.length() == 11) {
+	        return phone.replaceFirst(
+	            "(\\d{3})(\\d{4})(\\d{4})",
+	            "$1-$2-$3"
+	        );
+	    }
+
+	    // 집 전화의 경우
+	    if (phone.length() == 10) {
+	        return phone.replaceFirst(
+	            "(\\d{3})(\\d{3})(\\d{4})",
+	            "$1-$2-$3"
+	        );
+	    }
+
+	    // 그 외는 원본 그대로
+	    return phone;
+	}
+
 	
 }
