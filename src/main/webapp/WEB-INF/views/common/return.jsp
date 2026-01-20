@@ -9,6 +9,7 @@
 <script>
 	//서버에서 저장된 msg가 담김.
 	alert('${msg}');
+
 	<c:if test = "${cmd == 'back'}">
 		history.back();
 	</c:if> 

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
 import kr.co.gotoday.reservation.ReservationService;
-import kr.co.gotoday.reservation.ReservationVO;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -158,6 +157,7 @@ public class MypageController {
         }
     }
     
+    // 예약 관리
     @GetMapping("/mypage/reservation")
     public String showReservationList(HttpSession sess, Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
@@ -167,7 +167,7 @@ public class MypageController {
     	
     	return "mypage/reserve_list";
     }
-    
+    // 예약 관리
     @GetMapping("/mypage/reservations/{reservation_id}")
     public String showReservationDetail(HttpSession sess, Model model, @PathVariable("reservation_id") int reservation_id) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");

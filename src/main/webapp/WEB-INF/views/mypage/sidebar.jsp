@@ -106,13 +106,13 @@
     <div class="sidebar-section">
         <h2 class="sidebar-title">주문 관리</h2>
         <a href="${pageContext.request.contextPath}/mypage/reservation" class="sidebar-item" target="mainFrame">예약 관리</a>
-        <a href="#" class="sidebar-item" target="mainFrame">나의 리뷰</a>
-        <a href="#" class="sidebar-item" target="mainFrame">찜 관리</a>
+        <a href="${pageContext.request.contextPath}/mypage/review_list" class="sidebar-item" target="mainFrame">나의 리뷰</a>
+        <a href="${pageContext.request.contextPath}/mypage/like_list" class="sidebar-item" target="mainFrame">찜 관리</a>
     </div>
 
     <div class="sidebar-section">
         <h2 class="sidebar-title">문의 내역</h2>
-        <a href="${pageContext.request.contextPath}/mypage/qna" class="sidebar-item" target="mainFrame">1:1문의</a>
+        <a href="${pageContext.request.contextPath}/mypage/reply_list" class="sidebar-item" target="mainFrame">1:1문의</a>
     </div>
 
     <div class="sidebar-section">

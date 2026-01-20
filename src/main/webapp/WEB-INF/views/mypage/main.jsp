@@ -44,7 +44,7 @@
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
     
     <div class="container">
-        <jsp:include page="/WEB-INF/views/mypage/sidebar.jsp" />
+    <jsp:include page="/WEB-INF/views/mypage/sidebar.jsp" />
         
         <div class="content">
             <div class="main-content">

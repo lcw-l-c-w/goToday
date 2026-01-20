@@ -22,15 +22,21 @@ public class LoginInterceptor implements HandlerInterceptor{
 		HttpSession sess = request.getSession();
 		UserVO login = (UserVO)sess.getAttribute("loginSess");
 		if (login == null) {
-			response.setContentType("text/html; charset=utf-8");
-			PrintWriter out = response.getWriter();
-			out.print("<script>");
-			out.print("alert('로그인 후 사용가능합니다.');");
-			out.print("location.href='/gotoday/member/login';");
-			out.print("</script>");
-			out.close();
-			return false; // 못가
-		}
+            response.setContentType("text/html; charset=utf-8");
+            PrintWriter out = response.getWriter();
+
+            out.print("<script>");
+            out.print("alert('로그인 후 사용 가능합니다.');");
+            out.print("if (window.top !== window.self) {");
+            out.print("  window.top.location.href = '/gotoday/member/login';");
+            out.print("} else {");
+            out.print("  location.href = '/gotoday/member/login';");
+            out.print("}");
+            out.print("</script>");
+
+            out.close();
+            return false;
+        }
 		return true; // 가던길가
 	}
 }
