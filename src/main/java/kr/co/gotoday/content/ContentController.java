@@ -2,7 +2,6 @@ package kr.co.gotoday.content;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import kr.co.gotoday.contentLike.ContentLikeService;
 import kr.co.gotoday.user.UserVO;
 
 @Controller
@@ -21,22 +21,26 @@ public class ContentController {
 	//주입
 	@Autowired
 	private ContentService contentService;
-	
-	
+	@Autowired
+	private ContentLikeService contentLikeService;
+
 	//상세보기 
 	@GetMapping("/detail/{content_id}") // @pathVariable @RequestParam 햇갈려...
 	public String contentDetail(Model model, @PathVariable("content_id") int content_id, HttpSession session) {
 		System.out.println("▶ Controller 진입, content_id = " + content_id);
 		UserVO user = (UserVO) session.getAttribute("loginSess");
-//		if (user == null) {
-//			sysout
-//		    return "member/login";
-//		}
+
 		Integer user_id = (user != null) ? user.getUser_id() : null;
 		//content 
-		Object result = contentService.getDetailContents(content_id, user_id);
-		System.out.println("▶ Service 반환값 = " + result);
-
+		ContentVO result = contentService.getDetailContents(content_id, user_id);
+		
+		if (user != null && result != null) {
+	        // user도 있고, 컨텐츠도 있다면 
+	        int like = contentLikeService.CheckContentLike( content_id,user.getUser_id());
+	        result.setLiked(like); // VO에 결과 담기
+	    }
+		
+		
 		model.addAttribute("content", result);
 		return "content/content_detail";
 	}
@@ -69,6 +73,8 @@ public class ContentController {
 		model.addAttribute("time_zone",sess.getAttribute("reservation_time"));
 		return "redirect:/reserve/quantity.do";
 	}
+	
+
 	
 	
 }

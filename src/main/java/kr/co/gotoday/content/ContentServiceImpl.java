@@ -46,10 +46,9 @@ public class ContentServiceImpl implements ContentService {
 	@Override
 	public ContentVO getDetailContents(int content_id, Integer user_id) {
 		// 상세페이지 보여주는것
-		System.out.println("service~~집입" + content_id);
+	
 		ContentVO vo = contentMapper.selectByID(content_id);
 		if (vo == null) {
-			System.out.println("이게 문제인거임?");
 			return null;
 		}
 
@@ -167,5 +166,6 @@ public class ContentServiceImpl implements ContentService {
 		int count = contentMapper.countSearch(dto);
 		return PageInfo.of(count, dto.getPage(), PAGE_SIZE, BLOCK_SIZE);
 	}
+
 
 }
