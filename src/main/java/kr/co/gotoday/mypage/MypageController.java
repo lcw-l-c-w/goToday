@@ -24,6 +24,38 @@ public class MypageController {
 	private final UserService userService;
 	private final ReservationService reservationService;
 	
+	
+	// 메인 화면
+    @GetMapping("/mypage/main")
+    public String mypageMain(HttpSession session, Model model) {
+    	UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+    	
+    	// 로그인 체크
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+        
+        // DB에서 최신 정보 가져와서 세션 갱신
+        UserVO dbUser = userService.getUserById(loginUser.getUser_id());
+        if (dbUser != null) {
+            session.setAttribute("userName", dbUser.getName());
+            session.setAttribute("userEmail", dbUser.getEmail());
+        }
+        
+        return "mypage/main";
+    }
+	
+    // 로그아웃 처리
+    @GetMapping("/mypage/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        System.out.println("로그아웃 성공");
+        return "redirect:/main";
+    }
+    
 	// 관심사 수정
     @GetMapping("/mypage/user_like_edit")
     public String userLikeEdit(HttpSession session, Model model) {
@@ -107,10 +139,15 @@ public class MypageController {
         boolean result = userService.updateUserInfo(vo);
 
         if (result) {
-            // 세션 최신화: userMapper → userService
-            UserVO updatedUser = userService.loginByEmail(loginUser.getEmail());
+        	// DB에서 최신 정보 다시 가져오기
+            UserVO updatedUser = userService.getUserById(loginUser.getUser_id());
+            // 사이드바용 개별 세션 정보 업데이트
+            session.setAttribute("userName", updatedUser.getName());
+            session.setAttribute("userEmail", updatedUser.getEmail());
+            // 전체 객체 세션 최신화
             session.setAttribute("loginSess", updatedUser);
             return "redirect:/mypage/main";
+            
         } else {
             model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
             model.addAttribute("cmd", "back");
