@@ -37,14 +37,21 @@ public class UserController {
     // 로그인 처리
     @PostMapping("/member/login")
     public String login(HttpSession sess, UserVO vo, Model model) {
-        UserVO userVO = userService.login(vo);
-        if (userVO == null) {
-            model.addAttribute("msg", "아이디 또는 비밀번호가 올바르지 않습니다.");
+        try {
+            UserVO userVO = userService.login(vo);
+            if (userVO == null) {
+                model.addAttribute("msg", "아이디 또는 비밀번호가 올바르지 않습니다.");
+                model.addAttribute("cmd", "back");
+                return "common/return";
+            } else {
+                sess.setAttribute("loginSess", userVO);
+                return "redirect:/main";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("msg", "서버 오류가 발생했습니다.");
             model.addAttribute("cmd", "back");
             return "common/return";
-        } else {
-            sess.setAttribute("loginSess", userVO);
-            return "redirect:/main";
         }
     }
     
