@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -52,11 +53,7 @@ a { text-decoration: none; color: inherit; }
 .logo img { height: 32px; cursor: pointer; display: block; }
 
 .nav-menu {
-	display: flex;
-	gap: 35px;
-	list-style: none;
-	align-items: center;
-	height: 100%;
+	display: flex; gap: 35px; list-style: none; align-items: center; height: 100%;
 }
 
 .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
@@ -65,11 +62,10 @@ a { text-decoration: none; color: inherit; }
 
 .nav-icons { display: flex; gap: 20px; align-items: center; }
 
+/* 검색바 스타일 */
 .search-bar {
 	border-bottom: 1px solid #333;
-	display: flex;
-	align-items: center;
-	padding: 2px 5px;
+	display: flex; align-items: center; padding: 2px 5px;
 }
 .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
 
@@ -80,12 +76,8 @@ a { text-decoration: none; color: inherit; }
 .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
 
 .content-title-area {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
-	border-bottom: 2px solid #333;
-	padding-bottom: 15px;
-	margin-bottom: 30px;
+	display: flex; justify-content: space-between; align-items: flex-end;
+	border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px;
 }
 
 .content-title-area h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
@@ -99,28 +91,17 @@ a { text-decoration: none; color: inherit; }
 .poster-side { flex: 0 0 350px; display: flex; flex-direction: column; align-items: center; }
 
 .poster-img {
-	width: 100%;
-	height: 480px;
-	object-fit: cover;
-	border-radius: 8px;
+	width: 100%; height: 480px; object-fit: cover; border-radius: 8px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .poster-like-btn {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-top: 15px;
-	padding: 8px 25px;
-	background: #fff;
-	border: 1.5px solid #eee;
-	border-radius: 50px;
-	cursor: pointer;
-	transition: all 0.3s;
+	display: flex; align-items: center; gap: 8px; margin-top: 15px;
+	padding: 8px 25px; background: #fff; border: 1.5px solid #eee;
+	border-radius: 50px; cursor: pointer; transition: all 0.3s;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.poster-like-btn:hover { transform: translateY(-2px); border-color: var(--main-color); }
 .poster-like-btn.active-liked { background: #f0faff; border-color: var(--main-color); }
 
 /* 5. 정보 및 예매 섹션 */
@@ -134,23 +115,17 @@ a { text-decoration: none; color: inherit; }
 #calendar { flex: 1.2; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; font-size: 12px; }
 .time-selector { flex: 1; border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; background: #fafafa; }
 
-.time-option { display: flex; align-items: center; padding: 10px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
+.time-option { 
+    display: flex; align-items: center; padding: 10px; background: #fff; 
+    border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; cursor: pointer; 
+}
 
 .action-btns { display: flex; gap: 10px; margin-top: 25px; }
 
 .btn-reserve {
-	flex: 2;
-	background-color: var(--main-color);
-	color: #fff;
-	border: none;
-	padding: 16px;
-	border-radius: 6px;
-	font-weight: bold;
-	cursor: pointer;
-	font-size: 16px;
-	transition: background 0.2s;
+	flex: 2; background-color: var(--main-color); color: #fff; border: none;
+	padding: 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px;
 }
-.btn-reserve:hover { background-color: #37b0f0; }
 .btn-save-cal { flex: 1; background: #f8f9fa; border: 1px solid #ddd; padding: 16px; border-radius: 6px; cursor: pointer; }
 
 /* 6. 탭 메뉴 */
@@ -169,14 +144,14 @@ $(function() {
     let selectedTime = null;
     let scheduleId = null;
 
-    // 탭 전환
+    // 1. 탭 전환
     $(".tab-item").click(function() {
         $(".tab-item").removeClass("active");
         $(this).addClass("active");
         $(".tab-panel").hide().eq($(this).index()).show();
     });
 
-    // 달력 로드
+    // 2. 달력 로드
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
         const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -194,7 +169,7 @@ $(function() {
         calendar.render();
     }
 
-    // 시간 조회
+    // 3. 시간 조회 AJAX
     function fetchTimes(date) {
         $.ajax({
             url: "${pageContext.request.contextPath}/schedule/time",
@@ -220,12 +195,13 @@ $(function() {
         });
     }
 
+    // 4. 시간 선택
     $(document).on("change", "input[name='sch_radio']", function() {
         selectedTime = $(this).data("time");
         scheduleId = $(this).data("id");
     });
 
-    // 예매하기
+    // 5. 예매하기
     $(".btn-reserve").click(function() {
         if(!selectedDate || !selectedTime || !scheduleId) {
             alert("날짜와 시간을 선택해주세요.");
@@ -243,7 +219,7 @@ $(function() {
         });
     });
 
-    // 좋아요 토글 - 깨짐 방지를 위해 코드로 변경
+    // 6. 좋아요 AJAX (이모지 깨짐 방지)
     $("#likeBtn").click(function() {
         const heart = $(this).find(".heart-icon");
         const count = $(this).find(".like-count-num");
@@ -256,33 +232,20 @@ $(function() {
             data: JSON.stringify({ content_id: content_id }),
             success: function(res) {
                 if (!res) {
-                    alert("로그인이 필요한 서비스입니다.");
+                    alert("로그인이 필요합니다.");
                     location.href = "${pageContext.request.contextPath}/member/login";
                     return;
                 }
-                // JavaScript에서도 코드로 변경
                 if (res.liked == 1) {
-                    heart.html("&#x1F499;"); // 파란 하트
+                    heart.html("&#x1F499;");
                     $("#likeBtn").addClass("active-liked");
                 } else {
-                    heart.html("&#x1F90D;"); // 흰 하트
+                    heart.html("&#x1F90D;");
                     $("#likeBtn").removeClass("active-liked");
                 }
                 count.text(res.count_num);
-            },
-            error: function() { alert("오류가 발생했습니다."); }
+            }
         });
-    });
-
-    // 마이페이지 로그인 체크
-    $("#myPageBtn").click(function() {
-        const isLoggedIn = ${not empty loginSess};
-        if (!isLoggedIn) {
-            alert("로그인이 필요한 서비스입니다.");
-            location.href = "${pageContext.request.contextPath}/member/login";
-        } else {
-            location.href = "${pageContext.request.contextPath}/member/mypage";
-        }
     });
 });
 </script>
@@ -316,12 +279,12 @@ $(function() {
 		<div class="content-title-area">
 			<div>
 				<h1>${content.title}</h1>
-				<p style="margin-top: 8px; color: var(--text-gray);">${content.start_at} ~ ${content.end_at} | ${content.location} 📍</p>
+                <p style="margin-top: 8px; color: var(--text-gray);">${fn:substring(content.start_at,0,10)} ~ ${fn:substring(content.end_at,0,10)} | ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">
-				<img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X" style="width:22px; margin-left:10px;"> 
-                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG" style="width:22px; margin-left:10px;"> 
-                <img src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png" alt="Link" style="width:22px; margin-left:10px;">
+				<img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X"> 
+                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG"> 
+                <img src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png" alt="Link">
 			</div>
 		</div>
 
@@ -330,7 +293,7 @@ $(function() {
 				<img class="poster-img" src="${pageContext.request.contextPath}${content.main_image_path}" alt="포스터">
 				<button type="button" class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}" id="likeBtn">
 					<span class="heart-icon" data-content-id="${content.content_id}">
-                        <c:choose>
+						<c:choose>
 							<c:when test="${content.liked == 1}">&#x1F499;</c:when>
 							<c:otherwise>&#x1F90D;</c:otherwise>
 						</c:choose>
@@ -371,7 +334,6 @@ $(function() {
 				<li class="tab-item">리뷰</li>
 				<li class="tab-item">문의사항</li>
 			</ul>
-
 			<div class="tab-content">
 				<section class="tab-panel active">
 					<div class="detail-content">${content.detail_description}</div>
