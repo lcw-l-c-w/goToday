@@ -171,7 +171,7 @@
                         <c:otherwise>
                             <h3>관심사 등록 전이신가요?</h3>
                             <p>관심사를 설정하면 당신만을 위한<br>특별한 맞춤 콘텐츠를 추천해드려요!</p>
-                            <a href="${pageContext.request.contextPath}/mypage/interest" class="cta-btn">관심사 설정하기</a>
+                            <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="cta-btn">관심사 설정하기</a>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -301,7 +301,7 @@
             if(myBtn) {
                 myBtn.onclick = () => {
                     const isLoggedIn = ${not empty loginSess};
-                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
+                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/mypage/main" : "${pageContext.request.contextPath}/member/login";
                 };
             }
         });

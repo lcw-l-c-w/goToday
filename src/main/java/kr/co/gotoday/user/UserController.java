@@ -28,7 +28,14 @@ public class UserController {
     
     // 로그인 폼
     @GetMapping("/member/login")
-	public String login(Model model) {
+	public String login(@RequestParam(required = false) String redirect
+			, HttpSession session
+	        , Model model) {
+    	
+    	if (redirect != null) {
+            session.setAttribute("redirectAfterLogin", redirect);
+        }
+    	
     	model.addAttribute("REST_API_KEY", kakaoRestApiKey);
         model.addAttribute("REDIRECT_URI", kakaoRedirectUri);
         return "member/login";		
@@ -45,6 +52,12 @@ public class UserController {
                 return "common/return";
             } else {
                 sess.setAttribute("loginSess", userVO);
+                String redirect = (String) sess.getAttribute("redirectAfterLogin");
+                sess.removeAttribute("redirectAfterLogin");
+
+                if (redirect != null) {
+                    return "redirect:" + redirect;
+                }
                 return "redirect:/main";
             }
         } catch (Exception e) {
