@@ -520,7 +520,7 @@ a {
 
 			<%-- 2. 추천 리스트가 비어있는지 확인 --%>
 			<%-- 기존의 recommand[0].blur 조건이 까다로워서 오작동할 확률이 높으므로 단순화합니다 --%>
-			<c:set var="isTagEmpty" value="${empty recommand}" />
+			<c:set var="isTagEmpty" value="${empty recommend}" />
 
 			<%-- 3. 블러 처리 여부 결정: 로그인을 안 했거나, 추천 데이터가 아예 없을 때 --%>
 			<c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
@@ -552,7 +552,7 @@ a {
 				<div class="recommend-view">
 					<div id="recList"
 						class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
-						<c:forEach var="item" items="${recommand}">
+						<c:forEach var="item" items="${recommend}">
 							<article class="content-card"
 								onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
 								<div class="card-img-wrap">
@@ -564,7 +564,7 @@ a {
 								</div>
 							</article>
 						</c:forEach>
-						<c:if test="${empty recommand}">
+						<c:if test="${empty recommend}">
 							<div style="height: 280px; width: 100%;"></div>
 						</c:if>
 					</div>
@@ -677,13 +677,21 @@ a {
             }
 
             // --- 3. 로그인 체크 (마이페이지 버튼) ---
-            const myBtn = document.getElementById('myPageBtn');
-            if(myBtn) {
-                myBtn.onclick = () => {
-                    const isLoggedIn = ${not empty loginSess};
-                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
-                };
-            }
+      document.getElementById('myPageBtn').onclick = () => {
+            	
+            	const isLoggedIn = ${not empty loginSess ? true : false};
+            	const userRole = ${not empty loginSess ? loginSess.role : -1};
+            	
+            	if (!isLoggedIn) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    location.href = "${pageContext.request.contextPath}/member/login";
+                } else if(userRole==0){
+                    location.href = "${pageContext.request.contextPath}/mypage/main";
+                }else if(userRole==1){
+                	location.href="${pageContext.request.contextPath}/vendor/content_manage";
+                }
+                else alert("잘못된 접근입니다.");
+            };
         });
     </script>
 </body>

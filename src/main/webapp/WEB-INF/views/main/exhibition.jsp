@@ -153,7 +153,7 @@
         <section class="recommend-section">
             <%-- 컨트롤러 세션명 loginSess와 일치시킴 --%>
             <c:set var="isLoggedIn" value="${not empty loginSess}" />
-            <c:set var="isTagEmpty" value="${not empty recommand and recommand[0].blur}" />
+            <c:set var="isTagEmpty" value="${ empty recommend }" />
             <c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
 
             <c:if test="${isBlur}">
@@ -177,7 +177,7 @@
                 <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
                 <div class="recommend-view">
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
-                        <c:forEach var="item" items="${recommand}">
+                        <c:forEach var="item" items="${recommend}">
                             <article class="content-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
                                 <div class="card-img-wrap"><img src="<c:url value='${item.main_image_path}'/>"></div>
                                 <div class="content-body">
@@ -186,7 +186,7 @@
                                 </div>
                             </article>
                         </c:forEach>
-                        <c:if test="${empty recommand}">
+                        <c:if test="${empty recommend}">
                             <div style="height:280px; width:100%;"></div>
                         </c:if>
                     </div>
@@ -292,13 +292,21 @@
             }
 
             // --- 3. 로그인 체크 (마이페이지 버튼) ---
-            const myBtn = document.getElementById('myPageBtn');
-            if(myBtn) {
-                myBtn.onclick = () => {
-                    const isLoggedIn = ${not empty loginSess};
-                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
-                };
-            }
+      document.getElementById('myPageBtn').onclick = () => {
+            	
+            	const isLoggedIn = ${not empty loginSess ? true : false};
+            	const userRole = ${not empty loginSess ? loginSess.role : -1};
+            	
+            	if (!isLoggedIn) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    location.href = "${pageContext.request.contextPath}/member/login";
+                } else if(userRole==0){
+                    location.href = "${pageContext.request.contextPath}/mypage/main";
+                }else if(userRole==1){
+                	location.href="${pageContext.request.contextPath}/vendor/content_manage";
+                }
+                else alert("잘못된 접근입니다.");
+            };
         });
     </script>
 </body>
