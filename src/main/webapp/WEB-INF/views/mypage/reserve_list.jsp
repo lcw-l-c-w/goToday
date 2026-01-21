@@ -278,19 +278,6 @@
                 const reservation_id = $(this).data("reservation-id");
                 window.location.href = "/gotoday/ticket/" + reservation_id;
             });
->>>>>>> 345bcbfa6e5a11e015e8b3242ecfc15ebbd59330
-        });
-        
-        $(".info-btn").click(function () {
-        	const reservation_id = $(this).data("reservation-id");
-            window.location.href = "/gotoday/mypage/reservations/" + reservation_id;
-		});
-		
-		$(".review-btn").click(function () {
-			const reservation_id = $(this).data("reservation-id");
-			const content_id = $(this).data("content-id");
-			window.location.href = "/gotoday/review/write?reservation_id="+reservation_id+"&content_id="+content_id;
-		});
     });
 </script>
 
