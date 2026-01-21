@@ -6,280 +6,270 @@
 <meta charset="UTF-8">
 <title>예약 관리 | GoToday</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <style>
-    /* 1. 기본 초기화 */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-        background-color: #f5f5f5; /* 변수 대신 직접 지정하여 오류 방지 */
-        font-family: 'Pretendard', -apple-system, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        justify-content: flex-start;
-    }
+body {
+    background: #f5f5f5;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+}
 
-    /* 2. 메인 컨테이너 수정 - 위로 바짝 올리기 */
-    .container {
-        display: flex;
-        gap: 40px; /* 사이드바와의 간격 최적화 */
-        padding: 20px 8% 60px 8%; /* 상단 padding을 60px -> 20px로 대폭 축소 */
-        max-width: 1400px;
-        margin: 0 auto;
-        align-items: flex-start; /* 콘텐츠가 위에서부터 시작하도록 고정 */
-    }
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+}
 
-    .content {
-        flex: 1;
-    }
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
 
-    /* 3. 제목 영역 수정 - 여백 최소화 */
-    .page-title {
-        font-size: 28px;
-        font-weight: 700;
-        margin-top: 10px; /* 상단 여백 미세 조정 */
-        margin-bottom: 25px; /* 티켓 리스트와의 간격 축소 */
-    }
+/* 카드 */
+.reserve-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
 
-    .list-wrapper {
-        max-width: 800px;
-    }
+/* 왼쪽 정보 */
+.reserve-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
-    /* 4. 티켓 헤더 및 카드 스타일 */
-    .ticket-page-header {
-        width: 360px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0; /* 마진 제거 */
-        margin-bottom: 10px;
-    }
+.reserve-code {
+    font-size: 13px;
+    color: #888;
+}
 
-    .ticket-wrapper {
-        width: 360px;
-        filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));
-        margin-top: 0;
-        margin-bottom: 40px;
-    }
+/* 제목 줄 */
+.title-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-    .reserve-item {
-        background: white;
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        position: relative;
-    }
+.badge {
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #e1f5fe;
+    color: #03a9f4;
+}
 
-    /* 배지 스타일 */
-    .badge {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        color: white;
-        background-color: #4dc3ff; /* 기본 d-day 색상 */
-    }
+.title {
+    font-size: 17px;
+    font-weight: 700;
+}
 
-    /* 날짜/시간 영역 */
-    .datetime {
-        margin-bottom: 20px;
-        padding-left: 0;
-    }
+.datetime {
+    font-size: 13px;
+    color: #555;
+}
 
-    .reserve-code {
-        font-size: 12px;
-        color: #999;
-        margin-bottom: 8px;
-    }
+/* 상태 */
+.state-line {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+}
 
-    .date {
-        font-size: 15px;
-        font-weight: 600;
-        color: #333;
-        margin-right: 10px;
-    }
+.state.done { color: #4dc3ff; font-weight: 700; }
+.state.canceled { color: #ff4444; font-weight: 700; }
+.state.visited { color: #28a745; font-weight: 700; }
 
-    .time {
-        font-size: 14px;
-        color: #666;
-    }
+.payment.waiting {
+    color: #ff9800;
+    font-weight: 700;
+}
 
-    /* 상태 표시 */
-    .state {
-        display: inline-block;
-        margin-top: 10px;
-        font-size: 13px;
-        font-weight: 600;
-    }
+/* 버튼 */
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
 
-    .state.done { color: #4dc3ff; }
-    .state.canceled { color: #ff4444; }
-    .state.visited { color: #28a745; }
+.btn-group button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-    .payment-type.waiting {
-        display: inline-block;
-        margin-left: 10px;
-        padding: 4px 12px;
-        background-color: #fff3cd;
-        color: #856404;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-    }
+.info-btn {
+    background: #fff;
+    border: 1px solid #ddd;
+}
 
-    .ticket-btn {
-        margin-top: 10px;
-        padding: 8px 20px;
-        background-color: #333;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
+.ticket-btn {
+    background: #333;
+    color: #fff;
+    border: none;
+}
 
-    .ticket-btn:hover { background-color: #4dc3ff; }
+.review-btn {
+    background: #4dc3ff;
+    color: #fff;
+    border: none;
+}
 
-    /* 콘텐츠 정보 */
-    .reserve-content {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
-        padding: 15px 0;
-        border-top: 1px solid #eee;
-    }
+/* 포스터 */
+.poster img {
+    width: 100px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+}
 
-    .reserve-content p {
-        flex: 1;
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-    }
+/* 페이징 */
+.paging {
+    margin-top: 30px;
+    text-align: center;
+}
 
-    .reserve-content img {
-        width: 80px;
-        height: 80px;
-        border-radius: 10px;
-        object-fit: cover;
-    }
+.paging a {
+    display: inline-block;
+    margin: 0 4px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ddd;
+}
 
-    /* 하단 버튼 */
-    .info-btn, .review-btn {
-        padding: 10px 24px;
-        border: 2px solid #ddd;
-        background: white;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-right: 8px;
-        transition: all 0.2s;
-    }
-
-    .info-btn:hover { border-color: #4dc3ff; color: #4dc3ff; }
-    .review-btn { background-color: #4dc3ff; border-color: #4dc3ff; color: white; }
-
-    .paging { text-align: center; margin-top: 40px; font-size: 16px; color: #333; }
-    .paging a { margin: 0 5px; text-decoration: none; color: #333; }
-
-    @media (max-width : 768px) {
-        .container { padding: 20px; }
-        .reserve-content { flex-direction: column; align-items: flex-start; }
-        .reserve-content img { width: 100%; height: 200px; }
-    }
+.paging a.active {
+    background: #4dc3ff;
+    color: #fff;
+    border-color: #4dc3ff;
+}
 </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="content">
-            <h1 class="page-title">예약 관리</h1>
+<div class="container">
+    <h1 class="page-title">예약 관리</h1>
 
-            <div class="list-wrapper">
-                <c:choose>
-                    <c:when test="${empty reservationList}">
-                        <div class="empty-box">예약 내역이 없습니다.</div>
-                    </c:when>
-                    <c:otherwise>
-                        <c:forEach var="r" items="${reservationList}">
-                            <div class="reserve-item">
-                                <div class="badge">${r.dday}</div>
+    <!-- ================= 페이징 계산 ================= -->
+    <c:set var="page" value="${empty param.page ? 1 : param.page}" />
+    <c:set var="page" value="${page + 0}" />
 
-                                <div class="datetime">
-                                    <p class="reserve-code">${r.reservation_code}</p>
-                                    <span class="date">${r.reserved_for_at}</span> 
-                                    <span class="time">${r.time_zone}</span>
+    <c:set var="contentPerPage" value="4" />
+    <c:set var="pageBtnCount" value="5" />
 
-                                    <c:choose>
-                                        <c:when test="${r.reservation_status eq 'DONE'}">
-                                            <p class="state done">예약 완료</p>
-                                        </c:when>
-                                        <c:when test="${r.reservation_status eq 'CANCELED'}">
-                                            <p class="state canceled">예약 취소</p>
-                                        </c:when>
-                                        <c:when test="${r.reservation_status eq 'VISITED'}">
-                                            <p class="state visited">이용 완료</p>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <p class="state">${r.reservation_status}</p>
-                                        </c:otherwise>
-                                    </c:choose>
+    <c:set var="totalPage"
+           value="${(totalCount + contentPerPage - 1) / contentPerPage}" />
 
-                                    <c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
-                                        <p class="payment-type waiting">입금 대기</p>
-                                    </c:if>
+    <c:set var="startPage" value="${page}" />
+    <c:set var="endPage" value="${page + pageBtnCount - 1}" />
 
-                                    <c:if test="${r.receive_type eq 'MOBILE'}">
-                                        <button class="ticket-btn" data-reservation-id="${r.reservation_id}">모바일 티켓</button>
-                                    </c:if>
-                                </div>
+    <c:if test="${endPage > totalPage}">
+        <c:set var="endPage" value="${totalPage}" />
+    </c:if>
 
-                                <div class="reserve-content">
-                                    <p>${r.title}</p>
-                                    <img src="${r.main_image_path}" alt="포스터">
-                                </div>
+    <!-- ================= 리스트 ================= -->
+    <c:forEach var="r" items="${reservationList}">
+        <div class="reserve-item">
 
-                                <button class="info-btn" data-reservation-id="${r.reservation_id}">예약정보</button>
-                                <c:if test="${r.reservation_status eq 'VISITED'}">
-                                    <button class="review-btn" data-reservation-id="${r.reservation_id}" data-content-id="${r.content_id}">리뷰쓰기</button>
-                                </c:if>
-                            </div>
-                        </c:forEach>
-                        <div class="paging">&lt;&lt; 1 2 3 4 5 &gt;&gt;</div>
-                    </c:otherwise>
-                </c:choose>
+            <div class="reserve-info">
+                <div class="reserve-code">${r.reservation_code}</div>
+
+                <div class="title-line">
+                    <span class="badge">${r.dday}</span>
+                    <span class="title">${r.title}</span>
+                </div>
+
+                <div class="state-line">
+                    <c:choose>
+                        <c:when test="${r.reservation_status eq 'DONE'}">
+                            <span class="state done">예약 완료</span>
+                        </c:when>
+                        <c:when test="${r.reservation_status eq 'CANCELED'}">
+                            <span class="state canceled">예약 취소</span>
+                        </c:when>
+                        <c:when test="${r.reservation_status eq 'VISITED'}">
+                            <span class="state visited">이용 완료</span>
+                        </c:when>
+                    </c:choose>
+
+                    <c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
+                        <span class="payment waiting">입금대기</span>
+                    </c:if>
+                    
+                    <span class="datetime">| ${r.reserved_for_at} ${r.time_zone}</span>
+                </div>
+
+                <div class="btn-group">
+                    <button class="info-btn" data-id="${r.reservation_id}">예약정보</button>
+
+                    <c:if test="${r.receive_type eq 'MOBILE'}">
+                        <button class="ticket-btn" data-id="${r.reservation_id}">모바일 티켓</button>
+                    </c:if>
+
+                    <c:if test="${r.reservation_status eq 'VISITED'}">
+                        <button class="review-btn"
+                                data-id="${r.reservation_id}"
+                                data-content="${r.content_id}">
+                            리뷰쓰기
+                        </button>
+                    </c:if>
+                </div>
             </div>
+
+			<div class="poster">
+			    <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
+			        <img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
+			    </a>
+			</div>
         </div>
+    </c:forEach>
+
+    <!-- ================= 페이징 UI ================= -->
+    <div class="paging">
+        <c:if test="${page > 1}">
+            <a href="?page=${page - 1}">&lt;&lt;</a>
+        </c:if>
+
+        <c:forEach var="i" begin="${startPage}" end="${endPage}">
+            <a href="?page=${i}" class="${i == page ? 'active' : ''}">
+                ${i}
+            </a>
+        </c:forEach>
+
+        <c:if test="${page < totalPage}">
+            <a href="?page=${page + 1}">&gt;&gt;</a>
+        </c:if>
     </div>
+</div>
 
-    <script>
-        $(function() {
-            $(".info-btn").click(function() {
-                const reservation_id = $(this).data("reservation-id");
-                window.location.href = "/gotoday/mypage/reservations/" + reservation_id;
-            });
-
-            $(".review-btn").click(function() {
-                const reservation_id = $(this).data("reservation-id");
-                const content_id = $(this).data("content-id");
-                window.location.href = "/gotoday/review/write?reservation_id=" + reservation_id + "&content_id=" + content_id;
-            });
-
-            $(".ticket-btn").click(function() {
-                const reservation_id = $(this).data("reservation-id");
-                window.location.href = "/gotoday/ticket/" + reservation_id;
-            });
+<script>
+$(function() {
+    $(".info-btn").click(function() {
+        location.href = "/gotoday/mypage/reservations/" + $(this).data("id");
     });
-</script>
 
+    $(".ticket-btn").click(function() {
+        location.href = "/gotoday/ticket/" + $(this).data("id");
+    });
+
+    $(".review-btn").click(function() {
+        location.href = "/gotoday/review/write?reservation_id="
+            + $(this).data("id")
+            + "&content_id=" + $(this).data("content");
+    });
+});
+</script>
 </body>
 </html>

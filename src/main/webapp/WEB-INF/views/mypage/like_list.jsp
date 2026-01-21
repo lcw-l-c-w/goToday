@@ -154,10 +154,11 @@ body {
                                 </c:choose>
                             </span>
 
-                            <a href="${pageContext.request.contextPath}/content/detail?id=${item.content_id}"
-                               class="item-title">
-                                ${item.title}
-                            </a>
+							<a href="${pageContext.request.contextPath}/detail/${item.content_id}"
+							   class="item-title" 
+							   target="_top">
+							    ${item.title}
+							</a>
                         </div>
 
                         <!-- 기간 -->
@@ -171,7 +172,7 @@ body {
                         <div class="btn-group">
                             <button type="button"
                                     class="btn-action btn-reserve"
-                                    onclick="location.href='${pageContext.request.contextPath}/content/detail?id=${item.content_id}'">
+                                    onclick="top.location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
                                 예약하러 가기
                             </button>
                         </div>
@@ -180,9 +181,11 @@ body {
                     <!-- 포스터 -->
                     <c:choose>
                         <c:when test="${not empty item.main_image_path}">
-                            <img src="${pageContext.request.contextPath}${item.main_image_path}"
-                                 class="poster-img"
-                                 alt="포스터">
+                            <a href="${pageContext.request.contextPath}/detail/${item.content_id}" target="_top">
+							    <img src="${pageContext.request.contextPath}${item.main_image_path}"
+							         class="poster-img"
+							         alt="포스터">
+							</a>
                         </c:when>
                         <c:otherwise>
                             <div class="poster-img"

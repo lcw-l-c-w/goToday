@@ -201,5 +201,9 @@ public class MypageController {
         return "mypage/like_list";
     }
     
-    
+    // 찜 예약하러가기
+    @GetMapping("/content/detail")
+    public String contentDetail(@RequestParam("id") int contentId, Model model) {
+        return "content/content_detail";
+    }
 }
