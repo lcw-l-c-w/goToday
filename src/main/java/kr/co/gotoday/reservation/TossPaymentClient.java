@@ -44,6 +44,7 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 		Reader reader = null;
 
 		try {
+			log.info("디버깅 중: requestBody={}", requestBody);
 			// HTTP 연결 설정
 			URL url = new URL(apiUrl + endpoint);
 			connection = (HttpURLConnection) url.openConnection();
