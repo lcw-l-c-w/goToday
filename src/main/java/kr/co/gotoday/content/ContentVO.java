@@ -31,7 +31,7 @@ public class ContentVO {
     private String place_tag;
     
     private int like_count;// 각 content에 대한 like수
-    
+    private int liked; //새로고침시 like되어있으면 파란색이 들어오게끔 설정해야함
     public String getReservationTypeLabel() {
         if (reservation_type == null) return "";
 

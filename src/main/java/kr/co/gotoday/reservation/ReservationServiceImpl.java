@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,9 +83,22 @@ public class ReservationServiceImpl implements ReservationService{
 			trySubCurrentTicket(reservationVO);
 			ticketSucceed = true;
 			
-			// 토스 결제 승인
-			paymentVO = tossPaymentClient.confirmPayment(paymentKey, orderId, amount);
-			
+			// 유, 무료에 의해 분기됨
+			if (amount == 0) {
+	            // 🔥 무료 결제 로직
+	            paymentVO = new PaymentVO();
+	            paymentVO.setOrder_key("FREE_" + UUID.randomUUID());
+	            paymentVO.setAmount_price(0);
+	            paymentVO.setPayment_method("FREE");
+	            paymentVO.setPayment_status("DONE");
+	            paymentVO.setRefund_status("NONE");
+	            
+	        } else {
+	            // 🔥 유료 결제 로직
+	            paymentVO = tossPaymentClient.confirmPayment(
+	                paymentKey, orderId, amount
+	            );
+	        }
 			// DB 저장 (예약 + 결제)-> 트랜잭션
 			ReservationVO savedReservation = 
 		            createReservationWithPaymentent(reservationVO, paymentVO);
@@ -109,6 +123,7 @@ public class ReservationServiceImpl implements ReservationService{
 			});
 			
 			return savedReservation;
+			
 		} catch (Exception e) {
 			if (paymentVO != null) {
 				try {
