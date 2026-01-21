@@ -46,10 +46,11 @@
     <div class="wrap">
         <div class="sub">
             <div class="size">
-                <h3 class="sub_title">문의사항 작성</h3>
+                <h3 class="sub_title">관리자 답변</h3>
     
                 <div class="bbs">
-                <form method="post" name="frm" id="frm" action="insert.do" enctype="multipart/form-data" >
+                <form method="post" name="frm" id="frm" action="reply.do" enctype="multipart/form-data" >
+                <input type="hidden" name="gno" value="${vo.gno}">
                     <table class="board_write">
                         <tbody>
                         <tr>
@@ -67,7 +68,6 @@
                         </tbody>
                     </table>
                     <div class="btnSet"  style="text-align:right;">
-	                    <a class="btn" href="index.do" style="background-color: #888 !important; margin-right: 5px;">취소</a>
                         <a class="btn" href="javascript:goSave();">저장 </a>
                     </div>
                     </form>

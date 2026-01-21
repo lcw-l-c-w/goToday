@@ -23,17 +23,41 @@
 	</insert>
 	
 	<select id="selectContentList" resultType="kr.co.gotoday.content.ContentVO">
-		SELECT * FROM content WHERE user_id = #{user_id} AND is_delete = 0
-		<if test="keyword != null and keyword != ''">
-			AND title LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		
-		<if test="status != null and status != ''">
-			AND content_status = #{status}
-		</if>
-		
-		ORDER BY content_id DESC
+    SELECT
+	        content_id, user_id, content_kind, category, location, title, description, reservation_type,
+	        start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
+	        is_active, is_delete, content_time, instagram_url, x_url, place_tag,
+	        CASE
+	            WHEN content_status = 'STATUS_REQUESTED' THEN 'STATUS_REQUESTED'
+	            WHEN content_status = 'STATUS_REJECTED' THEN 'STATUS_REJECTED'
+	            WHEN content_status = 'STATUS_APPROVAL' AND <![CDATA[NOW() < start_at]]> THEN 'STATUS_SCHEDULED'
+	            WHEN content_status = 'STATUS_APPROVAL' AND <![CDATA[NOW() BETWEEN start_at AND end_at]]> THEN 'STATUS_OPEN'
+	            WHEN content_status = 'STATUS_APPROVAL' AND <![CDATA[NOW() > end_at]]> THEN 'STATUS_CLOSED'
+	        END AS content_status
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0
+	    <if test="keyword != null and keyword != ''">
+	        AND title LIKE CONCAT('%', #{keyword}, '%')
+	    </if>
+	    <if test="status != null and status != ''">
+	        AND (
+	            (content_status IN ('STATUS_REQUESTED','STATUS_REJECTED') AND content_status = #{status})
+	            OR
+	            (content_status = 'STATUS_APPROVAL' AND
+	                CASE
+	                    WHEN <![CDATA[NOW() < start_at]]> THEN 'STATUS_SCHEDULED'
+	                    WHEN <![CDATA[NOW() BETWEEN start_at AND end_at]]> THEN 'STATUS_OPEN'
+	                    WHEN <![CDATA[NOW() > end_at]]> THEN 'STATUS_CLOSED'
+	                END = #{status}
+	            )
+	        )
+	    </if>	
+
+	    ORDER BY content_id DESC
 	</select>
+
+
 	
 	<select id="selectContentOne" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
 		SELECT content_id, user_id, content_kind, category, location, title, description, reservation_type,
