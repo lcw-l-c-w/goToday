@@ -215,6 +215,7 @@ public class ReservationController {
 
 		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
 		model.addAttribute("paymentKey", paymentKey);
+		model.addAttribute("orderId", orderId);
 		model.addAttribute("amount", amount ==null ? 0 : amount);
 		model.addAttribute("reservation_code", reservation_code);
 
