@@ -8,7 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+       
         body {
             font-family: 'Pretendard', -apple-system, sans-serif;
             background-color: #f5f5f5;
@@ -261,14 +261,14 @@
                                 <div class="badge">
                                     ${r.dday}
                                 </div>
-                                
+                               
                                 <!-- 예약 정보 + 날짜 + 상태 -->
                                 <div class="datetime">
                                     <p class="reserve-code">${r.reservation_code}</p>
-                                
+                               
                                     <span class="date">${r.reserved_for_at}</span>
                                     <span class="time">${r.time_zone}</span>
-                                
+                               
                                     <!-- 예약 상태 -->
                                     <c:choose>
                                         <c:when test="${r.reservation_status eq 'DONE'}">
@@ -284,33 +284,33 @@
                                             <p class="state">${r.reservation_status}</p>
                                         </c:otherwise>
                                     </c:choose>
-                                
+                               
                                     <!-- 결제 상태: 입금 대기만 노출 -->
                                     <c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
                                         <p class="payment-type waiting">입금 대기</p>
                                     </c:if>
-                                
+                               
                                     <!-- 수령 방식: MOBILE일 때만 버튼 -->
                                     <c:if test="${r.receive_type eq 'MOBILE'}">
                                         <button class="ticket-btn" data-reservation-id="${r.reservation_id}">
                                             모바일 티켓
                                         </button>
                                     </c:if>
-                                
+                               
                                     <input type="hidden" name="reservation_id" value="${r.reservation_id}">
                                 </div>
-                                
+                               
                                 <!-- 콘텐츠 정보 -->
                                 <div class="reserve-content">
                                     <p>${r.title}</p>
                                     <img src="${r.main_image_path}" alt="포스터">
                                 </div>
-                                
+                               
                                 <!-- 버튼 -->
                                 <button class="info-btn" data-reservation-id="${r.reservation_id}">예약정보</button>
-                                
+                               
                                 <c:if test="${r.reservation_status eq 'VISITED'}">
-                                    <button class="review-btn" 
+                                    <button class="review-btn"
                                         data-reservation-id="${r.reservation_id}"
                                         data-content-id="${r.content_id}">
                                         리뷰쓰기
@@ -334,7 +334,7 @@
                 const reservation_id = $(this).data("reservation-id");
                 window.location.href = "/gotoday/mypage/reservations/" + reservation_id;
             });
-            
+           
             $(".review-btn").click(function () {
                 const reservation_id = $(this).data("reservation-id");
                 const content_id = $(this).data("content-id");
@@ -350,3 +350,4 @@
     </script>
 </body>
 </html>
+
