@@ -1,5 +1,7 @@
 package kr.co.gotoday.calendar;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,13 @@ public class CalendarServiceImpl implements CalendarService {
 	@Override
 	public void removeCalendar(CalendarVO vo) {
 	    calendarMapper.deleteCalendar(vo);
+	}
+
+
+	@Override
+	public List<CalendarDTO> getMySchedule(int user_id) {
+		return calendarMapper.getCalendarList(user_id);
+		
 	}
 
 }
