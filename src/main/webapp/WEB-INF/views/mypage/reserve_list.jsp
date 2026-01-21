@@ -238,7 +238,7 @@
                                         <p class="payment-type waiting">입금 대기</p>
                                     </c:if>
 
-                                    <c:if test="${r.receive_type eq 'MOBILE'}">
+                                    <c:if test="${r.receive_type eq 'MOBILE' and r.payment_status eq 'DONE'}">
                                         <button class="ticket-btn" data-reservation-id="${r.reservation_id}">모바일 티켓</button>
                                     </c:if>
                                 </div>
@@ -268,10 +268,25 @@
                 window.location.href = "/gotoday/mypage/reservations/" + reservation_id;
             });
 
-            $(".review-btn").click(function() {
-                const reservation_id = $(this).data("reservation-id");
-                const content_id = $(this).data("content-id");
-                window.location.href = "/gotoday/review/write?reservation_id=" + reservation_id + "&content_id=" + content_id;
+            $(".review-btn").click(function(e) {
+                e.preventDefault(); // 페이지 이동 방지
+                
+                const resId = $(this).data("reservation-id");
+                const contentId = $(this).data("content-id");
+
+                // 서버에서 리뷰 작성에 필요한 데이터(전시명, 위치, 시간대 등)를 가져옴
+                $.ajax({
+                    url: "/gotoday/review/getData", // 데이터를 가져올 API 주소
+                    type: "GET",
+                    data: { reservation_id: resId, content_id: contentId },
+                    success: function(data) {
+                        // 데이터 로드 성공 시 모달에 데이터 세팅 후 오픈
+                        openReviewModal(data);
+                    },
+                    error: function() {
+                        alert("데이터를 불러오는데 실패했습니다.");
+                    }
+                });
             });
 
             $(".ticket-btn").click(function() {

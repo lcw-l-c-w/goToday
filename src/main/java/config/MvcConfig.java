@@ -141,7 +141,8 @@ public class MvcConfig implements WebMvcConfigurer{
 					"/payment/**",
 					"/admin/**",
 					"/vendor/**",
-					"/mypage/**"
+					"/mypage/**",
+					"/review/**"
 			);
 		registry.addInterceptor(vendorInterceptor)
 		.addPathPatterns(
