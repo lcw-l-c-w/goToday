@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
@@ -25,7 +26,7 @@ public class MypageController {
 
 	private final UserService userService;
 	private final ReservationService reservationService;
-	
+	private final MypageService mypageService;
 	
 	// 메인 화면
     @GetMapping("/mypage/main")
@@ -175,7 +176,30 @@ public class MypageController {
     	ReservationDetailDTO reservationDetailDTO = reservationService.findReservationDetailById(reservation_id, userVO.getUser_id());
     	model.addAttribute("reservationDetailDTO", reservationDetailDTO);
     	
-    	return "mypage/reserve_detail";
     	
+    	return "mypage/reserve_detail";
     }
+    
+    // 좋아요 목록
+    @GetMapping("/mypage/like_list")
+    public String myLikeList(HttpSession session, Model model) {
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+
+        List<MypageDTO> likeList =
+                mypageService.getMyLikeList(loginUser.getUser_id());
+
+        model.addAttribute("likeList", likeList);
+
+        return "mypage/like_list";
+    }
+    
+    
 }
