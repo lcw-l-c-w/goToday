@@ -8,9 +8,11 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
 import kr.co.gotoday.reservation.ReservationService;
 import kr.co.gotoday.user.UserService;
@@ -24,6 +26,38 @@ public class MypageController {
 	private final UserService userService;
 	private final ReservationService reservationService;
 	
+	
+	// 메인 화면
+    @GetMapping("/mypage/main")
+    public String mypageMain(HttpSession session, Model model) {
+    	UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+    	
+    	// 로그인 체크
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+        
+        // DB에서 최신 정보 가져와서 세션 갱신
+        UserVO dbUser = userService.getUserById(loginUser.getUser_id());
+        if (dbUser != null) {
+            session.setAttribute("userName", dbUser.getName());
+            session.setAttribute("userEmail", dbUser.getEmail());
+        }
+        
+        return "mypage/main";
+    }
+	
+    // 로그아웃 처리
+    @GetMapping("/mypage/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        System.out.println("로그아웃 성공");
+        return "redirect:/main";
+    }
+    
 	// 관심사 수정
     @GetMapping("/mypage/user_like_edit")
     public String userLikeEdit(HttpSession session, Model model) {
@@ -59,7 +93,7 @@ public class MypageController {
 
         userService.updateUserTags(userId, tagNames);
 
-        return "redirect:/mypage/main";
+        return "redirect:/mypage/calender";
     }
     
     // 회원 정보 수정
@@ -107,10 +141,15 @@ public class MypageController {
         boolean result = userService.updateUserInfo(vo);
 
         if (result) {
-            // 세션 최신화: userMapper → userService
-            UserVO updatedUser = userService.loginByEmail(loginUser.getEmail());
+        	// DB에서 최신 정보 다시 가져오기
+            UserVO updatedUser = userService.getUserById(loginUser.getUser_id());
+            // 사이드바용 개별 세션 정보 업데이트
+            session.setAttribute("userName", updatedUser.getName());
+            session.setAttribute("userEmail", updatedUser.getEmail());
+            // 전체 객체 세션 최신화
             session.setAttribute("loginSess", updatedUser);
-            return "redirect:/mypage/main";
+            return "redirect:/mypage/calender";
+            
         } else {
             model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
             model.addAttribute("cmd", "back");
@@ -118,16 +157,25 @@ public class MypageController {
         }
     }
     
+    // 예약 관리
     @GetMapping("/mypage/reservation")
     public String showReservationList(HttpSession sess, Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-    	
-    	if (userVO == null) {
-            return "redirect:/member/login";  
-        }
+
     	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id());
     	model.addAttribute("reservationList", reservationList);
     	
     	return "mypage/reserve_list";
+    }
+    // 예약 관리
+    @GetMapping("/mypage/reservations/{reservation_id}")
+    public String showReservationDetail(HttpSession sess, Model model, @PathVariable("reservation_id") int reservation_id) {
+    	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
+    	
+    	ReservationDetailDTO reservationDetailDTO = reservationService.findReservationDetailById(reservation_id, userVO.getUser_id());
+    	model.addAttribute("reservationDetailDTO", reservationDetailDTO);
+    	
+    	return "mypage/reserve_detail";
+    	
     }
 }

@@ -15,4 +15,5 @@ public interface ContentService {
 	List<MainContentViewDTO> getUpcomingContent(int limit, String kind);
 	List<MainContentViewDTO> getSearchList(ContentSearchDTO dto);
 	PageInfo getSearchPageInfo(ContentSearchDTO dto);
+	
 }

@@ -1,170 +1,220 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>예약/결제 - 수량 선택</title>
-<style>
-    body { font-family: 'Malgun Gothic', sans-serif; margin: 20px; }
-    .debug-box { background: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    .debug-box h3 { color: #e74c3c; margin-top: 0; }
-    .ticket-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-    .ticket-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; margin: 10px 0; background: #f9f9f9; border-radius: 5px; }
-    .ticket-info { flex: 1; }
-    .ticket-info p { margin: 0; color: #666; font-size: 14px; }
-    .ticket-info strong { font-size: 18px; color: #333; }
-    .qty-control { display: flex; align-items: center; gap: 10px; }
-    .qty-control button { width: 36px; height: 36px; font-size: 20px; cursor: pointer; border: 1px solid #ddd; background: #fff; border-radius: 5px; }
-    .qty-control button:hover { background: #e0e0e0; }
-    .qty-control input { width: 50px; text-align: center; font-size: 16px; border: 1px solid #ddd; border-radius: 5px; padding: 5px; }
-    .total-section { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .total-section p { margin: 0; font-size: 14px; }
-    .total-section strong { font-size: 28px; }
-    .submit-btn { width: 100%; padding: 15px; font-size: 18px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; }
-    .submit-btn:hover { background: #2980b9; }
-    h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GoToday - 수량 선택</title>
+    <style>
+        /* [공통 스타일] 팀원 파일(main.jsp) 스타일 적용 */
+        :root { --main-color: #4dc3ff; --text-color: #333; --border-color: #eee; --bg-gray: #f9f9f9; } 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-gray); color: var(--text-color); }
+        a { text-decoration: none; color: inherit; }
+        
+        /* [헤더] main.jsp와 동일 */
+        .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
+        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
+        .logo img { height: 32px; cursor: pointer; display: block; }
+        .nav-menu { display: flex; gap: 35px; height: 100%; list-style: none; align-items: center; }
+        .nav-menu a { font-weight: 600; font-size: 15px; color: #333; transition: color 0.3s ease; }
+        .nav-menu a:hover { color: var(--main-color); }
+        .nav-icons { display: flex; gap: 20px; align-items: center; }
+        .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
+        .user-icon:hover { color: var(--main-color); }
+
+        /* [메인 레이아웃] */
+        .main-wrapper { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        /* [카드 스타일] */
+        .card-box {
+            background: #fff; border-radius: 20px; padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        /* 타이틀 섹션 */
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+        .page-header p { font-size: 16px; color: #888; }
+        .highlight-date { color: var(--main-color); font-weight: 600; background: #eef9ff; padding: 5px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; }
+
+        /* 티켓 리스트 */
+        .ticket-list { display: flex; flex-direction: column; gap: 20px; }
+        .ticket-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 20px; border: 1px solid #f0f0f0; border-radius: 15px; background: #fff;
+            transition: 0.3s;
+        }
+        .ticket-item:hover { border-color: var(--main-color); box-shadow: 0 4px 12px rgba(77, 195, 255, 0.1); }
+        
+        .ticket-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+        .ticket-info span { font-size: 14px; color: #888; }
+        .ticket-price { font-size: 18px; font-weight: 700; color: #333; margin-top: 5px; display: block; }
+
+        /* 수량 조절 버튼 */
+        .qty-control { display: flex; align-items: center; gap: 10px; background: #f5f5f5; padding: 5px; border-radius: 30px; }
+        .qty-btn { 
+            width: 32px; height: 32px; border-radius: 50%; border: none; background: #fff; 
+            font-size: 18px; color: #555; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .qty-btn:hover { background: var(--main-color); color: #fff; }
+        .qty-input { 
+            width: 40px; text-align: center; border: none; background: transparent; 
+            font-size: 18px; font-weight: 600; color: #333; outline: none; 
+        }
+
+        /* 총 결제 금액바 */
+        .total-bar { 
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; padding-top: 20px; border-top: 2px dashed #eee;
+        }
+        .total-label { font-size: 18px; font-weight: 600; }
+        .total-price { font-size: 28px; font-weight: 800; color: var(--main-color); }
+
+        /* 하단 버튼 */
+        .submit-btn {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: var(--main-color); color: #fff; font-size: 20px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(77, 195, 255, 0.2);
+        }
+        .submit-btn:hover { background: #38b2f0; transform: translateY(-2px); }
+    </style>
 </head>
 <body>
 
-<!-- ===================== HEADER ===================== -->
-<header>
-    <a href="#" aria-label="GoToday 홈"><strong>GoToday</strong></a>
-    <nav aria-label="메인 메뉴" style="margin: 10px 0;">
-        <a href="#">Q&amp;A</a> |
-        <a href="#">PopUp</a> |
-        <a href="#">Exhibition</a>
-    </nav>
-</header>
-
-<hr />
-
-<!-- ===================== DEBUG: 서버에서 받은 데이터 확인 ===================== -->
-<div class="debug-box">
-    <h3>[DEBUG] 서버에서 받은 데이터 (model)</h3>
-    <p><strong>reservationDTO.content_id:</strong> ${reservationDTO.content_id}</p>
-    <p><strong>reservationDTO.reserved_for_at:</strong> ${reservationDTO.reserved_for_at}</p>
-    <p><strong>reservationDTO.time_zone:</strong> ${reservationDTO.time_zone}</p>
-    <hr/>
-    <p><strong>contentVO.title:</strong> ${contentVO.title}</p>
-    <p><strong>contentVO.adult_price:</strong> ${contentVO.adult_price}원</p>
-    <p><strong>contentVO.teen_price:</strong> ${contentVO.teen_price}원</p>
-    <p><strong>contentVO.child_price:</strong> ${contentVO.child_price}원</p>
-</div>
-
-<!-- ===================== MAIN ===================== -->
-<main>
-    <h1>${contentVo.title} - 수량 선택</h1>
-    <p>예약 날짜: <strong>${reservationDTO.reserved_for_at} ${reservationDTO.time_zone}</strong></p>
-
-    <!-- 수량 선택 폼 -->
-    <form action="${pageContext.request.contextPath}/reserve/quantity.do" method="post">
-        <!-- hidden: content_id 전달 -->
-        <input type="hidden" name="content_id" value="${reservationDTO.content_id}" />
-
-        <div class="ticket-section">
-            <h2>티켓 선택</h2>
-
-            <!-- 성인 -->
-            <div class="ticket-item">
-                <div class="ticket-info">
-                    <p>성인 (만 19세 이상)</p>
-                    <strong>${contentVO.adult_price}원</strong>
-                </div>
-                <div class="qty-control">
-                    <button type="button" onclick="changeQty('adult_qty', -1)">-</button>
-                    <input type="number" id="adult_qty" name="adult_qty" value="0" min="0" max="10" readonly />
-                    <button type="button" onclick="changeQty('adult_qty', 1)">+</button>
-                </div>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="${pageContext.request.contextPath}/main">
+                    <img src="<c:url value='/resources/images/logo.png'/>" alt="GoToday Logo">
+                </a>
             </div>
-
-            <!-- 청소년 -->
-            <div class="ticket-item">
-                <div class="ticket-info">
-                    <p>청소년 (만 13~18세)</p>
-                    <strong>${contentVO.teen_price}원</strong>
-                </div>
-                <div class="qty-control">
-                    <button type="button" onclick="changeQty('teen_qty', -1)">-</button>
-                    <input type="number" id="teen_qty" name="teen_qty" value="0" min="0" max="10" readonly />
-                    <button type="button" onclick="changeQty('teen_qty', 1)">+</button>
-                </div>
+            <ul class="nav-menu">
+                <li><a href="#">Q&A</a></li>
+                <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
+                <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
+            </ul>
+            <div class="nav-icons">
+                <div class="search-bar"><input type="text" placeholder="검색" style="border:none; border-bottom:1px solid #333; padding:5px; outline:none;"><span>🔍</span></div>
+                <span class="user-icon" id="myPageBtn">👤</span>
             </div>
+        </div>
+    </header>
 
-            <!-- 어린이 -->
-            <div class="ticket-item">
-                <div class="ticket-info">
-                    <p>어린이 (만 4~12세)</p>
-                    <strong>${contentVO.child_price}원</strong>
-                </div>
-                <div class="qty-control">
-                    <button type="button" onclick="changeQty('child_qty', -1)">-</button>
-                    <input type="number" id="child_qty" name="child_qty" value="0" min="0" max="10" readonly />
-                    <button type="button" onclick="changeQty('child_qty', 1)">+</button>
-                </div>
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1>${contentVO.title}</h1>
+            <p>관람하실 인원을 선택해주세요.</p>
+            <div class="highlight-date">
+                📅 방문 예정일: ${reservationDTO.reserved_for_at} (${reservationDTO.time_zone})
             </div>
         </div>
 
-        <!-- 총 금액 -->
-        <div class="total-section">
-            <p>총 금액</p>
-            <strong><span id="totalAmountText">0</span>원</strong>
-            <input type="hidden" id="total_price" name="total_price" value="0" />
-        </div>
+        <form action="${pageContext.request.contextPath}/reserve/quantity.do" method="post">
+            <input type="hidden" name="content_id" value="${reservationDTO.content_id}" />
 
-        <!-- 예매하기 버튼 -->
-        <button type="submit" class="submit-btn">예매하기</button>
-    </form>
-</main>
+            <div class="card-box">
+                <div class="ticket-list">
+                    <div class="ticket-item">
+                        <div class="ticket-info">
+                            <h3>성인</h3>
+                            <span>만 19세 이상</span>
+                            <span class="ticket-price">${contentVO.adult_price}원</span>
+                        </div>
+                        <div class="qty-control">
+                            <button type="button" class="qty-btn" onclick="changeQty('adult_qty', -1)">-</button>
+                            <input type="text" id="adult_qty" name="adult_qty" class="qty-input" value="0" readonly />
+                            <button type="button" class="qty-btn" onclick="changeQty('adult_qty', 1)">+</button>
+                        </div>
+                    </div>
 
-<hr />
+                    <div class="ticket-item">
+                        <div class="ticket-info">
+                            <h3>청소년</h3>
+                            <span>만 13세 ~ 18세</span>
+                            <span class="ticket-price">${contentVO.teen_price}원</span>
+                        </div>
+                        <div class="qty-control">
+                            <button type="button" class="qty-btn" onclick="changeQty('teen_qty', -1)">-</button>
+                            <input type="text" id="teen_qty" name="teen_qty" class="qty-input" value="0" readonly />
+                            <button type="button" class="qty-btn" onclick="changeQty('teen_qty', 1)">+</button>
+                        </div>
+                    </div>
 
-<!-- ===================== FOOTER ===================== -->
-<footer>
-    <p>Team Project</p>
-</footer>
+                    <div class="ticket-item">
+                        <div class="ticket-info">
+                            <h3>어린이</h3>
+                            <span>만 4세 ~ 12세</span>
+                            <span class="ticket-price">${contentVO.child_price}원</span>
+                        </div>
+                        <div class="qty-control">
+                            <button type="button" class="qty-btn" onclick="changeQty('child_qty', -1)">-</button>
+                            <input type="text" id="child_qty" name="child_qty" class="qty-input" value="0" readonly />
+                            <button type="button" class="qty-btn" onclick="changeQty('child_qty', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
 
-<!-- ===================== JavaScript ===================== -->
-<script>
-    // 가격 정보 (서버에서 받은 값)
-    const prices = {
-        adult: parseInt("${contentVO.adult_price}") || 0,
-        teen: parseInt("${contentVO.teen_price}") || 0,
-        child: parseInt("${contentVO.child_price}") || 0
-    };
+                <div class="total-bar">
+                    <span class="total-label">총 결제 예정 금액</span>
+                    <span class="total-price"><span id="totalAmountText">0</span>원</span>
+                </div>
+                <input type="hidden" id="total_price" name="total_price" value="0" />
+            </div>
 
-    // 수량 변경 함수
-    function changeQty(inputId, delta) {
-        const input = document.getElementById(inputId);
-        let currentVal = parseInt(input.value) || 0;
-        let newVal = currentVal + delta;
+            <button type="submit" class="submit-btn">예매하기</button>
+        </form>
+    </main>
 
-        // 범위 제한 (0 ~ 10)
-        if (newVal < 0) newVal = 0;
-        if (newVal > 10) newVal = 10;
+    <script>
+        // 가격 정보
+        const prices = {
+            adult: parseInt("${contentVO.adult_price}") || 0,
+            teen: parseInt("${contentVO.teen_price}") || 0,
+            child: parseInt("${contentVO.child_price}") || 0
+        };
 
-        input.value = newVal;
+        // 수량 변경 함수
+        function changeQty(inputId, delta) {
+            const input = document.getElementById(inputId);
+            let currentVal = parseInt(input.value) || 0;
+            let newVal = currentVal + delta;
+            
+            // 0 ~ 10 제한
+            if (newVal < 0) newVal = 0;
+            if (newVal > 10) newVal = 10;
+
+            input.value = newVal;
+            calculateTotal();
+        }
+
+        // 총 금액 계산
+        function calculateTotal() {
+            const adultQty = parseInt(document.getElementById('adult_qty').value) || 0;
+            const teenQty = parseInt(document.getElementById('teen_qty').value) || 0;
+            const childQty = parseInt(document.getElementById('child_qty').value) || 0;
+
+            const total = (adultQty * prices.adult) + (teenQty * prices.teen) + (childQty * prices.child);
+            
+            document.getElementById('totalAmountText').textContent = total.toLocaleString();
+            document.getElementById('total_price').value = total;
+        }
+
+        // 마이페이지 이동
+        const myBtn = document.getElementById('myPageBtn');
+        if(myBtn) {
+            myBtn.onclick = () => {
+                const isLoggedIn = ${not empty loginSess};
+                location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
+            };
+        }
+
         calculateTotal();
-    }
-
-    // 총 금액 계산 함수
-    function calculateTotal() {
-        const adultQty = parseInt(document.getElementById('adult_qty').value) || 0;
-        const teenQty = parseInt(document.getElementById('teen_qty').value) || 0;
-        const childQty = parseInt(document.getElementById('child_qty').value) || 0;
-
-        const total = (adultQty * prices.adult) + (teenQty * prices.teen) + (childQty * prices.child);
-
-        // 화면 표시
-        document.getElementById('totalAmountText').textContent = total.toLocaleString();
-        // hidden input에 값 설정
-        document.getElementById('total_price').value = total;
-    }
-
-    // 초기 계산
-    calculateTotal();
-</script>
+    </script>
 </body>
 </html>
