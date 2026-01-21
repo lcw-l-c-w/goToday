@@ -63,7 +63,7 @@ pageEncoding="UTF-8"%>
 				</table>
 			</td>
 
-			<td><iframe name="mainFrame" src="calendar.html" width="100%"
+			<td><iframe name="mainFrame" src="calendar.jsp" width="100%"
 					height="900" frameborder="0"></iframe></td>
 		</tr>
 	</table>
