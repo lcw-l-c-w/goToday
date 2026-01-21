@@ -44,6 +44,13 @@ public class ReservationController {
 	@PostMapping("/reserve/schedule.do")
 	@ResponseBody
 	public String selectSchedule(HttpSession session, ReservationDTO dto) {
+		// 필수 값 검증
+		if (dto.getReserved_for_at() == null || dto.getReserved_for_at().isEmpty()
+				|| dto.getTime_zone() == null || dto.getTime_zone().isEmpty()
+				|| dto.getContent_id() == 0 || dto.getSchedule_id() == 0) {
+			return "error";
+		}
+
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());

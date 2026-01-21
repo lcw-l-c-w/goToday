@@ -125,12 +125,13 @@ public class ReservationServiceImpl implements ReservationService{
 			return savedReservation;
 			
 		} catch (Exception e) {
-			if (paymentVO != null) {
+			//토스 결제 이후 에러가 발생하여 예약은 안 된 경우, 
+			if (paymentVO != null && paymentVO.getAmount_price()!=0) {
 				try {
 					//결제 승인 후 DB저장 실패 로그
 					log.error("[예약결제 DB저장 실패]",e);
 					// 토스 결제 취소
-					tossPaymentClient.cancelPayment(paymentKey, "DB 저장 실패로 인한 취소");
+					tossPaymentClient.cancelPayment(paymentKey, "DB 저장 실패로 인한 토스 결제 취소");
 				} catch (Exception cancelException) {
 					log.error("[토스 결제 취소 실패] paymentKey={}, orderId={}", 
 							paymentKey,
@@ -308,9 +309,13 @@ public class ReservationServiceImpl implements ReservationService{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("reservation_id", reservation_id);
 		map.put("user_id", user_id);
-		
+
 		ReservationDetailDTO dto = reservationMapper.findReservationDetailById(map);
-		
+
+		if (dto == null) {
+			throw new RuntimeException("예약 정보를 찾을 수 없습니다. reservation_id=" + reservation_id);
+		}
+
     	String birth = dto.getReceiver_birth();
     	if (birth != null && birth.length() >= 10) {
     	    birth = birth.substring(0, 10); //yyyy-MM-dd
