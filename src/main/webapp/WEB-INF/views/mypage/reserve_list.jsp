@@ -3,351 +3,212 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>예약 관리 | GoToday</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<title>예약 관리 | GoToday</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+:root { --main-color: #4dc3ff; --bg-gray: #f8f9fa; --text-gray: #666; }
+    body { font-family: 'Pretendard', sans-serif; background-color: transparent; margin: 0; padding: 0; }
+    
+    .page-title { font-size: 32px; font-weight: 700; margin-bottom: 40px; color: #111; }
+
+    /* 리스트 컨테이너 */
+    .reserve-container { width: 100%; max-width: 800px; }
+
+    /* 개별 카드 스타일 (찜 관리 스타일 계승) */
+    .reserve-item {
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px 30px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+    }
+
+    .item-info { flex: 1; }
+
+    /* 예약 번호 */
+    .reserve-code {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    /* 배지 & 제목 한 줄 */
+    .item-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+    .date-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #e1f5fe;
+        color: #03a9f4;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    /* 종료/취소 시 배지 색상 변경 */
+    .date-badge.end { background: #eee; color: #888; }
+    .date-badge.cancel { background: #ffebee; color: #ff4444; }
+
+    .item-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: #333;
+        text-decoration: none;
+    }
+
+    /* 예약 상세 날짜 및 상태 */
+    .item-detail {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .status-text { font-weight: 700; margin-left: 10px; }
+    .status-done { color: #4dc3ff; }
+    .status-cancel { color: #ff4444; }
+    .status-visited { color: #28a745; }
+
+    /* 버튼 스타일 */
+    .btn-group { display: flex; gap: 8px; }
+    .btn-action {
+        padding: 8px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        background: #fff;
+        transition: 0.2s;
+    }
+    .btn-action:hover { background: #f8f9fa; border-color: var(--main-color); color: var(--main-color); }
+    .btn-main { background: var(--main-color); color: #fff; border: none; }
+    .btn-main:hover { background: #3ab3ef; color: #fff; }
+
+    /* 포스터 이미지 */
+    .poster-img {
+        width: 100px;
+        height: 130px;
+        background: #f0f0f0;
+        border-radius: 12px;
+        margin-left: 20px;
+        object-fit: cover;
+    }
+
+    /* 페이징 */
+    .paging { text-align: center; margin-top: 40px; padding-bottom: 40px; }
+    .paging a { margin: 0 8px; text-decoration: none; color: #999; font-weight: 600; }
+    .paging a.active { color: var(--main-color); text-decoration: underline; }
+
+    .empty-msg {
+        text-align: center;
+        padding: 100px 0;
+        background: #fff;
+        border-radius: 20px;
+        color: var(--text-gray);
+    }
+</style>
+<script>
+    $(function() {
+        $(".info-btn").click(function () {
+            const reservation_id = $(this).data("reservation-id");
+            window.location.href = "/gotoday/mypage/reservations/" + reservation_id;
+        });
        
-        body {
-            font-family: 'Pretendard', -apple-system, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
+        $(".review-btn").click(function () {
+            const reservation_id = $(this).data("reservation-id");
+            const content_id = $(this).data("content-id");
+            window.location.href = "/gotoday/review/write?reservation_id="+reservation_id+"&content_id="+content_id;
+        });
 
-        .container {
-            display: flex;
-            gap: 60px;
-            padding: 60px 8%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .content {
-            flex: 1;
-        }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 40px;
-        }
-
-        .list-wrapper {
-            max-width: 800px;
-        }
-
-        .empty-box {
-            text-align: center;
-            padding: 80px 20px;
-            background: white;
-            border-radius: 20px;
-            color: #999;
-            font-size: 16px;
-        }
-
-        .reserve-item {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: relative;
-        }
-
-        /* 배지 스타일 */
-        .badge {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            color: white;
-        }
-
-        .badge:contains("END") {
-            background-color: #ff6b35;
-        }
-
-        .badge:contains("D-") {
-            background-color: #4dc3ff;
-        }
-
-        .badge:contains("CANCEL") {
-            background-color: #ff4444;
-        }
-
-        /* 날짜/시간 영역 */
-        .datetime {
-            margin-bottom: 20px;
-            padding-left: 0;
-        }
-
-        .reserve-code {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 8px;
-        }
-
-        .date {
-            font-size: 15px;
-            font-weight: 600;
-            color: #333;
-            margin-right: 10px;
-        }
-
-        .time {
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* 상태 표시 */
-        .state {
-            display: inline-block;
-            margin-top: 10px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .state.done {
-            color: #4dc3ff;
-        }
-
-        .state.canceled {
-            color: #ff4444;
-        }
-
-        .state.visited {
-            color: #28a745;
-        }
-
-        .payment-type.waiting {
-            display: inline-block;
-            margin-left: 10px;
-            padding: 4px 12px;
-            background-color: #fff3cd;
-            color: #856404;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .ticket-btn {
-            margin-top: 10px;
-            padding: 8px 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .ticket-btn:hover {
-            background-color: #4dc3ff;
-        }
-
-        /* 콘텐츠 정보 */
-        .reserve-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 15px 0;
-            border-top: 1px solid #eee;
-        }
-
-        .reserve-content p {
-            flex: 1;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .reserve-content img {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        /* 버튼 영역 */
-        .info-btn,
-        .review-btn {
-            padding: 10px 24px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-right: 8px;
-            transition: all 0.2s;
-        }
-
-        .info-btn:hover {
-            border-color: #4dc3ff;
-            color: #4dc3ff;
-        }
-
-        .review-btn {
-            background-color: #4dc3ff;
-            border-color: #4dc3ff;
-            color: white;
-        }
-
-        .review-btn:hover {
-            background-color: #3ab3ef;
-        }
-
-        /* 페이징 */
-        .paging {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .paging a {
-            margin: 0 5px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .paging a:hover {
-            color: #4dc3ff;
-        }
-
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            .reserve-item {
-                padding: 20px;
-            }
-
-            .reserve-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .reserve-content img {
-                width: 100%;
-                height: 200px;
-            }
-        }
-    </style>
+        $(".ticket-btn").click(function() {
+            const reservation_id = $(this).data("reservation-id");
+            // 모바일 티켓 표시 로직
+            alert("모바일 티켓 표시 - 예약ID: " + reservation_id);
+        });
+    });
+</script>
 </head>
 <body>
-            <h1 class="page-title">예약 관리</h1>
+    <h1 class="page-title">예약 관리</h1>
 
-            <div class="list-wrapper">
-                <c:choose>
-                    <c:when test="${empty reservationList}">
-                        <div class="empty-box">
-                            예약 내역이 없습니다.
-                        </div>
-                    </c:when>
-                    <c:otherwise>
-                        <c:forEach var="r" items="${reservationList}">
-                            <div class="reserve-item">
-                                <!-- badge: D-Day / END / CANCEL -->
-                                <div class="badge">
+    <div class="reserve-container">
+        <c:choose>
+            <c:when test="${not empty reservationList}">
+                <c:forEach var="r" items="${reservationList}">
+                    <div class="reserve-item">
+                        <div class="item-info">
+                            <span class="reserve-code">예약번호 ${r.reservation_code}</span>
+                            
+                            <div class="item-header">
+                                <span class="date-badge ${r.reservation_status eq 'CANCELED' ? 'cancel' : (r.dday eq 'END' ? 'end' : '')}">
                                     ${r.dday}
-                                </div>
-                               
-                                <!-- 예약 정보 + 날짜 + 상태 -->
-                                <div class="datetime">
-                                    <p class="reserve-code">${r.reservation_code}</p>
-                               
-                                    <span class="date">${r.reserved_for_at}</span>
-                                    <span class="time">${r.time_zone}</span>
-                               
-                                    <!-- 예약 상태 -->
-                                    <c:choose>
-                                        <c:when test="${r.reservation_status eq 'DONE'}">
-                                            <p class="state done">예약 완료</p>
-                                        </c:when>
-                                        <c:when test="${r.reservation_status eq 'CANCELED'}">
-                                            <p class="state canceled">예약 취소</p>
-                                        </c:when>
-                                        <c:when test="${r.reservation_status eq 'VISITED'}">
-                                            <p class="state visited">이용 완료</p>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <p class="state">${r.reservation_status}</p>
-                                        </c:otherwise>
-                                    </c:choose>
-                               
-                                    <!-- 결제 상태: 입금 대기만 노출 -->
-                                    <c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
-                                        <p class="payment-type waiting">입금 대기</p>
-                                    </c:if>
-                               
-                                    <!-- 수령 방식: MOBILE일 때만 버튼 -->
-                                    <c:if test="${r.receive_type eq 'MOBILE'}">
-                                        <button class="ticket-btn" data-reservation-id="${r.reservation_id}">
-                                            모바일 티켓
-                                        </button>
-                                    </c:if>
-                               
-                                    <input type="hidden" name="reservation_id" value="${r.reservation_id}">
-                                </div>
-                               
-                                <!-- 콘텐츠 정보 -->
-                                <div class="reserve-content">
-                                    <p>${r.title}</p>
-                                    <img src="${r.main_image_path}" alt="포스터">
-                                </div>
-                               
-                                <!-- 버튼 -->
-                                <button class="info-btn" data-reservation-id="${r.reservation_id}">예약정보</button>
-                               
+                                </span>
+                                <span class="item-title">${r.title}</span>
+                            </div>
+
+                            <div class="item-detail">
+                                <span>${r.reserved_for_at} (${r.time_zone})</span>
+                                <c:choose>
+                                    <c:when test="${r.reservation_status eq 'DONE'}">
+                                        <span class="status-text status-done">예약 완료</span>
+                                    </c:when>
+                                    <c:when test="${r.reservation_status eq 'CANCELED'}">
+                                        <span class="status-text status-cancel">예약 취소</span>
+                                    </c:when>
+                                    <c:when test="${r.reservation_status eq 'VISITED'}">
+                                        <span class="status-text status-visited">이용 완료</span>
+                                    </c:when>
+                                </c:choose>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="button" class="btn-action" onclick="location.href='/gotoday/mypage/reservations/${r.reservation_id}'">예약정보</button>
+                                
+                                <c:if test="${r.receive_type eq 'MOBILE' && r.reservation_status ne 'CANCELED'}">
+                                    <button type="button" class="btn-action btn-main" onclick="alert('티켓 발권 시스템 준비 중')">모바일 티켓</button>
+                                </c:if>
+
                                 <c:if test="${r.reservation_status eq 'VISITED'}">
-                                    <button class="review-btn"
-                                        data-reservation-id="${r.reservation_id}"
-                                        data-content-id="${r.content_id}">
-                                        리뷰쓰기
+                                    <button type="button" class="btn-action btn-main" 
+                                            onclick="location.href='/gotoday/review/write?reservation_id=${r.reservation_id}&content_id=${r.content_id}'">
+                                        리뷰 쓰기
                                     </button>
                                 </c:if>
                             </div>
-                        </c:forEach>
-
-                        <!-- 페이징 -->
-                        <div class="paging">
-                            &lt;&lt; 1 2 3 4 5 &gt;&gt;
                         </div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
 
+                        <c:choose>
+                            <c:when test="${not empty r.main_image_path}">
+                                <img src="http://localhost:8081/gotoday${r.main_image_path}" class="poster-img" alt="포스터">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="poster-img" style="display:flex; align-items:center; justify-content:center; font-size:12px; color:#aaa;">No Image</div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:forEach>
 
-    <script>
-        $(function() {
-            $(".info-btn").click(function () {
-                const reservation_id = $(this).data("reservation-id");
-                window.location.href = "/gotoday/mypage/reservations/" + reservation_id;
-            });
-           
-            $(".review-btn").click(function () {
-                const reservation_id = $(this).data("reservation-id");
-                const content_id = $(this).data("content-id");
-                window.location.href = "/gotoday/review/write?reservation_id="+reservation_id+"&content_id="+content_id;
-            });
-
-            $(".ticket-btn").click(function() {
-                const reservation_id = $(this).data("reservation-id");
-                // 모바일 티켓 표시 로직
-                alert("모바일 티켓 표시 - 예약ID: " + reservation_id);
-            });
-        });
-    </script>
+                <div class="paging">
+                    <a href="#">&lt;</a>
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">&gt;</a>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="empty-msg">
+                    <p>예약 내역이 없습니다.</p>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
 </body>
 </html>
 
