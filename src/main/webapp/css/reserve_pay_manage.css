@@ -4,7 +4,11 @@
         body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: #333; }
 
         .admin-layout { display: flex; min-height: 100vh; }
-
+/* CSS 파일 상단이나 <style> 태그 안에 추가 */
+html {
+    /* 스크롤바가 필요 없어도 항상 공간을 유지합니다. */
+    overflow-y: scroll;
+}
         /* 사이드바 전체 컨테이너 */
 .sidebar {
     width: 260px;
@@ -15,6 +19,37 @@
     height: 100vh;
     position: sticky;
     top: 0;
+}
+/* 이름과 아이콘을 가로로 배치 */
+.name-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 이름은 왼쪽, 아이콘은 오른쪽 끝 */
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.home-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #666; /* 기본 색상 */
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.home-icon-btn:hover {
+    color: #000; /* 마우스 올렸을 때 색상 */
+    transform: scale(1.1); /* 살짝 커지는 효과 */
+}
+
+.home-icon-btn .material-symbols-outlined {
+    font-size: 20px; /* 아이콘 크기 조절 */
+}
+
+/* 기존 admin-info 스타일 보정 (필요시) */
+.admin-info {
+    padding: 15px; /* 사이드바 하단 여백 */
 }
 
 /* 로고 영역 */

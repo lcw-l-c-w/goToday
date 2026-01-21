@@ -31,8 +31,7 @@ $(function() {
             }
         }, //boolean
         fOnAppLoad : function(){
-            //예제 코드
-            //oEditors.getById["contents"].exec("PASTE_HTML", ["로딩이 완료된 후에 본문에 삽입되는 text입니다."]);
+        	
         },
         fCreator: "createSEditor2"
     });
@@ -47,7 +46,10 @@ $(function() {
     <form class="content-form" method="post" id="frm" 
     	action="${pageContext.request.contextPath}/vendor/${isEdit ? 'content_update' : 'content_create'}" enctype="multipart/form-data">
 
-    <input type="hidden" name="content_id" value="${contentVO.content_id}">
+    <c:if test="${isEdit}">
+	    <input type="hidden" name="content_id" value="${contentVO.content_id}">
+	</c:if>
+
 
     <!-- 상단 -->
     <button type="button" class="back-btn">←</button>
@@ -68,7 +70,7 @@ $(function() {
                     <span>팝업스토어</span>
                 </label>
                 <label class="radio-item">
-                    <input type="radio" name="content_kind" value="exhibition" <c:if test="${contentVO.content_kind eq 'exhibition'}">checked</c:if>>
+                    <input type="radio" name="content_kind" value="exhibition" required <c:if test="${contentVO.content_kind eq 'exhibition'}">checked</c:if>>
                     <span>전시</span>
                 </label>
             </div>
@@ -157,7 +159,7 @@ $(function() {
         </div>
         <div class="form-group">
             <label>전시명 *</label>
-            <input type="text" name="title" placeholder="전시명을 입력하세요" value="${contentVO.title}" required>
+            <input type="text" name="title" placeholder="전시명을 입력하세요" value="<c:out value='${contentVO.title}'/>" required >
         </div>
 
         <div class="form-group">
