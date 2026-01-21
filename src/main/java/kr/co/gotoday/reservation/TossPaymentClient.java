@@ -97,6 +97,7 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 		requestBody.put("amount", String.valueOf(amount));
 		requestBody.put("paymentKey", paymentKey);
 
+		log.info("[paymentKey 확인]: ", paymentKey);
 		// API 호출
 		JSONObject tossResponse = callTossApi("/confirm", requestBody);
 		
