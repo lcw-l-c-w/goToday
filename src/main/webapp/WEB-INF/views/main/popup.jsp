@@ -681,7 +681,7 @@ a {
             if(myBtn) {
                 myBtn.onclick = () => {
                     const isLoggedIn = ${not empty loginSess};
-                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
+                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/mypage/main" : "${pageContext.request.contextPath}/member/login";
                 };
             }
         });
