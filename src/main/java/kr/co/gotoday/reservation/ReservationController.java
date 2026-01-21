@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.content.ContentVO;
-import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.payment.TossInputDTO;
 import kr.co.gotoday.user.UserVO;
 
@@ -342,5 +342,30 @@ public class ReservationController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+	
+	@PostMapping("/ticket/{reservation_id}")
+    public ReservationVO onlineTicket(@PathVariable Integer reservation_id) {
+        return reservationService.findByReservationId(reservation_id);
+    }
+    @GetMapping("/ticket/{reservation_id}")
+    public String showTicket(@PathVariable("reservation_id") Integer reservation_id, HttpSession sess,Model model) {
+        UserVO userVO= (UserVO) sess.getAttribute("loginSess");
+        if(userVO== null || reservation_id==null) {
+            return null;
+        }
+        ReservationVO reservationVO =reservationService.findByReservationId(reservation_id); 
+        if(reservationVO==null) {
+            model.addAttribute("msg","존재하지 않습니다");
+            return "common/return";
+        }
+        ContentVO contentVO = contentService.getDetailContents(reservationVO.getContent_id(), userVO.getUser_id());
+        int totalQty= reservationVO.getChild_qty()+reservationVO.getTeen_qty()+reservationVO.getAdult_qty();
+        reservationVO.setTotalQty(totalQty);
+        reservationVO.setLocation(contentVO.getLocation());
+        reservationVO.setTitle(contentVO.getTitle());
+        reservationVO.setImgPath(contentVO.getMain_image_path());
+        model.addAttribute("reservation", reservationVO);
+        return "mypage/reserve_ticket";
+    }
 
 }
