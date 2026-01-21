@@ -26,4 +26,12 @@ public class ReservationVO {
     private String receive_type;
     private int admin_id;
     private int schedule_id;
+    
+    // 추가
+    private int totalQty; //전체 수량
+    private String title; // 컨텐츠 이름
+    private String location; //위치 
+    private String imgPath;
+    
+    
 }
