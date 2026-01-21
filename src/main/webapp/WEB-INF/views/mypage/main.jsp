@@ -48,7 +48,7 @@
         
         <div class="content">
             <div class="main-content">
-                <iframe name="mainFrame" src="${pageContext.request.contextPath}/mypage/calendar"></iframe>
+                <iframe name="mainFrame" src="${pageContext.request.contextPath}/calendar" width="100%" height="900" frameborder="0"></iframe>
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 package kr.co.gotoday.calendar;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -20,6 +21,30 @@ public class CalendarController {
 
 	@Autowired
 	private CalendarService calendarService;
+
+	// 1. 마이페이지 화면으로 이동만 함 (데이터는 안 가지고 감)
+	@GetMapping("/mypage")
+	public String myPage() {
+		return "mypage/main";
+	}
+
+	@GetMapping("/calendar")
+	public String calendarPage() {
+		return "mypage/calendar"; 
+	}
+
+	// 2. [AJAX용] 캘린더 데이터만 JSON으로 뱉어주는 API
+	@GetMapping("/mypage/calendar-data")
+	@ResponseBody
+	public List<CalendarDTO> getCalendarData(HttpSession session) {
+		UserVO user = (UserVO) session.getAttribute("loginSess");
+		if (user == null) {
+			return null; // 혹은 빈 리스트
+		}
+
+		// 서비스에서 DB 조회 후 리턴
+		return calendarService.getMySchedule(user.getUser_id());
+	}
 
 	// 캘린더 PICK 저장 (AJAX 요청)
 	// 주소: /calendar/add
