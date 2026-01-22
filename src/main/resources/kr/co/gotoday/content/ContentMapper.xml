@@ -352,7 +352,9 @@ SELECT
     c.reservation_type AS reservation_type,
     c.category 			AS category,
     c.content_time 		AS 	content_time,
-    c.content_kind		AS content_kind
+    c.content_kind		AS content_kind,
+    c.x_url 			AS x_url,
+    c.instagram_url 	AS instagram_url
    
 FROM content c
 WHERE 

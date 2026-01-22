@@ -199,6 +199,7 @@ input[type="date"] {
 		.pay-failed { background: #fff2f0; color: #cf1322; border: 1px solid #ffa39e; }
 		/* 환불 처리: 보라색 계열 */
 		.pay-refund { background: #f9f0ff; color: #722ed1; border: 1px solid #d3adf7; }
+		.pay-cancel { background-color: #f9eeee; color: #af5b5b; border: 1px solid #e8d5d5; }
 
         .btn-sm { padding: 6px 12px; border: 1px solid #eee; background: white; border-radius: 6px; cursor: pointer; font-size: 13px; transition: 0.2s; }
         .btn-sm:hover { background: #f5f5f5; }
