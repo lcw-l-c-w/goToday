@@ -207,5 +207,28 @@
 		WHERE order_key = #{order_key}
 	</update>
 	
+	<select id="findReservationListByUserId" parameterType="int" resultType="kr.co.gotoday.reservation.ReservationListDTO">
+		SELECT r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
+			c.content_id, c.title, c.main_image_path,
+			p.payment_status,
+			p.order_key AS order_id
+		FROM content c 
+		JOIN reservation r ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		WHERE r.user_id = #{user_id}
+		ORDER BY r.reserved_for_at, r.time_zone
+	</select>
+	
+	<select id="findReservationDetailById" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationDetailDTO">
+		SELECT r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
+			r.receiver_name, r.receiver_birth, r.receiver_phone, r.adult_qty, r.child_qty, r.teen_qty,
+			c.content_id, c.title, c.main_image_path, c.location,
+			p.paid_at, p.payment_status, p.payment_method, p.amount_price
+		FROM content c 
+		JOIN reservation r ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		WHERE r.user_id = #{user_id}
+			AND r.reservation_id = #{reservation_id}
+	</select>
 	
 </mapper>

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody; // ★ 이거 필수!
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -16,16 +16,23 @@ public class CancelController {
     @Autowired
     CancelService cancelService;
 
-    // 마이페이지 등에서 '취소하기' 버튼 클릭 시 호출 (AJAX 요청 권장)
     @PostMapping("/payment/cancel.do")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> cancelPayment(
-            @RequestParam String orderId,
-            @RequestParam(defaultValue = "단순 변심") String reason) {
+    // ★ 수정: @RequestParam 대신 @RequestBody Map<String, Object> params 사용
+    public ResponseEntity<Map<String, Object>> cancelPayment(@RequestBody Map<String, Object> params) {
         
         Map<String, Object> result = new HashMap<>();
 
         try {
+            // ★ JSON 맵에서 하나씩 꺼내기
+            String orderId = (String) params.get("orderId");
+            String reason = (String) params.get("reason");
+
+            // 기본값 처리 (reason이 없을 경우)
+            if (reason == null || reason.trim().isEmpty()) {
+                reason = "단순 변심";
+            }
+
             // 서비스 호출
             cancelService.cancelPayment(orderId, reason);
             
