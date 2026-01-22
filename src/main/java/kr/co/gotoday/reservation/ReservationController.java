@@ -56,20 +56,19 @@ public class ReservationController {
 
 	@GetMapping("/reserve/quantity.do")
 	public String showQuantityForm(HttpSession session, Model model) {
-		 ReservationDTO dto = (ReservationDTO) session.getAttribute("schedule");
+		 ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
 
-		 // [테스트용] 세션에 schedule이 없으면 임시 데이터 생성
-		 if (dto == null) {
+		 if (reservation == null) {
 			 model.addAttribute("cmd", "back");
 			 model.addAttribute("msg", "예약정보가 누락되었습니다.");
 			 return "common/return";
 		 }
 		 
-		 model.addAttribute("reservationDTO", dto);
+		 model.addAttribute("reservationDTO", reservation);
 
 		 UserVO userVO = (UserVO) session.getAttribute("loginSess");
 		 
-		 ContentVO contentVO = contentService.getDetailContents(dto.getContent_id(), userVO.getUser_id());
+		 ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
 		 model.addAttribute("contentVO",contentVO);
 
 		return "reserve_pay/reservation";

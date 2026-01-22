@@ -8,8 +8,8 @@
 <title>POPUP</title>
 <style>
 /* 1. 공통 기본 스타일 */
-:root { -
-	-main-color: #4dc3ff;
+:root { 
+	--main-color: #4dc3ff;
 }
 
 * {

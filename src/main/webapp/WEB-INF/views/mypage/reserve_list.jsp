@@ -279,6 +279,9 @@
                 window.location.href = "/gotoday/ticket/" + reservation_id;
             });
         });
-    </script>
+        
+        
+</script>
+
 </body>
 </html>
