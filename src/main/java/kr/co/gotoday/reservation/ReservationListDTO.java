@@ -20,5 +20,7 @@ public class ReservationListDTO {
 	private String main_image_path;
 	
 	private String dday;
+	
+	private String order_id; //payment 의 orderKey 저장하려고 추가(취소하려면 orderKey 필요)
 
 }

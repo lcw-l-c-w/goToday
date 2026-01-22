@@ -27,7 +27,7 @@ public class ContentController {
 	//상세보기 
 	@GetMapping("/detail/{content_id}") // @pathVariable @RequestParam 햇갈려...
 	public String contentDetail(Model model, @PathVariable("content_id") int content_id, HttpSession session) {
-		System.out.println("▶ Controller 진입, content_id = " + content_id);
+	
 		UserVO user = (UserVO) session.getAttribute("loginSess");
 
 		Integer user_id = (user != null) ? user.getUser_id() : null;

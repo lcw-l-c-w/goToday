@@ -31,7 +31,7 @@ public class ExhibitionController {
 		}
 		//service 호출
 		model.addAttribute("random",contentService.getRandomContents(mcd));
-		model.addAttribute("recommand",contentService.getRecommandContents(mcd));
+		model.addAttribute("recommend",contentService.getRecommendContents(mcd));
 	
 		
 		model.addAttribute("popularList", contentService.getPopularContent(7, "exhibition"));
