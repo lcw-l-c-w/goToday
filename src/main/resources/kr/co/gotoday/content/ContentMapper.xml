@@ -33,7 +33,8 @@
 		FROM content c
 		WHERE 	
 		<include refid="USER_VISIBLE_CONTENT" />
-		AND c.end_at >= NOW()
+			AND c.start_at &lt;= NOW()
+			AND c.end_at >= NOW()  
 		<if test="content_kind != null and content_kind != ''">
             AND c.content_kind = #{content_kind}
         </if>
