@@ -52,7 +52,7 @@ public class MvcConfig implements WebMvcConfigurer{
     private String kakaoRestApiKey;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
-    
+	
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
@@ -88,6 +88,8 @@ public class MvcConfig implements WebMvcConfigurer{
 	    
 		return dataSource;
 	}
+
+	
 	// mybatis
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception{

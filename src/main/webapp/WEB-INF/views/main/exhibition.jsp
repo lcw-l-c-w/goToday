@@ -13,23 +13,7 @@
         body { font-family: 'Pretendard', sans-serif; overflow-x: hidden; background-color: #fff; }
         a { text-decoration: none; color: inherit; }
         
-        .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
-        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
-        .logo img { height: 32px; cursor: pointer; display: block; }
-        .nav-menu { display: flex; gap: 35px; height: 100%; list-style: none; align-items: center; }
-        .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
-        .nav-menu a { font-weight: 600; font-size: 15px; color: #333; transition: color 0.3s ease; height: 100%; display: flex; align-items: center; padding: 0 5px; }
-        .nav-menu li:hover a { color: var(--main-color); }
-        .nav-menu li::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 3px; background-color: var(--main-color); transition: width 0.3s ease; z-index: 5; }
-        .nav-menu li:hover::after { width: 100%; }
-        
-        .nav-icons { display: flex; gap: 20px; align-items: center; }
-        .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
-        .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
-        .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
-        .user-icon:hover { color: var(--main-color); }
 
-        .main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
         /* 2. 입체 캐러셀 배너 스타일 */
         .exhibit-banner-section { 
@@ -110,23 +94,8 @@
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <div class="nav-container">
-            <div class="logo">
-                <a href="${pageContext.request.contextPath}/main"><img src="<c:url value='/resources/images/logo.png'/>" alt="Logo"></a>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#">Q&A</a></li>
-                <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-                <li><a href="${pageContext.request.contextPath}/exhibition" style="color: var(--main-color);">Exhibition</a></li>
-            </ul>
-            <div class="nav-icons">
-                <div class="search-bar"><input type="text" placeholder="검색"><span>🔍</span></div>
-                <span class="user-icon" id="myPageBtn" style="cursor:pointer;">👤</span>
-            </div>
-        </div>
-    </header>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
     <main class="main-wrapper">
         <section class="exhibit-banner-section">
