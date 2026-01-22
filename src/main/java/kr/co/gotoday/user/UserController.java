@@ -242,5 +242,41 @@ public class UserController {
         return "redirect:/admin/content_manage";
     }
     
+    //페이지 이동
+    @GetMapping("/login/process")
+    public String movePage(HttpSession sess, Model model) {
+    	try{
+    		UserVO vo= (UserVO) sess.getAttribute("loginSess");
+    		if(vo==null) {
+    			model.addAttribute("msg","로그인이 필요한 서비스입니다.");
+    			model.addAttribute("cmd", "back");
+    			
+    			return "member/login";
+    	}
+    	if(!vo.getEmail().contains("@")) {
+    		  sess.setAttribute("loginSess", vo);
+    		return "redirect:/admin/content_manage";
+    	}
+    	UserVO login= userService.getUserById(vo.getUser_id());
+    	
+    	if(login.getRole()==1) {
+    		sess.setAttribute("loginSess", login);
+    		return "redirect:/vendor/content_manage";
+    	}
+    	// admin인경우
+    	//개인 회원인 경우
+    	else if(login.getRole()==0) {
+    		sess.setAttribute("loginSess", login);
+    		return "redirect:/mypage/main";
+    	}
+    	}
+    	catch(Exception e) {
+    		System.out.println("에러가 발생하였습니다.");
+    		return "/main";
+    	}
+		return null;
+    	
+    }
     
+  
 }
