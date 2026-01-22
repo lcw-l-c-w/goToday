@@ -37,7 +37,7 @@
 
     SELECT
 	    r.reservation_id AS reserve_id,
-	    r.reservation_code,
+	    r.reservation_code AS reservation_code,
 	    r.reserved_for_at AS visit_date,
 	    r.time_zone AS visit_time,
 	    (r.adult_qty + r.child_qty + r.teen_qty) AS person_count,

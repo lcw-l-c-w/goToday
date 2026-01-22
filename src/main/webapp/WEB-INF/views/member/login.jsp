@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 <script>
 $(function() {
   $("#togglePassword").on("click", function() {
@@ -42,11 +41,17 @@ $(function() {
   --radius-md: 4px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Roboto', sans-serif;
-  background-color: var(--color-bg-primary);
-  min-height: 100vh;
+body { font-family: 'Roboto', sans-serif; background-color: var(--color-bg-primary); min-height: 100vh; }
+
+/* 컨테이너 스타일 */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px); /* 헤더 높이 고려 */
+  padding: 20px 0;
 }
+
 /* 카드 스타일 */
 .login-card {
   background-color: var(--color-bg-white);
@@ -58,13 +63,6 @@ body {
 }
 .login-title { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 30px; }
 
-.login-wrapper {
-  min-height: calc(100vh - 70px); /* header 높이 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-}
 /* 폼 요소 */
 .role-selection { display: flex; gap: 18px; margin-bottom: 25px; }
 .form-group { margin-bottom: 28px; }
@@ -96,47 +94,45 @@ body {
 .naver-icon { width: 14px; height: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z'/%3E%3C/svg%3E") no-repeat center/contain; }
 </style>
 </head>
-
 <body>
-    <jsp:include page="/WEB-INF/views/common/header.jsp" />
-
-    <div class="login-wrapper">
-        <div class="login-card">
-		    <h1 class="login-title">LOGIN</h1>
-		    <form action="/gotoday/member/login" method="POST">
-		      <div class="role-selection">
-		        <label><input type="radio" name="role" value="0" checked> 개인 회원</label>
-		        <label><input type="radio" name="role" value="1"> 기업 회원</label>
-		      </div>
-		      <div class="form-group">
-		        <label class="form-label">이메일 주소</label>
-		        <input type="email" name="email" class="form-input" placeholder="이메일을 입력해주세요." required>
-		      </div>
-		      <div class="form-group">
-		        <label class="form-label">PASSWORD</label>
-		        <div class="password-wrapper">
-		          <input type="password" id="password" name="password" class="form-input" placeholder="비밀번호를 입력해주세요." required>
-		          <button type="button" id="togglePassword" class="password-toggle">
-		            <img src="${pageContext.request.contextPath}/img/eye-icon.svg" alt="eye">
-		          </button>
-		        </div>
-		      </div>
-		      
-		      <button type="submit" class="btn btn-primary">LOGIN</button>
-		      회원이 아니신가요? 
-		      <button type="button" id="btnRegister" class="btn btn-secondary">SIGN IN</button>
-		      
-		      <div id="socialLogin" class="social-login">
-		        <a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=account_email,profile_nickname" class="btn-social btn-kakao">
-		          <span class="kakao-icon"></span> 카카오 로그인
-		        </a>
-		        <a href="/naver" class="btn-social btn-naver">
-		          <span class="naver-icon"></span> 네이버 로그인
-		        </a>
-		      </div>
-		    </form>
-		  </div>
-        </div>
-</body>
+  <jsp:include page="/WEB-INF/views/common/header.jsp" />
   
+  <div class="container">
+    <div class="login-card">
+      <h1 class="login-title">LOGIN</h1>
+      <form action="/gotoday/member/login" method="POST">
+        <div class="role-selection">
+          <label><input type="radio" name="role" value="0" checked> 개인 회원</label>
+          <label><input type="radio" name="role" value="1"> 기업 회원</label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">이메일 주소</label>
+          <input type="email" name="email" class="form-input" placeholder="이메일을 입력해주세요." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" class="form-input" placeholder="비밀번호를 입력해주세요." required>
+            <button type="button" id="togglePassword" class="password-toggle">
+              <img src="${pageContext.request.contextPath}/img/eye-icon.svg" alt="eye">
+            </button>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">LOGIN</button>
+        회원이 아니신가요? 
+        <button type="button" id="btnRegister" class="btn btn-secondary">SIGN IN</button>
+        
+        <div id="socialLogin" class="social-login">
+          <a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=account_email,profile_nickname" class="btn-social btn-kakao">
+            <span class="kakao-icon"></span> 카카오 로그인
+          </a>
+          <a href="/naver" class="btn-social btn-naver">
+            <span class="naver-icon"></span> 네이버 로그인
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
 </html>
