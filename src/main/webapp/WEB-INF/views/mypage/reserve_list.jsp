@@ -188,7 +188,7 @@ body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif
 									예약정보
 								</button>
 
-								<c:if test="${r.receive_type eq 'MOBILE'}">
+								<c:if test="${r.receive_type eq 'MOBILE' and r.payment_status eq 'DONE'}">
 									<button class="ticket-btn"
 										data-reservation-id="${r.reservation_id}">
 										모바일 티켓
@@ -224,54 +224,70 @@ body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif
 			</c:otherwise>
 		</c:choose>
 	</div>
-</div>
+<jsp:include page="/WEB-INF/views/review/write.jsp" />
 
+<script src="/gotoday/resources/js/review/write.js"></script>
 <script>
-$(function () {
+	$(function() {
+		$(".info-btn").click(
+				function() {
+					const reservation_id = $(this).data("reservation-id");
+					window.location.href = "/gotoday/mypage/reservations/"
+							+ reservation_id;
+				});
+		$(".review-btn").click(function(e) {
+            e.preventDefault(); // 페이지 이동 방지 -> 모달로 띄울 거
+            
+            const resId = $(this).data("reservation-id");
+            const contentId = $(this).data("content-id");
 
-	$(".info-btn").click(function () {
-		const reservationId = $(this).data("reservation-id");
-		location.href = "/gotoday/mypage/reservations/" + reservationId;
-	});
-
-	$(".review-btn").click(function () {
-		const reservationId = $(this).data("reservation-id");
-		const contentId = $(this).data("content-id");
-		location.href = "/gotoday/review/write?reservation_id=" + reservationId + "&content_id=" + contentId;
-	});
-
-	$(".ticket-btn").click(function () {
-		const reservationId = $(this).data("reservation-id");
-		location.href = "/gotoday/ticket/" + reservationId;
-	});
-
-	$(".cancel-btn").click(function () {
-		const orderId = $(this).data("order-id");
-		if (!orderId) {
-			alert("결제 정보를 찾을 수 없습니다.");
-			return;
-		}
-
-		const reason = prompt("취소 사유를 입력해주세요", "단순 변심");
-		if (!reason) return;
-
-		if (!confirm("정말 예약을 취소하시겠습니까?")) return;
-
-		$.ajax({
-			url: "/gotoday/payment/cancel.do",
-			type: "POST",
-			contentType: "application/json",
-			data: JSON.stringify({ orderId: orderId, reason: reason }),
-			success: function (res) {
-				alert(res.msg);
-				location.reload();
-			},
-			error: function () {
-				alert("서버 오류");
+            // 서버에서 전시명, 위치, 시간대 가져옴
+            $.ajax({
+                url: "/gotoday/review/getData", 
+                type: "GET",
+                data: { reservation_id: resId},
+                success: function(data) {
+                    // 데이터 로드 성공 시 모달에 데이터 세팅 후 오픈
+                    openReviewModal(data);
+                },
+                error: function() {
+                    alert("데이터를 불러오는데 실패했습니다.");
+                }
+            });
+		});
+	
+		$(".ticket-btn").click(function () {
+			const reservationId = $(this).data("reservation-id");
+			location.href = "/gotoday/ticket/" + reservationId;
+		});
+	
+		$(".cancel-btn").click(function () {
+			const orderId = $(this).data("order-id");
+			if (!orderId) {
+				alert("결제 정보를 찾을 수 없습니다.");
+				return;
 			}
+	
+			const reason = prompt("취소 사유를 입력해주세요", "단순 변심");
+			if (!reason) return;
+	
+			if (!confirm("정말 예약을 취소하시겠습니까?")) return;
+	
+			$.ajax({
+				url: "/gotoday/payment/cancel.do",
+				type: "POST",
+				contentType: "application/json",
+				data: JSON.stringify({ orderId: orderId, reason: reason }),
+				success: function (res) {
+					alert(res.msg);
+					location.reload();
+				},
+				error: function () {
+					alert("서버 오류");
+				}
+			});
 		});
 	});
-});
 </script>
 </body>
 </html>
