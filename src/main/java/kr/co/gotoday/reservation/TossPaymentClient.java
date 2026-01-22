@@ -104,14 +104,26 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 		
 		log.info("[토스 결제 승인 성공] paymentKey={}, orderId={}", paymentKey, orderId);
 
+		// 토스에서 넘긴 정보가 우리 서버 값과 같은지 마지막 최종 점검
+		String tossOrderId = (String) tossResponse.get("orderId");
+		if(!orderId.equals(tossOrderId)) {
+			log.error("[토스 반환 주문키 불일치] expected={}, actual={}", orderId, tossOrderId);
+			throw new RuntimeException("토스 반환된 orderId 불일치");
+		}
+		
+		Number tossAmount = (Number) tossResponse.get("totalAmount");
+		if(tossAmount.intValue() != amount) {
+			log.error("[토스 반환 가격 불일치] expected={}, actual={}", amount, tossAmount);
+			throw new RuntimeException("토스 반환된 amount 불일치");
+		}
+		
 		// PaymentVO 생성 및 반환
 		PaymentVO paymentVO = new PaymentVO();
 		paymentVO.setPayment_key((String) tossResponse.get("paymentKey"));
 		paymentVO.setOrder_key((String) tossResponse.get("orderId"));
 		paymentVO.setPayment_method((String) tossResponse.get("method"));
 		paymentVO.setPayment_status((String) tossResponse.get("status"));
-		Number totalAmount = (Number) tossResponse.get("totalAmount");
-		paymentVO.setAmount_price(totalAmount.intValue());
+		paymentVO.setAmount_price(tossAmount.intValue());
 		paymentVO.setRefund_status("NONE");
 
 		return paymentVO;

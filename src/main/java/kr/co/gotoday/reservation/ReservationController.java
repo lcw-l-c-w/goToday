@@ -44,6 +44,13 @@ public class ReservationController {
 	@PostMapping("/reserve/schedule.do")
 	@ResponseBody
 	public String selectSchedule(HttpSession session, ReservationDTO dto) {
+		// 필수 값 검증
+		if (dto.getReserved_for_at() == null || dto.getReserved_for_at().isEmpty()
+				|| dto.getTime_zone() == null || dto.getTime_zone().isEmpty()
+				|| dto.getContent_id() == 0 || dto.getSchedule_id() == 0) {
+			return "error";
+		}
+
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());
@@ -215,6 +222,7 @@ public class ReservationController {
 
 		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
 		model.addAttribute("paymentKey", paymentKey);
+		model.addAttribute("orderId", orderId);
 		model.addAttribute("amount", amount ==null ? 0 : amount);
 		model.addAttribute("reservation_code", reservation_code);
 
