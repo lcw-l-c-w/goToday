@@ -14,8 +14,9 @@
 <body>
 
 <!-- ✅ 공통 네비바 -->
-<%@ include file="/WEB-INF/views/common/header.jsp" %>
-
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
+	
 <div class="search-page">
   <div class="search-container">
 
@@ -133,14 +134,17 @@
 
           <div class="col-poster">
             <div class="poster-box">
-              <img class="poster-img" src="<c:url value='${item.main_image_path}'/>" alt="poster">
+                <a class="poster-link"
+       				href="${pageContext.request.contextPath}/detail/${item.content_id}">
+              		<img class="poster-img" src="<c:url value='${item.main_image_path}'/>" alt="poster">
 
               <!-- ✅ 오픈예정 D-day: dday > 0 일 때만 -->
               <c:if test="${item.dday != null && item.dday > 0}">
                 <span class="dday">D-${item.dday}</span>
               </c:if>
-            </div>
+            </a>
           </div>
+        </div>
 
           <div class="col-title">
             <!-- 예약태그 -->

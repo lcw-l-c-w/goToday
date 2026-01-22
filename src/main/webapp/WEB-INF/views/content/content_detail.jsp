@@ -38,86 +38,6 @@ a {
 	color: inherit;
 }
 
-/* 2. 네비게이션 바 스타일 */
-.header {
-	width: 100%;
-	border-bottom: 1px solid var(--border-color);
-	background: #fff;
-	position: sticky;
-	top: 0;
-	z-index: 1000;
-}
-
-.nav-container {
-	max-width: 1100px;
-	margin: 0 auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 20px;
-	height: 70px;
-}
-
-.logo img {
-	height: 32px;
-	cursor: pointer;
-	display: block;
-}
-
-.nav-menu {
-	display: flex;
-	gap: 35px;
-	list-style: none;
-	align-items: center;
-	height: 100%;
-}
-
-.nav-menu li {
-	position: relative;
-	height: 100%;
-	display: flex;
-	align-items: center;
-}
-
-.nav-menu a {
-	font-weight: 600;
-	font-size: 15px;
-	transition: color 0.3s ease;
-}
-
-.nav-menu li:hover a {
-	color: var(- -main-color);
-}
-
-.nav-icons {
-	display: flex;
-	gap: 20px;
-	align-items: center;
-}
-
-.search-bar {
-	border-bottom: 1px solid #333;
-	display: flex;
-	align-items: center;
-	padding: 2px 5px;
-}
-
-.search-bar input {
-	border: none;
-	outline: none;
-	width: 150px;
-	font-size: 14px;
-}
-
-.user-icon {
-	font-size: 22px;
-	cursor: pointer;
-	transition: color 0.2s;
-}
-
-.user-icon:hover {
-	color: var(- -main-color);
-}
 
 /* 3. 레이아웃 및 본문 */
 .container {
@@ -551,7 +471,7 @@ $(function() {
     		GoTodayRecentViewed.add({
       		id: "${content.content_id}",
       		title: "${content.title}",
-      		image: "${content.main_image_path}",
+            image: "<c:url value='${content.main_image_path}'/>",
       		url: "${pageContext.request.contextPath}/detail/${content.content_id}",
       		location: "${content.location}"
     		});
@@ -562,28 +482,9 @@ $(function() {
 </script>
 </head>
 <body>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
 	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
-	<header class="header">
-		<div class="nav-container">
-			<div class="logo">
-				<a href="${pageContext.request.contextPath}/main"> <img
-					src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
-				</a>
-			</div>
-			<ul class="nav-menu">
-				<li><a href="#">Q&A</a></li>
-				<li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-				<li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
-			</ul>
-			<div class="nav-icons">
-				<div class="search-bar">
-					<input type="text" placeholder="검색"> <span>🔍</span>
-				</div>
-				<span class="user-icon" id="myPageBtn">👤</span>
-			</div>
-		</div>
-	</header>
 
 	<div class="container">
 		<div class="breadcrumb">
