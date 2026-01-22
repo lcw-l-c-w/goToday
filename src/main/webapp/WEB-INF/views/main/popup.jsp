@@ -181,7 +181,6 @@ a {
 	width: 100%;
 	margin-bottom: 80px;
 	min-height: 450px;
-	background: #fafafa;
 	border-radius: 25px;
 	padding: 40px 0;
 }

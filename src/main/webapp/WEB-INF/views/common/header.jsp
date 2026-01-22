@@ -14,7 +14,6 @@ uri="http://java.sun.com/jsp/jstl/core"%>
     body {
         font-family: "Pretendard", sans-serif;
         overflow-x: hidden;
-        background-color: #fff;
     }
     a {
         text-decoration: none;
@@ -217,7 +216,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
         </div>
 
         <ul class="nav-menu">
-            <li><a href="#">Q&A</a></li>
+            <li><a href="${pageContext.request.contextPath}/reply/index.do">Q&A</a></li>
             <li>
                 <a href="${pageContext.request.contextPath}/popup">PopUp</a>
             </li>
