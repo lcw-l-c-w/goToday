@@ -7,7 +7,8 @@ public enum ContentEnum {
 	STATUS_SCHEDULED ,
 	STATUS_OPEN ,
 	STATUS_CLOSED ,
-	
+    STATUS_APPROVAL,    // 승인완료
+
 	
 	// 
 	CONTENT_POPUP ,

@@ -87,15 +87,15 @@ public class ContentServiceImpl implements ContentService {
 	// 날짜 조회
 	@Override
 	public List<String> getAvailableDatesByContent(Integer content_id) {
-		// TODO Auto-generated method stub
 
+		
 		return contentMapper.selectDateByID(content_id);
 	}
 
 	// 시간 조회
 	@Override
 	public List<ContentScheduleVO> getAvailableTimesByContent(Integer content_id, String scheduled_at) {
-		// TODO Auto-generated method stub
+		
 		return contentMapper.selectTimeByID(content_id, scheduled_at);
 	}
 
@@ -124,7 +124,7 @@ public class ContentServiceImpl implements ContentService {
 			// 2) D-day (시작일까지 남은 일수)
 			if (start != null) {
 				long diff = ChronoUnit.DAYS.between(today, start); // 오늘->시작일
-				dto.setDday((int) diff);
+				dto.setDday(diff > 0 ? (int) diff : null);  // 오픈예정만
 			} else {
 				dto.setDday(null);
 			}

@@ -13,7 +13,7 @@
         body { font-family: 'Pretendard', sans-serif; overflow-x: hidden; background-color: #fff; }
         a { text-decoration: none; color: inherit; }
         
-        .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
+     <%--  .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
         .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
         .logo img { height: 32px; cursor: pointer; display: block; }
         .nav-menu { display: flex; gap: 35px; height: 100%; list-style: none; align-items: center; }
@@ -26,7 +26,7 @@
         .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
         .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
         .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
-        .user-icon:hover { color: var(--main-color); }
+        .user-icon:hover { color: var(--main-color); } --%>
 
         /* 2. 메인 배너 */
         .main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
@@ -72,8 +72,10 @@
     </style>
 </head>
 <body>
-
-    <header class="header">
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
+	
+   <%--  <header class="header">
         <div class="nav-container">
             <div class="logo">
                 <a href="${pageContext.request.contextPath}/main">
@@ -93,7 +95,7 @@
                 <span class="user-icon" id="myPageBtn">👤</span>
             </div>
         </div>
-    </header>
+    </header> --%>
 
     <main class="main-wrapper">
         <section class="main-banner">

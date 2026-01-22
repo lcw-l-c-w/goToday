@@ -150,9 +150,23 @@
           }
       });
     });
+    
+    //  상세 페이지 들어갔을 때 최근본페이지 기능에 넣으려고 만든 부분
+	document.addEventListener("DOMContentLoaded", function () {
+  		if (window.GoTodayRecentViewed) {
+    		GoTodayRecentViewed.add({
+      		id: "${content.content_id}",
+      		title: "${content.title}",
+      		image: "${content.main_image_path}",
+      		url: "${pageContext.request.contextPath}/detail/${content.content_id}",
+      		location: "${content.location}"
+    		});
+  		}
+	});
   </script>
 </head>
 <body>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
   <header class="header">
     <div class="nav-container">
