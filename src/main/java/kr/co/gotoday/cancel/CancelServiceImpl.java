@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +20,12 @@ public class CancelServiceImpl implements CancelService{
 
     @Autowired
     CancelMapper cancelMapper;
-
-    // 토스페이먼츠 시크릿 키 (개발자센터에서 확인, "test_sk_..." 형태)
-    private final String TOSS_SECRET_KEY = "test_sk_Poxy1XQL8Rakdljp5v4Zr7nO5Wml"; 
+    
+	@Value("${toss.payments.secret-key}")
+	private String secretKey;
+	
+	@Value("${toss.payments.api-url}")
+	private String apiUrl;
     
 
     @Override
@@ -86,7 +90,7 @@ public class CancelServiceImpl implements CancelService{
         connection.setRequestProperty("Content-Type", "application/json");
         
         // 인증 헤더 (Basic Auth: SecretKey를 Base64 인코딩)
-        String encodedAuth = Base64.getEncoder().encodeToString((TOSS_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
+        String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
         connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
         connection.setDoOutput(true);
 

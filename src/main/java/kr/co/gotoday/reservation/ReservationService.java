@@ -1,5 +1,8 @@
 package kr.co.gotoday.reservation;
 
+import java.util.List;
+import java.util.Map;
+
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentVO;
 
@@ -25,4 +28,8 @@ public interface ReservationService {
 	void updatePaymentStatus(String order_key);
 	
 	int updateReservationStatusById(int reservation_id);
+	
+	List<ReservationListDTO> findReservationListByUserId(int user_id);
+	
+	ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id);
 }

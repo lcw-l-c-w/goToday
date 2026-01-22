@@ -33,8 +33,7 @@
 		FROM content c
 		WHERE 	
 		<include refid="USER_VISIBLE_CONTENT" />
-			AND c.start_at &lt;= NOW()
-			AND c.end_at >= NOW()  
+		AND c.end_at >= NOW()
 		<if test="content_kind != null and content_kind != ''">
             AND c.content_kind = #{content_kind}
         </if>
@@ -355,8 +354,9 @@ SELECT
     c.content_kind		AS content_kind
    
 FROM content c
-WHERE c.content_id = #{content_id};
-
+WHERE 
+	<include refid="USER_VISIBLE_CONTENT" />
+	AND c.content_id = #{content_id}
 	</select>
 	
 	<select id="selectDateByID" parameterType="int" resultType="string">

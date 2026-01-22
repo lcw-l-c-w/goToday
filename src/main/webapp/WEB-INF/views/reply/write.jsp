@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html lang="ko">
 <head> 
@@ -11,16 +12,16 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="/project/css/reset.css"/>
-    <link rel="stylesheet" href="/project/css/contents.css"/>
-    <script src="/project/smarteditor/js/HuskyEZCreator.js"></script>
+    <link rel="stylesheet" href="${ctx}/css/reset.css"/>
+    <link rel="stylesheet" href="${ctx}/css/contents.css"/>
+    <script src="${ctx}/smarteditor/js/HuskyEZCreator.js"></script>
     <script>
     var oEditors = [];
     $(function() {
         nhn.husky.EZCreator.createInIFrame({
             oAppRef: oEditors,
-            elPlaceHolder: "content",
-            sSkinURI: "/project/smarteditor/SmartEditor2Skin.html",    
+            elPlaceHolder: "body",
+            sSkinURI: "${ctx}/smarteditor/SmartEditor2Skin.html",    
             htParams : {
                 bUseToolbar : true,                // 툴바 사용 여부 (true:사용/ false:사용하지 않음)
                 bUseVerticalResizer : true,        // 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
@@ -36,8 +37,8 @@
         });
     })
     function goSave() {
-    	oEditors.getById['content'].exec('UPDATE_CONTENTS_FIELD',[]);
-    	$("#frm").submit();
+    	oEditors[0].exec('UPDATE_CONTENTS_FIELD',[]);
+    	document.getElementById("frm").submit();
     }
     </script>
 </head> 
@@ -45,7 +46,7 @@
     <div class="wrap">
         <div class="sub">
             <div class="size">
-                <h3 class="sub_title">답변 게시판</h3>
+                <h3 class="sub_title">문의사항 작성</h3>
     
                 <div class="bbs">
                 <form method="post" name="frm" id="frm" action="insert.do" enctype="multipart/form-data" >
@@ -60,18 +61,13 @@
                         <tr>
                             <th>내용</th>
                             <td>
-                                <textarea name="content" id="content" style="width:100%;"></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>첨부파일</th>
-                            <td>
-                                <input type="file" name="file" id="file" class="wid100"/>
+                                <textarea name="body" id="body" style="width:100%;"></textarea>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                     <div class="btnSet"  style="text-align:right;">
+	                    <a class="btn" href="index.do" style="background-color: #888 !important; margin-right: 5px;">취소</a>
                         <a class="btn" href="javascript:goSave();">저장 </a>
                     </div>
                     </form>

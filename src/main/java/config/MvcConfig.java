@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -17,15 +18,20 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import util.AdminInterceptor;
+import util.LoginInterceptor;
+import util.VendorInterceptor;
+
 @Configuration
 @MapperScan(annotationClass = Mapper.class, basePackages = "kr.co.gotoday")
-@ComponentScan(basePackages = {"kr.co.gotoday"})
+@ComponentScan(basePackages = {"kr.co.gotoday", "util"})
 @EnableWebMvc
 @EnableTransactionManagement
 public class MvcConfig implements WebMvcConfigurer{
@@ -57,6 +63,13 @@ public class MvcConfig implements WebMvcConfigurer{
 		registry.jsp("/WEB-INF/views/", ".jsp");
 	}
 	
+	// 1. 상단에 변수 추가
+	@Value("${spring.datasource.hikari.maximum-pool-size}")
+	private int maxPoolSize;
+
+	@Value("${spring.datasource.hikari.minimum-idle}")
+	private int minIdle;
+	
 	// hikaricp
 	@Bean
 	@Primary
@@ -66,6 +79,13 @@ public class MvcConfig implements WebMvcConfigurer{
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);
+		
+		// 이 코드들을 추가해야 프로퍼티 설정이 적용
+	    dataSource.setMaximumPoolSize(maxPoolSize); // 3으로 설정됨
+	    dataSource.setMinimumIdle(minIdle);         // 1로 설정됨
+	    dataSource.setIdleTimeout(10000);           // 10초
+	    dataSource.setMaxLifetime(30000);           // 30초v
+	    
 		return dataSource;
 	}
 
@@ -107,6 +127,35 @@ public class MvcConfig implements WebMvcConfigurer{
 		return config;
 	}
 	
+
+	//로그인 인터셉터 설정
+	@Autowired
+	private LoginInterceptor loginInterceptor;
+	@Autowired
+	private VendorInterceptor vendorInterceptor;
+	@Autowired
+	private AdminInterceptor adminInterceptor;
+	
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(loginInterceptor)
+			.addPathPatterns(
+					"/reserve/**",
+					"/payment/**",
+					"/admin/**",
+					"/vendor/**",
+					"/mypage/**"
+			);
+		registry.addInterceptor(vendorInterceptor)
+		.addPathPatterns(
+				"/vendor/**"
+		);
+		
+		 registry.addInterceptor(adminInterceptor)
+	        .addPathPatterns(
+	            "/admin/**"
+	        );
+			
+	}
 	
 }
 

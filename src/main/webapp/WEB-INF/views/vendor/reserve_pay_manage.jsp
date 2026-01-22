@@ -8,243 +8,9 @@
     <meta charset="UTF-8" />
     <title>예약 및 결제 관리</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="${ctx}/css/reserve_pay_manage.css">
     <style>
-        /* 기본 초기화 및 레이아웃 (기존 스타일 유지) */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: #333; }
-
-        .admin-layout { display: flex; min-height: 100vh; }
-
-        /* 사이드바 전체 컨테이너 */
-.sidebar {
-    width: 260px;
-    background-color: #1a1f33; /* 다크 네이비 */
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-}
-
-/* 로고 영역 */
-.sidebar-top {
-     padding: 40px 25px; 
-}
-
-.logo {
-     font-size: 20px; font-weight: 800; color: #5d5dff; 
-}
-
-.subtitle {
-    font-size: 10px; opacity: 0.6; letter-spacing: 1px; margin-top: 5px;
-}
-
-/* 메뉴 영역 */
-.sidebar-menu {
-     flex: 1; padding: 0 15px; 
-}
-
-.sidebar-menu ul {
-    list-style: none;
-}
-
-.sidebar-menu li {
-     margin-bottom: 5px; 
-}
-
-.sidebar-menu li a {
-    display: flex;
-	    align-items: center;
-	    padding: 12px 15px;
-	    color: #8a94ad;
-	    text-decoration: none;
-	    border-radius: 8px;
-	    transition: 0.3s;
-	    font-size: 15px;
-}
-
-/* 마우스 올렸을 때 */
-.sidebar-menu li a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-.title-link {
-    color: inherit;
-    text-decoration: none;
-}
-
-.title-link:hover .title {
-    text-decoration: underline;
-}
-
-/* 활성화된 메뉴 (콘텐츠 관리) */
-.sidebar-menu li.active a {
-     background-color: #4d4dff; color: white; 
-}
-
-.sidebar-menu .icon {
-    margin-right: 12px;
-    font-size: 18px;
-}
-.material-symbols-outlined { margin-right: 12px; font-size: 20px; }
-
-/* 하단 관리자 정보 */
-.sidebar-bottom {
-    padding: 20px;
-}
-
-.admin-info {
-    background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; 
-}
-
-.admin-info .role {
-    font-size: 11px;
-    color: #8a94ad;
-    margin-bottom: 4px;
-}
-
-.admin-info .name {
-     display: block; font-size: 13px; color: #fff; margin-bottom: 3px; 
-}
-        /* 메인 콘텐츠 */
-        .main-content { flex: 1; padding: 40px; background-color: #f8f9fa; }
-        .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .page-title h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-
-        /* 필터 바 개선 */
-.filter-bar { 
-    background: white; 
-    padding: 20px; 
-    border-radius: 12px; 
-    display: flex; 
-    gap: 12px;           /* 요소 사이 간격 살짝 넓힘 */
-    margin-bottom: 25px; 
-    align-items: center; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
-}
-
-/* 모든 입력 필드의 길이를 동일하게 설정 */
-.filter-bar input, 
-.filter-bar select { 
-    flex: 1;            /* 모든 요소가 동일한 비율로 가로 길이를 나눠 가짐 */
-    min-width: 0;       /* flex 박스 내에서 깨짐 방지 */
-    padding: 10px 15px; 
-    border: 1px solid #eee; 
-    border-radius: 8px; 
-    font-size: 14px; 
-    outline: none; 
-    height: 42px;       /* 높이 통일 */
-}
-
-/* 검색창만 다른 필드보다 조금 더 길게 하고 싶다면 (선택 사항) */
-.filter-bar .searchInput { 
-    flex: 2;            /* 검색창은 다른 필터의 2배 길이를 가짐 */
-}
-
-/* 날짜 입력 필드 폰트 보정 */
-input[type="date"] {
-    font-family: inherit;
-    }
-
-        /* 테이블 영역 */
-        .table-wrap { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .user-table { width: 100%; border-collapse: collapse; }
-        .user-table th { text-align: left; padding: 15px; border-bottom: 1px solid #eee; color: #aaa; font-size: 13px; font-weight: 600; }
-        .user-table td { padding: 20px 15px; border-bottom: 1px solid #f8f8f8; font-size: 14px; vertical-align: middle; }
-
-        /* 뱃지 스타일 (이미지 기반 정의) */
-        .badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         
-       /* --- 예약 상태 뱃지 (RESERVE_MAP) --- */
-		/* 예약 확정: 청록색 계열 */
-		.res-confirm { background: #e6fffa; color: #00b5ad; border: 1px solid #b2f5ea; }
-		/* 예약 취소: 붉은색 계열 */
-		.res-cancel { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffccc7; }
-		/* 예약 보류: 주황색 계열 */
-		.res-pending { background: #fff8e6; color: #ffa000; border: 1px solid #ffeeba; }
-		/* 이용 완료: 차분한 회색/네이비 계열 */
-		.res-visited { background: #f0f5ff; color: #597ef7; border: 1px solid #adc6ff; }
-		
-		/* --- 결제 상태 뱃지 (PAY_MAP) --- */
-		/* 결제 완료: 메인 블루 계열 */
-		.pay-complete { background: #eef2ff; color: #4d4dff; border: 1px solid #dadaff; }
-		/* 입금 대기: 베이지/황토색 계열 */
-		.pay-waiting { background: #fafafa; color: #8c8c8c; border: 1px solid #d9d9d9; }
-		/* 결제 실패: 어두운 빨강 계열 */
-		.pay-failed { background: #fff2f0; color: #cf1322; border: 1px solid #ffa39e; }
-		/* 환불 처리: 보라색 계열 */
-		.pay-refund { background: #f9f0ff; color: #722ed1; border: 1px solid #d3adf7; }
-
-        .btn-sm { padding: 6px 12px; border: 1px solid #eee; background: white; border-radius: 6px; cursor: pointer; font-size: 13px; transition: 0.2s; }
-        .btn-sm:hover { background: #f5f5f5; }
-
-        /* 모달 전체 컨테이너 */
-.modal-overlay { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; 
-    z-index: 2000; visibility: hidden; opacity: 0; transition: 0.3s; 
-}
-.modal-overlay.active { visibility: visible; opacity: 1; }
-
-/* 모달 본체 */
-.modal { 
-    background: white; width: 640px; border-radius: 24px; overflow: hidden; 
-    display: flex; flex-direction: column; max-height: 90vh; 
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-
-/* 모달 헤더 */
-.modal-header { 
-    padding: 24px 30px; border-bottom: 1px solid #f0f0f0; 
-    display: flex; justify-content: space-between; align-items: center; 
-}
-.modal-header h3 { font-size: 18px; font-weight: 800; color: #111; }
-.modal-header h3 span { color: #5d5dff; margin-left: 8px; font-size: 15px; }
-
-/* 모달 바디 */
-.modal-body { padding: 30px; overflow-y: auto; background-color: #fff; }
-
-/* 섹션 타이틀 스타일 */
-.detail-group { margin-bottom: 28px; }
-.group-title { 
-    display: flex; align-items: center; gap: 8px; 
-    font-size: 14px; font-weight: 600; margin-bottom: 14px; 
-}
-.icon-blue { color: #5d5dff; }
-.icon-green { color: #059669; }
-.icon-purple { color: #a55eea; }
-
-/* 정보 카드 (회색 박스) */
-.info-card { 
-    background-color: #f8f9fc; border-radius: 16px; padding: 20px; 
-    display: flex; flex-direction: column; gap: 18px;
-}
-.info-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.info-item label { display: block; font-size: 11px; color: #999; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
-.info-item .val { font-size: 14px; color: #333; font-weight: 500; display: flex; align-items: center; gap: 5px; }
-.info-item .val-bold { font-size: 15px; font-weight: 700; color: #111; }
-.info-item .val-price { font-size: 18px; font-weight: 600; color: #059669; }
-
-/* 하단 버튼 영역 */
-.modal-footer { 
-    padding: 20px 30px; background: #fff; border-top: 1px solid #f0f0f0; 
-    display: flex; justify-content: space-between; align-items: center; 
-}
-.footer-btns { display: flex; gap: 10px; }
-
-.btn-action { 
-    background: #4d4dff; color: white; border: none; padding: 12px 20px; 
-    border-radius: 12px; font-weight: 600; cursor: pointer; 
-    display: flex; align-items: center; gap: 8px; font-size: 14px; transition: 0.2s;
-}
-.btn-action:hover { background: #3535ff; transform: translateY(-1px); }
-
-.btn-close { 
-    background: #fff; border: 1px solid #e0e0e0; color: #666; 
-    padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 14px; transition: 0.2s;
-}
-.btn-close:hover { background: #f9f9f9; color: #333; }
-        .empty { padding: 50px; text-align: center; color: #bbb; }
     </style>
 </head>
 <body>
@@ -259,15 +25,28 @@ input[type="date"] {
             <ul>
                 <li><a href="${ctx}/vendor/content_manage"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
                 <li class="active"><a href="#"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
-                <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+                <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
             </ul>
         </nav>
         <div class="sidebar-bottom">
-            <div class="admin-info">
-                <p class="role">Signed in as</p>
-                <strong class="name">${loginSess.name}</strong>
-            </div>
-        </div>
+	    <div class="admin-info">
+	        <p class="role">Signed in as</p>
+	        <div class="name-wrapper"> <strong class="name">
+	                <c:choose>
+	                    <c:when test="${not empty loginSess}">
+	                        ${loginSess.name}
+	                    </c:when>
+	                    <c:otherwise>
+	                        잘못된 접근입니다.
+	                    </c:otherwise>
+	                </c:choose>
+	            </strong>
+	            <a href="${ctx}/main" class="home-icon-btn" title="메인으로 이동">
+	                <span class="material-symbols-outlined">home</span>
+	            </a>
+	        </div>
+	    </div>
+	</div>
     </aside>
 
     <main class="main-content">
@@ -465,7 +244,7 @@ function renderList(list) {
         
         const html = `
         	<tr>
-        	    <td>\${item.reserve_id}</td>
+        	    <td>\${item.reservation_code}</td>
         	    <td style="font-weight:600;">\${item.content_title}</td>
         	    <td>\${item.receiver_name}<br>
         	    <small style="color:#888;">\${formatPhone(item.receiver_phone)}</small>

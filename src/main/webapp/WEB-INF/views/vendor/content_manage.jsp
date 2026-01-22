@@ -8,310 +8,7 @@
     <meta charset="UTF-8" />
     <title>전시 게시물 관리</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-<style>
-/* 기본 초기화 */
-	* { margin: 0; padding: 0; box-sizing: border-box; }
-	body { font-family: 'Pretendard', sans-serif; background-color: #f3f5f9; color: #333; }
-
-
-/* 레이아웃 구성 */
-.admin-layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* 사이드바 전체 컨테이너 */
-.sidebar {
-    width: 260px;
-    background-color: #1a1f33; /* 다크 네이비 */
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-}
-
-/* 로고 영역 */
-.sidebar-top {
-     padding: 40px 25px; 
-}
-
-.logo {
-     font-size: 20px; font-weight: 800; color: #5d5dff; 
-}
-
-.subtitle {
-    font-size: 10px; opacity: 0.6; letter-spacing: 1px; margin-top: 5px;
-}
-
-/* 메뉴 영역 */
-.sidebar-menu {
-     flex: 1; padding: 0 15px; 
-}
-
-.sidebar-menu ul {
-    list-style: none;
-}
-
-.sidebar-menu li {
-     margin-bottom: 5px; 
-}
-
-.sidebar-menu li a {
-    display: flex;
-	    align-items: center;
-	    padding: 12px 15px;
-	    color: #8a94ad;
-	    text-decoration: none;
-	    border-radius: 8px;
-	    transition: 0.3s;
-	    font-size: 15px;
-}
-
-/* 마우스 올렸을 때 */
-.sidebar-menu li a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-.title-link {
-    color: inherit;
-    text-decoration: none;
-}
-
-.title-link:hover .title {
-    text-decoration: underline;
-}
-
-/* 활성화된 메뉴 (콘텐츠 관리) */
-.sidebar-menu li.active a {
-     background-color: #4d4dff; color: white; 
-}
-
-.sidebar-menu .icon {
-    margin-right: 12px;
-    font-size: 18px;
-}
-.material-symbols-outlined { margin-right: 12px; font-size: 20px; }
-
-/* 하단 관리자 정보 */
-.sidebar-bottom {
-    padding: 20px;
-}
-
-.admin-info {
-    background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; 
-}
-
-.admin-info .role {
-    font-size: 11px;
-    color: #8a94ad;
-    margin-bottom: 4px;
-}
-
-.admin-info .name {
-     display: block; font-size: 13px; color: #fff; margin-bottom: 3px; 
-}
-
-/* 메인 콘텐츠 영역 */
-.main-content {
-    flex: 1;
-    padding: 40px;
-    background-color: #f8f9fa;
-}
-
-/* 헤더 영역 */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 30px;
-}
-
-.page-title h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.page-title p {
-    color: #888;
-    font-size: 14px;
-}
-
-.btn-primary {
-    background-color: #4d4dff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-primary:hover {
-    background-color: #3b3bff;
-}
-
-/* 필터 & 검색바 */
-.filter-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    padding: 15px 25px;
-    border-radius: 12px 12px 0 0;
-    border: 1px solid #eee;
-    border-bottom: none;
-}
-.search-box {
-	    display: flex; align-items: center; background: #f5f6f8;
-	    padding: 10px 15px; border-radius: 10px; width: 320px;
-	}
-
-.search-box input {
-    border: none; background: transparent; outline: none;
-	    margin-left: 10px; width: 100%; font-size: 14px;
-}
-
-.filter-btn {
-    background: none;
-    border: none;
-    padding: 8px 16px;
-    margin-left: 5px;
-    color: #888;
-    cursor: pointer;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.filter-btn.active {
-    background-color: #1a1f33;
-    color: #fff;
-}
-
-/* 리스트 섹션 */
-.content-list {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 0 0 12px 12px;
-    overflow: hidden;
-}
-
-/* 리스트 헤더 */
-.list-header {
-    display: flex;
-    padding: 15px 25px;
-    background-color: #fafafa;
-    border-bottom: 1px solid #eee;
-    color: #888;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-/* 리스트 로우(Row) */
-.content-row {
-    display: flex;
-    align-items: center;
-    padding: 20px 25px;
-    border-bottom: 1px solid #f1f1f1;
-    transition: background 0.2s;
-}
-
-.content-row:hover {
-    background-color: #fcfcfc;
-}
-
-/* 컬럼 너비 설정 (flex 비율) */
-.col-info { flex: 4; display: flex; align-items: center; }
-.col-period { flex: 3; color: #666; font-size: 14px; }
-.col-status { flex: 2; text-align: center; }
-.col-manage { flex: 1; text-align: right; }
-
-/* 전시 정보 셀 내부 */
-.thumb {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    margin-right: 15px;
-    background-color: #eee;
-}
-
-.text .title {
-    font-weight: 700;
-    font-size: 16px;
-    margin-bottom: 4px;
-}
-
-.text .location {
-    color: #888;
-    font-size: 13px;
-}
-
-/* 상태 뱃지 스타일 */
-.col-status span, /* 직접 텍스트인 경우 */
-.status-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.STATUS_OPEN { 
-    background: #eef2ff; 
-    color: #4d4dff; 
-    border: 1px solid #dadaff;
-}
-
-.STATUS_REQUESTED { 
-    background: #fff8e6; 
-    color: #ffa000; 
-    border: 1px solid #ffeeba;
-}
-
-.STATUS_REJECTED { 
-    background: #fff1f0; 
-    color: #ff4d4f; 
-    border: 1px solid #ffccc7;
-}
-
-.STATUS_SCHEDULED { 
-    background: #e6fffa; 
-    color: #00b5ad; 
-    border: 1px solid #b2f5ea;
-}
-
-.STATUS_CLOSED { 
-    background: #f5f5f5; 
-    color: #8c8c8c; 
-    border: 1px solid #d9d9d9;
-}
-
-/* 관리하기 링크 버튼 */
-.col-manage a {
-    color: #888;
-    text-decoration: none;
-    font-size: 14px;
-    border: 1px solid #eee;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.col-manage a:hover {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-/* 데이터 없음/로딩중 */
-.empty, .loading {
-    padding: 50px;
-    text-align: center;
-    color: #bbb;
-}
-</style>    
+    <link rel="stylesheet" href="${ctx}/css/vendor_content_manage.css">
 </head>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <body>
@@ -327,27 +24,31 @@
         <ul>
             <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
             <li><a href="${ctx}/vendor/reserve_pay_manage"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
-            <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+            <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
         </ul>
     </nav>
 
-    <div class="sidebar-bottom">
-    <div class="admin-info">
-        <p class="role">Signed in as</p>
-
-        <strong class="name">
-            <c:choose>
-                <c:when test="${not empty loginSess}">
-                    ${loginSess.name}
-                </c:when>
-                <c:otherwise>
-                    잘못된 접근입니다.
-                </c:otherwise>
-            </c:choose>
-        </strong>
-    </div>
-</div>
+	<div class="sidebar-bottom">
+	    <div class="admin-info">
+	        <p class="role">Signed in as</p>
+	        <div class="name-wrapper"> <strong class="name">
+	                <c:choose>
+	                    <c:when test="${not empty loginSess}">
+	                        ${loginSess.name}
+	                    </c:when>
+	                    <c:otherwise>
+	                        잘못된 접근입니다.
+	                    </c:otherwise>
+	                </c:choose>
+	            </strong>
+	            <a href="${ctx}/main" class="home-icon-btn" title="메인으로 이동">
+	                <span class="material-symbols-outlined">home</span>
+	            </a>
+	        </div>
+	    </div>
+	</div>
 </aside>
+
 
     <main class="main-content">
         <div class="page-header">
@@ -446,6 +147,7 @@ function formatDate(dateStr) {
 
 function renderList(list) {
     const $list = $('#contentList');
+    
     $list.empty();
 
     if (list.length === 0) {
