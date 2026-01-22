@@ -95,7 +95,7 @@
         </div>
     </header>
 
-    <main class="main-wrapper">
+   <main class="main-wrapper">
         <section class="main-banner">
             <button class="banner-btn btn-prev" id="slidePrev">&lt;</button>
             <ul id="slideList">
@@ -115,14 +115,28 @@
         <section class="recommend-section">
             <h2 class="section-title">추천 컨텐츠</h2>
             
-            <%-- 수정: random이 아닌 recommand 리스트의 속성을 참조하여 블러 처리 판단 --%>
-            <c:set var="isBlur" value="${not empty recommand and recommand[0].blur and empty loginSess}" />
+            <%-- 통합 로직: 로그인 여부 및 추천 리스트 비어있음 확인 --%>
+            <c:set var="isLoggedIn" value="${not empty loginSess}" />
+            <c:set var="isTagEmpty" value="${empty recommend}" />
+            <c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
 
+            <%-- 블러 조건 충족 시 안내 오버레이 표시 --%>
             <c:if test="${isBlur}">
                 <div class="cta-overlay">
-                    <h3>${recommand[0].ctaMessage}</h3>
-                    <p>취향을 등록하면 당신만을 위한<br>특별한 팝업과 전시를 추천해드려요!</p>
-                    <a href="${pageContext.request.contextPath}${recommand[0].ctaUrl}" class="cta-btn">지금 설정하러 가기</a>
+                    <c:choose>
+                        <%-- 로그인 전일 때 --%>
+                        <c:when test="${!isLoggedIn}">
+                            <h3>로그인이 필요한 서비스입니다</h3>
+                            <p>로그인하시면 당신의 취향에 딱 맞는<br>멋진 전시들을 추천해드려요!</p>
+                            <a href="${pageContext.request.contextPath}/member/login" class="cta-btn">로그인하러 가기</a>
+                        </c:when>
+                        <%-- 로그인 했으나 추천 데이터(관심사)가 없을 때 --%>
+                        <c:when test="${isTagEmpty}">
+                            <h3>관심사 등록 전이신가요?</h3>
+                            <p>관심사를 설정하면 당신만을 위한<br>특별한 맞춤 전시를 추천해드려요!</p>
+                            <a href="${pageContext.request.contextPath}/mypage/interest" class="cta-btn">관심사 설정하기</a>
+                        </c:when>
+                    </c:choose>
                 </div>
             </c:if>
 
@@ -130,17 +144,24 @@
                 <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
                 
                 <div class="recommend-view">
-                    <%-- 수정: items를 random에서 recommand로 변경 --%>
+                    <%-- 조건에 따라 blur-container 클래스 동적 부여 --%>
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
-                        <c:forEach var="item" items="${recommand}">
+                        <c:forEach var="item" items="${recommend}">
                             <article class="content-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
-                                <div class="card-img-wrap"><img src="<c:url value='${item.main_image_path}'/>"></div>
+                                <div class="card-img-wrap">
+                                    <img src="<c:url value='${item.main_image_path}'/>">
+                                </div>
                                 <div class="content-body">
                                     <h4 style="margin-bottom: 5px; font-size: 15px;">${item.title}</h4>
                                     <p style="font-size: 13px; color: #888;">${item.location}</p>
                                 </div>
                             </article>
                         </c:forEach>
+                        
+                        <%-- 데이터가 없을 때 레이아웃 무너짐 방지 --%>
+                        <c:if test="${empty recommend}">
+                            <div style="height:280px; width:100%;"></div>
+                        </c:if>
                     </div>
                 </div>
 
@@ -149,7 +170,7 @@
         </section>
 
         <section>
-            <h2 class="section-title">HOT 컨텐츠</h2>
+            <h2 class="section-title">HOT 콘텐츠</h2>
             <div class="hot-grid-container">
                 <c:if test="${not empty popularList}">
                     <div class="hot-main" onclick="location.href='${pageContext.request.contextPath}/detail/${popularList[0].content_id}'">
@@ -168,7 +189,7 @@
         </section>
 
         <section style="padding-bottom: 100px;">
-            <h2 class="section-title">오픈 예정 컨텐츠</h2>
+            <h2 class="section-title">오픈 예정 콘텐츠</h2>
             <div class="content-list horizontal" style="overflow-x: auto; scrollbar-width: none;">
                 <c:forEach var="item" items="${upcomingList}">
                     <article class="content-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
@@ -225,13 +246,19 @@
 
             // 3. 로그인 체크
             document.getElementById('myPageBtn').onclick = () => {
-                const isLoggedIn = ${not empty loginSess};
-                if (!isLoggedIn) {
+            	
+            	const isLoggedIn = ${not empty loginSess ? true : false};
+            	const userRole = ${not empty loginSess ? loginSess.role : -1};
+            	
+            	if (!isLoggedIn) {
                     alert("로그인이 필요한 서비스입니다.");
                     location.href = "${pageContext.request.contextPath}/member/login";
-                } else {
+                } else if(userRole==0){
                     location.href = "${pageContext.request.contextPath}/mypage/main";
+                }else if(userRole==1){
+                	location.href="${pageContext.request.contextPath}/vendor/content_manage";
                 }
+                else alert("잘못된 접근입니다.");
             };
         });
     </script>

@@ -7,7 +7,7 @@ import util.PageInfo;
 public interface ContentService {
 	//이채원 구현 : 추천 컨텐츠 + 랜덤 컨텐츠 
 	public List<MainContentViewDTO> getRandomContents(MainContentDTO mcd);
-	public List<MainContentViewDTO> getRecommandContents(MainContentDTO mcd) ;
+	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) ;
 	public ContentVO getDetailContents(int content_id, Integer user_id);
 	public List<String> getAvailableDatesByContent(Integer content_id);
 	public List<ContentScheduleVO> getAvailableTimesByContent(Integer content_id, String scheduled_at);

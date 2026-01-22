@@ -85,7 +85,7 @@ public class ReservationServiceImpl implements ReservationService{
 			
 			// 유, 무료에 의해 분기됨
 			if (amount == 0) {
-	            // 🔥 무료 결제 로직
+	            //무료 결제 로직
 	            paymentVO = new PaymentVO();
 	            paymentVO.setOrder_key("FREE_" + UUID.randomUUID());
 	            paymentVO.setAmount_price(0);
@@ -94,7 +94,7 @@ public class ReservationServiceImpl implements ReservationService{
 	            paymentVO.setRefund_status("NONE");
 	            
 	        } else {
-	            // 🔥 유료 결제 로직
+	            //유료 결제 로직
 	            paymentVO = tossPaymentClient.confirmPayment(
 	                paymentKey, orderId, amount
 	            );

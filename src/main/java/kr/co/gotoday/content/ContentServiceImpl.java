@@ -1,5 +1,6 @@
 package kr.co.gotoday.content;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,10 +37,10 @@ public class ContentServiceImpl implements ContentService {
 	}
 
 	@Override
-	public List<MainContentViewDTO> getRecommandContents(MainContentDTO mcd) {
+	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
 		// TODO Auto-generated method stub
 		List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
-
+		//System.out.println("리스트 출력"+list);
 		return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());
 	}
 
@@ -51,12 +52,36 @@ public class ContentServiceImpl implements ContentService {
 		if (vo == null) {
 			return null;
 		}
+		return updateContentStatus(vo);
 
-		System.out.println("db 조회결과 vo=" + vo);
-
-		return vo;
 	}
 
+	//시간 비교
+	
+	public ContentVO updateContentStatus(ContentVO vo) {
+		
+		LocalDate today = LocalDate.now();
+		
+	
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    LocalDate startDateTime = LocalDate.parse(vo.getStart_at().substring(0, 10));
+	    LocalDate endDateTime= LocalDate.parse(vo.getEnd_at().substring(0,10));
+	 // !start.isAfter(today) 는 (오늘 >= 시작일) 과 같습니다.
+	    if(!startDateTime.isAfter(today) && !endDateTime.isBefore(today)) {
+	    	//진행형이면
+	    	vo.setContent_status_current("STATUS_OPEN");
+	    }
+	    else if(startDateTime.isAfter(today)) {
+	    	//이후에 시작이면
+	    	vo.setContent_status_current("STATUS_SCHEDULED");
+	    }
+	    else if(endDateTime.isBefore(today)) {
+	    	//끝났으면
+	    	vo.setContent_status_current("STATUS_CLOSED");
+	    }
+		return vo;
+	}
+	
 	// 핵심 메서드
 	private MainContentViewDTO applyViewPolicy(ContentVO vo, MainContentDTO mcd) {
 	    MainContentViewDTO mcv = new MainContentViewDTO(vo);

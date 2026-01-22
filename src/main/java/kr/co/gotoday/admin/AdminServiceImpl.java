@@ -79,7 +79,7 @@ public class AdminServiceImpl implements AdminService {
 	
 	@Override
 	public int updateRequest(int content_id) {
-		return adminMapper.updateContentStatus(content_id, "STATUS_SCHEDULED");
+		return adminMapper.updateContentStatus(content_id, "STATUS_APPROVAL");
 
 	}
 	

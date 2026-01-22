@@ -25,15 +25,28 @@
             <ul>
                 <li><a href="${ctx}/vendor/content_manage"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
                 <li class="active"><a href="#"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
-                <li><a href="${ctx}/reply/index"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+                <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
             </ul>
         </nav>
         <div class="sidebar-bottom">
-            <div class="admin-info">
-                <p class="role">Signed in as</p>
-                <strong class="name">${loginSess.name}</strong>
-            </div>
-        </div>
+	    <div class="admin-info">
+	        <p class="role">Signed in as</p>
+	        <div class="name-wrapper"> <strong class="name">
+	                <c:choose>
+	                    <c:when test="${not empty loginSess}">
+	                        ${loginSess.name}
+	                    </c:when>
+	                    <c:otherwise>
+	                        잘못된 접근입니다.
+	                    </c:otherwise>
+	                </c:choose>
+	            </strong>
+	            <a href="${ctx}/main" class="home-icon-btn" title="메인으로 이동">
+	                <span class="material-symbols-outlined">home</span>
+	            </a>
+	        </div>
+	    </div>
+	</div>
     </aside>
 
     <main class="main-content">
@@ -231,7 +244,7 @@ function renderList(list) {
         
         const html = `
         	<tr>
-        	    <td>\${item.reserve_id}</td>
+        	    <td>\${item.reservation_code}</td>
         	    <td style="font-weight:600;">\${item.content_title}</td>
         	    <td>\${item.receiver_name}<br>
         	    <small style="color:#888;">\${formatPhone(item.receiver_phone)}</small>

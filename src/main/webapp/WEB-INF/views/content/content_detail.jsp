@@ -1,23 +1,29 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8" />
 <title>GoToday | ${content.title}</title>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<script
+	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
 <style>
-/* 1. 기본 스타일 정의 - 변수 선언 오타 수정 */
-:root {
-	--main-color: #4dc3ff;
-	--border-color: #eee;
+/* 1. 기본 스타일 정의 */
+:root { 
+	--main-color: #4dc3ff; 
+	--border-color: #eee; 
 	--text-gray: #666;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
 
 body {
 	font-family: 'Pretendard', sans-serif;
@@ -27,7 +33,10 @@ body {
 	line-height: 1.5;
 }
 
-a { text-decoration: none; color: inherit; }
+a {
+	text-decoration: none;
+	color: inherit;
+}
 
 /* 2. 네비게이션 바 스타일 */
 .header {
@@ -49,7 +58,11 @@ a { text-decoration: none; color: inherit; }
 	height: 70px;
 }
 
-.logo img { height: 32px; cursor: pointer; display: block; }
+.logo img {
+	height: 32px;
+	cursor: pointer;
+	display: block;
+}
 
 .nav-menu {
 	display: flex;
@@ -59,34 +72,28 @@ a { text-decoration: none; color: inherit; }
 	height: 100%;
 }
 
-.nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
+.nav-menu li {
+	position: relative;
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
 
 .nav-menu a {
 	font-weight: 600;
 	font-size: 15px;
 	transition: color 0.3s ease;
-	height: 100%;
+}
+
+.nav-menu li:hover a {
+	color: var(- -main-color);
+}
+
+.nav-icons {
 	display: flex;
+	gap: 20px;
 	align-items: center;
-	padding: 0 5px;
 }
-
-.nav-menu li:hover a { color: var(--main-color); }
-
-.nav-menu li::after {
-	content: "";
-	position: absolute;
-	bottom: -1px;
-	left: 0;
-	width: 0;
-	height: 3px;
-	background-color: var(--main-color);
-	transition: width 0.3s ease;
-}
-
-.nav-menu li:hover::after { width: 100%; }
-
-.nav-icons { display: flex; gap: 20px; align-items: center; }
 
 .search-bar {
 	border-bottom: 1px solid #333;
@@ -95,18 +102,29 @@ a { text-decoration: none; color: inherit; }
 	padding: 2px 5px;
 }
 
-.search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
+.search-bar input {
+	border: none;
+	outline: none;
+	width: 150px;
+	font-size: 14px;
+}
 
-.user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
+.user-icon {
+	font-size: 22px;
+	cursor: pointer;
+	transition: color 0.2s;
+}
 
-.user-icon:hover { color: var(--main-color); }
+.user-icon:hover {
+	color: var(- -main-color);
+}
 
 /* 3. 레이아웃 및 본문 */
-.container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-
-.breadcrumb { font-size: 13px; color: var(--text-gray); margin-bottom: 10px; }
-
-.breadcrumb span { color: var(--main-color); font-weight: 600; }
+.container {
+	max-width: 1100px;
+	margin: 40px auto;
+	padding: 0 20px;
+}
 
 .content-title-area {
 	display: flex;
@@ -117,18 +135,38 @@ a { text-decoration: none; color: inherit; }
 	margin-bottom: 30px;
 }
 
-.content-title-area h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
+.content-title-area h1 {
+	margin: 0;
+	font-size: 28px;
+	letter-spacing: -1px;
+}
 
-.sns-group { display: flex; gap: 10px; }
+.sns-group {
+	display: flex;
+	gap: 10px;
+}
 
-.sns-group img { width: 22px; cursor: pointer; opacity: 0.7; transition: 0.2s; }
+.sns-group img {
+	width: 22px;
+	cursor: pointer;
+	opacity: 0.7;
+	transition: 0.2s;
+}
 
-.sns-group img:hover { opacity: 1; }
+.main-box {
+	display: flex;
+	gap: 50px;
+	align-items: flex-start;
+	margin-bottom: 60px;
+}
 
-.main-box { display: flex; gap: 50px; align-items: flex-start; margin-bottom: 60px; }
-
-/* 4. 포스터 사이드 (왼쪽 정렬 유지) */
-.poster-side { flex: 0 0 350px; display: flex; flex-direction: column; align-items: flex-start; }
+/* 4. 포스터 사이드 */
+.poster-side {
+	flex: 0 0 350px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
 
 .poster-img {
 	width: 100%;
@@ -138,69 +176,96 @@ a { text-decoration: none; color: inherit; }
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* 좋아요 버튼 커스텀 */
 .poster-like-btn {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	margin-top: 15px;
-	padding: 8px 18px;
+	padding: 8px 25px;
 	background: #fff;
 	border: 1.5px solid #eee;
 	border-radius: 50px;
 	cursor: pointer;
-	transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	transition: all 0.3s;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-	font-size: 18px;
-	font-weight: bold;
-	color: #444;
 }
 
 .poster-like-btn:hover {
-	transform: translateY(-3px);
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-	border-color: var(--main-color);
+	transform: translateY(-2px);
+	border-color: var(- -main-color);
 }
 
 .poster-like-btn.active-liked {
 	background: #f0faff;
-	border-color: var(--main-color);
+	border-color: var(- -main-color);
 }
 
-.heart-icon { font-size: 22px; transition: transform 0.3s ease; }
-
-.like-count-num { font-size: 16px; font-weight: 700; color: #444; }
-
 /* 5. 정보 및 예매 섹션 */
-.info-side { flex: 1; }
+.info-side {
+	flex: 1;
+}
 
-.info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+.info-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 30px;
+}
 
 .info-table th {
 	text-align: left;
 	width: 100px;
 	padding: 12px 0;
 	color: #333;
-	font-size: 15px;
-	vertical-align: top;
 	border-bottom: 1px solid #f5f5f5;
 }
 
-.info-table td { padding: 12px 0; font-size: 15px; color: #555; line-height: 1.6; border-bottom: 1px solid #f5f5f5; }
+.info-table td {
+	padding: 12px 0;
+	font-size: 15px;
+	color: #555;
+	border-bottom: 1px solid #f5f5f5;
+}
 
-.reserve-section { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 30px; }
+.reserve-section {
+	display: flex;
+	gap: 20px;
+	border-top: 1px solid var(- -border-color);
+	padding-top: 30px;
+}
 
-#calendar { flex: 1.2; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; font-size: 12px; }
+#calendar {
+	flex: 1.2;
+	border: 1px solid var(- -border-color);
+	border-radius: 10px;
+	padding: 10px;
+	font-size: 12px;
+}
 
-.time-selector { flex: 1; border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; background: #fafafa; }
+.time-selector {
+	flex: 1;
+	border: 1px solid var(- -border-color);
+	border-radius: 10px;
+	padding: 15px;
+	background: #fafafa;
+}
 
-.time-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; display: block; }
+.time-option {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	background: #fff;
+	border: 1px solid var(- -border-color);
+	border-radius: 6px;
+	margin-bottom: 8px;
+	cursor: pointer;
+}
 
-.time-option { display: flex; align-items: center; padding: 10px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
+.action-btns {
+	display: flex;
+	gap: 10px;
+	margin-top: 25px;
+}
 
-.action-btns { display: flex; gap: 10px; margin-top: 25px; align-items: stretch; }
-
-/* 예매 버튼 스타일 복구 */
 .btn-reserve {
 	flex: 2;
 	background-color: var(--main-color);
@@ -214,21 +279,59 @@ a { text-decoration: none; color: inherit; }
 	transition: background 0.2s;
 }
 
-.btn-reserve:hover { background-color: #37b0f0; }
+.btn-reserve:hover {
+	background-color: #37b0f0;
+}
 
-.btn-save-cal { flex: 1; background: #f8f9fa; border: 1px solid #ddd; color: #444; padding: 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+.btn-save-cal {
+	flex: 1;
+	background: #f8f9fa;
+	border: 1px solid #ddd;
+	padding: 16px;
+	border-radius: 6px;
+	cursor: pointer;
+}
 
 /* 6. 탭 메뉴 */
-.tab-wrapper { margin-top: 50px; }
-.tab-menu { display: flex; list-style: none; border-bottom: 2px solid var(--border-color); margin-bottom: 30px; }
-.tab-item { flex: 1; padding: 18px 0; cursor: pointer; font-weight: bold; color: #999; text-align: center; transition: 0.3s; }
-.tab-item.active { color: #333; border-bottom: 3px solid var(--main-color); }
-.tab-panel { display: none; padding: 20px 0; }
-.tab-panel.active { display: block; }
-.detail-content { line-height: 1.8; color: #444; font-size: 16px; }
-.detail-img { width: 100%; border-radius: 8px; margin-top: 20px; }
+.tab-wrapper {
+	margin-top: 50px;
+}
 
-/* 리뷰 스타일 생략... */
+.tab-menu {
+	display: flex;
+	list-style: none;
+	border-bottom: 2px solid var(- -border-color);
+	margin-bottom: 30px;
+}
+
+.tab-item {
+	flex: 1;
+	padding: 18px 0;
+	cursor: pointer;
+	font-weight: bold;
+	color: #999;
+	text-align: center;
+}
+
+.tab-item.active {
+	color: #333;
+	border-bottom: 3px solid var(- -main-color);
+}
+
+.tab-panel {
+	display: none;
+	padding: 20px 0;
+}
+
+.tab-panel.active {
+	display: block;
+}
+
+.detail-img {
+	width: 100%;
+	border-radius: 8px;
+	margin-top: 20px;
+}
 </style>
 
 <script>
@@ -241,20 +344,47 @@ $(function() {
     $(".tab-item").click(function() {
         $(".tab-item").removeClass("active");
         $(this).addClass("active");
-        $(".tab-panel").removeClass("active").eq($(this).index()).addClass("active");
+        $(".tab-panel").hide().eq($(this).index()).show();
     });
 
     // 달력 로드
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
+    	
+    	// 1. JSP 변수에서 시작일과 종료일 가져오기 (문자열 자르기 포함)
+        const startDate = "${content.start_at}".substring(0, 10);
+        const endDate = "${content.end_at}".substring(0, 10);
+     // 2. 종료일 포함(inclusive)을 위해 하루 더하기
+        // JS의 Date 객체는 현재 지역 시간을 기준으로 하므로 시간 오차를 방지하기 위해 
+        // 단순 날짜 더하기 로직을 사용합니다.
+        let endDateObj = new Date(endDate);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        
+        
+     // yyyy-mm-dd 형식으로 변환
+        let finalEndDate = endDateObj.toISOString().substring(0, 10);
+     
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth', 
-            locale: 'ko', 
+            initialView: 'dayGridMonth',
+            locale: 'ko',
             height: 'auto',
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+       
+         // 3. 전시 기간 배경색 입히기 (핑크색)
+            events: [
+                {
+                    start: startDate,
+                    end: finalEndDate,
+                    display: 'background',
+                    backgroundColor: '#ffe3ee', // 연한 핑크색
+                    allDay: true
+                }
+            ],
             dateClick: function(info) {
-                $(".fc-daygrid-day").css("background", ""); 
-                $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
+            	// 모든 날짜 클릭 가능
+                $(".fc-daygrid-day").css("background", ""); // 이전 선택 초기화
+                $(info.dayEl).css("background", "rgba(77, 195, 255, 0.3)"); // 클릭한 날짜 강조
+                
                 selectedDate = info.dateStr;
                 fetchTimes(selectedDate);
             }
@@ -262,7 +392,7 @@ $(function() {
         calendar.render();
     }
 
-    // 시간 조회 AJAX
+    // 시간 조회
     function fetchTimes(date) {
         $.ajax({
             url: "${pageContext.request.contextPath}/schedule/time",
@@ -282,60 +412,139 @@ $(function() {
                     });
                 }
                 $(".reservation_timezone").html(html);
+                selectedTime = null;
+                scheduleId = null;
             }
         });
     }
 
-    // 시간 선택
     $(document).on("change", "input[name='sch_radio']", function() {
         selectedTime = $(this).data("time");
         scheduleId = $(this).data("id");
     });
+	
+    //추가-의선 캘박 
+    $(".btn-save-cal").click(function() {
+        // 1. 변수에 값이 있는지 확인
+        if(!selectedDate || !selectedTime) {
+            alert("관람하실 날짜와 시간을 먼저 선택해주세요.");
+            return;
+        }
 
-    // 좋아요 토글 AJAX
+        const contentId = $("#content_id").val();
+        
+        // 2. 캘린더 패키지로 데이터 전송 (AJAX)
+        $.ajax({
+            url: "${pageContext.request.contextPath}/calendar/add", // 새로 만들 컨트롤러 주소
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                "contentId": contentId,
+                "date": selectedDate,  // 변수에 저장된 날짜 (예: 2026-01-20)
+                "time": selectedTime   // 변수에 저장된 시간 (예: 14:00)
+            }),
+            success: function(res) {
+                if (res.success) {
+                    alert("📅 " + res.msg); // "나의 캘린더에 저장되었습니다!"
+                } else {
+                    alert(res.msg); // "로그인이 필요합니다." 등
+                    if (res.msg.includes("로그인")) {
+                        location.href = "${pageContext.request.contextPath}/member/login";
+                    }
+                }
+            },
+            error: function() {
+                alert("서버 통신 중 오류가 발생했습니다.");
+            }
+        });
+    });
+    
+    // 예매하기
+    $(".btn-reserve").click(function() {
+        if(!selectedDate || !selectedTime || !scheduleId) {
+            alert("날짜와 시간을 선택해주세요.");
+            return;
+        }
+        $.post("${pageContext.request.contextPath}/reserve/schedule.do", {
+            content_id: $("#content_id").val(),
+            reserved_for_at: selectedDate,
+            time_zone: selectedTime,
+            schedule_id: scheduleId
+        }).done(function(){
+            location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+        }).fail(function(){
+            alert("예약 요청 중 오류가 발생했습니다.");
+        });
+    });
+
+    // 좋아요 토글 - 깨짐 방지를 위해 코드로 변경
     $("#likeBtn").click(function() {
         const heart = $(this).find(".heart-icon");
         const count = $(this).find(".like-count-num");
-        let content_id = heart.data("content-id");
+        const content_id = heart.data("content-id");
 
         $.ajax({
             url: "${pageContext.request.contextPath}/heart",
             type: "POST",
-            contentType:'application/json',
-            data: JSON.stringify({ content_id: content_id }), 
+            contentType: 'application/json',
+            data: JSON.stringify({ content_id: content_id }),
             success: function(res) {
                 if (!res) {
                     alert("로그인이 필요한 서비스입니다.");
                     location.href = "${pageContext.request.contextPath}/member/login";
                     return;
                 }
-                
+                // JavaScript에서도 코드로 변경
                 if (res.liked == 1) {
-                    heart.html("&#x1F499;"); // 💙
+                    heart.html("&#x1F499;"); // 파란 하트
                     $("#likeBtn").addClass("active-liked");
                 } else {
-                    heart.html("&#x1F90D;"); // 🤍
+                    heart.html("&#x1F90D;"); // 흰 하트
                     $("#likeBtn").removeClass("active-liked");
                 }
                 count.text(res.count_num);
             },
-            error: function() {
-                alert("처리 중 오류가 발생했습니다.");
-            }
+            error: function() { alert("오류가 발생했습니다."); }
         });
     });
 
+    //예약 처리 여부 -> 만약 상태가 종료이면 reservation-div를 hidden처리
+   $(document).ready(function() {
+    // 1. data-status 값을 가져옴
+    const contentStatus = $("#confirmStatus").data("status");
+    
+    // 2. 상태가 "STATUS_CLOSED" (또는 "종료") 인지 확인
+    // 서비스단에서 저장한 정확한 문자열 값과 비교해야 합니다.
+    if(contentStatus === "STATUS_CLOSED" || contentStatus === "종료") {
+    	$(".reservation-div").html(`
+    	        <div style="background: #f8f9fa; padding: 40px; text-align: center; border-radius: 10px; border: 1px dashed #ccc;">
+    	            <p style="font-size: 18px; font-weight: bold; color: #999;">🔒 관람이 종료된 콘텐츠입니다.</p>
+    	            <p style="font-size: 14px; color: #bbb; margin-top: 10px;">다음에 더 좋은 전시로 찾아뵙겠습니다.</p>
+    	        </div>
+    	    `);
+    }
+});
+    
     // 마이페이지 로그인 체크
     $("#myPageBtn").click(function() {
         const isLoggedIn = ${not empty loginSess};
-        if (!isLoggedIn) {
+    	const userRole = ${not empty loginSess ? loginSess.role : -1};
+    	
+    	if (!isLoggedIn) {
             alert("로그인이 필요한 서비스입니다.");
             location.href = "${pageContext.request.contextPath}/member/login";
-        } else {
-            location.href = "${pageContext.request.contextPath}/member/mypage";
+        } else if(userRole==0){
+            location.href = "${pageContext.request.contextPath}/mypage/main";
+        }else if(userRole==1){
+        	location.href="${pageContext.request.contextPath}/vendor/content_manage";
         }
+        else alert("잘못된 접근입니다.");
     });
 });
+
+
+
+
 </script>
 </head>
 <body>
@@ -343,9 +552,9 @@ $(function() {
 	<header class="header">
 		<div class="nav-container">
 			<div class="logo">
-				<a href="${pageContext.request.contextPath}/main"> 
-                    <img src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
-                </a>
+				<a href="${pageContext.request.contextPath}/main"> <img
+					src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
+				</a>
 			</div>
 			<ul class="nav-menu">
 				<li><a href="#">Q&A</a></li>
@@ -354,7 +563,7 @@ $(function() {
 			</ul>
 			<div class="nav-icons">
 				<div class="search-bar">
-					<input type="text" placeholder="검색"><span>🔍</span>
+					<input type="text" placeholder="검색"> <span>🔍</span>
 				</div>
 				<span class="user-icon" id="myPageBtn">👤</span>
 			</div>
@@ -369,46 +578,67 @@ $(function() {
 		<div class="content-title-area">
 			<div>
 				<h1>${content.title}</h1>
-				<p style="margin-top: 8px; color: var(--text-gray);">
-					${content.start_at} ~ ${content.end_at} &nbsp;|&nbsp; ${content.location} 📍
-                </p>
+				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at}
+					~ ${content.end_at} | ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">
-				<img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X">
-                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
-                <img src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png" alt="Link">
+				<img src="https://cdn-icons-png.flaticon.com/512/733/733579.png"
+					alt="X" style="width: 22px; margin-left: 10px;"> <img
+					src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
+					alt="IG" style="width: 22px; margin-left: 10px;"> <img
+					src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png"
+					alt="Link" style="width: 22px; margin-left: 10px;">
 			</div>
 		</div>
 
 		<div class="main-box">
 			<section class="poster-side">
-				<img class="poster-img" src="${pageContext.request.contextPath}${content.main_image_path}" alt="포스터">
-				
-                <button type="button" class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}" id="likeBtn">
+				<img class="poster-img"
+					src="${pageContext.request.contextPath}${content.main_image_path}"
+					alt="포스터">
+				<button type="button"
+					class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}"
+					id="likeBtn">
 					<span class="heart-icon" data-content-id="${content.content_id}">
 						<c:choose>
 							<c:when test="${content.liked == 1}">&#x1F499;</c:when>
 							<c:otherwise>&#x1F90D;</c:otherwise>
 						</c:choose>
-					</span> 
-                    <span class="like-count-num">${content.like_count}</span>
+					</span> <span class="like-count-num">${content.like_count}</span>
 				</button>
 			</section>
 
 			<section class="info-side">
 				<table class="info-table">
-					<tr><th>소개</th><td>${content.description}</td></tr>
-					<tr><th>관람료</th><td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원</td></tr>
-					<tr><th>운영시간</th><td>${content.content_time}</td></tr>
-					<tr><th>수령방법</th><td>${content.reservationTypeLabel}</td></tr>
+					<tr>
+						<th>소개</th>
+						<td>${content.description}</td>
+					</tr>
+					<tr>
+						<th>관람료</th>
+						<td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원</td>
+					</tr>
+					<tr>
+						<th>운영시간</th>
+						<td>${content.content_time}</td>
+					</tr>
+					<tr>
+						<th>수령방법</th>
+						<td>${content.reservationTypeLabel}</td>
+					</tr>
+					<tr>
+						<th>상태</th>
+						<td id="confirmStatus" data-status="${content.contentStatusCurrent}">${content.contentStatusCurrent}</td>
+					</tr>
 				</table>
-
+				<div class="reservation-div">
 				<div class="reserve-section">
 					<div id="calendar"></div>
 					<div class="time-selector">
 						<div class="reservation_timezone">
 							<span class="time-title">시간대 선택</span>
-							<p style="font-size: 12px; color: #999; margin-top: 20px;">먼저 달력에서 날짜를 선택해주세요.</p>
+							<p style="font-size: 12px; color: #999; margin-top: 20px;">먼저
+								달력에서 날짜를 선택해주세요.</p>
 						</div>
 					</div>
 				</div>
@@ -416,7 +646,8 @@ $(function() {
 				<div class="action-btns">
 					<input type="hidden" id="content_id" value="${content.content_id}">
 					<button class="btn-reserve">예매하기</button>
-					<button class="btn-save-cal">캘린더 저장하기</button>
+					<button class="btn-save-cal">캘린더 저장</button>
+				</div>
 				</div>
 			</section>
 		</div>
@@ -431,11 +662,13 @@ $(function() {
 			<div class="tab-content">
 				<section class="tab-panel active">
 					<div class="detail-content">${content.detail_description}</div>
-					<c:if test="${not empty content.main_image_path}">
-						<img src="${pageContext.request.contextPath}${content.main_image_path}" class="detail-img" alt="상세이미지">
-					</c:if>
+					<img
+						src="${pageContext.request.contextPath}${content.main_image_path}"
+						class="detail-img">
 				</section>
-                </div>
+				<section class="tab-panel">리뷰 목록이 여기에 표시됩니다.</section>
+				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
+			</div>
 		</div>
 	</div>
 </body>

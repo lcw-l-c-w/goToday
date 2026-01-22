@@ -16,8 +16,24 @@
 
 	<delete id="deleteCalendar">
 		DELETE FROM calendar
-		WHERE calendar_id = #{calendar_id}
+		WHERE calendar_id =
+		#{calendar_id}
 		AND user_id = #{user_id}
 	</delete>
+
+	<select id="getCalendarList" parameterType="int"
+		resultType="kr.co.gotoday.calendar.CalendarDTO">
+		SELECT
+		c.title AS title,
+		LEFT(k.selected_at, 10) AS start,
+
+		CASE
+		WHEN k.type = 'reserve' THEN '#4dc3ff' WHEN k.type = 'PICK' THEN '#ff9f89'
+		ELSE '#cccccc' END AS color
+
+		FROM calendar k
+		JOIN content c ON k.content_id = c.content_id
+		WHERE k.user_id = #{userId}
+	</select>
 
 </mapper>
