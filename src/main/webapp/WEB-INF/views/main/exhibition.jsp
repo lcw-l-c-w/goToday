@@ -13,23 +13,7 @@
         body { font-family: 'Pretendard', sans-serif; overflow-x: hidden; background-color: #fff; }
         a { text-decoration: none; color: inherit; }
         
-        .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
-        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
-        .logo img { height: 32px; cursor: pointer; display: block; }
-        .nav-menu { display: flex; gap: 35px; height: 100%; list-style: none; align-items: center; }
-        .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
-        .nav-menu a { font-weight: 600; font-size: 15px; color: #333; transition: color 0.3s ease; height: 100%; display: flex; align-items: center; padding: 0 5px; }
-        .nav-menu li:hover a { color: var(--main-color); }
-        .nav-menu li::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 3px; background-color: var(--main-color); transition: width 0.3s ease; z-index: 5; }
-        .nav-menu li:hover::after { width: 100%; }
-        
-        .nav-icons { display: flex; gap: 20px; align-items: center; }
-        .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
-        .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
-        .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
-        .user-icon:hover { color: var(--main-color); }
 
-        .main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
         /* 2. 입체 캐러셀 배너 스타일 */
         .exhibit-banner-section { 
@@ -110,23 +94,8 @@
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <div class="nav-container">
-            <div class="logo">
-                <a href="${pageContext.request.contextPath}/main"><img src="<c:url value='/resources/images/logo.png'/>" alt="Logo"></a>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#">Q&A</a></li>
-                <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-                <li><a href="${pageContext.request.contextPath}/exhibition" style="color: var(--main-color);">Exhibition</a></li>
-            </ul>
-            <div class="nav-icons">
-                <div class="search-bar"><input type="text" placeholder="검색"><span>🔍</span></div>
-                <span class="user-icon" id="myPageBtn" style="cursor:pointer;">👤</span>
-            </div>
-        </div>
-    </header>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
     <main class="main-wrapper">
         <section class="exhibit-banner-section">
@@ -153,7 +122,7 @@
         <section class="recommend-section">
             <%-- 컨트롤러 세션명 loginSess와 일치시킴 --%>
             <c:set var="isLoggedIn" value="${not empty loginSess}" />
-            <c:set var="isTagEmpty" value="${not empty recommand and recommand[0].blur}" />
+            <c:set var="isTagEmpty" value="${ empty recommend }" />
             <c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
 
             <c:if test="${isBlur}">
@@ -177,7 +146,7 @@
                 <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
                 <div class="recommend-view">
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
-                        <c:forEach var="item" items="${recommand}">
+                        <c:forEach var="item" items="${recommend}">
                             <article class="content-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
                                 <div class="card-img-wrap"><img src="<c:url value='${item.main_image_path}'/>"></div>
                                 <div class="content-body">
@@ -186,7 +155,7 @@
                                 </div>
                             </article>
                         </c:forEach>
-                        <c:if test="${empty recommand}">
+                        <c:if test="${empty recommend}">
                             <div style="height:280px; width:100%;"></div>
                         </c:if>
                     </div>
@@ -292,13 +261,21 @@
             }
 
             // --- 3. 로그인 체크 (마이페이지 버튼) ---
-            const myBtn = document.getElementById('myPageBtn');
-            if(myBtn) {
-                myBtn.onclick = () => {
-                    const isLoggedIn = ${not empty loginSess};
-                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
-                };
-            }
+      document.getElementById('myPageBtn').onclick = () => {
+            	
+            	const isLoggedIn = ${not empty loginSess ? true : false};
+            	const userRole = ${not empty loginSess ? loginSess.role : -1};
+            	
+            	if (!isLoggedIn) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    location.href = "${pageContext.request.contextPath}/member/login";
+                } else if(userRole==0){
+                    location.href = "${pageContext.request.contextPath}/mypage/main";
+                }else if(userRole==1){
+                	location.href="${pageContext.request.contextPath}/vendor/content_manage";
+                }
+                else alert("잘못된 접근입니다.");
+            };
         });
     </script>
 </body>

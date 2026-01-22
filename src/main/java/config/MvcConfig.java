@@ -25,7 +25,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import util.AdminInterceptor;
 import util.LoginInterceptor;
+import util.VendorInterceptor;
 
 @Configuration
 @MapperScan(annotationClass = Mapper.class, basePackages = "kr.co.gotoday")
@@ -50,7 +52,7 @@ public class MvcConfig implements WebMvcConfigurer{
     private String kakaoRestApiKey;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
-    
+	
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
@@ -86,6 +88,8 @@ public class MvcConfig implements WebMvcConfigurer{
 	    
 		return dataSource;
 	}
+
+	
 	// mybatis
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception{
@@ -127,6 +131,10 @@ public class MvcConfig implements WebMvcConfigurer{
 	//로그인 인터셉터 설정
 	@Autowired
 	private LoginInterceptor loginInterceptor;
+	@Autowired
+	private VendorInterceptor vendorInterceptor;
+	@Autowired
+	private AdminInterceptor adminInterceptor;
 	
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(loginInterceptor)
@@ -137,6 +145,15 @@ public class MvcConfig implements WebMvcConfigurer{
 					"/vendor/**",
 					"/mypage/**"
 			);
+		registry.addInterceptor(vendorInterceptor)
+		.addPathPatterns(
+				"/vendor/**"
+		);
+		
+		 registry.addInterceptor(adminInterceptor)
+	        .addPathPatterns(
+	            "/admin/**"
+	        );
 			
 	}
 	

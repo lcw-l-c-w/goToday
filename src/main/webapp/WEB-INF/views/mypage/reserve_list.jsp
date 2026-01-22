@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
@@ -6,7 +7,6 @@
 <meta charset="UTF-8">
 <title>예약 관리 | GoToday</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -155,6 +155,23 @@ body {
     color: #fff;
     border-color: #4dc3ff;
 }
+
+.cancel-btn {
+	padding: 10px 24px;
+	border: 1px solid #ff4444; /* 빨간 테두리 */
+	background: white;
+	color: #ff4444;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+	background: #ff4444;
+	color: white;
+}
 </style>
 </head>
 
@@ -162,114 +179,146 @@ body {
 <div class="container">
     <h1 class="page-title">예약 관리</h1>
 
-    <!-- ================= 페이징 계산 ================= -->
-    <c:set var="page" value="${empty param.page ? 1 : param.page}" />
-    <c:set var="page" value="${page + 0}" />
+	<div class="list-wrapper">
+		<c:choose>
+		<c:when test="${empty reservationList}">
+			<div class="empty-box">예약 내역이 없습니다.</div>
+		</c:when>
+		<c:otherwise>
+			    <c:forEach var="r" items="${reservationList}">
+					<div class="reserve-item">
 
-    <c:set var="contentPerPage" value="4" />
-    <c:set var="pageBtnCount" value="5" />
+						<div class="reserve-info">
+							<div class="reserve-code">${r.reservation_code}</div>
 
-    <c:set var="totalPage"
-           value="${(totalCount + contentPerPage - 1) / contentPerPage}" />
+							<div class="title-line">
+								<span class="badge">${r.dday}</span>
+								<span class="title">${r.title}</span>
+							</div>
 
-    <c:set var="startPage" value="${page}" />
-    <c:set var="endPage" value="${page + pageBtnCount - 1}" />
+							<div class="state-line">
+								<c:choose>
+									<c:when test="${r.reservation_status eq 'DONE'}">
+										<span class="state done">예약 완료</span>
+									</c:when>
+									<c:when test="${r.reservation_status eq 'CANCELED'}">
+										<span class="state canceled">예약 취소</span>
+									</c:when>
+									<c:when test="${r.reservation_status eq 'VISITED'}">
+										<span class="state visited">이용 완료</span>
+									</c:when>
+								</c:choose>
 
-    <c:if test="${endPage > totalPage}">
-        <c:set var="endPage" value="${totalPage}" />
-    </c:if>
+								<c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
+									<span class="payment waiting">입금대기</span>
+								</c:if>
+								
+								<span class="datetime">| ${r.reserved_for_at} ${r.time_zone}</span>
+							</div>
 
-    <!-- ================= 리스트 ================= -->
-    <c:forEach var="r" items="${reservationList}">
-        <div class="reserve-item">
+							<div class="btn-group">
+								<button class="info-btn" data-id="${r.reservation_id}">예약정보</button>
 
-            <div class="reserve-info">
-                <div class="reserve-code">${r.reservation_code}</div>
+								<c:if test="${r.receive_type eq 'MOBILE'}">
+									<button class="ticket-btn" data-id="${r.reservation_id}">모바일 티켓</button>
+								</c:if>
 
-                <div class="title-line">
-                    <span class="badge">${r.dday}</span>
-                    <span class="title">${r.title}</span>
-                </div>
+								<c:if test="${r.reservation_status eq 'VISITED'}">
+									<button class="review-btn"
+											data-id="${r.reservation_id}"
+											data-content="${r.content_id}">
+										리뷰쓰기
+									</button>
+								</c:if>
+							</div>
+						</div>
 
-                <div class="state-line">
-                    <c:choose>
-                        <c:when test="${r.reservation_status eq 'DONE'}">
-                            <span class="state done">예약 완료</span>
-                        </c:when>
-                        <c:when test="${r.reservation_status eq 'CANCELED'}">
-                            <span class="state canceled">예약 취소</span>
-                        </c:when>
-                        <c:when test="${r.reservation_status eq 'VISITED'}">
-                            <span class="state visited">이용 완료</span>
-                        </c:when>
-                    </c:choose>
+						<div class="poster">
+							<a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
+								<img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
+							</a>
+						</div>
+					</div>
+				</c:forEach>
+		</c:otherwise>
 
-                    <c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
-                        <span class="payment waiting">입금대기</span>
-                    </c:if>
-                    
-                    <span class="datetime">| ${r.reserved_for_at} ${r.time_zone}</span>
-                </div>
+	</div>
+	<script>
+		$(function() {
+			$(".info-btn").click(
+					function() {
+						const reservation_id = $(this).data("reservation-id");
+						window.location.href = "/gotoday/mypage/reservations/"
+								+ reservation_id;
+					});
 
-                <div class="btn-group">
-                    <button class="info-btn" data-id="${r.reservation_id}">예약정보</button>
+			$(".review-btn")
+					.click(
+							function() {
+								const reservation_id = $(this).data(
+										"reservation-id");
+								const content_id = $(this).data("content-id");
+								window.location.href = "/gotoday/review/write?reservation_id="
+										+ reservation_id
+										+ "&content_id="
+										+ content_id;
+							});
 
-                    <c:if test="${r.receive_type eq 'MOBILE'}">
-                        <button class="ticket-btn" data-id="${r.reservation_id}">모바일 티켓</button>
-                    </c:if>
+			$(".ticket-btn").click(function() {
+				const reservation_id = $(this).data("reservation-id");
+				window.location.href = "/gotoday/ticket/" + reservation_id;
+			});
 
-                    <c:if test="${r.reservation_status eq 'VISITED'}">
-                        <button class="review-btn"
-                                data-id="${r.reservation_id}"
-                                data-content="${r.content_id}">
-                            리뷰쓰기
-                        </button>
-                    </c:if>
-                </div>
-            </div>
+			// [추가] 예약 취소 버튼 클릭 이벤트
+			$(".cancel-btn").click(function() {
+				// 1. 숨겨둔 orderId 가져오기
+				const orderId = $(this).data("order-id");
 
-			<div class="poster">
-			    <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
-			        <img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
-			    </a>
-			</div>
-        </div>
-    </c:forEach>
+				// orderId가 없는 경우 (결제 정보가 없는 예약 등)
+				if (!orderId) {
+					alert("결제 정보를 찾을 수 없습니다.");
+					return;
+				}
 
-    <!-- ================= 페이징 UI ================= -->
-    <div class="paging">
-        <c:if test="${page > 1}">
-            <a href="?page=${page - 1}">&lt;&lt;</a>
-        </c:if>
+				// 2. 취소 사유 입력받기
+				const reason = prompt("취소 사유를 입력해주세요 (예: 단순 변심)", "단순 변심");
 
-        <c:forEach var="i" begin="${startPage}" end="${endPage}">
-            <a href="?page=${i}" class="${i == page ? 'active' : ''}">
-                ${i}
-            </a>
-        </c:forEach>
+				// 취소 버튼을 눌렀거나 내용이 없으면 중단
+				if (reason === null)
+					return;
+				if (reason.trim() === "") {
+					alert("취소 사유를 입력해야 합니다.");
+					return;
+				}
 
-        <c:if test="${page < totalPage}">
-            <a href="?page=${page + 1}">&gt;&gt;</a>
-        </c:if>
-    </div>
-</div>
+				if (!confirm("정말로 예약을 취소하시겠습니까?"))
+					return;
 
-<script>
-$(function() {
-    $(".info-btn").click(function() {
-        location.href = "/gotoday/mypage/reservations/" + $(this).data("id");
-    });
-
-    $(".ticket-btn").click(function() {
-        location.href = "/gotoday/ticket/" + $(this).data("id");
-    });
-
-    $(".review-btn").click(function() {
-        location.href = "/gotoday/review/write?reservation_id="
-            + $(this).data("id")
-            + "&content_id=" + $(this).data("content");
-    });
-});
-</script>
+				// 3. 서버로 전송 (포스트맨과 동일한 설정)
+				$.ajax({
+					url : "/gotoday/payment/cancel.do", // 포스트맨 URL
+					type : "POST",
+					contentType : "application/json", // JSON 전송
+					data : JSON.stringify({
+						orderId : orderId, // 결제 키
+						reason : reason
+					// 취소 사유
+					}),
+					success : function(res) {
+						if (res.success) {
+							alert(res.msg); // "결제가 정상적으로 취소되었습니다."
+							location.reload(); // 새로고침하여 상태 변경 반영
+						} else {
+							alert("취소 실패: " + res.msg);
+						}
+					},
+					error : function(xhr, status, error) {
+						console.error(error);
+						alert("서버 통신 중 오류가 발생했습니다.");
+					}
+				});
+			});
+		});
+	</script>
 </body>
 </html>

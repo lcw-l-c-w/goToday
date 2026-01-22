@@ -44,6 +44,13 @@ public class ReservationController {
 	@PostMapping("/reserve/schedule.do")
 	@ResponseBody
 	public String selectSchedule(HttpSession session, ReservationDTO dto) {
+		// 필수 값 검증
+		if (dto.getReserved_for_at() == null || dto.getReserved_for_at().isEmpty()
+				|| dto.getTime_zone() == null || dto.getTime_zone().isEmpty()
+				|| dto.getContent_id() == 0 || dto.getSchedule_id() == 0) {
+			return "error";
+		}
+
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());
@@ -56,20 +63,19 @@ public class ReservationController {
 
 	@GetMapping("/reserve/quantity.do")
 	public String showQuantityForm(HttpSession session, Model model) {
-		 ReservationDTO dto = (ReservationDTO) session.getAttribute("schedule");
+		 ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
 
-		 // [테스트용] 세션에 schedule이 없으면 임시 데이터 생성
-		 if (dto == null) {
+		 if (reservation == null) {
 			 model.addAttribute("cmd", "back");
 			 model.addAttribute("msg", "예약정보가 누락되었습니다.");
 			 return "common/return";
 		 }
 		 
-		 model.addAttribute("reservationDTO", dto);
+		 model.addAttribute("reservationDTO", reservation);
 
 		 UserVO userVO = (UserVO) session.getAttribute("loginSess");
 		 
-		 ContentVO contentVO = contentService.getDetailContents(dto.getContent_id(), userVO.getUser_id());
+		 ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
 		 model.addAttribute("contentVO",contentVO);
 
 		return "reserve_pay/reservation";
@@ -216,6 +222,7 @@ public class ReservationController {
 
 		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
 		model.addAttribute("paymentKey", paymentKey);
+		model.addAttribute("orderId", orderId);
 		model.addAttribute("amount", amount ==null ? 0 : amount);
 		model.addAttribute("reservation_code", reservation_code);
 

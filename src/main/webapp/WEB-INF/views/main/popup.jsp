@@ -29,106 +29,7 @@ a {
 	color: inherit;
 }
 
-.header {
-	width: 100%;
-	border-bottom: 1px solid #eee;
-	background: #fff;
-	position: sticky;
-	top: 0;
-	z-index: 1000;
-}
 
-.nav-container {
-	max-width: 1100px;
-	margin: 0 auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 20px;
-	height: 70px;
-}
-
-.logo img {
-	height: 32px;
-	cursor: pointer;
-	display: block;
-}
-
-.nav-menu {
-	display: flex;
-	gap: 35px;
-	height: 100%;
-	list-style: none;
-	align-items: center;
-}
-
-.nav-menu li {
-	position: relative;
-	height: 100%;
-	display: flex;
-	align-items: center;
-}
-
-.nav-menu a {
-	font-weight: 600;
-	font-size: 15px;
-	color: #333;
-	transition: color 0.3s ease;
-	height: 100%;
-	display: flex;
-	align-items: center;
-	padding: 0 5px;
-}
-
-.nav-menu li:hover a {
-	color: var(- -main-color);
-}
-
-.nav-menu li::after {
-	content: "";
-	position: absolute;
-	bottom: -1px;
-	left: 0;
-	width: 0;
-	height: 3px;
-	background-color: var(- -main-color);
-	transition: width 0.3s ease;
-	z-index: 5;
-}
-
-.nav-menu li:hover::after {
-	width: 100%;
-}
-
-.nav-icons {
-	display: flex;
-	gap: 20px;
-	align-items: center;
-}
-
-.search-bar {
-	border-bottom: 1px solid #333;
-	display: flex;
-	align-items: center;
-	padding: 2px 5px;
-}
-
-.search-bar input {
-	border: none;
-	outline: none;
-	width: 150px;
-	font-size: 14px;
-}
-
-.user-icon {
-	font-size: 22px;
-	cursor: pointer;
-	transition: color 0.2s;
-}
-
-.user-icon:hover {
-	color: var(- -main-color);
-}
 
 .main-wrapper {
 	max-width: 1100px;
@@ -468,27 +369,8 @@ a {
 </style>
 </head>
 <body>
-
-	<header class="header">
-		<div class="nav-container">
-			<div class="logo">
-				<a href="${pageContext.request.contextPath}/main"><img
-					src="<c:url value='/resources/images/logo.png'/>" alt="Logo"></a>
-			</div>
-			<ul class="nav-menu">
-				<li><a href="#">Q&A</a></li>
-				<li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-				<li><a href="${pageContext.request.contextPath}/exhibition"
-					style="color: var(- -main-color);">Exhibition</a></li>
-			</ul>
-			<div class="nav-icons">
-				<div class="search-bar">
-					<input type="text" placeholder="검색"><span>🔍</span>
-				</div>
-				<span class="user-icon" id="myPageBtn" style="cursor: pointer;">👤</span>
-			</div>
-		</div>
-	</header>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
 	<main class="main-wrapper">
 		<section class="exhibit-banner-section">
@@ -518,22 +400,9 @@ a {
 			<%-- 1. 로그인 여부 확인 (세션 이름 확인 필수) --%>
 			<c:set var="isLoggedIn" value="${not empty loginSess}" />
 
-            <c:if test="${isBlur}">
-                <div class="cta-overlay">
-                    <c:choose>
-                        <c:when test="${!isLoggedIn}">
-                            <h3>로그인이 필요한 서비스입니다</h3>
-                            <p>로그인하시면 당신의 취향에 딱 맞는<br>다양한 팝업을 추천해드려요!</p>
-                            <a href="${pageContext.request.contextPath}/member/login" class="cta-btn">로그인하러 가기</a>
-                        </c:when>
-                        <c:otherwise>
-                            <h3>관심사 등록 전이신가요?</h3>
-                            <p>관심사를 설정하면 당신만을 위한<br>특별한 맞춤 콘텐츠를 추천해드려요!</p>
-                            <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="cta-btn">관심사 설정하기</a>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </c:if>
+			<%-- 2. 추천 리스트가 비어있는지 확인 --%>
+			<%-- 기존의 recommand[0].blur 조건이 까다로워서 오작동할 확률이 높으므로 단순화합니다 --%>
+			<c:set var="isTagEmpty" value="${empty recommend}" />
 
 			<%-- 3. 블러 처리 여부 결정: 로그인을 안 했거나, 추천 데이터가 아예 없을 때 --%>
 			<c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
@@ -565,7 +434,7 @@ a {
 				<div class="recommend-view">
 					<div id="recList"
 						class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
-						<c:forEach var="item" items="${recommand}">
+						<c:forEach var="item" items="${recommend}">
 							<article class="content-card"
 								onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
 								<div class="card-img-wrap">
@@ -577,7 +446,7 @@ a {
 								</div>
 							</article>
 						</c:forEach>
-						<c:if test="${empty recommand}">
+						<c:if test="${empty recommend}">
 							<div style="height: 280px; width: 100%;"></div>
 						</c:if>
 					</div>
@@ -690,13 +559,21 @@ a {
             }
 
             // --- 3. 로그인 체크 (마이페이지 버튼) ---
-            const myBtn = document.getElementById('myPageBtn');
-            if(myBtn) {
-                myBtn.onclick = () => {
-                    const isLoggedIn = ${not empty loginSess};
-                    location.href = isLoggedIn ? "${pageContext.request.contextPath}/mypage/main" : "${pageContext.request.contextPath}/member/login";
-                };
-            }
+      document.getElementById('myPageBtn').onclick = () => {
+            	
+            	const isLoggedIn = ${not empty loginSess ? true : false};
+            	const userRole = ${not empty loginSess ? loginSess.role : -1};
+            	
+            	if (!isLoggedIn) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    location.href = "${pageContext.request.contextPath}/member/login";
+                } else if(userRole==0){
+                    location.href = "${pageContext.request.contextPath}/mypage/main";
+                }else if(userRole==1){
+                	location.href="${pageContext.request.contextPath}/vendor/content_manage";
+                }
+                else alert("잘못된 접근입니다.");
+            };
         });
     </script>
 </body>

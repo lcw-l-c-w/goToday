@@ -38,86 +38,6 @@ a {
 	color: inherit;
 }
 
-/* 2. 네비게이션 바 스타일 */
-.header {
-	width: 100%;
-	border-bottom: 1px solid var(--border-color);
-	background: #fff;
-	position: sticky;
-	top: 0;
-	z-index: 1000;
-}
-
-.nav-container {
-	max-width: 1100px;
-	margin: 0 auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 20px;
-	height: 70px;
-}
-
-.logo img {
-	height: 32px;
-	cursor: pointer;
-	display: block;
-}
-
-.nav-menu {
-	display: flex;
-	gap: 35px;
-	list-style: none;
-	align-items: center;
-	height: 100%;
-}
-
-.nav-menu li {
-	position: relative;
-	height: 100%;
-	display: flex;
-	align-items: center;
-}
-
-.nav-menu a {
-	font-weight: 600;
-	font-size: 15px;
-	transition: color 0.3s ease;
-}
-
-.nav-menu li:hover a {
-	color: var(- -main-color);
-}
-
-.nav-icons {
-	display: flex;
-	gap: 20px;
-	align-items: center;
-}
-
-.search-bar {
-	border-bottom: 1px solid #333;
-	display: flex;
-	align-items: center;
-	padding: 2px 5px;
-}
-
-.search-bar input {
-	border: none;
-	outline: none;
-	width: 150px;
-	font-size: 14px;
-}
-
-.user-icon {
-	font-size: 22px;
-	cursor: pointer;
-	transition: color 0.2s;
-}
-
-.user-icon:hover {
-	color: var(- -main-color);
-}
 
 /* 3. 레이아웃 및 본문 */
 .container {
@@ -350,14 +270,41 @@ $(function() {
     // 달력 로드
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
+    	
+    	// 1. JSP 변수에서 시작일과 종료일 가져오기 (문자열 자르기 포함)
+        const startDate = "${content.start_at}".substring(0, 10);
+        const endDate = "${content.end_at}".substring(0, 10);
+     // 2. 종료일 포함(inclusive)을 위해 하루 더하기
+        // JS의 Date 객체는 현재 지역 시간을 기준으로 하므로 시간 오차를 방지하기 위해 
+        // 단순 날짜 더하기 로직을 사용합니다.
+        let endDateObj = new Date(endDate);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        
+        
+     // yyyy-mm-dd 형식으로 변환
+        let finalEndDate = endDateObj.toISOString().substring(0, 10);
+     
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'ko',
             height: 'auto',
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+       
+         // 3. 전시 기간 배경색 입히기 (핑크색)
+            events: [
+                {
+                    start: startDate,
+                    end: finalEndDate,
+                    display: 'background',
+                    backgroundColor: '#ffe3ee', // 연한 핑크색
+                    allDay: true
+                }
+            ],
             dateClick: function(info) {
-                $(".fc-daygrid-day").css("background", "");
-                $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
+            	// 모든 날짜 클릭 가능
+                $(".fc-daygrid-day").css("background", ""); // 이전 선택 초기화
+                $(info.dayEl).css("background", "rgba(77, 195, 255, 0.3)"); // 클릭한 날짜 강조
+                
                 selectedDate = info.dateStr;
                 fetchTimes(selectedDate);
             }
@@ -395,6 +342,9 @@ $(function() {
         selectedTime = $(this).data("time");
         scheduleId = $(this).data("id");
     });
+    
+
+ 
 	
     //추가-의선 캘박 
     $(".btn-save-cal").click(function() {
@@ -481,45 +431,60 @@ $(function() {
         });
     });
 
+    //예약 처리 여부 -> 만약 상태가 종료이면 reservation-div를 hidden처리
+   $(document).ready(function() {
+    // 1. data-status 값을 가져옴
+    const contentStatus = $("#confirmStatus").data("status");
+    
+    // 2. 상태가 "STATUS_CLOSED" (또는 "종료") 인지 확인
+    // 서비스단에서 저장한 정확한 문자열 값과 비교해야 합니다.
+    if(contentStatus === "STATUS_CLOSED" || contentStatus === "종료") {
+    	$(".reservation-div").html(`
+    	        <div style="background: #f8f9fa; padding: 40px; text-align: center; border-radius: 10px; border: 1px dashed #ccc;">
+    	            <p style="font-size: 18px; font-weight: bold; color: #999;">🔒 관람이 종료된 콘텐츠입니다.</p>
+    	            <p style="font-size: 14px; color: #bbb; margin-top: 10px;">다음에 더 좋은 전시로 찾아뵙겠습니다.</p>
+    	        </div>
+    	    `);
+    }
+});
+    
     // 마이페이지 로그인 체크
     $("#myPageBtn").click(function() {
         const isLoggedIn = ${not empty loginSess};
-        if (!isLoggedIn) {
+    	const userRole = ${not empty loginSess ? loginSess.role : -1};
+    	
+    	if (!isLoggedIn) {
             alert("로그인이 필요한 서비스입니다.");
             location.href = "${pageContext.request.contextPath}/member/login";
-        } else {
-            location.href = "${pageContext.request.contextPath}/member/mypage";
+        } else if(userRole==0){
+            location.href = "${pageContext.request.contextPath}/mypage/main";
+        }else if(userRole==1){
+        	location.href="${pageContext.request.contextPath}/vendor/content_manage";
         }
+        else alert("잘못된 접근입니다.");
     });
 });
 
-
+    //  상세 페이지 들어갔을 때 최근본페이지 기능에 넣으려고 만든 부분
+	document.addEventListener("DOMContentLoaded", function () {
+  		if (window.GoTodayRecentViewed) {
+    		GoTodayRecentViewed.add({
+      		id: "${content.content_id}",
+      		title: "${content.title}",
+            image: "<c:url value='${content.main_image_path}'/>",
+      		url: "${pageContext.request.contextPath}/detail/${content.content_id}",
+      		location: "${content.location}"
+    		});
+  		}
+	});
 
 
 </script>
 </head>
 <body>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
-	<header class="header">
-		<div class="nav-container">
-			<div class="logo">
-				<a href="${pageContext.request.contextPath}/main"> <img
-					src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
-				</a>
-			</div>
-			<ul class="nav-menu">
-				<li><a href="#">Q&A</a></li>
-				<li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-				<li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
-			</ul>
-			<div class="nav-icons">
-				<div class="search-bar">
-					<input type="text" placeholder="검색"> <span>🔍</span>
-				</div>
-				<span class="user-icon" id="myPageBtn">👤</span>
-			</div>
-		</div>
-	</header>
 
 	<div class="container">
 		<div class="breadcrumb">
@@ -577,8 +542,12 @@ $(function() {
 						<th>수령방법</th>
 						<td>${content.reservationTypeLabel}</td>
 					</tr>
+					<tr>
+						<th>상태</th>
+						<td id="confirmStatus" data-status="${content.contentStatusCurrent}">${content.contentStatusCurrent}</td>
+					</tr>
 				</table>
-
+				<div class="reservation-div">
 				<div class="reserve-section">
 					<div id="calendar"></div>
 					<div class="time-selector">
@@ -594,6 +563,7 @@ $(function() {
 					<input type="hidden" id="content_id" value="${content.content_id}">
 					<button class="btn-reserve">예매하기</button>
 					<button class="btn-save-cal">캘린더 저장</button>
+				</div>
 				</div>
 			</section>
 		</div>

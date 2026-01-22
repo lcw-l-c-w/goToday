@@ -1,64 +1,377 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core"%>
 
 <style>
-    :root { --main-color: #4dc3ff; --text-gray: #666; }
-    
-    .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
-    .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
-    .logo img { height: 32px; cursor: pointer; display: block; }
-    
-    .nav-menu { display: flex; gap: 35px; list-style: none; align-items: center; height: 100%; margin: 0; padding: 0; }
-    .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
-    .nav-menu a { font-weight: 600; font-size: 15px; color: #333; text-decoration: none; transition: color 0.3s ease; height: 100%; display: flex; align-items: center; padding: 0 5px; }
-    
-    .nav-menu li:hover a { color: var(--main-color); }
-    .nav-menu li::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 3px; background-color: var(--main-color); transition: width 0.3s ease; }
-    .nav-menu li:hover::after { width: 100%; }
+    :root {
+        --main-color: #4dc3ff;
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: "Pretendard", sans-serif;
+        overflow-x: hidden;
+        background-color: #fff;
+    }
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
 
-    .nav-icons { display: flex; gap: 20px; align-items: center; }
-    .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
-    .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
-    .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; color: #333; }
-    .user-icon:hover { color: var(--main-color); }
+    .header {
+        width: 100%;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    .nav-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        height: 70px;
+    }
+    .logo img {
+        height: 32px;
+        cursor: pointer;
+        display: block;
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 35px;
+        height: 100%;
+        list-style: none;
+        align-items: center;
+    }
+    .nav-menu li {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+    .nav-menu a {
+        font-weight: 600;
+        font-size: 15px;
+        color: #333;
+        transition: color 0.3s ease;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 5px;
+    }
+    .nav-menu li:hover a {
+        color: var(--main-color);
+    }
+    .nav-menu li::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 0;
+        height: 3px;
+        background-color: var(--main-color);
+        transition: width 0.3s ease;
+        z-index: 5;
+    }
+    .nav-menu li:hover::after {
+        width: 100%;
+    }
+
+    .nav-icons {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    /* header search */
+    .search-bar {
+        border-bottom: 1px solid #333;
+        display: flex;
+        align-items: center;
+        padding: 2px 5px;
+    }
+    .search-bar input {
+        border: none;
+        outline: none;
+        width: 150px;
+        font-size: 14px;
+        background: transparent;
+    }
+    .search-btn {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .user-icon {
+        font-size: 22px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .user-icon:hover {
+        color: var(--main-color);
+    }
+
+    .search-wrap {
+        position: relative;
+    }
+    .search-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 260px;
+        background: #fff;
+        border: 1px solid #eee;
+        padding: 10px;
+        z-index: 2000;
+    }
+    .search-wrap:hover .search-panel,
+    .search-panel:hover {
+        display: block;
+    }
+    .search-panel::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 0;
+        right: 0;
+        height: 10px;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+    .clear-btn {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: #666;
+        font-size: 12px;
+    }
+    .clear-btn:hover {
+        color: var(--main-color);
+    }
+
+    .recent-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .recent-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+    .recent-keyword {
+        font-size: 13px;
+        color: #333;
+        cursor: pointer;
+    }
+    .recent-keyword:hover {
+        color: var(--main-color);
+    }
+    .recent-del {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: #999;
+        font-size: 12px;
+    }
+    .recent-del:hover {
+        color: #333;
+    }
+    .empty-recent {
+        display: none;
+        color: #888;
+        font-size: 12px;
+        margin-top: 6px;
+    }
 </style>
 
 <header class="header">
     <div class="nav-container">
         <div class="logo">
             <a href="${pageContext.request.contextPath}/main">
-                <img src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
+                <img
+                    src="<c:url value='/resources/images/logo.png'/>"
+                    alt="Logo"
+                />
             </a>
         </div>
-        
+
         <ul class="nav-menu">
             <li><a href="#">Q&A</a></li>
-            <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li> 
-            <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
+            <li>
+                <a href="${pageContext.request.contextPath}/popup">PopUp</a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/exhibition"
+                    >Exhibition</a
+                >
+            </li>
         </ul>
 
         <div class="nav-icons">
-            <div class="search-bar">
-                <input type="text" placeholder="검색">
-                <span>🔍</span>
+            <div class="search-wrap" id="searchWrap">
+                <form
+                    id="headerSearchForm"
+                    method="get"
+                    action="${pageContext.request.contextPath}/search"
+                >
+                    <div class="search-bar">
+                        <input
+                            id="headerSearchInput"
+                            type="text"
+                            name="q"
+                            placeholder="검색"
+                            autocomplete="off"
+                        />
+                        <button
+                            type="submit"
+                            class="search-btn"
+                            aria-label="search"
+                        >
+                            🔍
+                        </button>
+                    </div>
+                </form>
+
+                <div class="search-panel" id="searchPanel">
+                    <div class="panel-header">
+                        <strong>최근 검색어</strong>
+                        <button
+                            type="button"
+                            id="clearRecentBtn"
+                            class="clear-btn"
+                        >
+                            전체삭제
+                        </button>
+                    </div>
+                    <ul id="recentList" class="recent-list"></ul>
+                    <div id="emptyRecent" class="empty-recent">
+                        최근 검색어가 없습니다.
+                    </div>
+                </div>
             </div>
+
             <span class="user-icon" id="commonMyPageBtn">👤</span>
         </div>
     </div>
 </header>
 
 <script>
-$(function() {
-    // 네비게이션 로그인 체크 및 이동
-    $("#commonMyPageBtn").click(function() {
-        // JSP 내장 객체 세션을 체크하되, 외부 JS 파일이 아니므로 EL 사용 가능
-        const isLoggedIn = ${not empty loginSess}; 
-        if (!isLoggedIn) {
-            alert("로그인이 필요한 서비스입니다.");
-            location.href = "${pageContext.request.contextPath}/member/login";
-        } else {
-            location.href = "${pageContext.request.contextPath}/mypage/main";
+    (function () {
+      const STORAGE_KEY = "gotoday_recent_keywords";
+      const MAX_RECENT = 5;
+
+      const form = document.getElementById("headerSearchForm");
+      const input = document.getElementById("headerSearchInput");
+      const recentList = document.getElementById("recentList");
+      const emptyRecent = document.getElementById("emptyRecent");
+      const clearBtn = document.getElementById("clearRecentBtn");
+
+      function loadKeywords() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          const arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+      function saveKeywords(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+      function normalize(q) { return (q || "").trim(); }
+
+      function addKeyword(q) {
+        q = normalize(q);
+        if (!q) return;
+        if (q.length > 50) q = q.substring(0, 50);
+        let arr = loadKeywords().filter(item => item !== q);
+        arr.unshift(q);
+        if (arr.length > MAX_RECENT) arr = arr.slice(0, MAX_RECENT);
+        saveKeywords(arr);
+      }
+      function removeKeyword(q) { saveKeywords(loadKeywords().filter(item => item !== q)); }
+      function clearKeywords() { localStorage.removeItem(STORAGE_KEY); }
+
+      function renderRecent() {
+        const arr = loadKeywords();
+        recentList.innerHTML = "";
+        if (arr.length === 0) { emptyRecent.style.display = "block"; return; }
+        emptyRecent.style.display = "none";
+
+        arr.forEach(q => {
+          const li = document.createElement("li");
+          li.className = "recent-item";
+
+          const span = document.createElement("span");
+          span.className = "recent-keyword";
+          span.textContent = q;
+          span.addEventListener("click", function () {
+            input.value = q;
+            form.requestSubmit();
+          });
+
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "recent-del";
+          del.textContent = "X";
+          del.addEventListener("click", function () {
+            removeKeyword(q);
+            renderRecent();
+          });
+
+          li.appendChild(span);
+          li.appendChild(del);
+          recentList.appendChild(li);
+        });
+      }
+
+      form.addEventListener("submit", function (e) {
+        const q = normalize(input.value);
+        if (!q) {
+        	e.preventDefault();
+        	window.location.href = form.action;   // /search 로 이동
+        	return;
         }
+        addKeyword(q);
+      });
+
+      clearBtn.addEventListener("click", function () {
+        clearKeywords();
+        renderRecent();
+      });
+
+      document.getElementById("searchWrap").addEventListener("mouseenter", renderRecent);
+      renderRecent();
+    })();
+
+    $(function() {
+        // 네비게이션 로그인 체크 및 이동
+        $("#commonMyPageBtn").click(function() {
+            // JSP 내장 객체 세션을 체크하되, 외부 JS 파일이 아니므로 EL 사용 가능
+            const isLoggedIn = ${not empty loginSess};
+            if (!isLoggedIn) {
+                alert("로그인이 필요한 서비스입니다.");
+                location.href = "${pageContext.request.contextPath}/member/login";
+            } else {
+                location.href = "${pageContext.request.contextPath}/mypage/main";
+            }
+        });
     });
-});
 </script>

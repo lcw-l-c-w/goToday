@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class VendorReservationListDTO {
     private String reserve_id;
+    private String reservation_code;
     private String visit_date;
     private String visit_time;
     private Integer person_count;
