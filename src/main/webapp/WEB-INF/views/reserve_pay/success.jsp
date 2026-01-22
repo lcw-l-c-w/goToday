@@ -67,6 +67,8 @@
             resultEl.style.display = "block";
             messageEl.textContent = json.msg;
             codeEl.textContent = "예약코드: " + json.reservationCode;
+            
+            bindActionButtons();
           } else {
             // 실패
             titleEl.textContent = "결제 처리 실패";
@@ -74,6 +76,8 @@
             resultEl.className = "result-box error";
             resultEl.style.display = "block";
             messageEl.textContent = json.msg;
+            
+            bindActionButtons();
 
             // 3초 후 fail 페이지로 이동
             setTimeout(function() {
@@ -97,7 +101,7 @@
 
    	    if (mypageBtn) {
    	      mypageBtn.addEventListener("click", function () {
-   	        window.location.href = contextPath + "/mypage/reservation";
+   	        window.location.href = contextPath + "/mypage";
    	      });
    	    }
 
