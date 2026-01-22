@@ -88,6 +88,8 @@ public class AdminServiceImpl implements AdminService {
 		return adminMapper.updateContentStatus(content_id, "STATUS_REJECTED");
 
 	}
+
+
 	
 	
 

@@ -372,23 +372,11 @@ uri="http://java.sun.com/jsp/jstl/core"%>
     	  const userRole = Number("${not empty loginSess ? loginSess.role : -1}");
 
     	  btn.addEventListener("click", function () {
-    	    if (!isLoggedIn) {
-    	      alert("로그인이 필요한 서비스입니다.");
-    	      location.href = CTX + "/member/login";
-    	      return;
-    	    }
-
-    	    if (userRole === 0) {
-    	      location.href = CTX + "/mypage/main";
-    	      return;
-    	    }
-
-    	    if (userRole === 1) {
-    	      location.href = CTX + "/vendor/content_manage";
-    	      return;
-    	    }
-
-    	    alert("잘못된 접근입니다.");
+    		  if(!isLoggedIn) {
+    			  alert("로그인이 필요합니다.");
+    			  location.href="${pageContext.request.contextPath}/member/login";
+    		  }
+    		  else location.href="${pageContext.request.contextPath}/login/process";
     	  });
     	})();
 </script>
