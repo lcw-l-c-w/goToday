@@ -30,6 +30,9 @@ public class ContentVO {
     private int user_id;
     private String place_tag;
     
+    //추가 private 
+    private String content_status_current; // s현재 상태 
+    
     private int like_count;// 각 content에 대한 like수
     private int liked; //새로고침시 like되어있으면 파란색이 들어오게끔 설정해야함
     public String getReservationTypeLabel() {
@@ -57,4 +60,11 @@ public class ContentVO {
     	return "";
     }
     
+    //종료/ 오픈예정/ 진행중 
+    public String getContentStatusCurrent() {
+    	if("STATUS_OPEN".equals(content_status_current)) return "진행중";
+        else if("STATUS_SCHEDULED".equals(content_status_current)) return "오픈예정";
+        else if("STATUS_CLOSED".equals(content_status_current)) return "종료";
+    	return "해당없음";
+    }
 }
