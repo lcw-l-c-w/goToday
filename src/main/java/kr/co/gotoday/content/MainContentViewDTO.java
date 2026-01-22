@@ -38,5 +38,7 @@ public class MainContentViewDTO {
 
 	private String periodText; // "25.12.25~26.01.01"
 	private Integer dday; // 시작일까지 남은 일수 (0이면 D-0, 음수면 이미 시작)
-
+	private String content_status;
+	
+	private String reservation_type;
 }

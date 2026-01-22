@@ -43,7 +43,6 @@ public class ReplyServiceImpl implements ReplyService {
 
 	@Override
 	public Map<String, Object> list(ReplyVO param) {
-		System.out.println("list 메서드 실행");
 		int count = mapper.count(param); // 총개수
         // 총페이지수
         int totalPage = count / 5;

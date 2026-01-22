@@ -27,7 +27,7 @@ $(document).ready(function() {
 	 body { font-family: 'Pretendard', sans-serif; background-color: transparent; margin: 0; padding: 0; }
 	 
 	 /* 공통 제목 스타일 */
-	 .page-title { font-size: 32px; font-weight: 700; margin-bottom: 40px; color: #111; }
+	 .page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
 	
 	 /* 공통 흰색 박스 스타일 */
 	 .form-wrapper { 

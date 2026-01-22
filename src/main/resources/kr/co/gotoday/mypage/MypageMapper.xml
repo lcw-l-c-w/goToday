@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.gotoday.mypage.MypageMapper">
+
+    <select id="selectMyLikeList"
+            parameterType="int"
+            resultType="kr.co.gotoday.mypage.MypageDTO">
+
+        SELECT
+            c.content_id,
+            c.title,
+            c.main_image_path,
+            c.start_at,
+            c.end_at
+        FROM content_like cl
+        JOIN content c
+          ON cl.content_id = c.content_id
+        WHERE cl.user_id = #{user_id}
+    </select>
+
+</mapper>

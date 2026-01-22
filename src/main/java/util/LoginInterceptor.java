@@ -51,7 +51,7 @@ public class LoginInterceptor implements HandlerInterceptor{
 
 	        out.print("<script>");
 	        out.print("alert('로그인 후 사용 가능합니다.');");
-	        out.print("location.href='" + contextPath + "/member/login?redirect=" + encodedUrl + "';");
+	        out.print("top.location.href='" + contextPath + "/member/login?redirect=" + encodedUrl + "';");
 	        out.print("</script>");
 
 	        out.close();
@@ -60,3 +60,9 @@ public class LoginInterceptor implements HandlerInterceptor{
 	    return true;
 	}
 }
+
+
+
+
+
+
