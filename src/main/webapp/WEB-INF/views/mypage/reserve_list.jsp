@@ -7,194 +7,160 @@
 <meta charset="UTF-8">
 <title>예약 관리 | GoToday</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif; }
+.container { max-width: 900px; margin: 40px auto; }
+.page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
 
-body {
-    background: #f5f5f5;
-    font-family: 'Pretendard', -apple-system, sans-serif;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-}
-
-.page-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 30px;
-}
-
-/* 카드 */
 .reserve-item {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 22px 26px;
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     gap: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+    border: 1px solid #eee;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 왼쪽 정보 */
-.reserve-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.reserve-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px rgba(77,195,255,0.18);
 }
 
-.reserve-code {
-    font-size: 13px;
-    color: #888;
-}
+.reserve-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.reserve-code { font-size: 13px; color: #888; }
 
-/* 제목 줄 */
-.title-line {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+.title-line { display: flex; align-items: center; gap: 8px; }
 .badge {
-    padding: 4px 10px;
-    border-radius: 14px;
-    font-size: 12px;
-    font-weight: 700;
-    background: #e1f5fe;
-    color: #03a9f4;
+	padding: 4px 10px;
+	border-radius: 14px;
+	font-size: 12px;
+	font-weight: 700;
+	background: #e1f5fe;
+	color: #03a9f4;
 }
 
-.title {
-    font-size: 17px;
-    font-weight: 700;
+/* 🔥 badge 색상 조건별 분기 */
+.badge.dday {
+	background: #fff9c4;
+	color: #f57f17;
+}
+.badge.canceled {
+	background: #ffebee;
+	color: #ff4444;
+}
+.badge.end {
+	background: #f5f5f5;
+	color: #666;
 }
 
-.datetime {
-    font-size: 13px;
-    color: #555;
-}
+.title { font-size: 17px; font-weight: 700; }
+.datetime { font-size: 13px; color: #555; }
 
-/* 상태 */
-.state-line {
-    display: flex;
-    gap: 10px;
-    font-size: 14px;
-}
-
+.state-line { display: flex; gap: 10px; font-size: 14px; }
 .state.done { color: #4dc3ff; font-weight: 700; }
 .state.canceled { color: #ff4444; font-weight: 700; }
 .state.visited { color: #28a745; font-weight: 700; }
+.payment.waiting { color: #ff9800; font-weight: 700; }
 
-.payment.waiting {
-    color: #ff9800;
-    font-weight: 700;
-}
-
-/* 버튼 */
-.btn-group {
-    display: flex;
-    gap: 8px;
-    margin-top: auto;
-}
-
+.btn-group { display: flex; gap: 8px; margin-top: auto; }
 .btn-group button {
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
 }
 
 .info-btn {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: white;
+    border: 1px solid #4dc3ff;
+    color: #4dc3ff;
 }
-
+.info-btn:hover {
+    background: #4dc3ff;
+    color: white;
+}
 .ticket-btn {
-    background: #333;
-    color: #fff;
-    border: none;
-}
-
-.review-btn {
-    background: #4dc3ff;
-    color: #fff;
-    border: none;
-}
-
-/* 포스터 */
-.poster img {
-    width: 100px;
-    height: 140px;
-    border-radius: 12px;
-    object-fit: cover;
-}
-
-/* 페이징 */
-.paging {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.paging a {
-    display: inline-block;
-    margin: 0 4px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    text-decoration: none;
+    background: white;
+    border: 1px solid #333;
     color: #333;
-    border: 1px solid #ddd;
+}
+.ticket-btn:hover {
+    background: #333;
+    color: white;
+}
+.review-btn {
+    background: white;
+    border: 1px solid #4dc3ff;
+    color: #4dc3ff;
 }
 
-.paging a.active {
+.review-btn:hover {
     background: #4dc3ff;
-    color: #fff;
-    border-color: #4dc3ff;
+    color: white;
 }
-
 .cancel-btn {
-	padding: 10px 24px;
-	border: 1px solid #ff4444; /* 빨간 테두리 */
-	background: white;
-	color: #ff4444;
-	border-radius: 8px;
-	font-size: 14px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s;
+    background: white;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+}
+.cancel-btn:hover {
+    background: #ff4444;
+    color: white;
 }
 
-.cancel-btn:hover {
-	background: #ff4444;
-	color: white;
+.poster img {
+	width: 100px;
+	height: 140px;
+	border-radius: 12px;
+	object-fit: cover;
 }
 </style>
 </head>
 
 <body>
 <div class="container">
-    <h1 class="page-title">예약 관리</h1>
+	<h1 class="page-title">예약 관리</h1>
 
 	<div class="list-wrapper">
 		<c:choose>
-		<c:when test="${empty reservationList}">
-			<div class="empty-box">예약 내역이 없습니다.</div>
-		</c:when>
-		<c:otherwise>
-			    <c:forEach var="r" items="${reservationList}">
+			<c:when test="${empty reservationList}">
+				<div class="empty-box">예약 내역이 없습니다.</div>
+			</c:when>
+
+			<c:otherwise>
+				<c:forEach var="r" items="${reservationList}">
 					<div class="reserve-item">
 
 						<div class="reserve-info">
 							<div class="reserve-code">${r.reservation_code}</div>
 
-							<div class="title-line">
-								<span class="badge">${r.dday}</span>
-								<span class="title">${r.title}</span>
-							</div>
+						<div class="title-line">
+							<c:choose>
+								<c:when test='${r.dday eq "D-Day"}'>
+									<span class="badge dday">${r.dday}</span>
+								</c:when>
+								<c:when test='${r.dday eq "CANCELED"}'>
+									<span class="badge canceled">${r.dday}</span>
+								</c:when>
+								<c:when test='${r.dday eq "END"}'>
+									<span class="badge end">${r.dday}</span>
+								</c:when>
+								<c:otherwise>
+									<span class="badge">${r.dday}</span>
+								</c:otherwise>
+							</c:choose>
+							<span class="title">${r.title}</span>
+						</div>
 
 							<div class="state-line">
 								<c:choose>
@@ -212,113 +178,100 @@ body {
 								<c:if test="${r.payment_status eq 'WAITING_FOR_DEPOSIT'}">
 									<span class="payment waiting">입금대기</span>
 								</c:if>
-								
+
 								<span class="datetime">| ${r.reserved_for_at} ${r.time_zone}</span>
 							</div>
 
 							<div class="btn-group">
-								<button class="info-btn" data-id="${r.reservation_id}">예약정보</button>
+								<button class="info-btn"
+									data-reservation-id="${r.reservation_id}">
+									예약정보
+								</button>
 
 								<c:if test="${r.receive_type eq 'MOBILE'}">
-									<button class="ticket-btn" data-id="${r.reservation_id}">모바일 티켓</button>
+									<button class="ticket-btn"
+										data-reservation-id="${r.reservation_id}">
+										모바일 티켓
+									</button>
 								</c:if>
 
 								<c:if test="${r.reservation_status eq 'VISITED'}">
 									<button class="review-btn"
-											data-id="${r.reservation_id}"
-											data-content="${r.content_id}">
+										data-reservation-id="${r.reservation_id}"
+										data-content-id="${r.content_id}">
 										리뷰쓰기
+									</button>
+								</c:if>
+
+								<c:if test="${r.reservation_status eq 'DONE' and not empty r.order_id}">
+									<button class="cancel-btn"
+										data-order-id="${r.order_id}"
+										data-reservation-id="${r.reservation_id}">
+										예약 취소
 									</button>
 								</c:if>
 							</div>
 						</div>
 
 						<div class="poster">
-							<a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
+							<a href="${pageContext.request.contextPath}/detail/${r.content_id}">
 								<img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
 							</a>
 						</div>
+
 					</div>
 				</c:forEach>
-		</c:otherwise>
-
+			</c:otherwise>
+		</c:choose>
 	</div>
-	<script>
-		$(function() {
-			$(".info-btn").click(
-					function() {
-						const reservation_id = $(this).data("reservation-id");
-						window.location.href = "/gotoday/mypage/reservations/"
-								+ reservation_id;
-					});
+</div>
 
-			$(".review-btn")
-					.click(
-							function() {
-								const reservation_id = $(this).data(
-										"reservation-id");
-								const content_id = $(this).data("content-id");
-								window.location.href = "/gotoday/review/write?reservation_id="
-										+ reservation_id
-										+ "&content_id="
-										+ content_id;
-							});
+<script>
+$(function () {
 
-			$(".ticket-btn").click(function() {
-				const reservation_id = $(this).data("reservation-id");
-				window.location.href = "/gotoday/ticket/" + reservation_id;
-			});
+	$(".info-btn").click(function () {
+		const reservationId = $(this).data("reservation-id");
+		location.href = "/gotoday/mypage/reservations/" + reservationId;
+	});
 
-			// [추가] 예약 취소 버튼 클릭 이벤트
-			$(".cancel-btn").click(function() {
-				// 1. 숨겨둔 orderId 가져오기
-				const orderId = $(this).data("order-id");
+	$(".review-btn").click(function () {
+		const reservationId = $(this).data("reservation-id");
+		const contentId = $(this).data("content-id");
+		location.href = "/gotoday/review/write?reservation_id=" + reservationId + "&content_id=" + contentId;
+	});
 
-				// orderId가 없는 경우 (결제 정보가 없는 예약 등)
-				if (!orderId) {
-					alert("결제 정보를 찾을 수 없습니다.");
-					return;
-				}
+	$(".ticket-btn").click(function () {
+		const reservationId = $(this).data("reservation-id");
+		location.href = "/gotoday/ticket/" + reservationId;
+	});
 
-				// 2. 취소 사유 입력받기
-				const reason = prompt("취소 사유를 입력해주세요 (예: 단순 변심)", "단순 변심");
+	$(".cancel-btn").click(function () {
+		const orderId = $(this).data("order-id");
+		if (!orderId) {
+			alert("결제 정보를 찾을 수 없습니다.");
+			return;
+		}
 
-				// 취소 버튼을 눌렀거나 내용이 없으면 중단
-				if (reason === null)
-					return;
-				if (reason.trim() === "") {
-					alert("취소 사유를 입력해야 합니다.");
-					return;
-				}
+		const reason = prompt("취소 사유를 입력해주세요", "단순 변심");
+		if (!reason) return;
 
-				if (!confirm("정말로 예약을 취소하시겠습니까?"))
-					return;
+		if (!confirm("정말 예약을 취소하시겠습니까?")) return;
 
-				// 3. 서버로 전송 (포스트맨과 동일한 설정)
-				$.ajax({
-					url : "/gotoday/payment/cancel.do", // 포스트맨 URL
-					type : "POST",
-					contentType : "application/json", // JSON 전송
-					data : JSON.stringify({
-						orderId : orderId, // 결제 키
-						reason : reason
-					// 취소 사유
-					}),
-					success : function(res) {
-						if (res.success) {
-							alert(res.msg); // "결제가 정상적으로 취소되었습니다."
-							location.reload(); // 새로고침하여 상태 변경 반영
-						} else {
-							alert("취소 실패: " + res.msg);
-						}
-					},
-					error : function(xhr, status, error) {
-						console.error(error);
-						alert("서버 통신 중 오류가 발생했습니다.");
-					}
-				});
-			});
+		$.ajax({
+			url: "/gotoday/payment/cancel.do",
+			type: "POST",
+			contentType: "application/json",
+			data: JSON.stringify({ orderId: orderId, reason: reason }),
+			success: function (res) {
+				alert(res.msg);
+				location.reload();
+			},
+			error: function () {
+				alert("서버 오류");
+			}
 		});
-	</script>
+	});
+});
+</script>
 </body>
 </html>

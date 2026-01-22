@@ -7,205 +7,186 @@
 <head>
 <meta charset="UTF-8">
 <title>찜 관리 | GoToday</title>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <style>
-:root {
-    --main-color: #4dc3ff;
-    --bg-gray: #f8f9fa;
-    --text-gray: #666;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif; }
+.container { max-width: 900px; margin: 40px auto; }
+.page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
 
-body {
-    font-family: 'Pretendard', sans-serif;
-    background-color: transparent;
-    margin: 0;
-    padding: 0;
-}
-
-.page-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 40px;
-    color: #111;
-}
-
-/* 컨테이너 */
-.like-container {
-    width: 100%;
-    max-width: 800px;
-}
-
-/* 카드 */
 .like-item {
-    background: #fff;
+    background: #ffffff;
     border-radius: 20px;
-    padding: 25px 30px;
+    padding: 22px 26px;
     margin-bottom: 20px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    gap: 20px;
+
     border: 1px solid #eee;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.item-info {
-    flex: 1;
+.like-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px rgba(77,195,255,0.18);
 }
 
-/* D-day 배지 */
-.date-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    background: #e1f5fe;
-    color: #03a9f4;
-    border-radius: 50px;
-    font-size: 13px;
-    font-weight: 700;
+.item-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+.title-line { display: flex; align-items: center; gap: 8px; }
+.badge {
+	padding: 4px 10px;
+	border-radius: 14px;
+	font-size: 12px;
+	font-weight: 700;
+	background: #e1f5fe;
+	color: #03a9f4;
 }
 
-/* 제목 */
-.item-title {
-    font-size: 19px;
-    font-weight: 700;
+.badge.dday {
+	background: #fff9c4;
+	color: #f57f17;
+}
+.badge.end {
+	background: #f5f5f5;
+	color: #666;
+}
+
+.title { 
+    font-size: 17px; 
+    font-weight: 700; 
     color: #333;
     text-decoration: none;
 }
 
-/* 버튼 */
-.btn-group {
-    display: flex;
-    gap: 10px;
+.title:hover {
+    color: #4dc3ff;
 }
 
-.btn-action {
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
+.period { font-size: 13px; color: #555; }
+
+.btn-group { display: flex; gap: 8px; margin-top: auto; }
+.btn-group button {
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
 }
 
-.btn-reserve {
-    background: #e0e0e0;
-    color: #333;
+.reserve-btn {
+    background: white;
+    border: 1px solid #4dc3ff;
+    color: #4dc3ff;
+}
+.reserve-btn:hover {
+    background: #4dc3ff;
+    color: white;
 }
 
-.btn-reserve:hover {
-    background: #d0d0d0;
+.poster img {
+	width: 100px;
+	height: 140px;
+	border-radius: 12px;
+	object-fit: cover;
 }
 
-/* 이미지 */
-.poster-img {
-    width: 100px;
-    height: 140px;
-    background: #f0f0f0;
-    border-radius: 12px;
-    margin-left: 20px;
-    object-fit: cover;
-}
-
-/* empty */
-.empty-msg {
+.empty-box {
     text-align: center;
     padding: 100px 0;
     background: #fff;
     border-radius: 20px;
-    color: var(--text-gray);
+    color: #666;
     font-size: 16px;
 }
 </style>
 </head>
 
 <body>
+<div class="container">
+	<h1 class="page-title">찜 관리</h1>
 
-<h1 class="page-title">찜 관리</h1>
+	<div class="list-wrapper">
+		<!-- 오늘 날짜 -->
+		<jsp:useBean id="now" class="java.util.Date" />
+		<fmt:parseNumber value="${now.time / (1000*60*60*24)}"
+		                 integerOnly="true"
+		                 var="nowDays" />
 
-<div class="like-container">
+		<c:choose>
+			<c:when test="${empty likeList}">
+				<div class="empty-box">찜한 내역이 없습니다.</div>
+			</c:when>
 
-    <!-- 오늘 날짜 -->
-    <jsp:useBean id="now" class="java.util.Date" />
-    <fmt:parseNumber value="${now.time / (1000*60*60*24)}"
-                     integerOnly="true"
-                     var="nowDays" />
+			<c:otherwise>
+				<c:forEach var="item" items="${likeList}">
+					<!-- 종료일 기준 D-day 계산 -->
+					<fmt:parseNumber value="${item.end_at.time / (1000*60*60*24)}"
+					                 integerOnly="true"
+					                 var="endDays" />
+					<c:set var="dDay" value="${endDays - nowDays}" />
 
-    <c:choose>
-        <c:when test="${not empty likeList}">
-            <c:forEach var="item" items="${likeList}">
+					<div class="like-item">
+						<div class="item-info">
+							<div class="title-line">
+								<c:choose>
+									<c:when test="${dDay == 0}">
+										<span class="badge dday">D-Day</span>
+									</c:when>
+									<c:when test="${dDay < 0}">
+										<span class="badge end">종료</span>
+									</c:when>
+									<c:otherwise>
+										<span class="badge">D-${dDay}</span>
+									</c:otherwise>
+								</c:choose>
 
-                <!-- 종료일 기준 D-day 계산 -->
-                <fmt:parseNumber value="${item.end_at.time / (1000*60*60*24)}"
-                                 integerOnly="true"
-                                 var="endDays" />
-                <c:set var="dDay" value="${endDays - nowDays}" />
+								<a href="${pageContext.request.contextPath}/detail/${item.content_id}"
+								   class="title"
+								   target="_top">
+									${item.title}
+								</a>
+							</div>
 
-                <div class="like-item">
-                    <div class="item-info">
+							<div class="period">
+								<fmt:formatDate value="${item.start_at}" pattern="yyyy.MM.dd"/>
+								~
+								<fmt:formatDate value="${item.end_at}" pattern="yyyy.MM.dd"/>
+							</div>
 
-                        <!-- D-day + 제목 -->
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
-                            <span class="date-badge">
-                                <c:choose>
-                                    <c:when test="${dDay > 0}">D-${dDay}</c:when>
-                                    <c:when test="${dDay == 0}">D-Day</c:when>
-                                    <c:otherwise>종료</c:otherwise>
-                                </c:choose>
-                            </span>
+							<div class="btn-group">
+								<button type="button"
+								        class="reserve-btn"
+								        onclick="top.location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
+									예약하러 가기
+								</button>
+							</div>
+						</div>
 
-							<a href="${pageContext.request.contextPath}/detail/${item.content_id}"
-							   class="item-title" 
-							   target="_top">
-							    ${item.title}
-							</a>
-                        </div>
-
-                        <!-- 기간 -->
-                        <div style="font-size:14px; color:#999; margin-bottom:15px; font-weight:500;">
-                            <fmt:formatDate value="${item.start_at}" pattern="yyyy.MM.dd"/>
-                            ~
-                            <fmt:formatDate value="${item.end_at}" pattern="yyyy.MM.dd"/>
-                        </div>
-
-                        <!-- 버튼 -->
-                        <div class="btn-group">
-                            <button type="button"
-                                    class="btn-action btn-reserve"
-                                    onclick="top.location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
-                                예약하러 가기
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 포스터 -->
-                    <c:choose>
-                        <c:when test="${not empty item.main_image_path}">
-                            <a href="${pageContext.request.contextPath}/detail/${item.content_id}" target="_top">
-							    <img src="${pageContext.request.contextPath}${item.main_image_path}"
-							         class="poster-img"
-							         alt="포스터">
-							</a>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="poster-img"
-                                 style="display:flex; align-items:center; justify-content:center; font-size:12px; color:#aaa;">
-                                No Image
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-
-                </div>
-            </c:forEach>
-        </c:when>
-
-        <c:otherwise>
-            <div class="empty-msg">
-                찜한 내역이 없습니다.
-            </div>
-        </c:otherwise>
-    </c:choose>
-
+						<div class="poster">
+							<c:choose>
+								<c:when test="${not empty item.main_image_path}">
+									<a href="${pageContext.request.contextPath}/detail/${item.content_id}" target="_top">
+										<img src="${pageContext.request.contextPath}${item.main_image_path}" alt="포스터">
+									</a>
+								</c:when>
+								<c:otherwise>
+									<div style="width:100px; height:140px; border-radius:12px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#aaa;">
+										No Image
+									</div>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+				</c:forEach>
+			</c:otherwise>
+		</c:choose>
+	</div>
 </div>
 </body>
 </html>
