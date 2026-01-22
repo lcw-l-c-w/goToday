@@ -40,7 +40,7 @@ public class LoginInterceptor implements HandlerInterceptor{
 	                redirectUrl = "/index.do"; // 외부에서 유입된 경우 기본 페이지 설정
 	            }
 	        } else {
-	            redirectUrl = "/index.do"; // 이전 페이지 정보가 없는 경우
+	            redirectUrl = "/main"; // 이전 페이지 정보가 없는 경우
 	        }
 
 	        // URL 인코딩 (특수문자 처리)

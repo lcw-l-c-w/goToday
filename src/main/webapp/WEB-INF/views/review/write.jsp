@@ -1,128 +1,164 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="EUC-KR">
-<title>리뷰 등록 | Gotody</title>
+
 <style>
-    /* 배경 어둡게 */
-    .modal-overlay {
+    .review-modal-overlay {
         display: none;
         position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.7);
-        z-index: 1000;
+        z-index: 99999;
         justify-content: center;
         align-items: center;
     }
-    .modal-content {
+
+    .review-modal-content {
         background: white;
-        width: 450px;
-        padding: 30px;
+        width: 550px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 30px 40px;
         border-radius: 15px;
         position: relative;
     }
-    /* 별점 스타일 */
-    .star-wrapper {
+
+    .review-modal-content h3 {
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    /* 별점 클릭 스타일 */
+    .star-rating {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 5px;
         margin: 15px 0;
     }
-    #starRange { width: 150px; cursor: pointer; }
-    #starDisplay { font-size: 24px; color: #ffcc00; }
+
+    .star-rating .star {
+        font-size: 32px;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .star-rating .star:hover,
+    .star-rating .star.active {
+        color: #ffcc00;
+    }
+
+    .star-rating .star.half {
+        position: relative;
+    }
+
+    #ratingVal {
+        font-size: 18px;
+        font-weight: bold;
+        margin-left: 10px;
+        color: #333;
+    }
+
+    /* 시간대 선택 */
+    .time-zone-select, .time-zone-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .time-zone-display {
+        background: #f0f0f0;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 5px;
+        color: #333;
+    }
+
+    /* 기존 이미지 미리보기 */
+    .current-image-preview {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f8f8f8;
+        border-radius: 8px;
+    }
+    .current-image-preview img {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+    }
+    .current-image-preview .remove-image {
+        display: inline-block;
+        margin-top: 8px;
+        color: #ff4444;
+        cursor: pointer;
+        font-size: 13px;
+    }
 </style>
 
-<div id="reviewModal" class="modal-overlay">
-    <div class="modal-content">
-        <h3>리뷰 작성</h3>
+<div id="reviewModalContent" style="display:none;">
+    <div class="review-modal-content">
+        <h3 id="modalTitle">리뷰 작성</h3>
         <hr>
-        <div id="targetInfo" style="margin: 15px 0; font-size: 14px; background: #f8f8f8; padding: 10px;">
-            <p>전시: <span id="m_title"></span></p>
-            <p>위치: <span id="m_address"></span></p>
-            <p>방문일: <span id="m_date"></span></p>
+        <div id="targetInfo" style="margin: 15px 0; font-size: 14px; background: #f8f8f8; padding: 15px; border-radius: 8px;">
+            <p><strong>전시:</strong> <span id="m_title"></span></p>
+            <p><strong>위치:</strong> <span id="m_address"></span></p>
+            <p><strong>방문일:</strong> <span id="m_date"></span></p>
         </div>
 
-        <form id="reviewForm">
+        <form id="reviewForm" enctype="multipart/form-data">
             <input type="hidden" name="reservation_id" id="m_resId">
-            
-            <label>별점 <span id="ratingVal">5.0</span></label>
-            <div class="star-wrapper">
-                <input type="range" id="starRange" name="rating" min="0" max="5" step="0.5" value="5">
-                <div id="starDisplay">⭐⭐⭐⭐⭐</div>
+            <input type="hidden" name="content_id" id="m_contentId">
+            <input type="hidden" name="review_id" id="m_reviewId">
+            <input type="hidden" name="rating" id="m_rating" value="5">
+            <input type="hidden" name="visited_at" id="m_visitedAt">
+            <input type="hidden" name="visited_time_zone" id="m_visitedTimeZone">
+            <input type="hidden" name="keep_image" id="m_keepImage" value="true">
+
+            <label style="font-weight:600;">별점 <span id="ratingVal">5.0</span></label>
+            <div class="star-rating" id="starRating">
+                <span class="star active" data-value="1">★</span>
+                <span class="star active" data-value="2">★</span>
+                <span class="star active" data-value="3">★</span>
+                <span class="star active" data-value="4">★</span>
+                <span class="star active" data-value="5">★</span>
             </div>
 
             <div id="timeZoneArea" style="margin-bottom:15px;">
-                <label>방문 시간대</label>
+                <label style="font-weight:600;">방문 시간대</label>
                 <div id="timeInputContainer"></div>
             </div>
 
-            <textarea name="content" style="width:100%; height:100px; margin-bottom:15px;" placeholder="소중한 리뷰를 남겨주세요."></textarea>
+            <label style="font-weight:600;">리뷰 내용</label>
+            <textarea name="content" id="m_content" style="width:100%; height:100px; margin: 10px 0 15px 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: none;" placeholder="소중한 리뷰를 남겨주세요."></textarea>
 
-            <label>사진 업로드 (1장)</label>
-            <input type="file" name="reviewPhoto" id="reviewPhoto" accept="image/*" style="margin-bottom:20px;">
+            <div id="currentImageArea" style="display:none;">
+                <label style="font-weight:600;">현재 이미지</label>
+                <div class="current-image-preview">
+                    <img id="currentImage" src="" alt="현재 이미지">
+                    <span class="remove-image" id="btnRemoveImage">이미지 삭제</span>
+                </div>
+            </div>
 
-            <div style="display:flex; gap:10px;">
-                <button type="button" onclick="submitReview()" style="flex:1; padding:10px; background:#4dc3ff; color:white; border:none; border-radius:5px;">등록</button>
-                <button type="button" onclick="closeReviewModal()" style="flex:1; padding:10px; background:#ddd; border:none; border-radius:5px;">취소</button>
+            <label style="font-weight:600;">사진 업로드 (1장)</label>
+            <input type="file" name="image_new" id="reviewPhoto" accept="image/*" style="margin: 10px 0 20px 0; width: 100%;">
+
+            <!-- 등록 모드 버튼 -->
+            <div id="createButtons" style="display:flex; gap:10px;">
+                <button type="button" id="btnSubmitReview" style="flex:1; padding:12px; background:#4dc3ff; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">등록</button>
+                <button type="button" id="btnCloseReview" style="flex:1; padding:12px; background:#ddd; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">취소</button>
+            </div>
+
+            <!-- 수정 모드 버튼 -->
+            <div id="editButtons" style="display:none; gap:10px;">
+                <button type="button" id="btnUpdateReview" style="flex:1; padding:12px; background:#4dc3ff; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">수정</button>
+                <button type="button" id="btnDeleteReview" style="flex:1; padding:12px; background:#ff4444; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">삭제</button>
+                <button type="button" id="btnCloseReview2" style="flex:1; padding:12px; background:#ddd; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">취소</button>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-    function openReviewModal(data) {
-        // 1. 기본 정보 세팅
-        $("#m_resId").val(data.reservation_id);
-        $("#m_title").text(data.title);
-        $("#m_address").text(data.address);
-        $("#m_date").text(data.visitDate);
-
-        // 2. 시간대 처리 (서버에서 준 값이 'ALL'이면 select, 아니면 readonly input)
-        let timeHtml = "";
-        if(data.visitTime === 'ALL') {
-            timeHtml = `<select name="visitTime" style="width:100%; padding:8px;">
-                            <option value="MORNING">오전(09:00-12:00)</option>
-                            <option value="AFTERNOON">오후(12:00-18:00)</option>
-                        </select>`;
-        } else {
-            timeHtml = `<input type="text" name="visitTime" value="\${data.visitTime}" readonly style="width:100%; padding:8px; background:#eee; border:1px solid #ddd;">`;
-        }
-        $("#timeInputContainer").html(timeHtml);
-
-        $("#reviewModal").css("display", "flex");
-    }
-
-    function closeReviewModal() {
-        $("#reviewModal").hide();
-        $("#reviewForm")[0].reset();
-    }
-
-    // 별점 슬라이더 이벤트
-    $("#starRange").on("input", function() {
-        let val = parseFloat($(this).val()).toFixed(1);
-        $("#ratingVal").text(val);
-        // 별 아이콘 로직은 간단히 텍스트로 대체하거나 CSS width로 조절 가능
-    });
-
-    function submitReview() {
-        const form = $('#reviewForm')[0];
-        const formData = new FormData(form);
-
-        $.ajax({
-            url: "/gotoday/review/create.do",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(res) {
-                alert("리뷰가 등록되었습니다.");
-                location.reload();
-            }
-        });
-    }
-</script>
-</body>
-</html>

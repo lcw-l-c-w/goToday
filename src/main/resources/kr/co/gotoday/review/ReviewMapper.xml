@@ -7,7 +7,7 @@
             content, rating, image_org, image_new, visited_at, visited_time_zone,
             created_at, content_id, user_id, reservation_id
         ) VALUES (
-            #{content}, #{rating},#{image_org},#{image_new},#{visited_at}, #{visited_time_zone}, 
+            #{content}, #{rating}, #{image_org}, #{image_new}, #{visited_at}, #{visited_time_zone}, 
             NOW(), #{content_id}, #{user_id}, #{reservation_id}
         )
     </insert>
@@ -110,6 +110,15 @@
 
     <select id="checkReviewExistsById" resultType="int">
         SELECT COUNT(*)
+        FROM review
+        WHERE reservation_id = #{reservation_id}
+    </select>
+
+    <select id="findReviewByReservationId" resultType="kr.co.gotoday.review.ReviewVO">
+        SELECT
+            review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at,
+            content_id, user_id, reservation_id
         FROM review
         WHERE reservation_id = #{reservation_id}
     </select>

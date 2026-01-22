@@ -4,88 +4,227 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.oreilly.servlet.MultipartRequest;
-
+import kr.co.gotoday.reservation.ReservationDetailDTO;
+import kr.co.gotoday.reservation.ReservationService;
 import kr.co.gotoday.user.UserVO;
+import util.MyFileRenamePolicy;
 
 @Controller
 public class ReviewController {
-	
-	@Autowired
-	ReviewService reviewService;
-	
 
-	
+	private static final String UPLOAD_PATH = "C:/gotoday_img";
+
+	@Autowired
+	private ReviewService reviewService;
+
+	@Autowired
+	private ReservationService reservationService;
+
+	private static final Logger log = LoggerFactory.getLogger(ReviewController.class);
+
+	@GetMapping("/review/getData")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getReviewData(
+			@RequestParam("reservation_id") int reservationId,
+			HttpSession sess) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+			if (userVO == null) {
+				response.put("success", false);
+				response.put("message", "로그인이 필요합니다.");
+				return ResponseEntity.badRequest().body(response);
+			}
+
+			// 예약 정보 조회
+			ReservationDetailDTO dto = reservationService.findReservationDetailById(reservationId, userVO.getUser_id());
+
+			if (dto == null) {
+				response.put("success", false);
+				response.put("message", "예약 정보를 찾을 수 없습니다.");
+				return ResponseEntity.badRequest().body(response);
+			}
+
+			response.put("reservation_id", dto.getReservation_id());
+			response.put("content_id", dto.getContent_id());
+			response.put("title", dto.getTitle());
+			response.put("location", dto.getLocation());
+			response.put("visited_at", dto.getReserved_for_at());
+			response.put("visited_time_zone", dto.getTime_zone());
+
+			// 리뷰 존재 여부 확인
+			boolean reviewExists = reviewService.checkReviewExists(reservationId);
+			response.put("reviewExists", reviewExists);
+
+			// 리뷰가 존재하면 리뷰 데이터도 함께 반환
+			if (reviewExists) {
+				ReviewVO review = reviewService.findReviewByReservationId(reservationId);
+				response.put("review", review);
+			}
+
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			log.error("[리뷰 데이터 조회 실패] reservationId={}", reservationId, e);
+			response.put("success", false);
+			response.put("message", "데이터 조회에 실패했습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
+
 	@PostMapping("/review/create.do")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> createReview(
-			HttpServletRequest request, HttpSession sess) {		
-		
-		String uploadPath = "C:/gotoday_img";
-		
-		//해당 폴더가 없으면 생성
-		File dir = new File(uploadPath);
-	    if (!dir.exists()) {
-	        dir.mkdirs();
-	    }
-		
-	    int maxSize = 10 * 1024 * 1024; // 10MB
-	    
-	    try {
-	        MultipartRequest multi = new MultipartRequest(
-	            request, 
-	            uploadPath,
-	            maxSize, 
-	            new util.MyFileRenamePolicy()
-	        );
-	        
-	        UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+			@RequestParam(value = "image_new", required = false) MultipartFile imageFile,
+			@RequestParam("content") String content,
+			@RequestParam(value = "rating", required = false, defaultValue = "5") int rating,
+			@RequestParam("content_id") int contentId,
+			@RequestParam("reservation_id") int reservationId,
+			@RequestParam(value = "visited_at", required = false) String visitedAt,
+			@RequestParam(value = "visited_time_zone", required = false) String visitedTimeZone,
+			HttpSession sess) {
 
-	        String visited_at = multi.getParameter("visited_at");
-	        String visited_time_zone = multi.getParameter("visited_time_zone");
+		Map<String, Object> response = new HashMap<>();
 
-	        String image_new = multi.getFilesystemName("image_new");
-	        String image_org = multi.getOriginalFileName("image_org");
+		try {
+			UserVO userVO = (UserVO) sess.getAttribute("loginSess");
 
-	        ReviewVO reviewVO = new ReviewVO();
-	        reviewVO.setContent(multi.getParameter("content"));
+			// 이미지 업로드 처리
+			String[] imageNames = processImageUpload(imageFile);
 
-	        String ratingStr = multi.getParameter("rating");
-	        if (ratingStr != null && !ratingStr.isEmpty()) {
-	            reviewVO.setRating(Integer.parseInt(ratingStr));
-	        }
+			// ReviewVO 생성
+			ReviewVO reviewVO = new ReviewVO();
+			reviewVO.setContent(content);
+			reviewVO.setRating(rating);
+			reviewVO.setContent_id(contentId);
+			reviewVO.setReservation_id(reservationId);
+			reviewVO.setUser_id(userVO.getUser_id());
+			reviewVO.setImage_org(imageNames[0]);
+			reviewVO.setImage_new(imageNames[1]);
+			reviewVO.setVisited_at(visitedAt);
+			reviewVO.setVisited_time_zone(visitedTimeZone);
 
-	        reviewVO.setVisited_at(visited_at);
-	        reviewVO.setVisited_time_zone(visited_time_zone);
-	        reviewVO.setImage_org(image_org);
-	        reviewVO.setImage_new(image_new);
-	        reviewVO.setContent_id(Integer.parseInt(multi.getParameter("content_id")));
-	        reviewVO.setReservation_id(Integer.parseInt(multi.getParameter("reservation_id")));
-	        reviewVO.setUser_id(userVO.getUser_id());
+			reviewService.createReview(reviewVO);
 
-	        //등록 서비스 호출
-	        reviewService.createReview(reviewVO);
+			response.put("success", true);
+			response.put("message", "리뷰가 등록되었습니다.");
+			return ResponseEntity.ok(response);
 
-	        Map<String, Object> response = new HashMap<>();
-	        response.put("success", true);
-	        response.put("message", "리뷰가 등록되었습니다.");
-	        return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("[리뷰 등록 실패]", e);
+			response.put("success", false);
+			response.put("message", "리뷰 등록에 실패했습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        Map<String, Object> errorResponse = new HashMap<>();
-	        errorResponse.put("success", false);
-	        errorResponse.put("message", "리뷰 등록에 실패했습니다.");
-	        return ResponseEntity.badRequest().body(errorResponse);
-	    }
+	@PostMapping("/review/update.do")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateReview(
+			@RequestParam(value = "image_new", required = false) MultipartFile imageFile,
+			@RequestParam("review_id") int reviewId,
+			@RequestParam("content") String content,
+			@RequestParam(value = "rating", required = false, defaultValue = "5") int rating,
+			@RequestParam(value = "keep_image", required = false, defaultValue = "false") boolean keepImage,
+			HttpSession sess) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+
+			ReviewVO reviewVO = new ReviewVO();
+			reviewVO.setReview_id(reviewId);
+			reviewVO.setUser_id(userVO.getUser_id());
+			reviewVO.setContent(content);
+			reviewVO.setRating(rating);
+
+			// 새 이미지가 있으면 업로드, 없으면 기존 이미지 유지 여부에 따라 처리
+			if (imageFile != null && !imageFile.isEmpty()) {
+				String[] imageNames = processImageUpload(imageFile);
+				reviewVO.setImage_org(imageNames[0]);
+				reviewVO.setImage_new(imageNames[1]);
+			} else if (!keepImage) {
+				// 이미지 삭제 요청
+				reviewVO.setImage_org(null);
+				reviewVO.setImage_new(null);
+			}
+
+			reviewService.updateReview(reviewVO);
+
+			response.put("success", true);
+			response.put("message", "리뷰가 수정되었습니다.");
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			log.error("[리뷰 수정 실패] reviewId={}", reviewId, e);
+			response.put("success", false);
+			response.put("message", "리뷰 수정에 실패했습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
+
+	@PostMapping("/review/delete.do")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> deleteReview(
+			@RequestParam("review_id") int reviewId,
+			HttpSession sess) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+
+			reviewService.deleteReview(reviewId, userVO.getUser_id());
+
+			response.put("success", true);
+			response.put("message", "리뷰가 삭제되었습니다.");
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			log.error("[리뷰 삭제 실패] reviewId={}", reviewId, e);
+			response.put("success", false);
+			response.put("message", "리뷰 삭제에 실패했습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
+
+	//이미지 업로드 처리 (공통 로직)
+	private String[] processImageUpload(MultipartFile imageFile) throws Exception {
+		String imageOrg = null;
+		String imageNew = null;
+
+		if (imageFile != null && !imageFile.isEmpty()) {
+			File dir = new File(UPLOAD_PATH);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+
+			imageOrg = imageFile.getOriginalFilename();
+			File originFile = new File(UPLOAD_PATH, imageOrg);
+
+			MyFileRenamePolicy policy = new MyFileRenamePolicy();
+			File renamedFile = policy.rename(originFile);
+
+			imageFile.transferTo(renamedFile);
+			imageNew = renamedFile.getName();
+		}
+
+		return new String[]{imageOrg, imageNew};
 	}
 }

@@ -156,6 +156,13 @@ public class MvcConfig implements WebMvcConfigurer{
 			
 	}
 	
+	//리뷰 이미지 업로드하면 저장되는 경로
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    registry.addResourceHandler("/uploads/**")
+	            .addResourceLocations("file:///C:/gotoday_img/");
+	}
+	
 }
 
 

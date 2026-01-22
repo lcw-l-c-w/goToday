@@ -331,7 +331,9 @@ body {
 			</div>
 		</div>
 	</div>
+	<jsp:include page="/WEB-INF/views/review/write.jsp" />
 
+	<script src="/gotoday/resources/js/review/write.js"></script>
 	<script>
 		$(function() {
 			$(".info-btn").click(
@@ -351,7 +353,7 @@ body {
                 $.ajax({
                     url: "/gotoday/review/getData", 
                     type: "GET",
-                    data: { reservation_id: resId, content_id: contentId },
+                    data: { reservation_id: resId},
                     success: function(data) {
                         // 데이터 로드 성공 시 모달에 데이터 세팅 후 오픈
                         openReviewModal(data);

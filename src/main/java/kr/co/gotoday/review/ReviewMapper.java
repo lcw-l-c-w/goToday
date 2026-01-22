@@ -23,5 +23,6 @@ public interface ReviewMapper {
 
 	int checkReviewExistsById(@Param("reservation_id") int reservationId);
 	int countReviewsByContentId(@Param("content_id") int contentId);
+	ReviewVO findReviewByReservationId(@Param("reservation_id") int reservationId);
 
 }
