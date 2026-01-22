@@ -15,7 +15,7 @@ body {
 /* 2. 게시판 박스 위치 조정 */
 .size { 
     max-width: 1100px; 
-    margin: 70px auto;  
+    margin: 40px auto;  
     padding: 30px 40px 40px 40px;
     background: white; 
     border-radius: 16px; 

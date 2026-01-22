@@ -61,6 +61,7 @@
     </script>
 </head> 
 <body>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
     <div class="wrap">
         <div class="sub">
             <div class="size">
