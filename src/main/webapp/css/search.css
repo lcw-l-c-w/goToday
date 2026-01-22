@@ -1,0 +1,267 @@
+@charset "UTF-8";
+body { background: pink !important; }
+
+:root { --main-color: #4dc3ff; }
+
+.search-page {
+  width: 100%;
+  background: #f3f3f3;
+  min-height: 100vh;
+}
+
+.search-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 28px 24px 40px;
+}
+
+/* ===== 상단 검색바 ===== */
+.search-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 14px;
+}
+
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  border-bottom: 2px solid #222;
+  padding: 8px 6px;
+  gap: 8px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  padding: 4px 2px;
+}
+
+.clear-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: #999;
+}
+
+.clear-btn:hover { color: #333; }
+
+.submit-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: #111;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.chk {
+  font-size: 13px;
+  color: #444;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ===== 필터 박스 ===== */
+.filter-box {
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 20px;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  border-top: 1px solid #eee;
+  min-height: 44px;
+}
+
+.filter-row:first-child { border-top: none; }
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+}
+
+.filter-options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #333;
+}
+
+.opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.sort-select {
+  height: 34px;
+  border: 1px solid #ddd;
+  padding: 0 10px;
+  border-radius: 6px;
+  outline: none;
+}
+
+.apply-btn {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.apply-btn:hover {
+  border-color: var(--main-color);
+  color: var(--main-color);
+}
+
+/* ===== 결과 리스트 ===== */
+.result-box {
+  border-top: 1px solid #e8e8e8;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 220px 180px;
+  gap: 18px;
+  padding: 22px 0;
+  border-bottom: 1px solid #e8f2ff;
+  align-items: center;
+}
+
+.col-poster {
+  display: flex;
+  justify-content: center;
+}
+
+.poster-box {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* D-day */
+.dday {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--main-color);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.col-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mini-tag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--main-color);
+  color: var(--main-color);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.title-link {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  text-decoration: none;
+}
+
+.title-link:hover {
+  color: var(--main-color);
+}
+
+.col-period, .col-place {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  position: relative;
+}
+
+.col-period::before, .col-place::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 40px;
+  background: #cfe6ff;
+}
+
+/* ===== 페이지네이션 ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.page-btn {
+  width: 30px;
+  height: 28px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.page-btn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  cursor: default;
+}
