@@ -532,7 +532,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 					~ ${content.end_at.substring(0,10)}  |  ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">
-				<img src="https://cdn-icons-png.flaticon.com/512/5968/5968830.png"
+				<img src="https://cdn-icons-png.flaticon.com/512/5968/5968958.png"
 					alt="X" style="width: 22px; margin-left: 10px;" id="x"> <img
 					src="https://cdn-icons-png.flaticon.com/512/1384/1384031.png"
 					alt="IG" style="width: 22px; margin-left: 10px;" id="ig"> <img

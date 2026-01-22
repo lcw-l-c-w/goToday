@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService{
         return true;
     }
     
-    //회원정보 수정
+    //회원정보 수정+회원 조회해서 사업자/ 개인/ admin 분기 
     @Override
     public UserVO getUserById(int userId) {
         return userMapper.getUserById(userId);

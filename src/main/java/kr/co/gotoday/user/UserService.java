@@ -30,4 +30,5 @@ public interface UserService {
 	// 회원 정보 수정
 	UserVO getUserById(int userId);
 	boolean updateUserInfo(UserVO vo);
+	
 }

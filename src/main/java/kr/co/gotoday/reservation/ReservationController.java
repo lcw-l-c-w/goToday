@@ -358,14 +358,22 @@ public class ReservationController {
     public String showTicket(@PathVariable("reservation_id") Integer reservation_id, HttpSession sess,Model model) {
         UserVO userVO= (UserVO) sess.getAttribute("loginSess");
         if(userVO== null || reservation_id==null) {
-            return null;
+        	model.addAttribute("msg","로그인이 필요합니다.");
+        	 model.addAttribute("cmd", "back");
+        	return "redirect:/member/login"; // null 반환 대신 로그인 페이지로 유도
         }
         ReservationVO reservationVO =reservationService.findByReservationId(reservation_id); 
         if(reservationVO==null) {
-            model.addAttribute("msg","존재하지 않습니다");
+            model.addAttribute("msg","존재하지 않는 예약입니다");
             return "common/return";
         }
         ContentVO contentVO = contentService.getDetailContents(reservationVO.getContent_id(), userVO.getUser_id());
+        if(contentVO == null) {
+            // 콘텐츠 정보가 사라졌거나 가져올 수 없는 경우에 대한 처리
+        	System.out.println("???");
+            model.addAttribute("msg", "해당 콘텐츠 정보를 불러올 수 없습니다.");
+            return "common/return";
+        }
         int totalQty= reservationVO.getChild_qty()+reservationVO.getTeen_qty()+reservationVO.getAdult_qty();
         reservationVO.setTotalQty(totalQty);
         reservationVO.setLocation(contentVO.getLocation());
