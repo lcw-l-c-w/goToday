@@ -676,22 +676,7 @@ a {
                 }
             }
 
-            // --- 3. 로그인 체크 (마이페이지 버튼) ---
-      document.getElementById('myPageBtn').onclick = () => {
-            	
-            	const isLoggedIn = ${not empty loginSess ? true : false};
-            	const userRole = ${not empty loginSess ? loginSess.role : -1};
-            	
-            	if (!isLoggedIn) {
-                    alert("로그인이 필요한 서비스입니다.");
-                    location.href = "${pageContext.request.contextPath}/member/login";
-                } else if(userRole==0){
-                    location.href = "${pageContext.request.contextPath}/mypage/main";
-                }else if(userRole==1){
-                	location.href="${pageContext.request.contextPath}/vendor/content_manage";
-                }
-                else alert("잘못된 접근입니다.");
-            };
+    
         });
     </script>
 </body>
