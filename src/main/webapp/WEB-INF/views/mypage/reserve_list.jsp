@@ -214,7 +214,7 @@ body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif
 						</div>
 
 						<div class="poster">
-							<a href="${pageContext.request.contextPath}/detail/${r.content_id}">
+							<a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
 								<img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
 							</a>
 						</div>
