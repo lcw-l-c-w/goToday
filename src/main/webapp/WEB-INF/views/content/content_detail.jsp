@@ -328,9 +328,13 @@ a {
 }
 
 .detail-img {
-	width: 100%;
-	border-radius: 8px;
-	margin-top: 20px;
+width: 100%;           /* 1. 상자 너비에 딱 맞게! */
+    max-width: 600px;      /* 2. 너무 커지는 건 방지 (원하는 숫자로 조절해!) */
+    height: auto;          /* 3. 높이는 비율에 맞게 알아서! */
+    display: block;        /* 4. 덩어리로 만들어서 */
+    margin: 20px auto;     /* 5. 가운데로 모으기! */
+    border-radius: 8px;
+    object-fit: contain;   /* 6. 이미지가 잘리지 않고 상자 안에 다 보이게! */
 }
 </style>
 
@@ -578,8 +582,8 @@ $(function() {
 		<div class="content-title-area">
 			<div>
 				<h1>${content.title}</h1>
-				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at}
-					~ ${content.end_at} | ${content.location} 📍</p>
+				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at.substring(0,10)}
+					~ ${content.end_at.substring(0,10)}  |  ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">
 				<img src="https://cdn-icons-png.flaticon.com/512/733/733579.png"

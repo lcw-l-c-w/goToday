@@ -104,7 +104,7 @@
                         <img src="<c:url value='${item.main_image_path}'/>">
                         <div class="banner-info">
                             <h3>${item.title}</h3>
-                            <p>운영 기간 | ${item.start_at} ~ ${item.end_at}</p>
+                            <p>운영 기간 | ${item.start_at.substring(0,10)} ~ ${item.end_at.substring(0,10)}</p>
                         </div>
                     </li>
                 </c:forEach>
