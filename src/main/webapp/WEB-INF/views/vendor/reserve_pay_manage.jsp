@@ -128,7 +128,8 @@ const PAY_MAP = {
     'DONE': { text: '결제 완료', className: 'pay-complete' },
     'WAITING_FOR_DEPOSIT': { text: '입금 대기', className: 'pay-waiting' },
     'FAILED': { text: '결제 실패', className: 'pay-failed' },
-    'REFUNDED': { text: '환불 처리', className: 'pay-refund' }
+    'REFUNDED': { text: '환불 처리', className: 'pay-refund' },
+    'CANCELED' : { text: '결제 취소', className: 'pay-cancel'}
 };
 
 function loadContentFilter() {
@@ -316,11 +317,11 @@ function openModal(id) {
                     <div class="info-row-grid">
                         <div class="info-item">
                             <label>결제 수단</label>
-                            <div class="val">신용카드</div>
+                            <div class="val">\${data.payment_method}</div>
                         </div>
                         <div class="info-item">
                             <label>결제 금액</label>
-                            <div class="val-price">₩\${Number(data.total_price || 44000).toLocaleString()}</div>
+                            <div class="val-price">₩\${Number(data.amount_price || 0).toLocaleString()}</div>
                         </div>
                     </div>
                 </div>

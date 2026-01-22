@@ -20,11 +20,13 @@
     </script>
 </head> 
 <body>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
     <div class="wrap">
         <div class="sub">
             <div class="size">
                 <h3 class="sub_title">문의사항</h3>
                 <div class="bbs">
+                  <div class="list-wrap">
                     <table class="list">
                     <p><span><strong>총 ${map.count }개</strong>  |  ${replyVO.page }/${map.totalPage }페이지</span></p>
                     <p class="btnSet" style="text-align:right; margin-top:-30px;">
@@ -66,33 +68,41 @@
 									</a>
                                 </td>
                                 <td class="writer">
-                                    ${vo.writer_name }
+                                	<c:choose>
+									    <c:when test="${empty vo.writer_name}">
+									        관리자
+									    </c:when>
+									    <c:otherwise>
+									        ${vo.writer_name}
+									    </c:otherwise>
+									</c:choose>
                                 </td>
                                 <td class="date"><fmt:formatDate value="${vo.created_at }" pattern="YYYY-MM-dd"/></td>
                             </tr>
                        </c:forEach>
                         </tbody>
                     </table>
-                    
+                   </div>
+                   <div class="pagenate">
                     <div class="pagenate clear">
                         <ul class='paging'>
-                        <c:if test="${map.prev }">
+                        <c:if test="${map.isPrev }">
                         	<li><a href="index.do?page=${map.startPage-1 }&searchType=${replyVO.searchType}&searchWord=${replyVO.searchWord}"> << </a></li>
                         </c:if>
                         <c:forEach var="p" begin="${map.startPage}" end="${map.endPage}">
                         	<c:if test="${p == replyVO.page}">
-                            <li><a href='#;' class='current'>${p}</a></li>
+                            	<li><a href='#;' class='current'>${p}</a></li>
                             </c:if>
                             <c:if test="${p != replyVO.page}">
-                            <li><a href='index.do?page=${p}&searchType=${replyVO.searchType}&searchWord=${replyVO.searchWord}'>${p}</a></li>
+                            	<li><a href='index.do?page=${p}&searchType=${replyVO.searchType}&searchWord=${replyVO.searchWord}'>${p}</a></li>
                             </c:if>
                         </c:forEach>
-                        <c:if test="${map.next }">
+                        <c:if test="${map.isNext }">
                         	<li><a href="index.do?page=${map.endPage+1 }&searchType=${replyVO.searchType}&searchWord=${replyVO.searchWord}"> >> </a></li>
                         </c:if>
                         </ul> 
                     </div>
-                
+                </div>
                     <!-- 페이지처리 -->
                     <div class="bbsSearch">
                         <form method="get" name="searchForm" id="searchForm" action="index.do">
@@ -108,8 +118,8 @@
                                 <input type="button" id="" value="검색" title="검색"  onclick="document.getElementById('searchForm').submit();">
                             </span>
                         </form>
-                        
                     </div>
+                   
                 </div>
             </div>
         </div>
