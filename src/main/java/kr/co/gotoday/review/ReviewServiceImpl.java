@@ -17,11 +17,12 @@ public class ReviewServiceImpl implements ReviewService{
 	        LoggerFactory.getLogger(ReservationServiceImpl.class);
 	
 	@Override
-	public void createReivew(ReviewVO reviewVO) {
+	public void createReview(ReviewVO reviewVO) {
 		int result  = reviewMapper.createReview(reviewVO);
 		
 		if (result < 1) {
-			log.err
+			log.error("[리뷰 등록 실패] reviewVO={}",reviewVO);
+			throw new RuntimeException("리뷰 등록 실패!");
 		}
 	}
 

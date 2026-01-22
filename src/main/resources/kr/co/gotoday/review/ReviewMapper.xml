@@ -4,11 +4,11 @@
 
 	 <insert id="createReview" parameterType="kr.co.gotoday.review.ReviewVO">
         INSERT INTO review (
-            content, rating, image_org, image_new, visited_at, created_at,
-            content_id, user_id, reservation_id
+            content, rating, image_org, image_new, visited_at, visited_time_zone,
+            created_at, content_id, user_id, reservation_id
         ) VALUES (
-            #{content}, #{rating},#{image_org},#{image_new},#{visited_at}, NOW(),
-            #{content_id}, #{user_id}, #{reservation_id}
+            #{content}, #{rating},#{image_org},#{image_new},#{visited_at}, #{visited_time_zone}, 
+            NOW(), #{content_id}, #{user_id}, #{reservation_id}
         )
     </insert>
 
@@ -31,16 +31,9 @@
 
     <select id="findOneReviewById" resultType="kr.co.gotoday.review.ReviewVO">
         SELECT 
-            review_id,
-            content,
-            rating,
-            image_org,
-            image_new,
-            visited_at,
-            created_at,
-            content_id,
-            user_id,
-            reservation_id
+            review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id
         FROM review
         WHERE review_id = #{review_id}
     </select>
@@ -48,7 +41,8 @@
     <select id="findReviewsByUserId" parameterType="map" resultType="kr.co.gotoday.review.ReviewVO">
         SELECT 
             review_id, content, rating, image_org, image_new,
-            visited_at, created_at, content_id, user_id, reservation_id
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id
         FROM review
         WHERE user_id = #{user_id}
         ORDER BY created_at DESC
@@ -57,7 +51,8 @@
     <select id="findReviewsByContentIdWithSort" parameterType="map" resultType="kr.co.gotoday.review.ReviewVO">
         SELECT 
             review_id, content, rating, image_org, image_new,
-            visited_at, created_at, content_id, user_id, reservation_id
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id
         FROM review
         WHERE content_id = #{content_id}
         <choose>
@@ -79,7 +74,8 @@
     <select id="findAllReviews" resultType="kr.co.gotoday.review.ReviewVO">
         SELECT 
         	review_id, content, rating, image_org, image_new,
-            visited_at, created_at, content_id, user_id, reservation_id 
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id 
         FROM review
         ORDER BY created_at DESC
     </select>

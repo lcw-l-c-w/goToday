@@ -12,6 +12,7 @@ public class ReviewVO {
     private String image_org;
     private String image_new;
     private String visited_at;
+    private String visited_time_zone;
     private Timestamp created_at;
     private int content_id;
     private int user_id;

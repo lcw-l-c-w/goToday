@@ -112,7 +112,7 @@
         const formData = new FormData(form);
 
         $.ajax({
-            url: "/gotoday/review/insert",
+            url: "/gotoday/review/create.do",
             type: "POST",
             data: formData,
             contentType: false,
