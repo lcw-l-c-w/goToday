@@ -62,10 +62,9 @@ public class ContentVO {
     
     //종료/ 오픈예정/ 진행중 
     public String getContentStatusCurrent() {
-    	if(content_status_current.equals("STATUS_OPEN")) return "진행중";
-    	else if(content_status_current.equals("STATUS_SCHEDULED")) return "오픈예정";
-    	else if(content_status_current.equals("STATUS_CLOSED")) return "종료";
-    	
-    	return "";
+    	if("STATUS_OPEN".equals(content_status_current)) return "진행중";
+        else if("STATUS_SCHEDULED".equals(content_status_current)) return "오픈예정";
+        else if("STATUS_CLOSED".equals(content_status_current)) return "종료";
+    	return "해당없음";
     }
 }
