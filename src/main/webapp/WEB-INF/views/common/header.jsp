@@ -271,7 +271,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
                 </div>
             </div>
 
-            <span class="user-icon" id="commonMyPageBtn">👤</span>
+            <span class="user-icon" id="myPageBtn">👤</span>
         </div>
     </div>
 </header>
@@ -361,17 +361,34 @@ uri="http://java.sun.com/jsp/jstl/core"%>
       renderRecent();
     })();
 
-    $(function() {
-        // 네비게이션 로그인 체크 및 이동
-        $("#commonMyPageBtn").click(function() {
-            // JSP 내장 객체 세션을 체크하되, 외부 JS 파일이 아니므로 EL 사용 가능
-            const isLoggedIn = ${not empty loginSess};
-            if (!isLoggedIn) {
-                alert("로그인이 필요한 서비스입니다.");
-                location.href = "${pageContext.request.contextPath}/member/login";
-            } else {
-                location.href = "${pageContext.request.contextPath}/mypage/main";
-            }
-        });
-    });
+    (function () {
+    	  const btn = document.getElementById("myPageBtn");
+    	  if (!btn) return; // 페이지에 버튼 없으면 아무것도 안 함
+
+    	  const CTX = "${pageContext.request.contextPath}";
+    	  const isLoggedIn = ${not empty loginSess}; // true/false
+
+    	  // role이 숫자라고 가정하면 아래처럼 (안전하게 숫자로 변환)
+    	  const userRole = Number("${not empty loginSess ? loginSess.role : -1}");
+
+    	  btn.addEventListener("click", function () {
+    	    if (!isLoggedIn) {
+    	      alert("로그인이 필요한 서비스입니다.");
+    	      location.href = CTX + "/member/login";
+    	      return;
+    	    }
+
+    	    if (userRole === 0) {
+    	      location.href = CTX + "/mypage/main";
+    	      return;
+    	    }
+
+    	    if (userRole === 1) {
+    	      location.href = CTX + "/vendor/content_manage";
+    	      return;
+    	    }
+
+    	    alert("잘못된 접근입니다.");
+    	  });
+    	})();
 </script>

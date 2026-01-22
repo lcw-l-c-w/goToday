@@ -448,21 +448,7 @@ $(function() {
     }
 });
     
-    // 마이페이지 로그인 체크
-    $("#myPageBtn").click(function() {
-        const isLoggedIn = ${not empty loginSess};
-    	const userRole = ${not empty loginSess ? loginSess.role : -1};
-    	
-    	if (!isLoggedIn) {
-            alert("로그인이 필요한 서비스입니다.");
-            location.href = "${pageContext.request.contextPath}/member/login";
-        } else if(userRole==0){
-            location.href = "${pageContext.request.contextPath}/mypage/main";
-        }else if(userRole==1){
-        	location.href="${pageContext.request.contextPath}/vendor/content_manage";
-        }
-        else alert("잘못된 접근입니다.");
-    });
+
 });
 
     //  상세 페이지 들어갔을 때 최근본페이지 기능에 넣으려고 만든 부분
