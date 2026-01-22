@@ -38,6 +38,24 @@
     })
     function goSave() {
     	oEditors[0].exec('UPDATE_CONTENTS_FIELD',[]);
+    	
+    	// 2. 제목 유효성 검사
+        var title = document.getElementById("title");
+        if (title.value.trim() == "") {
+            alert("제목을 입력해주세요.");
+            title.focus();
+            return false;
+        }
+
+        // 3. 내용 유효성 검사 (스마트 에디터 공백 체크)
+        var body = document.getElementById("body").value;
+        // 에디터 특성상 아무것도 안 써도 <p>&nbsp;</p> 등이 들어갈 수 있음
+        if (body == "" || body == null || body == "&nbsp;" || body == "<p>&nbsp;</p>" || body == "<p><br></p>") {
+            alert("내용을 입력해주세요.");
+            oEditors[0].exec("FOCUS"); // 에디터에 포커스
+            return false;
+        }
+    	
     	document.getElementById("frm").submit();
     }
     </script>
@@ -49,19 +67,19 @@
                 <h3 class="sub_title">문의사항 작성</h3>
     
                 <div class="bbs">
-                <form method="post" name="frm" id="frm" action="insert.do" enctype="multipart/form-data" >
+                <form method="post" name="frm" id="frm" action="insert.do" enctype="multipart/form-data">
                     <table class="board_write">
                         <tbody>
                         <tr>
                             <th>제목</th>
                             <td>
-                                <input type="text" name="title" id="title" class="wid100" value=""/>
+                                <input type="text" name="title" id="title" class="wid100" required>
                             </td>
                         </tr>
                         <tr>
                             <th>내용</th>
                             <td>
-                                <textarea name="body" id="body" style="width:100%;"></textarea>
+                                <textarea name="body" id="body" style="width:100%; height:300px;"></textarea>
                             </td>
                         </tr>
                         </tbody>

@@ -58,7 +58,6 @@
                             <div class="fl_l">
                             	<a href="index.do" class="btn">목록</a>
                             	<c:if test="${!empty login and login.user_id == vo.writer}">
-	                            	<a href="edit.do?reply_id=${vo.reply_id}" class="btn">수정</a>
 	                            	<a href="javascript:del();" class="btn">삭제</a>
                             	</c:if>
                             	<c:if test="${Admin and empty adminReply}">

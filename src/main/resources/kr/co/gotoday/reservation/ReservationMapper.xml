@@ -43,6 +43,8 @@
 	    (r.adult_qty + r.child_qty + r.teen_qty) AS person_count,
 	    r.reservation_status AS reserve_status,
 	    p.payment_status AS pay_status,
+	    p.payment_method AS payment_method,
+	    p.amount_price AS amount_price,
 	    r.receiver_name,
 	    r.receiver_phone,
 	    c.title AS content_title

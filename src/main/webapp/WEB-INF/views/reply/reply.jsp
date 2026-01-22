@@ -62,12 +62,13 @@
                         <tr>
                             <th>내용</th>
                             <td>
-                                <textarea name="body" id="body" style="width:100%;"></textarea>
+                                <textarea name="body" id="body" style="width:100%; height:300px;"></textarea>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                     <div class="btnSet"  style="text-align:right;">
+                    	<a class="btn" href="view.do?reply_id=${origin.reply_id}" style="background-color: #888 !important; margin-right: 5px;">취소</a>
                         <a class="btn" href="javascript:goSave();">저장 </a>
                     </div>
                     </form>

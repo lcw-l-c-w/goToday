@@ -21,6 +21,35 @@ body {
     border-radius: 16px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
     box-sizing: border-box; /* 패딩이 크기에 영향을 주지 않도록 추가 */
+    min-height: 730px;
+}
+.list-page .size {
+    min-height: auto;
+}
+
+.list-page .list {
+    min-height: auto;
+}
+
+/* 페이지네이션 flex 밀어내기 제거 */
+.list-page .pagenate {
+    margin-top: 30px;
+}
+
+/* 목록 페이지는 flex 필요 없음 */
+.list-page .bbs {
+    display: block;
+}
+
+/* 에디터가 들어가는 textarea의 최소 높이 조절 */
+.board_write td textarea {
+    width: 100%;
+    min-height: 200px; /* 에디터 로드 전 보이는 높이 */
+}
+
+/* 게시판 내부 컨테이너 */
+.bbs {
+     display: block;     
 }
 
 /* 3. 혹시 wrap을 사용 중이시라면 padding으로도 조절 가능합니다 */
@@ -61,7 +90,9 @@ body {
     max-width: 1000px;   /* 원하는 내부 박스 너비 */
     margin: 0 auto;     /* 가운데 정렬 */
 }
-
+.sub:has(.view) .size {
+    min-height: 730px; /* 목록 페이지와 비슷한 느낌을 주는 최소 높이 (원하는 만큼 조절) */
+}
 /* 상세 페이지의 버튼 영역도 폭에 맞게 정렬 */
 .sub:has(.view) .btnSet {
     max-width: 1000px;
@@ -76,29 +107,44 @@ body {
 }
 .bbs p strong { color: #4d4dff; }
 
+/* 리스트를 감싸는 영역 */
+.list-wrap {
+    min-height: 432px;   /* 65px * 5줄 */
+}
+
 /* 테이블 스타일 현대화 */
 .list { 
     width: 100%; 
     border-collapse: collapse; 
-    margin-bottom: 30px; 
+    table-layout: fixed; 
+    margin-bottom: 0; 
+    min-height: auto;
 }
-
 .list th { 
     background-color: #f8f9fa; 
-    color: #aaa; 
-    font-size: 12px; 
+    color: #aaa; /* 기존 aaa보다 조금 더 진하게 가독성 높임 */
+    font-size: 13px; 
     font-weight: 600; 
-    padding: 15px; 
+    padding: 15px 20px; /* 좌우 여백 확보 */
     border-bottom: 1px solid #eee; 
     text-transform: uppercase;
+    text-align: left; /* 헤더 왼쪽 정렬 */
 }
 
+
 .list td { 
-    padding: 18px 15px; 
+	height: 65px;
+    padding: 0px 20px; /* 헤더와 동일한 좌우 여백 */
     border-bottom: 1px solid #f8f8f8; 
     font-size: 14px; 
     color: #444; 
     vertical-align: middle;
+    text-align: left; /* 내용 왼쪽 정렬 */
+    box-sizing: border-box;
+}
+/* 데이터 영역 (tbody) 고정 */
+.list tbody {
+    display: table-row-group; /* 기본 유지하되 내부 높이 확보를 위해 아래 td 조절 */
 }
 
 /* 제목 및 링크 스타일 */
@@ -149,9 +195,10 @@ body {
 }
 /* 페이지네이션 */
 .pagenate { 
+    margin-top: auto; /* 위쪽 공간을 최대한 밀어냄 */
     display: flex; 
     justify-content: center; 
-    margin: 30px 0; 
+    padding: 15px 0 20px 0;
 }
 .paging { display: flex; list-style: none; gap: 8px; }
 .paging li a { 
@@ -172,7 +219,7 @@ body {
 /* 검색창 스타일 */
 .bbsSearch { 
     background: #f8f9fa; 
-    padding: 20px; 
+    padding: 10px; 
     border-radius: 12px; 
     text-align: center; 
 }
@@ -302,33 +349,9 @@ body {
     border-radius: 6px; 
     cursor: pointer; 
 }
-/* 테이블 스타일 현대화 */
-.list { 
-    width: 100%; 
-    border-collapse: collapse; 
-    margin-bottom: 30px; 
-    table-layout: fixed; /* 열 너비를 고정하여 흐트러짐 방지 */
-}
 
-.list th { 
-    background-color: #f8f9fa; 
-    color: #888; /* 기존 aaa보다 조금 더 진하게 가독성 높임 */
-    font-size: 13px; 
-    font-weight: 600; 
-    padding: 15px 20px; /* 좌우 여백 확보 */
-    border-bottom: 1px solid #eee; 
-    text-transform: uppercase;
-    text-align: left; /* 헤더 왼쪽 정렬 */
-}
 
-.list td { 
-    padding: 20px 20px; /* 헤더와 동일한 좌우 여백 */
-    border-bottom: 1px solid #f8f8f8; 
-    font-size: 14px; 
-    color: #444; 
-    vertical-align: middle;
-    text-align: left; /* 내용 왼쪽 정렬 */
-}
+
 
 /* 제목 열은 기본 정렬을 따르되, 링크 스타일 유지 */
 .list td a {
