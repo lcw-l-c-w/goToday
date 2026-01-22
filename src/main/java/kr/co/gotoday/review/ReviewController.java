@@ -154,16 +154,23 @@ public class ReviewController {
 			reviewVO.setContent(content);
 			reviewVO.setRating(rating);
 
-			// 새 이미지가 있으면 업로드, 없으면 기존 이미지 유지 여부에 따라 처리
-			if (imageFile != null && !imageFile.isEmpty()) {
-				String[] imageNames = processImageUpload(imageFile);
-				reviewVO.setImage_org(imageNames[0]);
-				reviewVO.setImage_new(imageNames[1]);
-			} else if (!keepImage) {
-				// 이미지 삭제 요청
-				reviewVO.setImage_org(null);
-				reviewVO.setImage_new(null);
-			}
+			//새로운 이미지가 업로드 되거나 사진을 유지 한다면 -> DB에 새로 저장 or 기존 이름 저
+	        if (imageFile != null && !imageFile.isEmpty()) {
+	            String[] imageNames = processImageUpload(imageFile);
+	            reviewVO.setImage_org(imageNames[0]);
+	            reviewVO.setImage_new(imageNames[1]);
+	            
+	        } else if ("true".equals(keepImage)) {
+	            // DB에서 기존 정보를 불러와서 원본 이름과 변경된 이름을 다시 세팅해줌
+	            ReviewVO oldReview = reviewService.findReviewByReservationId(reviewId); 
+	            if (oldReview != null) {
+	                reviewVO.setImage_org(oldReview.getImage_org());
+	                reviewVO.setImage_new(oldReview.getImage_new());
+	            }
+	        } else {
+	            reviewVO.setImage_org(null);	//삭제하거나 안 넣으면 null
+	            reviewVO.setImage_new(null);
+	        }
 
 			reviewService.updateReview(reviewVO);
 
