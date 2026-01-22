@@ -38,86 +38,6 @@ a {
 	color: inherit;
 }
 
-/* 2. 네비게이션 바 스타일 */
-.header {
-	width: 100%;
-	border-bottom: 1px solid var(--border-color);
-	background: #fff;
-	position: sticky;
-	top: 0;
-	z-index: 1000;
-}
-
-.nav-container {
-	max-width: 1100px;
-	margin: 0 auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 20px;
-	height: 70px;
-}
-
-.logo img {
-	height: 32px;
-	cursor: pointer;
-	display: block;
-}
-
-.nav-menu {
-	display: flex;
-	gap: 35px;
-	list-style: none;
-	align-items: center;
-	height: 100%;
-}
-
-.nav-menu li {
-	position: relative;
-	height: 100%;
-	display: flex;
-	align-items: center;
-}
-
-.nav-menu a {
-	font-weight: 600;
-	font-size: 15px;
-	transition: color 0.3s ease;
-}
-
-.nav-menu li:hover a {
-	color: var(- -main-color);
-}
-
-.nav-icons {
-	display: flex;
-	gap: 20px;
-	align-items: center;
-}
-
-.search-bar {
-	border-bottom: 1px solid #333;
-	display: flex;
-	align-items: center;
-	padding: 2px 5px;
-}
-
-.search-bar input {
-	border: none;
-	outline: none;
-	width: 150px;
-	font-size: 14px;
-}
-
-.user-icon {
-	font-size: 22px;
-	cursor: pointer;
-	transition: color 0.2s;
-}
-
-.user-icon:hover {
-	color: var(- -main-color);
-}
 
 /* 3. 레이아웃 및 본문 */
 .container {
@@ -328,9 +248,13 @@ a {
 }
 
 .detail-img {
-	width: 100%;
-	border-radius: 8px;
-	margin-top: 20px;
+width: 100%;           /* 1. 상자 너비에 딱 맞게! */
+    max-width: 600px;      /* 2. 너무 커지는 건 방지 (원하는 숫자로 조절해!) */
+    height: auto;          /* 3. 높이는 비율에 맞게 알아서! */
+    display: block;        /* 4. 덩어리로 만들어서 */
+    margin: 20px auto;     /* 5. 가운데로 모으기! */
+    border-radius: 8px;
+    object-fit: contain;   /* 6. 이미지가 잘리지 않고 상자 안에 다 보이게! */
 }
 </style>
 
@@ -340,6 +264,13 @@ $(function() {
     let selectedTime = null;
     let scheduleId = null;
 
+    if("${content.content_id}"=='' ) {
+    	$(".container").hide();
+    	setTimeout(function() {
+            alert("해당 콘텐츠를 찾을 수 없습니다.");
+        }, 10);
+        return;
+    }
     // 탭 전환
     $(".tab-item").click(function() {
         $(".tab-item").removeClass("active");
@@ -422,6 +353,9 @@ $(function() {
         selectedTime = $(this).data("time");
         scheduleId = $(this).data("id");
     });
+    
+
+ 
 	
     //추가-의선 캘박 
     $(".btn-save-cal").click(function() {
@@ -507,14 +441,51 @@ $(function() {
             error: function() { alert("오류가 발생했습니다."); }
         });
     });
+    //트위터 클릭시 해당 프로필로 이동 . 근데 만약 트위터 주소가 없으면 버튼 블락 처리해야하지 않을까? 클릭을 못하도록 . 
+    	if("${content.x_url}"=="")$("#x").hide();
+    	if("${content.instagram_url}"=="") $("#ig").hide();
+    	$("#x").click(function(){
+    		window.location.href= "${content.x_url}";
+    	})
+    	$("#ig").click(function(){
+    		window.location.href= "${content.instagram_url}";
+    	})
+    	
 
+  // url 공유 하는 마법
+$("#link").click(async function() { // async 사용 해야하는 이유
+    const shareData = {
+        title: "GoToday ! " + "${content.title}", 
+        text: "멋진 전시/팝업 정보를 확인해보세요!", 
+        url: window.location.href 
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = window.location.href;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("주소가 복사되었습니다.");
+        }
+    } catch(err) {
+        console.log("공유하기 에러 발생:", err);
+    }
+});
+    	
+    	
+    	
     //예약 처리 여부 -> 만약 상태가 종료이면 reservation-div를 hidden처리
    $(document).ready(function() {
     // 1. data-status 값을 가져옴
     const contentStatus = $("#confirmStatus").data("status");
     
-    // 2. 상태가 "STATUS_CLOSED" (또는 "종료") 인지 확인
-    // 서비스단에서 저장한 정확한 문자열 값과 비교해야 합니다.
+    
     if(contentStatus === "STATUS_CLOSED" || contentStatus === "종료") {
     	$(".reservation-div").html(`
     	        <div style="background: #f8f9fa; padding: 40px; text-align: center; border-radius: 10px; border: 1px dashed #ccc;">
@@ -525,50 +496,29 @@ $(function() {
     }
 });
     
-    // 마이페이지 로그인 체크
-    $("#myPageBtn").click(function() {
-        const isLoggedIn = ${not empty loginSess};
-    	const userRole = ${not empty loginSess ? loginSess.role : -1};
-    	
-    	if (!isLoggedIn) {
-            alert("로그인이 필요한 서비스입니다.");
-            location.href = "${pageContext.request.contextPath}/member/login";
-        } else if(userRole==0){
-            location.href = "${pageContext.request.contextPath}/mypage/main";
-        }else if(userRole==1){
-        	location.href="${pageContext.request.contextPath}/vendor/content_manage";
-        }
-        else alert("잘못된 접근입니다.");
-    });
+
 });
 
-
+    //  상세 페이지 들어갔을 때 최근본페이지 기능에 넣으려고 만든 부분
+	document.addEventListener("DOMContentLoaded", function () {
+  		if (window.GoTodayRecentViewed) {
+    		GoTodayRecentViewed.add({
+      		id: "${content.content_id}",
+      		title: "${content.title}",
+            image: "<c:url value='${content.main_image_path}'/>",
+      		url: "${pageContext.request.contextPath}/detail/${content.content_id}",
+      		location: "${content.location}"
+    		});
+  		}
+	});
 
 
 </script>
 </head>
 <body>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
-	<header class="header">
-		<div class="nav-container">
-			<div class="logo">
-				<a href="${pageContext.request.contextPath}/main"> <img
-					src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
-				</a>
-			</div>
-			<ul class="nav-menu">
-				<li><a href="#">Q&A</a></li>
-				<li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-				<li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
-			</ul>
-			<div class="nav-icons">
-				<div class="search-bar">
-					<input type="text" placeholder="검색"> <span>🔍</span>
-				</div>
-				<span class="user-icon" id="myPageBtn">👤</span>
-			</div>
-		</div>
-	</header>
 
 	<div class="container">
 		<div class="breadcrumb">
@@ -578,16 +528,16 @@ $(function() {
 		<div class="content-title-area">
 			<div>
 				<h1>${content.title}</h1>
-				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at}
-					~ ${content.end_at} | ${content.location} 📍</p>
+				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at.substring(0,10)}
+					~ ${content.end_at.substring(0,10)}  |  ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">
-				<img src="https://cdn-icons-png.flaticon.com/512/733/733579.png"
-					alt="X" style="width: 22px; margin-left: 10px;"> <img
-					src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
-					alt="IG" style="width: 22px; margin-left: 10px;"> <img
+				<img src="https://cdn-icons-png.flaticon.com/512/5968/5968830.png"
+					alt="X" style="width: 22px; margin-left: 10px;" id="x"> <img
+					src="https://cdn-icons-png.flaticon.com/512/1384/1384031.png"
+					alt="IG" style="width: 22px; margin-left: 10px;" id="ig"> <img
 					src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png"
-					alt="Link" style="width: 22px; margin-left: 10px;">
+					alt="Link" style="width: 22px; margin-left: 10px;"id="link">
 			</div>
 		</div>
 

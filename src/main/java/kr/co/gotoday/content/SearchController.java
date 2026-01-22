@@ -13,8 +13,8 @@ public class SearchController {
 	
 	@GetMapping("/search")
 	public String search(Model model, ContentSearchDTO dto) {
-	    model.addAttribute("searchList", contentService.getSearchList(dto));
 	    model.addAttribute("pageInfo", contentService.getSearchPageInfo(dto));
+	    model.addAttribute("searchList", contentService.getSearchList(dto));
 	    model.addAttribute("search", dto);
 	    return "main/search";
 	}
