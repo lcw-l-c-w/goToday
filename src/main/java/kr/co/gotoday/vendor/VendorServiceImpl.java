@@ -133,15 +133,6 @@ public class VendorServiceImpl implements VendorService {
 	}
 	
 	@Override
-	public int deleteContentSchedule(Integer content_id) {
-		// 수정 모드일 경우 기존 스케줄 삭제
-		if (content_id != null) {
-		    vendorMapper.deleteContentSchedule(content_id);
-		}
-		return content_id;
-	}
-	
-	@Override
 	public int updateContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 
 			MultipartFile file, HttpServletRequest request, List<String> timeList, Integer total_ticket) {
 		
@@ -159,36 +150,6 @@ public class VendorServiceImpl implements VendorService {
 		int r = vendorMapper.updateContent(contentVo);
 		
 		if(r<=0) return 0;
-		
-		// 수정일 때 스케줄이 없으면 content만 수정하고 종료
-		if (timeList == null || timeList.isEmpty() || total_ticket == null) {
-		    return r;
-		}
-
-		// 수정일때 기존 스케줄 삭제
-	    vendorMapper.deleteContentSchedule(contentVo.getContent_id());
-		
-	    // 일정 수정 안 하고 content만 수정ㄴ
-	    if (contentVo.getStart_at() == null || contentVo.getEnd_at() == null) {
-	        return r; 
-	    }
-	    LocalDate startDate = LocalDate.parse(contentVo.getStart_at());
-	    LocalDate endDate   = LocalDate.parse(contentVo.getEnd_at());
-
-	    for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-	        for (String time : timeList) {
-	            if (time == null || time.trim().isEmpty()) continue;
-
-	            ContentScheduleVO vo = new ContentScheduleVO();
-	            vo.setContent_id(contentVo.getContent_id());
-	            vo.setScheduled_at(date.toString());
-	            vo.setTime_zone(time);
-	            vo.setTotal_ticket(total_ticket);
-	            vo.setCurrent_ticket(total_ticket);
-
-	            vendorMapper.createSchedule(vo);
-	        }
-	    }
 
 	    return r;
 	}

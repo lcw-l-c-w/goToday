@@ -25,9 +25,6 @@ public interface VendorService {
 	ContentVO getContent(Integer content_id);
 	List<ContentScheduleVO> getContentSchedule(Integer content_id);
 	
-	//수정시 이전 스케줄 삭제
-	int deleteContentSchedule(Integer content_id);
-	
 	//예약 확인
 	Map<String, Object> findReservationByVendor(VendorReservationSearchDTO dto);
 	int updateReservationStatus(int reserve_id);

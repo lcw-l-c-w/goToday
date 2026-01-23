@@ -25,6 +25,7 @@
             <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
             <li><a href="${ctx}/vendor/reserve_pay_manage"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
             <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+            <li><a href="${ctx}/mypage/logout" onclick="return confirmLogout();"><span class="material-symbols-outlined">logout</span> 로그아웃</a></li>
         </ul>
     </nav>
 
@@ -91,6 +92,14 @@
 
 <script>
 const ctx = '${pageContext.request.contextPath}';
+
+function confirmLogout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+        return true; 
+    } else {
+        return false;
+    }
+}
 
 const STATUS_MAP = {
 	    STATUS_REQUESTED: { text: '승인요청', className: 'STATUS_REQUESTED' },
