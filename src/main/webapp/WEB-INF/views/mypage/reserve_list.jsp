@@ -112,6 +112,11 @@ body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif
     background: white;
     border: 1px solid #ff4444;
     color: #ff4444;
+    border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
 }
 .cancel-btn:hover {
     background: #ff4444;
