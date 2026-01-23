@@ -51,6 +51,19 @@ public class UserController {
                 model.addAttribute("cmd", "back");
                 return "common/return";
             } else {
+            	
+            	// 선택한 role과 DB의 role 비교
+                if (vo.getRole() != userVO.getRole()) {
+                    if (userVO.getRole() == 0) {
+                        model.addAttribute("msg", "개인 회원입니다. 개인 회원으로 로그인해주세요.");
+                    } else if (userVO.getRole() == 1) {
+                        model.addAttribute("msg", "기업 회원입니다. 기업 회원으로 로그인해주세요.");
+                    }
+                    model.addAttribute("cmd", "back");
+                    return "common/return";
+                }
+            	
+                // 로그인 성공 처리
                 sess.setAttribute("loginSess", userVO);
                 String redirect = (String) sess.getAttribute("redirectAfterLogin");
                 sess.removeAttribute("redirectAfterLogin");

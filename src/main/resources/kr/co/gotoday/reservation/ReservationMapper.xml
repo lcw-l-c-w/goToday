@@ -159,7 +159,8 @@
 		SELECT 
 			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
 			c.content_id, c.title, c.main_image_path,
-			p.payment_status
+			p.payment_status,
+			p.order_key as order_id
 		FROM content c 
 		JOIN reservation r ON r.content_id = c.content_id
 		JOIN payment p ON r.reservation_id = p.reservation_id
