@@ -8,7 +8,7 @@
 </head>
 <body>
 <h1>관리자 LOGIN</h1>
-	<form action="/gotoday/member/loginForAdmin" method="POST"> 
+	<form action="${pageContext.request.contextPath}/member/login/admin" method="POST"> 
 	    <label>아이디</label>
 	    <input type="text" name="email" placeholder="아이디를 입력하세요" required>
 	    <br>
