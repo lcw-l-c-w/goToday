@@ -38,7 +38,11 @@ a {
 	color: inherit;
 }
 
-
+img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
 /* 3. 레이아웃 및 본문 */
 .container {
 	max-width: 1100px;
@@ -211,6 +215,11 @@ a {
 	border-radius: 6px;
 	cursor: pointer;
 }
+.btn-reserve.is-disabled,
+.btn-reserve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* 6. 탭 메뉴 */
 .tab-wrapper {
@@ -256,6 +265,17 @@ width: 100%;           /* 1. 상자 너비에 딱 맞게! */
     border-radius: 8px;
     object-fit: contain;   /* 6. 이미지가 잘리지 않고 상자 안에 다 보이게! */
 }
+#btn-reservation-detail {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #eaf7ff;        /* 하늘색 배경 */
+  color: #2b7fc2;             /* 진한 하늘색 글자 */
+  border: 1px solid #bfe6ff;  /* 테두리 */
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
 </style>
 
 <script>
@@ -271,13 +291,21 @@ $(function() {
         }, 10);
         return;
     }
+      const isReservable= "${content.contentReservation}" === "1" ? 1:0;
+      if(isReservable==0) {$(".btn-reserve").prop("disabled", true)
+   							 			  .addClass("is-disabled")
+  							    $("#btn-reservation-detail").html("이 컨텐츠는 현장 대기만 가능하므로, 예매가 불가합니다.");
+      }
+      else{
+    	  $("#btn-reservation-detail").hide();
+}
     // 탭 전환
     $(".tab-item").click(function() {
         $(".tab-item").removeClass("active");
         $(this).addClass("active");
         $(".tab-panel").hide().eq($(this).index()).show();
     });
-
+	
     // 달력 로드
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
@@ -285,6 +313,7 @@ $(function() {
     	// 1. JSP 변수에서 시작일과 종료일 가져오기 (문자열 자르기 포함)
         const startDate = "${content.start_at}".substring(0, 10);
         const endDate = "${content.end_at}".substring(0, 10);
+        const today = new Date().toISOString().slice(0,10);
      // 2. 종료일 포함(inclusive)을 위해 하루 더하기
         // JS의 Date 객체는 현재 지역 시간을 기준으로 하므로 시간 오차를 방지하기 위해 
         // 단순 날짜 더하기 로직을 사용합니다.
@@ -300,7 +329,7 @@ $(function() {
             locale: 'ko',
             height: 'auto',
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-       
+      
          // 3. 전시 기간 배경색 입히기 (핑크색)
             events: [
                 {
@@ -315,6 +344,11 @@ $(function() {
             	// 모든 날짜 클릭 가능
                 $(".fc-daygrid-day").css("background", ""); // 이전 선택 초기화
                 $(info.dayEl).css("background", "rgba(77, 195, 255, 0.3)"); // 클릭한 날짜 강조
+               const todayDate= new Date();
+                if(info.date<todayDate){
+            		alert("지난 날짜는 불가합니다. 다른 날짜를 선택해주세요.");
+            		return;
+            	}
                 
                 selectedDate = info.dateStr;
                 fetchTimes(selectedDate);
@@ -399,6 +433,7 @@ $(function() {
             alert("날짜와 시간을 선택해주세요.");
             return;
         }
+    
         $.post("${pageContext.request.contextPath}/reserve/schedule.do", {
             content_id: $("#content_id").val(),
             reserved_for_at: selectedDate,
@@ -598,6 +633,9 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 					<button class="btn-reserve">예매하기</button>
 					<button class="btn-save-cal">캘린더 저장</button>
 				</div>
+				</div>
+				<div id="btn-reservation-detail">
+				
 				</div>
 			</section>
 		</div>
