@@ -13,5 +13,6 @@ public interface ReplyMapper {
 	ReplyVO detail(ReplyVO vo);
 	int update(ReplyVO vo);
 	int delete(int no);
+	int deleteAdmin(int no);
 	ReplyVO getAdminReply(int reply_id);
 }
