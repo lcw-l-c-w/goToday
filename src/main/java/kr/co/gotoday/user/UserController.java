@@ -235,12 +235,12 @@ public class UserController {
     
 
     // 관리자 로그인
-    @GetMapping("/member/loginForAdmin")
-    public void loginForAdmin() {
-       
+    @GetMapping("/member/login/admin")
+    public String loginForAdmin() {
+       return "member/loginForAdmin";
     }
   
-    @PostMapping("/member/loginForAdmin")
+    @PostMapping("/member/login/admin")
     public String loginForAdmin(HttpSession session
     		, UserVO vo, Model model) {
 
@@ -289,6 +289,28 @@ public class UserController {
     	}
 		return null;
     	
+    }
+    
+    // 찾기 페이지 이동
+    @GetMapping("/member/find_account")
+    public String findAccount() {
+        return "member/find_account";
+    }
+
+    // 아이디 찾기 처리
+    @PostMapping("/member/find_id")
+    @ResponseBody
+    public String findId(@RequestParam String name, @RequestParam String birthday, @RequestParam String phone_number) {
+        String email = userService.findEmail(name, birthday, phone_number);
+        return (email != null) ? email : "fail";
+    }
+
+    // 비밀번호 찾기 처리
+    @PostMapping("/member/find_pw")
+    @ResponseBody
+    public String findPw(@RequestParam String email, @RequestParam String phone_number) {
+        String tempPw = userService.resetPassword(email, phone_number);
+        return (tempPw != null) ? tempPw : "fail";
     }
     
   

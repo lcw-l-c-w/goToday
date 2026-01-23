@@ -2,6 +2,36 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <style>
+	.modal-header {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    margin-bottom: 15px;
+	}
+	
+	.delete-icon-btn {
+	    background: none;
+	    border: none;
+	    font-size: 20px;
+	    color: #ff4444;
+	    cursor: pointer;
+	    padding: 5px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    transition: transform 0.2s;
+	}
+	
+	.delete-icon-btn:hover {
+	    transform: scale(1.1);
+	}
+	
+	/* 하단 버튼 영역 높이 통일 */
+	.modal-footer-btns {
+	    display: flex;
+	    gap: 10px;
+	}
+
     .review-modal-overlay {
         display: none;
         position: fixed;
@@ -102,7 +132,13 @@
 
 <div id="reviewModalContent" style="display:none;">
     <div class="review-modal-content">
-        <h3 id="modalTitle">리뷰 작성</h3>
+        <div class="modal-header">
+            <h3 id="modalTitle">리뷰 작성</h3>
+            <button type="button" id="btnDeleteReview" class="delete-icon-btn" style="display:none;" title="리뷰 삭제">
+                리뷰삭제 
+            </button>
+        </div>
+        
         <hr>
         <div id="targetInfo" style="margin: 15px 0; font-size: 14px; background: #f8f8f8; padding: 15px; border-radius: 8px;">
             <p><strong>전시:</strong> <span id="m_title"></span></p>
@@ -121,11 +157,11 @@
 
             <label style="font-weight:600;">별점 <span id="ratingVal">5.0</span></label>
             <div class="star-rating" id="starRating">
-                <span class="star active" data-value="1">★</span>
-                <span class="star active" data-value="2">★</span>
-                <span class="star active" data-value="3">★</span>
-                <span class="star active" data-value="4">★</span>
-                <span class="star active" data-value="5">★</span>
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
             </div>
 
             <div id="timeZoneArea" style="margin-bottom:15px;">
@@ -156,7 +192,6 @@
             <!-- 수정 모드 버튼 -->
             <div id="editButtons" style="display:none; gap:10px;">
                 <button type="button" id="btnUpdateReview" style="flex:1; padding:12px; background:#4dc3ff; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">수정</button>
-                <button type="button" id="btnDeleteReview" style="flex:1; padding:12px; background:#ff4444; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">삭제</button>
                 <button type="button" id="btnCloseReview2" style="flex:1; padding:12px; background:#ddd; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">취소</button>
             </div>
         </form>

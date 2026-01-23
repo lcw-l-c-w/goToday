@@ -367,7 +367,7 @@ public class ReservationController {
             model.addAttribute("msg","존재하지 않는 예약입니다");
             return "common/return";
         }
-        ContentVO contentVO = contentService.getDetailContents(reservationVO.getContent_id(), userVO.getUser_id());
+        ContentVO contentVO = contentService.getDetailContentsForTicket(reservationVO.getContent_id(), userVO.getUser_id());
         if(contentVO == null) {
             // 콘텐츠 정보가 사라졌거나 가져올 수 없는 경우에 대한 처리
         	System.out.println("???");

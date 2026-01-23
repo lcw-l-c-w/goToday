@@ -39,13 +39,15 @@
     </select>
 
     <select id="findReviewsByUserId" parameterType="map" resultType="kr.co.gotoday.review.ReviewVO">
-        SELECT 
-            review_id, content, rating, image_org, image_new,
-            visited_at, visited_time_zone, created_at, 
-            content_id, user_id, reservation_id
-        FROM review
-        WHERE user_id = #{user_id}
-        ORDER BY created_at DESC
+        SELECT
+            r.review_id, r.content, r.rating, r.image_org, r.image_new,
+            r.visited_at, r.visited_time_zone, r.created_at,
+            r.content_id, r.user_id, r.reservation_id,
+            c.title, c.main_image_path
+        FROM review r
+        LEFT JOIN content c ON r.content_id = c.content_id
+        WHERE r.user_id = #{user_id}
+        ORDER BY r.created_at DESC
     </select>
 
     <select id="findReviewsByContentIdWithSort" parameterType="map" resultType="kr.co.gotoday.review.ReviewVO">

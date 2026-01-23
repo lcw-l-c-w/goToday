@@ -2,6 +2,7 @@ package kr.co.gotoday.mypage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
+import kr.co.gotoday.reply.ReplyVO;
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
 import kr.co.gotoday.reservation.ReservationService;
+import kr.co.gotoday.review.ReviewService;
+import kr.co.gotoday.review.ReviewVO;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class MypageController {
 	private final UserService userService;
 	private final ReservationService reservationService;
 	private final MypageService mypageService;
+	private final ReviewService reviewService;
 	
 	// 메인 화면
     @GetMapping("/mypage/main")
@@ -206,4 +210,73 @@ public class MypageController {
     public String contentDetail(@RequestParam("id") int contentId, Model model) {
         return "content/content_detail";
     }
+    
+    // 1:1 문의 목록
+    @GetMapping("/mypage/reply_list")
+    public String myReplyList(HttpSession session, Model model, ReplyVO vo) {
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+        
+        // 내가 작성한 문의만 조회하도록 user_id 설정
+        vo.setUser_id(loginUser.getUser_id());
+        
+        // 서비스에서 목록 가져오기
+        Map<String, Object> resultMap = mypageService.getMyReplyList(vo);
+        
+        model.addAttribute("map", resultMap);
+        model.addAttribute("vo", vo);
+        
+        return "mypage/reply_list";
+    }
+    
+    @GetMapping("/mypage/reply_detail")
+    public String replyDetail(@RequestParam("reply_id") int replyId, HttpSession session, Model model) {
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+
+        // 문의글 본문 가져오기
+        ReplyVO reply = mypageService.getReplyDetail(replyId);
+        
+        // 본인 글인지 검증 (보안)
+        if (reply == null || reply.getUser_id() != loginUser.getUser_id()) {
+            model.addAttribute("msg", "권한이 없거나 존재하지 않는 게시물입니다.");
+            model.addAttribute("cmd", "back");
+            return "common/return";
+        }
+        
+        
+        // 해당 글의 답변(들) 가져오기
+        ReplyVO answer = mypageService.getReplyAnswer(replyId);
+
+        model.addAttribute("reply", reply);
+        model.addAttribute("answer", answer);
+        model.addAttribute("userName", loginUser.getName());
+        
+        return "mypage/reply_detail";
+    }
+    
+	@GetMapping("/mypage/myreviews.do")
+	public String showUserReviewList(HttpSession sess, Model model) {
+		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+		if(userVO == null) {
+			model.addAttribute("cmd","back");
+			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+			return "common/return";
+		}
+		List<ReviewVO> reviewList = reviewService.findReviewsByUserId(userVO.getUser_id());
+		model.addAttribute("reviewList", reviewList);
+		return "mypage/review_list";
+	}
 }
