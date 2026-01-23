@@ -12,7 +12,15 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif; }
 .container { max-width: 900px; margin: 40px auto; }
-.page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.page-title {
+    margin-bottom: 0; 
+}
 
 .reserve-item {
     background: #ffffff;
@@ -137,12 +145,55 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 	border-radius: 12px;
 	object-fit: cover;
 }
+.filter-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 0; 
+}
+
+.filter-btn {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.filter-btn.active {
+    background: #333;
+    color: white;
+    border-color: #333;
+}
+
+
 </style>
 </head>
 
 <body>
 <div class="container">
-	<h1 class="page-title">예약 관리</h1>
+	<div class="page-header">
+	    <h1 class="page-title">예약 관리</h1>
+	
+	    <div class="filter-bar">
+	        <a class="filter-btn ticket-btn ${currentFilter eq 'ALL' ? 'active' : ''}"
+	           href="${pageContext.request.contextPath}/mypage/reservations?filter=ALL">
+	            전체
+	        </a>
+	
+	        <a class="filter-btn ticket-btn ${currentFilter eq 'UPCOMING' ? 'active' : ''}"
+	           href="${pageContext.request.contextPath}/mypage/reservations?filter=UPCOMING">
+	            이용 예정
+	        </a>
+	
+	        <a class="filter-btn ticket-btn ${currentFilter eq 'END' ? 'active' : ''}"
+	           href="${pageContext.request.contextPath}/mypage/reservations?filter=END">
+	            종료된 내역
+	        </a>
+	
+	        <a class="filter-btn ticket-btn ${currentFilter eq 'CANCELED' ? 'active' : ''}"
+	           href="${pageContext.request.contextPath}/mypage/reservations?filter=CANCELED">
+	            예약 취소
+	        </a>
+	    </div>
+	</div>
 
 	<div class="list-wrapper">
 		<c:choose>
@@ -253,7 +304,7 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 		$(".info-btn").click(
 				function() {
 					const reservation_id = $(this).data("reservation-id");
-					window.location.href = "/gotoday/mypage/reservations/"
+					window.location.href = "/gotoday/mypage/reservation/"
 							+ reservation_id;
 				});
 		$(".review-btn, .review-check-btn").click(function(e) {

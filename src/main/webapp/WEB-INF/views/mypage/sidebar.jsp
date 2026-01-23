@@ -105,7 +105,7 @@
 
     <div class="sidebar-section">
         <h2 class="sidebar-title">주문 관리</h2>
-        <a href="${pageContext.request.contextPath}/mypage/reservation" class="sidebar-item" target="mainFrame">예약 관리</a>
+        <a href="${pageContext.request.contextPath}/mypage/reservations" class="sidebar-item" target="mainFrame">예약 관리</a>
         <a href="${pageContext.request.contextPath}/mypage/myreviews.do" class="sidebar-item" target="mainFrame">나의 리뷰</a>
         <a href="${pageContext.request.contextPath}/mypage/like_list" class="sidebar-item" target="mainFrame">찜 관리</a>
     </div>

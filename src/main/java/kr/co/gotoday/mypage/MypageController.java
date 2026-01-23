@@ -1,7 +1,9 @@
 package kr.co.gotoday.mypage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -162,17 +164,27 @@ public class MypageController {
     }
     
     // 예약 관리
-    @GetMapping("/mypage/reservation")
-    public String showReservationList(HttpSession sess, Model model) {
+    @GetMapping("/mypage/reservations")
+    public String showReservationList(
+    		@RequestParam(required = false, defaultValue = "ALL") String filter, 
+    		HttpSession sess, 
+    		Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-
-    	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id());
+    	
+    	if (userVO == null) {
+            model.addAttribute("cmd", "back");
+            model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+            return "common/return";
+        }
+    	
+    	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id(), filter);
     	model.addAttribute("reservationList", reservationList);
+    	model.addAttribute("currentFilter", filter);
     	
     	return "mypage/reserve_list";
     }
     // 예약 관리
-    @GetMapping("/mypage/reservations/{reservation_id}")
+    @GetMapping("/mypage/reservation/{reservation_id}")
     public String showReservationDetail(HttpSession sess, Model model, @PathVariable("reservation_id") int reservation_id) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
     	

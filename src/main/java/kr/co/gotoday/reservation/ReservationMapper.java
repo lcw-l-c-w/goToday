@@ -21,6 +21,6 @@ public interface ReservationMapper {
 	PaymentVO findByOrderId(String order_key);
 	int updatePaymentStatus(Map<String, Object> map);
 	int updateReservationStatusById(int reservation_id);
-	List<ReservationListDTO> findReservationListByUserId(int user_id);
+	List<ReservationListDTO> findReservationListByUserId(Map<String, Object> map);
 	ReservationDetailDTO findReservationDetailById(Map<String, Object> map);
 }
