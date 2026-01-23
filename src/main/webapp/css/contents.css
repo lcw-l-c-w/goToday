@@ -3,13 +3,15 @@
 /* 1. 기본 레이아웃 수정 */
 
 html {
-    overflow-y: scroll; /* 내용이 짧아도 오른쪽 스크롤바 자리를 비워둡니다 */
+    /* 스크롤바 공간을 미리 계산해 화면 중앙을 유지합니다. */
+    scrollbar-gutter: stable;
 }
+
 body { 
     background-color: #f3f5f9; 
     font-family: 'Pretendard', sans-serif; 
     margin: 0; padding: 0; 
-    padding-bottom:170px;
+    padding-bottom:0px;
 }
 
 /* 2. 게시판 박스 위치 조정 */
@@ -21,7 +23,7 @@ body {
     border-radius: 16px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
     box-sizing: border-box; /* 패딩이 크기에 영향을 주지 않도록 추가 */
-    min-height: 730px;
+    min-height: 710px;
 }
 .list-page .size {
     min-height: auto;
@@ -77,6 +79,10 @@ body {
     margin-bottom: 15px;    /* 기존 20px에서 15px로 축소 */
 }
 
+.sub {
+    padding-bottom : 20px; 
+}
+
 /* 제목 부분 */
 .sub_title { 
     font-size: 26px; 
@@ -91,7 +97,7 @@ body {
     margin: 0 auto;     /* 가운데 정렬 */
 }
 .sub:has(.view) .size {
-    min-height: 730px; /* 목록 페이지와 비슷한 느낌을 주는 최소 높이 (원하는 만큼 조절) */
+    min-height: 710px; /* 목록 페이지와 비슷한 느낌을 주는 최소 높이 (원하는 만큼 조절) */
 }
 /* 상세 페이지의 버튼 영역도 폭에 맞게 정렬 */
 .sub:has(.view) .btnSet {
@@ -198,7 +204,7 @@ body {
     margin-top: auto; /* 위쪽 공간을 최대한 밀어냄 */
     display: flex; 
     justify-content: center; 
-    padding: 15px 0 20px 0;
+    padding: 10px 0 15px 0;
 }
 .paging { display: flex; list-style: none; gap: 8px; }
 .paging li a { 

@@ -28,6 +28,7 @@
                 <li><a href="${ctx}/admin/content_manage"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
                 <li class="active"><a href="#"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
                 <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+                <li><a href="${ctx}/mypage/logout" onclick="return confirmLogout();"><span class="material-symbols-outlined">logout</span> 로그아웃</a></li>
             </ul>
         </nav>
 
@@ -37,7 +38,7 @@
 		        <div class="name-wrapper"> <strong class="user-name">
 		                <c:choose>
 		                    <c:when test="${not empty loginSess}">
-		                        ${loginSess.name}
+		                        관리자
 		                    </c:when>
 		                    <c:otherwise>
 		                        잘못된 접근입니다.
@@ -102,6 +103,14 @@
 </body>
 <script>
 const ctx = '${pageContext.request.contextPath}';
+
+function confirmLogout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+        return true; 
+    } else {
+        return false;
+    }
+}
 
 const USER_MAP = {
 		  1:  { text: '업체', className: 'vendor' },

@@ -52,10 +52,31 @@ public class ContentServiceImpl implements ContentService {
 		if (vo == null) {
 			return null;
 		}
+	
+		if("false".equals(vo.getReservation_type())) {
+			System.out.println("현장대기 실행됨");
+			vo.setContentReservation(0); //볼수없게함
+		}
+		else if ("true".equals(vo.getReservation_type())) {
+			System.out.println("사전 예매");
+			vo.setContentReservation(1);
+		}
 		return updateContentStatus(vo);
 
 	}
+	
+	//예외 : 티켓 관련 조회 ( 승인요청까지도 보여줘야함
+	@Override
+	public ContentVO getDetailContentsForTicket(int content_id, Integer user_id) {
+		// 상세페이지 보여주는것
+	
+		ContentVO vo = contentMapper.selectTicketDetail(content_id);
+		if (vo == null) {
+			return null;
+		}
+		return updateContentStatus(vo);
 
+	}
 	//시간 비교
 	
 	public ContentVO updateContentStatus(ContentVO vo) {

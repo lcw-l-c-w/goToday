@@ -70,10 +70,6 @@
 		SELECT * FROM content_schedule WHERE content_id = #{content_id}
 	</select>
 
-	<delete id="deleteContentSchedule" parameterType="int">
-	    DELETE FROM content_schedule WHERE content_id = #{content_id}
-	</delete>
-
 	<update id="updateContent" parameterType="kr.co.gotoday.content.ContentVO">
 		UPDATE content
 		<set>

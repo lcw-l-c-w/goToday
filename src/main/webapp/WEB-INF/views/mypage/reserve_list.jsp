@@ -89,15 +89,23 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
     background: #4dc3ff;
     color: white;
 }
-.ticket-btn {
+.ticket-btn, .review-check-btn {
     background: white;
     border: 1px solid #333;
     color: #333;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
-.ticket-btn:hover {
+
+.ticket-btn:hover, .review-check-btn:hover {
     background: #333;
     color: white;
 }
+
 .review-btn {
     background: white;
     border: 1px solid #4dc3ff;
@@ -145,10 +153,8 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 			<c:otherwise>
 				<c:forEach var="r" items="${reservationList}">
 					<div class="reserve-item">
-
 						<div class="reserve-info">
 							<div class="reserve-code">${r.reservation_code}</div>
-
 						<div class="title-line">
 							<c:choose>
 								<c:when test='${r.dday eq "D-Day"}'>
@@ -201,14 +207,23 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 								</c:if>
 
 								<c:if test="${r.reservation_status eq 'VISITED'}">
-									<button class="review-btn"
-										data-reservation-id="${r.reservation_id}"
-										data-content-id="${r.content_id}">
-										리뷰쓰기
-									</button>
+									<c:choose>
+										<c:when test = "${r.review_exists eq 1 }">
+											<button class = "review-check-btn"
+											data-reservation-id = "${r.reservation_id }">
+												리뷰 확인하기
+											</button>
+										</c:when>
+										<c:otherwise>
+											<button class="review-btn" 
+												data-reservation-id = "${r.reservation_id }">
+												리뷰쓰기
+											</button>
+										</c:otherwise>
+									</c:choose>
 								</c:if>
 
-								<c:if test="${r.reservation_status eq 'DONE' and not empty r.order_id}">
+								<c:if test="${r.reservation_status eq 'DONE' and r.dday ne 'END' and not empty r.order_id}">
 									<button class="cancel-btn"
 										data-order-id="${r.order_id}"
 										data-reservation-id="${r.reservation_id}">
@@ -241,11 +256,10 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 					window.location.href = "/gotoday/mypage/reservations/"
 							+ reservation_id;
 				});
-		$(".review-btn").click(function(e) {
+		$(".review-btn, .review-check-btn").click(function(e) {
             e.preventDefault(); // 페이지 이동 방지 -> 모달로 띄울 거
             
             const resId = $(this).data("reservation-id");
-            const contentId = $(this).data("content-id");
 
             // 서버에서 전시명, 위치, 시간대 가져옴
             $.ajax({
@@ -260,9 +274,9 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
                     alert("데이터를 불러오는데 실패했습니다.");
                 }
             });
-		});
-	
-		$(".ticket-btn").click(function () {
+		}); 
+		
+		$(".ticket-btn").not(".review-check-btn").click(function () {
 			const reservationId = $(this).data("reservation-id");
 			location.href = "/gotoday/ticket/" + reservationId;
 		});

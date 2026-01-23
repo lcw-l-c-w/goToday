@@ -11,18 +11,18 @@ public interface ReviewMapper {
 
 	int createReview(ReviewVO review);
 	int updateReview(ReviewVO review);
-	int deleteReview(@Param("review_id") int reviewId, @Param("user_id") int userId);
+	int deleteReview(int review_id, int user_id);
 
-	ReviewVO findOneReviewById(@Param("review_id") int reviewId);
-	List<ReviewVO> findReviewsByUserId(@Param("user_id") int userId);
-	List<ReviewVO> findReviewsByContentIdWithSort(@Param("content_id") int contentId, @Param("sortType") String sortType);
+	ReviewVO findOneReviewById(int review_id);
+	List<ReviewVO> findReviewsByUserId(int user_id);
+	List<ReviewVO> findReviewsByContentIdWithSort(int content_id, String sortType);
 	List<ReviewVO> findAllReviews();
 
-	Map<String, Object> findAvgRatingByStar(@Param("content_id") int contentId);
-	List<Map<String, Object>> findAvgRatingByTimeSlot(@Param("content_id") int contentId);
+	Map<String, Object> findAvgRatingByStar(int content_id);
+	List<Map<String, Object>> findAvgRatingByTimeSlot(int content_id);
 
-	int checkReviewExistsById(@Param("reservation_id") int reservationId);
-	int countReviewsByContentId(@Param("content_id") int contentId);
-	ReviewVO findReviewByReservationId(@Param("reservation_id") int reservationId);
+	int checkReviewExistsById(int reservation_id);
+	int countReviewsByContentId(int content_id);
+	ReviewVO findReviewByReservationId(int reservation_id);
 
 }
