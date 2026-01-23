@@ -31,4 +31,8 @@ public interface UserService {
 	UserVO getUserById(int userId);
 	boolean updateUserInfo(UserVO vo);
 	
+	// 아이디 비밀번호 찾기
+	String findEmail(String name, String birthday, String phone_number);
+	String resetPassword(String email, String phone_number);
+	
 }
