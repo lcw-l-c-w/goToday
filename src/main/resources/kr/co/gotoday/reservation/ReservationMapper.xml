@@ -49,7 +49,9 @@
 		    p.payment_status AS pay_status,
 		    r.receiver_name,
 		    r.receiver_phone,
-		    c.title AS content_title
+		    c.title AS content_title,
+		    p.amount_price AS amount_price,
+		    p.payment_method AS payment_method
 	    FROM content c
 	    JOIN reservation r ON r.content_id = c.content_id
 	    LEFT JOIN payment p ON r.reservation_id = p.reservation_id
