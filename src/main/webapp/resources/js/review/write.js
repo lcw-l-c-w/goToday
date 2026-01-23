@@ -56,9 +56,12 @@ function openReviewModal(dto) {
     `;
 
     // 모달 컨텐츠 복사
-    const modalContent = document.getElementById('reviewModalContent').innerHTML;
-    reviewOverlay.innerHTML = modalContent;
+    const original = document.getElementById('reviewModalContent');
+    const modalClone = original.cloneNode(true);
 
+    modalClone.style.display = 'block';
+    
+    reviewOverlay.appendChild(modalClone);
     // 부모 body에 추가
     parentBody.appendChild(reviewOverlay);
 
