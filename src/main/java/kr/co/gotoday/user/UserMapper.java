@@ -3,6 +3,7 @@ package kr.co.gotoday.user;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper {
@@ -30,4 +31,9 @@ public interface UserMapper {
     int updateUserInfo(UserVO vo);
     
     void createUserTagsBatch(List<UserTagVO> list);
+    
+    // 아이디, 비밀번호 찾기
+    UserVO findEmail(@Param("name") String name, @Param("birthday") String birthday, @Param("phone_number") String phone_number);
+    UserVO findUserForPw(@Param("email") String email, @Param("phone_number") String phone_number);
+    int updateTempPassword(@Param("user_id") int user_id, @Param("tempPw") String tempPw);
 }

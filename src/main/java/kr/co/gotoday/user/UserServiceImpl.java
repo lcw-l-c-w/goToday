@@ -167,4 +167,24 @@ public class UserServiceImpl implements UserService{
         int result = userMapper.updateUserInfo(vo);
         return result > 0;
     }
+    
+    // 아이디 비밀번호 찾기
+    @Override
+    public String findEmail(String name, String birthday, String phone_number) {
+        UserVO vo = userMapper.findEmail(name, birthday, phone_number);
+        return (vo != null) ? vo.getEmail() : null;
+    }
+
+    @Override
+    @Transactional
+    public String resetPassword(String email, String phone_number) {
+        UserVO vo = userMapper.findUserForPw(email, phone_number);
+        if (vo != null) {
+            // 8자리 임시 비밀번호 생성 (영문+숫자)
+            String tempPw = java.util.UUID.randomUUID().toString().substring(0, 8);
+            userMapper.updateTempPassword(vo.getUser_id(), tempPw);
+            return tempPw;
+        }
+        return null;
+    }
 }
