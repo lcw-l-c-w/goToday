@@ -153,10 +153,8 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 			<c:otherwise>
 				<c:forEach var="r" items="${reservationList}">
 					<div class="reserve-item">
-
 						<div class="reserve-info">
 							<div class="reserve-code">${r.reservation_code}</div>
-
 						<div class="title-line">
 							<c:choose>
 								<c:when test='${r.dday eq "D-Day"}'>
@@ -225,7 +223,7 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 									</c:choose>
 								</c:if>
 
-								<c:if test="${r.reservation_status eq 'DONE' and not empty r.order_id}">
+								<c:if test="${r.reservation_status eq 'DONE' and r.dday ne 'END' and not empty r.order_id}">
 									<button class="cancel-btn"
 										data-order-id="${r.order_id}"
 										data-reservation-id="${r.reservation_id}">
