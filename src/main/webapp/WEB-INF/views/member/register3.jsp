@@ -6,25 +6,25 @@
 <title>회원가입 완료 | GoToday</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
-    <%@ include file="register.css" %>
-
-    /* 가입 완료 페이지 전용 정렬 스타일 */
-    .complete-box {
-        text-align: center;
-        padding: 60px 0; /* 아이콘이 빠진 만큼 상하 여백을 충분히 주었습니다 */
-    }
-    .complete-msg {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 50px;
-        line-height: 1.5;
-        color: #333;
-    }
-    /* 버튼 위치 조정 */
-    .next-btn-container {
-        display: flex;
-        justify-content: center;
-    }
+	<%@ include file="register.css" %>
+	
+	/* 가입 완료 페이지 전용 정렬 스타일 */
+	.complete-box {
+	    text-align: center;
+	    padding: 60px 0; /* 아이콘이 빠진 만큼 상하 여백을 충분히 주었습니다 */
+	}
+	.complete-msg {
+	    font-size: 22px;
+	    font-weight: 700;
+	    margin-bottom: 50px;
+	    line-height: 1.5;
+	    color: #333;
+	}
+	/* 버튼 위치 조정 */
+	.next-btn-container {
+	    display: flex;
+	    justify-content: center;
+	}
 </style>
 </head>
 <body>
@@ -41,7 +41,7 @@
             <div class="complete-box">
                 
                 <p class="complete-msg">
-                    <strong>${user.name}</strong>님의<br>
+                    <strong>${user.name}</strong> 님의<br>
                     가입이 완료되었습니다~
                 </p>
 

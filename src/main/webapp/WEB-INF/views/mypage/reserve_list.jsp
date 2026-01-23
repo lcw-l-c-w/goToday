@@ -10,7 +10,7 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif; }
+body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif; }
 .container { max-width: 900px; margin: 40px auto; }
 .page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
 
@@ -47,7 +47,7 @@ body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif
 	color: #03a9f4;
 }
 
-/* 🔥 badge 색상 조건별 분기 */
+/*  badge 색상 조건별 분기 */
 .badge.dday {
 	background: #fff9c4;
 	color: #f57f17;
