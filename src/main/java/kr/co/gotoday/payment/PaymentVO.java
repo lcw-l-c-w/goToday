@@ -15,4 +15,7 @@ public class PaymentVO {
     private String refund_status;
     private String payment_key;
     private String order_key;
+    
+    
+    private int cancel_amount;
 }
