@@ -235,12 +235,12 @@ public class UserController {
     
 
     // 관리자 로그인
-    @GetMapping("/member/loginForAdmin")
-    public void loginForAdmin() {
-       
+    @GetMapping("/member/login/admin")
+    public String loginForAdmin() {
+       return "member/loginForAdmin";
     }
   
-    @PostMapping("/member/loginForAdmin")
+    @PostMapping("/member/login/admin")
     public String loginForAdmin(HttpSession session
     		, UserVO vo, Model model) {
 

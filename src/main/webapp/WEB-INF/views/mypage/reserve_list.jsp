@@ -229,6 +229,7 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 			</c:otherwise>
 		</c:choose>
 	</div>
+</div>
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 
 <script src="/gotoday/resources/js/review/write.js"></script>
