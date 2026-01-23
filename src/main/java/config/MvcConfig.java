@@ -52,7 +52,7 @@ public class MvcConfig implements WebMvcConfigurer{
     private String kakaoRestApiKey;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
-    
+	
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
@@ -88,6 +88,8 @@ public class MvcConfig implements WebMvcConfigurer{
 	    
 		return dataSource;
 	}
+
+	
 	// mybatis
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception{
@@ -141,7 +143,8 @@ public class MvcConfig implements WebMvcConfigurer{
 					"/payment/**",
 					"/admin/**",
 					"/vendor/**",
-					"/mypage/**"
+					"/mypage/**",
+					"/review/**"
 			);
 		registry.addInterceptor(vendorInterceptor)
 		.addPathPatterns(
@@ -153,6 +156,13 @@ public class MvcConfig implements WebMvcConfigurer{
 	            "/admin/**"
 	        );
 			
+	}
+	
+	//리뷰 이미지 업로드하면 저장되는 경로
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    registry.addResourceHandler("/uploads/**")
+	            .addResourceLocations("file:///C:/gotoday_img/");
 	}
 	
 }

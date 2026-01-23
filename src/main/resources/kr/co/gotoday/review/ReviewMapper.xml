@@ -2,4 +2,133 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.review.ReviewMapper">
 
+	 <insert id="createReview" parameterType="kr.co.gotoday.review.ReviewVO">
+        INSERT INTO review (
+            content, rating, image_org, image_new, visited_at, visited_time_zone,
+            created_at, content_id, user_id, reservation_id
+        ) VALUES (
+            #{content}, #{rating}, #{image_org}, #{image_new}, #{visited_at}, #{visited_time_zone}, 
+            NOW(), #{content_id}, #{user_id}, #{reservation_id}
+        )
+    </insert>
+
+    <update id="updateReview" parameterType="kr.co.gotoday.review.ReviewVO">
+        UPDATE review
+        SET 
+        	content = #{content},
+            rating = #{rating},
+            image_org = #{image_org},
+            image_new = #{image_new}
+        WHERE review_id = #{review_id}
+        	AND user_id = #{user_id}
+    </update>
+
+    <delete id="deleteReview">
+        DELETE FROM review
+        WHERE review_id = #{review_id}
+          	AND user_id = #{user_id}
+    </delete>
+
+    <select id="findOneReviewById" resultType="kr.co.gotoday.review.ReviewVO">
+        SELECT 
+            review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id
+        FROM review
+        WHERE review_id = #{review_id}
+    </select>
+
+    <select id="findReviewsByUserId" parameterType="map" resultType="kr.co.gotoday.review.ReviewVO">
+        SELECT 
+            review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id
+        FROM review
+        WHERE user_id = #{user_id}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findReviewsByContentIdWithSort" parameterType="map" resultType="kr.co.gotoday.review.ReviewVO">
+        SELECT 
+            review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id
+        FROM review
+        WHERE content_id = #{content_id}
+        <choose>
+            <when test="sortType == 'latest'">
+                ORDER BY created_at DESC
+            </when>
+            <when test="sortType == 'highRating'">
+                ORDER BY rating DESC, created_at DESC
+            </when>
+            <when test="sortType == 'lowRating'">
+                ORDER BY rating ASC, created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY created_at DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllReviews" resultType="kr.co.gotoday.review.ReviewVO">
+        SELECT 
+        	review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at, 
+            content_id, user_id, reservation_id 
+        FROM review
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 점수별 별점 개수와 전체 평균 -->
+    <select id="findAvgRatingByStar" resultType="map">
+        SELECT 
+            COUNT(*) as total_reviews,
+            IFNULL(AVG(rating), 0) as avg_rating,
+            SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as rating_5,
+            SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as rating_4,
+            SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as rating_3,
+            SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as rating_2,
+            SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as rating_1
+        FROM review
+        WHERE content_id = #{content_id}
+    </select>
+
+    <!-- 시간대별 리뷰의 평균 -->
+    <select id="findAvgRatingByTimeSlot" resultType="map">
+        SELECT 
+            visited_time_zone,
+            COUNT(*) as review_count,
+            AVG(rating) as avg_rating
+        FROM review
+        WHERE content_id = #{content_id}
+        	AND visited_at IS NOT NULL
+        	AND visited_time_zone IS NOT NULL
+        GROUP BY visited_time_zone
+        ORDER BY visited_time_zone
+    </select>
+
+    <select id="checkReviewExistsById" resultType="int">
+        SELECT COUNT(*)
+        FROM review
+        WHERE reservation_id = #{reservation_id}
+    </select>
+
+    <select id="findReviewByReservationId" resultType="kr.co.gotoday.review.ReviewVO">
+        SELECT
+            review_id, content, rating, image_org, image_new,
+            visited_at, visited_time_zone, created_at,
+            content_id, user_id, reservation_id
+        FROM review
+        WHERE reservation_id = #{reservation_id}
+    </select>
+
+    <select id="countReviewsByContentId" resultType="int">
+        SELECT COUNT(*)
+        FROM review
+        WHERE content_id = #{content_id}
+    </select>
+
+
+
 </mapper>
