@@ -1,5 +1,7 @@
 package kr.co.gotoday.review;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,11 @@ public class ReviewServiceImpl implements ReviewService{
 	}
 
 	@Override
+	public ReviewVO findReviewById(int reviewId) {
+		return reviewMapper.findOneReviewById(reviewId);
+	}
+
+	@Override
 	public ReviewVO findReviewByReservationId(int reservationId) {
 		return reviewMapper.findReviewByReservationId(reservationId);
 	}
@@ -51,6 +58,11 @@ public class ReviewServiceImpl implements ReviewService{
 	@Override
 	public boolean checkReviewExists(int reservationId) {
 		return reviewMapper.checkReviewExistsById(reservationId) > 0;
+	}
+
+	@Override
+	public List<ReviewVO> findReviewsByUserId(int user_id) {
+		return reviewMapper.findReviewsByUserId(user_id);
 	}
 
 }

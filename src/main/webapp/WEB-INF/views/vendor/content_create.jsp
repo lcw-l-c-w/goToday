@@ -36,6 +36,9 @@ $(function() {
         fCreator: "createSEditor2"
     });
 })
+
+const isEdit = ${isEdit};
+
 </script>
 </head>
 <body>
@@ -327,6 +330,37 @@ $(function() {
 
             if (posterText) posterText.style.display = "none";
             if (posterImg) posterImg.classList.add("show");
+            
+            if (isEdit) {
+                // 시간대 input 수정 불가
+                document.querySelectorAll('#scheduleList input[name="Time[]"]').forEach(input => {
+                    input.readOnly = true;
+                    input.classList.add('readonly');
+                });
+
+                // 시간대 추가 버튼 비활성화
+                const addBtn = document.getElementById("addScheduleBtn");
+                if (addBtn) {
+                    addBtn.disabled = true;
+                    addBtn.style.opacity = "0.5";
+                    addBtn.style.cursor = "not-allowed";
+                }
+
+                // 시간대 삭제 버튼 비활성화
+                document.querySelectorAll('#scheduleList .remove-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.5";
+                    btn.style.cursor = "not-allowed";
+                });
+
+                // 시간당 티켓 수 수정 불가
+                const totalTicketInput = document.querySelector('input[name="total_ticket"]');
+                if (totalTicketInput) {
+                    totalTicketInput.readOnly = true;
+                    totalTicketInput.classList.add('readonly');
+                }
+            }
+
         });
     </script>
 </c:if>

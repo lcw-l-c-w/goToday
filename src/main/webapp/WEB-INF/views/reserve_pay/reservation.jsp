@@ -39,6 +39,7 @@
         .page-header { text-align: center; margin-bottom: 40px; }
         .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
         .page-header p { font-size: 16px; color: #888; }
+        .purchase-notice { font-size: 13px; color: #e74c3c; margin-top: 10px; line-height: 1.6; }
         .highlight-date { color: var(--main-color); font-weight: 600; background: #eef9ff; padding: 5px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; }
 
         /* 티켓 리스트 */
@@ -82,34 +83,21 @@
             background: var(--main-color); color: #fff; font-size: 20px; font-weight: 700;
             cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(77, 195, 255, 0.2);
         }
-        .submit-btn:hover { background: #38b2f0; transform: translateY(-2px); }
+        .submit-btn:hover:not(:disabled) { background: #38b2f0; transform: translateY(-2px); }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div class="nav-container">
-            <div class="logo">
-                <a href="${pageContext.request.contextPath}/main">
-                    <img src="<c:url value='/resources/images/logo.png'/>" alt="GoToday Logo">
-                </a>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#">Q&A</a></li>
-                <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-                <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
-            </ul>
-            <div class="nav-icons">
-                <div class="search-bar"><input type="text" placeholder="검색" style="border:none; border-bottom:1px solid #333; padding:5px; outline:none;"><span>🔍</span></div>
-                <span class="user-icon" id="myPageBtn">👤</span>
-            </div>
-        </div>
+        <jsp:include page="/WEB-INF/views/common/header.jsp" />
     </header>
 
     <main class="main-wrapper">
         <div class="page-header">
             <h1>${contentVO.title}</h1>
             <p>관람하실 인원을 선택해주세요.</p>
+            <p class="purchase-notice">※ 1인당 최대 10매까지 구매 가능합니다.<br>단체 구매는 Q&A 게시판에 문의해주세요.</p>
             <div class="highlight-date">
                 📅 방문 예정일: ${reservationDTO.reserved_for_at} (${reservationDTO.time_zone})
             </div>
@@ -167,7 +155,7 @@
                 <input type="hidden" id="total_price" name="total_price" value="0" />
             </div>
 
-            <button type="submit" class="submit-btn">예매하기</button>
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>예매하기</button>
         </form>
     </main>
 
@@ -179,15 +167,31 @@
             child: parseInt("${contentVO.child_price}") || 0
         };
 
+        const MAX_TOTAL_QTY = 10; // 1인당 최대 구매 수량
+
+        // 현재 총 수량 계산
+        function getTotalQty() {
+            const adultQty = parseInt(document.getElementById('adult_qty').value) || 0;
+            const teenQty = parseInt(document.getElementById('teen_qty').value) || 0;
+            const childQty = parseInt(document.getElementById('child_qty').value) || 0;
+            return adultQty + teenQty + childQty;
+        }
+
         // 수량 변경 함수
         function changeQty(inputId, delta) {
             const input = document.getElementById(inputId);
             let currentVal = parseInt(input.value) || 0;
             let newVal = currentVal + delta;
-            
-            // 0 ~ 10 제한
+
+            // 0 이상
             if (newVal < 0) newVal = 0;
-            if (newVal > 10) newVal = 10;
+
+            // 총 수량 10개 제한
+            const currentTotal = getTotalQty();
+            if (delta > 0 && currentTotal >= MAX_TOTAL_QTY) {
+                alert('1인당 최대 ' + MAX_TOTAL_QTY + '매까지 구매 가능합니다.\n단체 구매는 Q&A 게시판에 문의해주세요.');
+                return;
+            }
 
             input.value = newVal;
             calculateTotal();
@@ -200,9 +204,18 @@
             const childQty = parseInt(document.getElementById('child_qty').value) || 0;
 
             const total = (adultQty * prices.adult) + (teenQty * prices.teen) + (childQty * prices.child);
-            
+            const totalQty = adultQty + teenQty + childQty;
+
             document.getElementById('totalAmountText').textContent = total.toLocaleString();
             document.getElementById('total_price').value = total;
+
+            // 수량이 0이면 버튼 비활성화
+            const submitBtn = document.getElementById('submitBtn');
+            if (totalQty > 0) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
         }
 
         // 마이페이지 이동
