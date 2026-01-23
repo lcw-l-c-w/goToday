@@ -135,7 +135,8 @@
         <div class="modal-header">
             <h3 id="modalTitle">리뷰 작성</h3>
             <button type="button" id="btnDeleteReview" class="delete-icon-btn" style="display:none;" title="리뷰 삭제">
-                🗑️ </button>
+                리뷰삭제 
+            </button>
         </div>
         
         <hr>
@@ -156,11 +157,11 @@
 
             <label style="font-weight:600;">별점 <span id="ratingVal">5.0</span></label>
             <div class="star-rating" id="starRating">
-                <span class="star active" data-value="1">★</span>
-                <span class="star active" data-value="2">★</span>
-                <span class="star active" data-value="3">★</span>
-                <span class="star active" data-value="4">★</span>
-                <span class="star active" data-value="5">★</span>
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
             </div>
 
             <div id="timeZoneArea" style="margin-bottom:15px;">
@@ -191,7 +192,6 @@
             <!-- 수정 모드 버튼 -->
             <div id="editButtons" style="display:none; gap:10px;">
                 <button type="button" id="btnUpdateReview" style="flex:1; padding:12px; background:#4dc3ff; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">수정</button>
-                <button type="button" id="btnDeleteReview" style="flex:1; padding:12px; background:#ff4444; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">삭제</button>
                 <button type="button" id="btnCloseReview2" style="flex:1; padding:12px; background:#ddd; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">취소</button>
             </div>
         </form>

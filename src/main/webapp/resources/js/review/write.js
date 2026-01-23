@@ -60,7 +60,12 @@ function openReviewModal(dto) {
     const modalClone = original.cloneNode(true);
 
     modalClone.style.display = 'block';
-    
+
+    // 복사된 모달의 모든 별에서 active 클래스 제거 (초기화)
+    modalClone.querySelectorAll('.star-rating .star').forEach(star => {
+        star.classList.remove('active');
+    });
+
     reviewOverlay.appendChild(modalClone);
     // 부모 body에 추가
     parentBody.appendChild(reviewOverlay);
@@ -72,16 +77,20 @@ function openReviewModal(dto) {
 
     // 리뷰 존재 여부 확인
     isEditMode = dto.reviewExists === true;
+    
+    const deleteTrashBtn = overlay.querySelector('#btnDeleteReview');
 
     // 모달 제목 및 버튼 설정
     if (isEditMode) {
         overlay.querySelector('#modalTitle').textContent = '리뷰 확인/수정';
         overlay.querySelector('#createButtons').style.display = 'none';
         overlay.querySelector('#editButtons').style.display = 'flex';
+        if(deleteTrashBtn) deleteTrashBtn.style.display = 'flex';
     } else {
         overlay.querySelector('#modalTitle').textContent = '리뷰 작성';
         overlay.querySelector('#createButtons').style.display = 'flex';
         overlay.querySelector('#editButtons').style.display = 'none';
+        if(deleteTrashBtn) deleteTrashBtn.style.display = 'none';
     }
 
     // 기본 데이터 세팅
@@ -110,13 +119,22 @@ function openReviewModal(dto) {
     overlay.querySelector('#m_reviewId').value = review.review_id;
     overlay.querySelector('#m_content').value = review.content || '';
     overlay.querySelector('#m_rating').value = review.rating || 5;
-    overlay.querySelector('#ratingVal').textContent = (review.rating || 5) + '.0';
+    overlay.querySelector('#ratingVal').textContent = (parseInt(review.rating) || 5) + '.0';
 
-    // 별점 UI 반영
-    updateStars(
-        overlay.querySelectorAll('.star-rating .star'),
-        review.rating || 5
-    );
+    // 별점 UI 반영 -전역 변수와 입력 필드에 실제 리뷰 점수 반영
+    currentRating = parseInt(review.rating) || 5;
+
+    overlay.querySelector('#m_rating').value = currentRating;
+    overlay.querySelector('#ratingVal').textContent = currentRating + '.0';
+
+    // 수정 모드: 기존 리뷰의 시간대 반영 (상시 전시 드롭다운인 경우)
+    if (review.visited_time_zone) {
+        overlay.querySelector('#m_visitedTimeZone').value = review.visited_time_zone;
+        const timeZoneSelect = overlay.querySelector('#timeZoneSelect');
+        if (timeZoneSelect) {
+            timeZoneSelect.value = review.visited_time_zone;
+        }
+    }
 
     // 현재 이미지 세팅
     if (review.image_new) {
@@ -141,12 +159,15 @@ function openReviewModal(dto) {
     overlay.querySelector('#m_rating').value = 5;
     overlay.querySelector('#ratingVal').textContent = '5.0';
 
+    // 신규 등록은 기본 5점
+    currentRating = 5;
+
     overlay.querySelector('#currentImageArea').style.display = 'none';
     overlay.querySelector('#m_keepImage').value = 'true';
 }
     
 
-    // 별점 클릭 이벤트 바인딩
+    // 별점 클릭 이벤트 바인딩 - 현재 설정된 별점 값도 전달
     initStarRating(overlay);
 
     // 버튼 이벤트 바인딩
@@ -342,25 +363,28 @@ function initStarRating(overlay) {
     const ratingInput = overlay.querySelector('#m_rating');
     const ratingVal = overlay.querySelector('#ratingVal');
 
-    stars.forEach((star, index) => {
+    stars.forEach((star) => {
+        // 클릭했을 때
         star.addEventListener('click', function() {
-            currentRating = parseInt(this.dataset.value);
+            currentRating = parseInt(this.dataset.value); // 전역 변수 업데이트
             ratingInput.value = currentRating;
             ratingVal.textContent = currentRating + '.0';
             updateStars(stars, currentRating);
         });
 
+        // 마우스 올렸을 때 (미리보기)
         star.addEventListener('mouseenter', function() {
             const hoverValue = parseInt(this.dataset.value);
             updateStars(stars, hoverValue);
         });
 
+        // 마우스 나갔을 때 (원래 점수로 복구)
         star.addEventListener('mouseleave', function() {
-            updateStars(stars, currentRating);
+            updateStars(stars, currentRating); // 저장된 currentRating 사용
         });
     });
 
-    // 초기 별 표시
+    // 초기 실행 시 별 상태 맞추기
     updateStars(stars, currentRating);
 }
 
@@ -382,7 +406,6 @@ function closeReviewModal() {
         reviewOverlay = null;
     }
     isEditMode = false;
-    currentRating = 5;
 }
 
 // 리뷰 등록

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
 import kr.co.gotoday.reservation.ReservationService;
+import kr.co.gotoday.review.ReviewService;
+import kr.co.gotoday.review.ReviewVO;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class MypageController {
 	private final UserService userService;
 	private final ReservationService reservationService;
 	private final MypageService mypageService;
+	private final ReviewService reviewService;
 	
 	// 메인 화면
     @GetMapping("/mypage/main")
@@ -206,4 +209,17 @@ public class MypageController {
     public String contentDetail(@RequestParam("id") int contentId, Model model) {
         return "content/content_detail";
     }
+    
+	@GetMapping("/mypage/myreviews.do")
+	public String showUserReviewList(HttpSession sess, Model model) {
+		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+		if(userVO == null) {
+			model.addAttribute("cmd","back");
+			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+			return "common/return";
+		}
+		List<ReviewVO> reviewList = reviewService.findReviewsByUserId(userVO.getUser_id());
+		model.addAttribute("reviewList", reviewList);
+		return "mypage/review_list";
+	}
 }

@@ -2,6 +2,7 @@ package kr.co.gotoday.review;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -160,9 +162,9 @@ public class ReviewController {
 	            reviewVO.setImage_org(imageNames[0]);
 	            reviewVO.setImage_new(imageNames[1]);
 	            
-	        } else if ("true".equals(keepImage)) {
+	        } else if (keepImage) {
 	            // DB에서 기존 정보를 불러와서 원본 이름과 변경된 이름을 다시 세팅해줌
-	            ReviewVO oldReview = reviewService.findReviewByReservationId(reviewId); 
+	            ReviewVO oldReview = reviewService.findReviewById(reviewId);
 	            if (oldReview != null) {
 	                reviewVO.setImage_org(oldReview.getImage_org());
 	                reviewVO.setImage_new(oldReview.getImage_new());
@@ -234,4 +236,5 @@ public class ReviewController {
 
 		return new String[]{imageOrg, imageNew};
 	}
+
 }
