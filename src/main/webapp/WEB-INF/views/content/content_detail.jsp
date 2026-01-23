@@ -654,7 +654,9 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 						src="${pageContext.request.contextPath}${content.main_image_path}"
 						class="detail-img">
 				</section>
-				<section class="tab-panel">리뷰 목록이 여기에 표시됩니다.</section>
+				<section class="tab-panel">
+					<jsp:include page="/WEB-INF/views/review/review_list_by_content.jsp" />
+				</section>
 				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
 			</div>
 		</div>
