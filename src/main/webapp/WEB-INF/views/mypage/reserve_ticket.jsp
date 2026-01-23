@@ -6,6 +6,8 @@
 <meta charset="UTF-8">
 <title>GoToday | 온라인 티켓</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+
 <style>
     :root {
         --ticket-bg: #ffffff;
@@ -15,9 +17,15 @@
         --text-sub: #888888;
     }
 
+* {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont,
+               'Apple SD Gothic Neo', 'Noto Sans KR',
+               'Malgun Gothic', Arial, sans-serif;
+}
+
     body {
         background-color: var(--page-bg);
-        font-family: 'Pretendard', -apple-system, sans-serif;
+        font-family: inherit;
         margin: 0;
         padding: 0;
         display: flex;
@@ -181,6 +189,8 @@
         color: #ccc;
         font-family: monospace;
     }
+	.ticket-qty{
+	font-size:11px;}
 
     /* 인쇄 설정 */
     @media print {
@@ -217,6 +227,18 @@
                     <div class="info-item">
                         <label>QUANTITY</label>
                         <span>${reservation.totalQty}매</span>
+                        <div class="ticket-qty">
+                        
+                        <c:if test="${reservation.adult_qty >0}">
+                        <div id="adultTicket">(어른  : ${reservation.adult_qty}매) </div>
+                        </c:if>
+                        <c:if test="${reservation.teen_qty >0}">
+                        <div id="teenTicket">(청소년 : ${reservation.teen_qty}매)</div>
+                        </c:if>
+                        <c:if test="${reservation.child_qty >0}">
+                        <div id="childTicket">(어린이 : ${reservation.child_qty}매)</div>
+                        </c:if>
+                         </div>
                     </div>
                     <div class="info-item" style="grid-column: span 2;">
                         <label>DATE & TIME</label>

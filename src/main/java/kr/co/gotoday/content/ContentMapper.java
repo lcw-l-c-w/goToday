@@ -32,4 +32,7 @@ public interface ContentMapper {
 			@Param("size") int size);
 
 	int countSearch(@Param("dto") ContentSearchDTO dto);
+	
+	//티켓 조회 (승인/ 승인 대기 상태에도 다 보이게끔)
+	ContentVO selectTicketDetail(@Param("content_id") int content_id);
 }
