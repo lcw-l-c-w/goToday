@@ -90,22 +90,7 @@
 <body>
 
     <header class="header">
-        <div class="nav-container">
-            <div class="logo">
-                <a href="${pageContext.request.contextPath}/main">
-                    <img src="<c:url value='/resources/images/logo.png'/>" alt="GoToday Logo">
-                </a>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#">Q&A</a></li>
-                <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li>
-                <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
-            </ul>
-            <div class="nav-icons">
-                <div class="search-bar"><input type="text" placeholder="검색" style="border:none; border-bottom:1px solid #333; padding:5px; outline:none;"><span>🔍</span></div>
-                <span class="user-icon" id="myPageBtn">👤</span>
-            </div>
-        </div>
+        <jsp:include page="/WEB-INF/views/common/header.jsp" />
     </header>
 
     <main class="main-wrapper">
