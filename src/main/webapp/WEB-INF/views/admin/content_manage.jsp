@@ -29,21 +29,24 @@
                 <li class="active"><a href="#"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
                 <li><a href="${ctx}/admin/user_manage"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
                 <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+                <li><a href="${ctx}/mypage/logout" onclick="return confirmLogout();"><span class="material-symbols-outlined">logout</span> 로그아웃</a></li>
             </ul>
         </nav>
 
         <div class="sidebar-footer">
 		    <div class="user-box">
 		        <p class="user-role">Signed in as</p>
-		        <div class="name-wrapper"> <strong class="user-name">
+		        <div class="name-wrapper user-name-trigger" onclick="toggleUserModal(event)"> 
+		        	<strong class="user-name" >
 		                <c:choose>
 		                    <c:when test="${not empty loginSess}">
-		                        ${loginSess.name}
+		                        관리자
 		                    </c:when>
 		                    <c:otherwise>
 		                        잘못된 접근입니다.
 		                    </c:otherwise>
 		                </c:choose>
+		            </strong>
 		            </strong>
 		            <a href="${ctx}/main" class="home-icon-btn" title="메인으로 이동">
 		                <span class="material-symbols-outlined">home</span>
@@ -89,7 +92,6 @@
 				</ul>
 
             </section>
-
             <div class="pagination">
                 <button class="arrow">◀</button>
                 <button>1</button>
@@ -104,6 +106,14 @@
 </body>
 <script>
 const ctx = '${pageContext.request.contextPath}';
+
+function confirmLogout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+        return true; 
+    } else {
+        return false;
+    }
+}
 
 const ACTIVATE_MAP = {
 		  1:  { text: '활성화', className: 'active' },
@@ -239,8 +249,6 @@ function renderList(list) {
         );
     });
 }
-
-
 </script>
 </html>
 

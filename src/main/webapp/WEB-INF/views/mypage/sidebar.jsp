@@ -91,17 +91,17 @@
 </style>
 
 <aside class="sidebar">
-    <div class="user-profile">
-        <div class="user-name">
-            <a href="${pageContext.request.contextPath}/mypage/main" target="_top" style="text-decoration: none; color: inherit;">
-        	<strong>${not empty sessionScope.userName ? sessionScope.userName : '홍길동'}</strong> 님
-    </a>
-        </div>
-        <div class="user-email">
-            ${not empty sessionScope.userEmail ? sessionScope.userEmail : 'user@email.com'}
-        </div>
-        <button type="button" class="logout-btn" onclick="logout()">로그아웃</button>
-    </div>
+	<div class="user-profile">
+	    <div class="user-name">
+	        <a href="${pageContext.request.contextPath}/mypage/main" target="_top" style="text-decoration: none; color: inherit;">
+	            <strong>${not empty sessionScope.userName ? sessionScope.userName : '홍길동'}</strong> 님
+	        </a>
+	    </div>
+	    <div class="user-email">
+	        ${not empty sessionScope.userEmail ? sessionScope.userEmail : 'user@email.com'}
+	    </div>
+	    <button type="button" class="logout-btn" onclick="logout()">로그아웃</button>
+	</div>
 
     <div class="sidebar-section">
         <h2 class="sidebar-title">주문 관리</h2>

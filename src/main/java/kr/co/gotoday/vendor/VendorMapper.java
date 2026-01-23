@@ -16,6 +16,5 @@ public interface VendorMapper {
 	List<ContentVO> selectContentList(Map<String, Object> param);
 	ContentVO selectContentOne(Integer content_id);
 	List<ContentScheduleVO> selectContentScheduleList(Integer content_id);
-	int deleteContentSchedule(Integer content_id);
 	int updateContent(ContentVO contentVO);
 }

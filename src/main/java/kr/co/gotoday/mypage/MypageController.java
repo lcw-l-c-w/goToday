@@ -97,7 +97,7 @@ public class MypageController {
 
         userService.updateUserTags(userId, tagNames);
 
-        return "redirect:/mypage/calender";
+        return "redirect:/calendar";
     }
     
     // 회원 정보 수정
@@ -152,7 +152,7 @@ public class MypageController {
             session.setAttribute("userEmail", updatedUser.getEmail());
             // 전체 객체 세션 최신화
             session.setAttribute("loginSess", updatedUser);
-            return "redirect:/mypage/calender";
+            return "redirect:/calendar";
             
         } else {
             model.addAttribute("msg", "회원 정보 수정 중 오류가 발생했습니다.");
