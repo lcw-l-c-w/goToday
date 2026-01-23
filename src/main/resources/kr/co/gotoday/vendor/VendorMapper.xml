@@ -36,7 +36,7 @@
 	        END AS content_status
 	    FROM content
 	    WHERE user_id = #{user_id}
-	      AND is_delete = 0
+	      AND is_delete = 0 AND is_active = 1
 	    <if test="keyword != null and keyword != ''">
 	        AND title LIKE CONCAT('%', #{keyword}, '%')
 	    </if>
