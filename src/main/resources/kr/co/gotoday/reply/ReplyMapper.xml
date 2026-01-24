@@ -41,6 +41,10 @@
 		DELETE FROM reply  WHERE reply_id = #{reply_id}
 	</delete>
 	
+	<delete id="deleteAdmin" parameterType="int">
+		DELETE FROM reply  WHERE gno = #{reply_id}
+	</delete>
+	
 	<sql id="searchSql">
 		<where>
 			reply_status = 0

@@ -294,7 +294,7 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 				</c:forEach>
 			</c:otherwise>
 		</c:choose>
-		</div>
+	</div>
 </div>
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 
