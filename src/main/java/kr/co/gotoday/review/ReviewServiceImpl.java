@@ -1,6 +1,8 @@
 package kr.co.gotoday.review;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,4 +67,70 @@ public class ReviewServiceImpl implements ReviewService{
 		return reviewMapper.findReviewsByUserId(user_id);
 	}
 
+	@Override
+	public List<ReviewVO> getReviewsByContentPaged(int content_id, int page, String sortType ) {
+		int limit = 5;
+	    int offset = (page - 1) * limit;
+	    
+	    Map<String, Object> map = new HashMap<String, Object>();
+	    map.put("content_id", content_id);
+	    map.put("limit", limit);
+	    map.put("offset", offset);
+	    map.put("sortType", sortType );
+
+	    List<ReviewVO> list = reviewMapper.findReviewsByContentIdWithSort(map);
+
+        for (ReviewVO r : list) {
+            r.setMaskedEmail(maskEmail(r.getEmail()));
+        }
+
+        return list;
+	}
+
+	@Override
+	public Map<String, Object> getRatingSummary(int content_id) {
+		Map<String, Object> row = reviewMapper.findAvgRatingByStar(content_id);
+		
+		if (row == null) {
+		    row = new HashMap<>();
+		}
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("totalReviews", ((Number) row.get("total_reviews")).intValue());
+	    result.put("avgRating", ((Number) row.get("avg_rating")).doubleValue());
+
+	    result.put("rating_5", ((Number) row.get("rating_5")).intValue());
+	    result.put("rating_4", ((Number) row.get("rating_4")).intValue());
+	    result.put("rating_3", ((Number) row.get("rating_3")).intValue());
+	    result.put("rating_2", ((Number) row.get("rating_2")).intValue());
+	    result.put("rating_1", ((Number) row.get("rating_1")).intValue());
+	    return result;
+	}
+
+	@Override
+	public  Map<String, Double> getAvgRatingByTimeZone(int content_id) {
+		List<Map<String, Object>> rows = reviewMapper.findAvgRatingByTimeSlot(content_id);
+
+	    Map<String, Double> result = new HashMap<>();
+	    for (Map<String, Object> row : rows) {
+	        Object zoneObj = row.get("visited_time_zone");
+	        Object avgObj  = row.get("avg_rating");
+
+	        if (avgObj == null) continue;
+
+	        String key;
+	        if (zoneObj == null || zoneObj.toString().trim().isEmpty()) {
+	            key = "always";   // 상시 전시
+	        } else {
+	            key = zoneObj.toString();
+	        }
+
+	        result.put(key, ((Number) avgObj).doubleValue());
+	    }
+	    return result;
+	}
+	
+	private String maskEmail(String email) {
+	    if (email == null || email.length() < 3) return "***";
+	    return email.substring(0, 3) + "****";
+	}
 }

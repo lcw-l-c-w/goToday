@@ -155,7 +155,7 @@
 		WHERE order_key = #{order_key}
 	</select>
 	
-	<select id="findReservationListByUserId" parameterType="int" resultType="kr.co.gotoday.reservation.ReservationListDTO">
+	<select id="findReservationListByUserId" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationListDTO">
 		SELECT 
 			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
 			c.content_id, c.title, c.main_image_path,
@@ -166,6 +166,22 @@
 		JOIN payment p ON r.reservation_id = p.reservation_id
 		LEFT JOIN review r2 ON r.reservation_id = r2.reservation_id
 		WHERE r.user_id = #{user_id}
+		   <choose>
+	        <when test="filter == 'CANCELED'">
+	            AND r.reservation_status = 'CANCELED'
+	        </when>
+
+	        <when test="filter == 'UPCOMING'">
+	            AND r.reserved_for_at >= NOW()
+	            AND r.reservation_status = 'DONE'
+	        </when>
+	
+	    	<when test="filter == 'END'">
+	            AND r.reserved_for_at &lt; NOW()
+	        </when>
+
+	        <otherwise></otherwise>
+	    </choose>
 		ORDER BY r.reserved_for_at, r.time_zone
 	</select>
 	
