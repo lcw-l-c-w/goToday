@@ -15,7 +15,7 @@ public interface ReviewMapper {
 
 	ReviewVO findOneReviewById(int review_id);
 	List<ReviewVO> findReviewsByUserId(int user_id);
-	List<ReviewVO> findReviewsByContentIdWithSort(int content_id, String sortType);
+	List<ReviewVO> findReviewsByContentIdWithSort(Map<String, Object> map);
 	List<ReviewVO> findAllReviews();
 
 	Map<String, Object> findAvgRatingByStar(int content_id);
