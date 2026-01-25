@@ -6,56 +6,159 @@
 <head>
     <meta charset="UTF-8">
     <title>GoToday Main</title>
-    <style>
-        /* 1. 기본 스타일 */
-        :root { --main-color: #4dc3ff; } 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Pretendard', sans-serif; overflow-x: hidden; background-color: #fff; }
-        a { text-decoration: none; color: inherit; }
-        
 
-        /* 2. 메인 배너 */
-        .main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-        .main-banner { position: relative; width: 100%; height: 500px; margin: 20px 0 60px; border-radius: 20px; overflow: hidden; background: #000; }
-        #slideList { display: flex !important; flex-wrap: nowrap !important; width: auto; height: 100%; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); margin: 0; padding: 0; list-style: none; }
-        .banner-card { flex: 0 0 100% !important; width: 100%; height: 100%; position: relative; cursor: pointer; }
-        .banner-card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        .banner-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 60px 40px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; }
-        .banner-info h3 { font-size: 32px; margin-bottom: 10px; }
-        .banner-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.3); border: none; color: white; font-size: 24px; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; z-index: 100; transition: 0.3s; }
-        .btn-prev { left: 20px; }
-        .btn-next { right: 20px; }
+  <style>
+    /* 1. 공통 및 초기화 */
+    :root { --main-color: #4dc3ff; } 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Pretendard', sans-serif; background-color: #fff; line-height: 1.4; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; } /* 전역 list-style 정리 */
 
-        /* 3. 추천 컨텐츠 슬라이드 및 잘림 방지 */
-        .recommend-section { position: relative; width: 100%; margin-bottom: 60px; }
-        .recommend-container { position: relative; width: 100%; padding: 0 10px; }
-        .recommend-view { width: 100%; overflow: hidden; }
-        .content-list.horizontal { display: flex; gap: 20px; transition: transform 0.5s ease; padding: 10px 0; list-style: none; }
-        .content-card { flex: 0 0 210px; cursor: pointer; transition: 0.3s; }
-        .content-card:hover { transform: translateY(-5px); }
-        .card-img-wrap { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; position: relative; margin-bottom: 15px; border: 1px solid #eee; }
-        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .recommend-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #eee; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; z-index: 110; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
-        .recommend-btn:hover { background: #f8f8f8; color: var(--main-color); }
-        .rec-prev { left: -22px; }
-        .rec-next { right: -22px; }
+    /* 2. 메인 베너 (최적화) */
+    .main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    .main-banner { 
+        position: relative; 
+        width: 100%; 
+        height: 500px; 
+        margin: 20px 0 60px; 
+        border-radius: 20px; 
+        overflow: hidden; 
+    }
+    #slideList { 
+        display: flex; 
+        width: 100%; 
+        height: 100%; 
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+    }
+    .banner-card { 
+        flex: 0 0 100%; 
+        height: 100%; 
+        position: relative; 
+        cursor: pointer; 
+    }
+    .banner-card img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .banner-info { 
+        position: absolute; 
+        bottom: 0; left: 0; 
+        width: 100%; 
+        padding: 60px 40px; 
+        background: linear-gradient(transparent, rgba(0,0,0,0.8)); 
+        color: white; 
+    }
+    .banner-info h3 { font-size: 32px; margin-bottom: 10px; }
 
-        /* 블러 및 CTA */
-        .blur-container { filter: blur(8px); pointer-events: none; user-select: none; }
-        .cta-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; background: rgba(255, 255, 255, 0.95); padding: 40px 60px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 480px; }
-        .cta-overlay h3 { font-size: 24px; font-weight: bold; margin-bottom: 15px; color: #111; }
-        .cta-overlay p { font-size: 16px; color: #666; margin-bottom: 25px; line-height: 1.6; }
-        .cta-btn { display: inline-block; background-color: var(--main-color); color: white; padding: 14px 35px; border-radius: 12px; font-weight: bold; }
+    /* 베너 버튼 공통 */
+    .banner-btn { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        background: rgba(255,255,255,0.3); 
+        border: none; 
+        color: white; 
+        font-size: 24px; 
+        width: 50px; 
+        height: 50px; 
+        border-radius: 50%; 
+        cursor: pointer; 
+        z-index: 10; 
+        transition: 0.3s; 
+    }
+    .banner-btn:hover { background: rgba(255,255,255,0.5); }
+    .btn-prev { left: 20px; }
+    .btn-next { right: 20px; }
 
-        /* 4. 기타 스타일 */
-        .section-title { font-size: 24px; font-weight: bold; margin: 60px 0 25px; text-align: center; }
-        .hot-grid-container { display: grid; grid-template-columns: 1.3fr 2fr; gap: 15px; height: 550px; }
-        .hot-main { border-radius: 18px; overflow: hidden; position: relative; cursor: pointer; }
-        .hot-main img { width: 100%; height: 100%; object-fit: cover; }
-        .hot-sub-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 12px; }
-        .sub-card { border-radius: 12px; overflow: hidden; cursor: pointer; }
-        .sub-card img { width: 100%; height: 100%; object-fit: cover; }
-    </style>
+    /* 3. 섹션 공통 */
+    .section-title { font-size: 24px; font-weight: bold; margin: 60px 0 25px; text-align: center; }
+
+    /* 4. 추천 컨텐츠 슬라이드 */
+    .recommend-section { position: relative; margin-bottom: 60px; }
+    .recommend-view { width: 100%; overflow: hidden; }
+    .content-list.horizontal { 
+        display: flex; 
+        gap: 20px; 
+        transition: transform 0.5s ease; 
+        padding: 10px 0; 
+    }
+    .content-card { flex: 0 0 210px; cursor: pointer; transition: 0.3s; }
+    .content-card:hover { transform: translateY(-5px); }
+    
+    .card-img-wrap { 
+        width: 100%; 
+        height: 280px; 
+        border-radius: 15px; 
+        overflow: hidden; 
+        position: relative; 
+        margin-bottom: 12px; 
+        border: 1px solid #eee; 
+    }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* 추천 슬라이드 버튼 */
+    .recommend-btn { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        background: #fff; 
+        border: 1px solid #eee; 
+        width: 44px; 
+        height: 44px; 
+        border-radius: 50%; 
+        cursor: pointer; 
+        z-index: 5; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    .rec-prev { left: -22px; }
+    .rec-next { right: -22px; }
+
+    /* 블러 및 오버레이 */
+    .blur-container { filter: blur(8px); pointer-events: none; }
+    .cta-overlay { 
+        position: absolute; 
+        top: 50%; left: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 100; 
+        background: rgba(255, 255, 255, 0.95); 
+        padding: 40px; 
+        border-radius: 25px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+        text-align: center; 
+        width: 90%; 
+        max-width: 450px; 
+    }
+    .cta-btn { 
+        display: inline-block; 
+        background-color: var(--main-color); 
+        color: white; 
+        padding: 12px 30px; 
+        border-radius: 10px; 
+        font-weight: bold; 
+        margin-top: 20px;
+    }
+
+    /* 5. HOT 그리드 */
+    .hot-grid-container { 
+        display: grid; 
+        grid-template-columns: 1.3fr 2fr; 
+        gap: 15px; 
+        height: 550px; 
+    }
+    .hot-main { border-radius: 18px; overflow: hidden; position: relative; cursor: pointer; }
+    .hot-main img { width: 100%; height: 100%; object-fit: cover; }
+    .hot-sub-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        grid-template-rows: repeat(2, 1fr); 
+        gap: 12px; 
+    }
+    .sub-card { border-radius: 12px; overflow: hidden; cursor: pointer; }
+    .sub-card img { width: 100%; height: 100%; object-fit: cover; }
+</style>
+   
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -172,46 +275,78 @@
     </main>
 
     <script>
-        window.addEventListener("load", function() {
-            // 1. 메인 배너
-            const slideList = document.getElementById('slideList');
-            const bannerSlides = slideList ? slideList.querySelectorAll('.banner-card') : [];
-            let bannerIdx = 0;
-            if (bannerSlides.length > 1) {
-                document.getElementById('slidePrev').onclick = () => {
-                    bannerIdx = (bannerIdx - 1 + bannerSlides.length) % bannerSlides.length;
-                    slideList.style.transform = `translateX(-\${bannerIdx * 100}%)`;
-                };
-                document.getElementById('slideNext').onclick = () => {
-                    bannerIdx = (bannerIdx + 1) % bannerSlides.length;
-                    slideList.style.transform = `translateX(-\${bannerIdx * 100}%)`;
-                };
+    window.addEventListener("load", function() {
+        // 1. 메인 배너 로직
+        const slideList = document.getElementById('slideList');
+        const bannerSlides = slideList ? slideList.querySelectorAll('.banner-card') : [];
+        let bannerIdx = 0;
+        let slideTimer;
+
+        if (bannerSlides.length > 1) {
+            // [수정] 슬라이드 이동 핵심 함수
+            function moveSlide(index) {
+                bannerIdx = index;
+                if (bannerIdx >= bannerSlides.length) bannerIdx = 0;
+                if (bannerIdx < 0) bannerIdx = bannerSlides.length - 1;
+                
+                // JSP 환경이므로 \${} 형태로 작성하여 간섭 방지
+                slideList.style.transform = `translateX(-\${bannerIdx * 100}%)`;
+                resetTimer(); 
             }
 
-            // 2. 추천 컨텐츠 슬라이드 로직
-            const recList = document.getElementById('recList');
-            const recCards = recList ? recList.querySelectorAll('.content-card') : [];
-            let recPosition = 0;
-            const cardWidth = 210 + 20; 
-            const containerWidth = document.querySelector('.recommend-view').offsetWidth;
-            const visibleCount = Math.floor(containerWidth / cardWidth);
-
-            if (recCards.length > visibleCount) {
-                document.getElementById('recPrev').onclick = () => {
-                    recPosition = Math.min(recPosition + cardWidth, 0);
-                    recList.style.transform = `translateX(\${recPosition}px)`;
-                };
-                document.getElementById('recNext').onclick = () => {
-                    recPosition = Math.max(recPosition - cardWidth, -(cardWidth * recCards.length - containerWidth + 10));
-                    recList.style.transform = `translateX(\${recPosition}px)`;
-                };
-            } else {
-                if(document.getElementById('recPrev')) document.getElementById('recPrev').style.display = 'none';
-                if(document.getElementById('recNext')) document.getElementById('recNext').style.display = 'none';
+            // 5초 자동 재생
+            function startTimer() {
+                slideTimer = setInterval(() => {
+                    moveSlide(bannerIdx + 1);
+                }, 5000);
             }
 
-      
-        });
+            function resetTimer() {
+                clearInterval(slideTimer);
+                startTimer();
+            }
+
+            // [수정] 버튼 클릭 시에도 moveSlide 함수를 호출해야 함
+            document.getElementById('slidePrev').onclick = () => {
+                moveSlide(bannerIdx - 1);
+            };
+            
+            document.getElementById('slideNext').onclick = () => {
+                moveSlide(bannerIdx + 1);
+            };
+
+            // 배너에 마우스 올리면 정지, 떼면 다시 시작 (편의기능)
+            const bannerArea = document.querySelector('.main-banner');
+            bannerArea.onmouseenter = () => clearInterval(slideTimer);
+            bannerArea.onmouseleave = () => startTimer();
+
+            startTimer(); // 최초 시작
+        }
+
+        // 2. 추천 컨텐츠 슬라이드 로직
+        const recList = document.getElementById('recList');
+        const recCards = recList ? recList.querySelectorAll('.content-card') : [];
+        let recPosition = 0;
+        const cardWidth = 210 + 20; 
+        const recView = document.querySelector('.recommend-view');
+        const containerWidth = recView ? recView.offsetWidth : 0;
+        const visibleCount = Math.floor(containerWidth / cardWidth);
+
+        if (recCards.length > visibleCount) {
+            document.getElementById('recPrev').onclick = () => {
+                recPosition = Math.min(recPosition + cardWidth, 0);
+                recList.style.transform = `translateX(\${recPosition}px)`;
+            };
+            document.getElementById('recNext').onclick = () => {
+                const maxScroll = -(cardWidth * recCards.length - containerWidth + 10);
+                recPosition = Math.max(recPosition - cardWidth, maxScroll);
+                recList.style.transform = `translateX(\${recPosition}px)`;
+            };
+        } else {
+            if(document.getElementById('recPrev')) document.getElementById('recPrev').style.display = 'none';
+            if(document.getElementById('recNext')) document.getElementById('recNext').style.display = 'none';
+        }
+    });
     </script>
 </body>
 </html>

@@ -19,6 +19,41 @@ import org.springframework.web.client.RestTemplate;
 public class ContentReplyServiceImpl implements ContentReplyService{
 	
 	@Autowired
-	private ContentReplyMapper userMapper;
+	private ContentReplyMapper contentReplyMapper;
 
+	@Override
+	public int insertQA(ContentReplyVO vo) {
+		// 매퍼가 성공하면 1, 실패하면 0을 반환
+		return contentReplyMapper.insertContentQA(vo);
+		
+	}
+
+	@Override
+	public int updateQA(ContentReplyVO vo) {
+		// TODO Auto-generated method stub
+		return contentReplyMapper.updateReply(vo);
+		
+	}
+
+	@Override
+	public int deleteQA(ContentReplyVO vo) {
+		// TODO Auto-generated method stub
+		return contentReplyMapper.deleteReply(vo);
+		
+	}
+
+	@Override
+	public List<ContentReplyVO> showQAByID(int user_id) {
+		// TODO Auto-generated method stub
+		return contentReplyMapper.selectQAByID(user_id);
+	}
+
+	@Override
+	public List<ContentReplyVO> showQAALL(int content_id) {
+		// TODO Auto-generated method stub
+		return contentReplyMapper.selectAllQA(content_id);
+	}
+
+
+	
 }

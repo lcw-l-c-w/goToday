@@ -301,9 +301,38 @@ $(function() {
 }
     // 탭 전환
     $(".tab-item").click(function() {
-        $(".tab-item").removeClass("active");
+    	// 클릭한 탭의 순서 (0, 1, 2)
+    	const index = $(this).index(); 
+    	//탭 이름 
+    	const tabCategory=$(this).data("type");
+    	const content_id=$("#content_id").val();
+    	
+        //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
+    	$(".tab-item").removeClass("active");
         $(this).addClass("active");
-        $(".tab-panel").hide().eq($(this).index()).show();
+        
+        // 패널 표시 전환 -> 모든패널을 숨기고 클릭한 순서에 맞는거만 보여줌 
+        $(".tab-panel").removeClass("active").hide();
+        const currentPanel = $(".tab-panel").eq(index);
+        currentPanel.addClass("active").show();
+        
+        if(tabCategory !== "detail") {   
+        //패널 가시성 조절
+        
+        $.ajax({
+        	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
+        	type:"GET", //목록 조회는 get
+        	data:{
+        		content_id:content_id
+        	},
+        	success:function(data){
+        		 currentPanel.html(data);
+        	}
+        	
+        	
+        })
+        }
+  
     });
 	
     // 달력 로드
@@ -642,9 +671,9 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 
 		<div class="tab-wrapper">
 			<ul class="tab-menu">
-				<li class="tab-item active">상세정보</li>
-				<li class="tab-item">리뷰</li>
-				<li class="tab-item">문의사항</li>
+				<li class="tab-item active" data-type="detail">상세정보</li>
+				<li class="tab-item" data-type="review">리뷰</li>
+				<li class="tab-item" data-type="inquiry">문의사항</li>
 			</ul>
 
 			<div class="tab-content">
@@ -654,8 +683,8 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 						src="${pageContext.request.contextPath}${content.main_image_path}"
 						class="detail-img">
 				</section>
-				<section class="tab-panel">리뷰 목록이 여기에 표시됩니다.</section>
-				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
+				<section class="tab-panel"></section>
+				<section class="tab-panel"></section>
 			</div>
 		</div>
 	</div>
