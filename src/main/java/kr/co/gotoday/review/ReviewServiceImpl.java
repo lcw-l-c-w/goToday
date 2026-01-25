@@ -69,7 +69,7 @@ public class ReviewServiceImpl implements ReviewService{
 
 	@Override
 	public List<ReviewVO> getReviewsByContentPaged(int content_id, int page, String sortType ) {
-	    int limit = 10;
+		int limit = 5;
 	    int offset = (page - 1) * limit;
 	    
 	    Map<String, Object> map = new HashMap<String, Object>();
@@ -91,6 +91,9 @@ public class ReviewServiceImpl implements ReviewService{
 	public Map<String, Object> getRatingSummary(int content_id) {
 		Map<String, Object> row = reviewMapper.findAvgRatingByStar(content_id);
 		
+		if (row == null) {
+		    row = new HashMap<>();
+		}
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("totalReviews", ((Number) row.get("total_reviews")).intValue());
 	    result.put("avgRating", ((Number) row.get("avg_rating")).doubleValue());
