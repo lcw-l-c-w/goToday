@@ -30,4 +30,9 @@ public interface UserMapper {
     int updateUserInfo(UserVO vo);
     
     void createUserTagsBatch(List<UserTagVO> list);
+    
+    int insertNaverUser(UserVO vo);
+    
+    UserVO loginByNaverKey(String naver_key);
+
 }

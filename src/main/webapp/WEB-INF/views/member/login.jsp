@@ -123,11 +123,18 @@ body { font-family: 'Roboto', sans-serif; background-color: var(--color-bg-prima
         회원이 아니신가요? 
         <button type="button" id="btnRegister" class="btn btn-secondary">SIGN IN</button>
         
+        		<!-- ✅ 여기: 에러 메시지 영역 -->
+		<c:if test="${not empty loginError}">
+  			<div class="login-error">
+    			${loginError}
+  			</div>
+		</c:if>
+        
         <div id="socialLogin" class="social-login">
           <a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=account_email,profile_nickname" class="btn-social btn-kakao">
             <span class="kakao-icon"></span> 카카오 로그인
           </a>
-          <a href="/naver" class="btn-social btn-naver">
+          <a href="https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NAVER_CLIENT_ID}&state=${NAVER_STATE}&redirect_uri=${NAVER_REDIRECT_URI}" class="btn-social btn-naver">
             <span class="naver-icon"></span> 네이버 로그인
           </a>
         </div>

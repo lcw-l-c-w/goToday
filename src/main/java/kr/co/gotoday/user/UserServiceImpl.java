@@ -167,4 +167,85 @@ public class UserServiceImpl implements UserService{
         int result = userMapper.updateUserInfo(vo);
         return result > 0;
     }
+
+// --------------------------------------------------------------------- 네이버 로그인
+    
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.redirect-uri}")
+    private String naverRedirectUri;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
+    
+	@Override
+	public UserVO getNaverUserInfo(String accessToken) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + accessToken);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
+		
+		ResponseEntity<String> response = rt.exchange(
+				"https://openapi.naver.com/v1/nid/me",
+				 HttpMethod.GET,
+				 entity,
+				 String.class
+				 );
+		
+		if (!response.getStatusCode().is2xxSuccessful()) {
+		    return null;
+		}
+		
+		JSONObject json = new JSONObject(response.getBody());
+		JSONObject responseObj = json.getJSONObject("response");
+		
+		
+	    UserVO user = new UserVO();
+	    user.setLogin_type("N");
+	    user.setNaver_key(responseObj.optString("id", null));
+	    user.setEmail(responseObj.optString("email", null));
+	    user.setName(responseObj.optString("name", null));      // 동의 항목 따라 null 가능
+	    user.setBirthday(responseObj.optString("birthday", null));      // 동의 항목 따라 null 가능
+	    user.setGender(responseObj.optString("gender", null));      // 동의 항목 따라 null 가능
+		return user;
+	}
+
+
+	@Override
+	public boolean insertNaverUser(UserVO vo) {
+		return userMapper.insertNaverUser(vo) > 0 ? true : false ;
+	}
+
+
+	@Override
+	public String getNaverAccessToken(String code, String savedState) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", naverClientId);
+		params.add("client_secret", naverClientSecret);
+		params.add("redirect_uri", naverRedirectUri);
+		params.add("code", code);
+		params.add("state", savedState);
+		
+		
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+		
+		ResponseEntity<String> response = rt.exchange(
+				"https://nid.naver.com/oauth2.0/token",
+				HttpMethod.POST,
+				request,
+				String.class
+				);
+		JSONObject json = new JSONObject(response.getBody());
+		return json.getString("access_token");
+	}
+
+
+	@Override
+	public UserVO loginByNaverKey(String naver_key) {
+		return userMapper.loginByNaverKey(naver_key);
+	}
 }

@@ -30,4 +30,12 @@ public interface UserService {
 	// 회원 정보 수정
 	UserVO getUserById(int userId);
 	boolean updateUserInfo(UserVO vo);
+	
+	public UserVO getNaverUserInfo(String accessToken);
+	
+	boolean insertNaverUser(UserVO vo);
+	
+	public String getNaverAccessToken(String code, String savedState);
+	
+	public UserVO loginByNaverKey(String naver_key);
 }

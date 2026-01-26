@@ -99,4 +99,14 @@
 	    </set>
 	    WHERE user_id = #{user_id}
 	</update>
+	<!-- 네이버 -->
+	<insert id="insertNaverUser" parameterType="kr.co.gotoday.user.UserVO" useGeneratedKeys="true" keyProperty="user_id">
+		INSERT INTO user(
+		email, name, registered_at, role, login_type, naver_key
+		) VALUES (#{email}, #{name} , NOW(), 0, 'N',  #{naver_key})
+	</insert>
+	<!-- 네이버 DB 중복체크  -->
+	<select id="loginByNaverKey" parameterType="string"  resultType="kr.co.gotoday.user.UserVO">
+		SELECT * FROM user WHERE naver_key = #{naver_key} AND login_type = 'N'
+	</select>
 </mapper>

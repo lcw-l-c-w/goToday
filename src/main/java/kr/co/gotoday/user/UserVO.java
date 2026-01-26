@@ -22,4 +22,7 @@ public class UserVO {
     // 카카오 로그인   
     private String kakao_email; 
     private String kakao_nickname;
+    
+    private String naver_key;
+    
 }

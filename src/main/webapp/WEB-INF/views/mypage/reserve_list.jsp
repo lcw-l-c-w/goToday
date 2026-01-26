@@ -309,7 +309,7 @@ body {
 
 								<div class="reserve-content">
 									<p>${r.title}</p>
-									<img src="${r.main_image_path}" alt="포스터">
+									<img src="<c:url value='${r.main_image_path}'/>" alt="포스터">
 								</div>
 
 								<button class="info-btn"
