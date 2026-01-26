@@ -47,7 +47,7 @@ public class ContentController {
 	        // user도 있고, 컨텐츠도 있다면 
 	        int like = contentLikeService.CheckContentLike( content_id,user.getUser_id());
 	        result.setLiked(like); // VO에 결과 담기
-	        System.out.println("개어렵네."+result.getContentReservation());
+	       
 	    }
 		
 		
