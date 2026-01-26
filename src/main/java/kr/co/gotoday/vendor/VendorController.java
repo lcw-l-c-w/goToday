@@ -69,7 +69,6 @@ public class VendorController {
 		
 		dto.setUser_id(login.getUser_id());
 		Map<String, Object> map = vendorService.findReservationByVendor(dto);
-		System.out.println("DTO = " + dto);
 		
 		return map;
 	}

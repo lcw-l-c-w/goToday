@@ -14,7 +14,22 @@
         <if test="is_active != null">
             AND is_active = #{is_active}
         </if>
-        
+    </where>
+    ORDER BY content_id DESC
+</select>
+
+<select id="selectContentListCount" parameterType="kr.co.gotoday.content.contentVO" resultType="int">
+    SELECT COUNT(*)
+    FROM content
+    <where>
+    	is_delete = 0
+    	AND content_status NOT IN ('STATUS_REQUESTED', 'STATUS_REJECTED')
+        <if test="keyword != null and keyword != ''">
+            AND title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="is_active != null">
+            AND is_active = #{is_active}
+        </if>
     </where>
     ORDER BY content_id DESC
 </select>

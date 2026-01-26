@@ -1,106 +1,57 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="ctx" value="${pageContext.request.contextPath}" />    
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8" />
-    <title>ExhibiReserve - 사용자 관리</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="${ctx}/css/admin_user_manage.css">
-</head>
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<link
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+	rel="stylesheet" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_user_manage.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
 
-<body>
+<header class="content-header">
+	<div class="title-group">
+		<h2>사용자 관리</h2>
+		<p>등록된 사용자의 상태를 확인하고 관리하세요.</p>
+	</div>
+</header>
 
-<div class="admin-container">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h1 class="logo">ExhibiReserve</h1>
-            <p class="logo-sub">ADMIN MANAGEMENT</p>
-        </div>
-
-        <nav class="sidebar-nav">
-            <ul>
-				<li><a href="${ctx}/admin/content_request"><span class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
-                <li><a href="${ctx}/admin/content_manage"><span class="material-symbols-outlined">description</span> 전시 관리</a></li>
-                <li class="active"><a href="#"><span class="material-symbols-outlined">person</span> 사용자 관리</a></li>
-                <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
-                <li><a href="${ctx}/mypage/logout" onclick="return confirmLogout();"><span class="material-symbols-outlined">logout</span> 로그아웃</a></li>
-            </ul>
-        </nav>
-
-        <div class="sidebar-footer">
-		    <div class="user-box">
-		        <p class="user-role">Signed in as</p>
-		        <div class="name-wrapper"> <strong class="user-name">
-		                <c:choose>
-		                    <c:when test="${not empty loginSess}">
-		                        관리자
-		                    </c:when>
-		                    <c:otherwise>
-		                        잘못된 접근입니다.
-		                    </c:otherwise>
-		                </c:choose>
-		            </strong>
-		            <a href="${ctx}/main" class="home-icon-btn" title="메인으로 이동">
-		                <span class="material-symbols-outlined">home</span>
-		            </a>
-		        </div>
-		    </div>
+<div class="content-card">
+	<div class="toolbar">
+		<div class="search-box">
+			<span class="material-symbols-outlined">search</span> <input
+				type="text" class="searchInput" id="searchInput"
+				placeholder="사용자 이름으로 검색..." />
 		</div>
-    </aside>
+		<div class="filter-tabs">
+			<button class="filter-btn active" data-status="">전체</button>
+			<button class="filter-btn" data-status="0">사용자</button>
+			<button class="filter-btn" data-status="1">업체</button>
+		</div>
+	</div>
 
-    <main class="main-content">
-        <header class="content-header">
-            <div class="title-group">
-                <h2>사용자 관리</h2>
-                <p>등록된 사용자의 상태를 확인하고 관리하세요.</p>
-            </div>
-        </header>
+	<section class="table-section">
+		<div class="table-header">
+			<span class="col-status">상태</span> <span class="col-email">이메일</span>
+			<span class="col-name">이름</span> <span class="col-phone">핸드폰
+				번호</span> <span class="col-birth">생년월일</span>
+		</div>
 
-        <div class="content-card">
-            <div class="toolbar">
-                <div class="search-box">
-                    <span class="material-symbols-outlined">search</span>
-                    <input type="text"  class="searchInput" id="searchInput" placeholder="사용자 이름으로 검색..."  />
-                </div>
-                <div class="filter-tabs">
-                    <button class="filter-btn active" data-status="">전체</button>
-                    <button class="filter-btn" data-status="0">사용자</button>
-                    <button class="filter-btn" data-status="1">업체</button>
-                </div>
-            </div>
+		<ul class="table-body" id="contentList">
+			<li class="loading">데이터를 불러오는 중입니다...</li>
+		</ul>
 
-            <section class="table-section">
-                <div class="table-header">
-                    <span class="col-status">상태</span>
-                    <span class="col-email">이메일</span>
-                    <span class="col-name">이름</span>
-                    <span class="col-phone">핸드폰 번호</span>
-                    <span class="col-birth">생년월일</span>
-                </div>
-                
-     			 <ul class="table-body" id="contentList">
-				    <li class="loading">데이터를 불러오는 중입니다...</li>
-				</ul>
+	</section>
 
-            </section>
-
-            <div class="pagination">
-                <button class="arrow">◀</button>
-                <button>1</button>
-                <button class="active">2</button>
-                <button>3</button>
-                <button class="arrow">▶</button>
-            </div>
-        </div>
-    </main>
+	<div class="pagination">
+		<button class="arrow">◀</button>
+		<button>1</button>
+		<button class="active">2</button>
+		<button>3</button>
+		<button class="arrow">▶</button>
+	</div>
 </div>
 
-</body>
 <script>
 const ctx = '${pageContext.request.contextPath}';
 
