@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.TossInputDTO;
@@ -70,14 +71,15 @@ public class ReservationController {
 		
 	    boolean isAllDayType =
 	            dto.getContent_time() != null &&
-	            endTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[1]);
+	            endTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[1]) &&
+	            startTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[0]);
 		
 	    if (isAllDayType) {
 	    	if (NOW.isAfter(endTime)) {
 	            return ResponseEntity.ok("이미 운영 시간이 종료된 전시입니다.");
 	        }
 		} else {
-			if (NOW.isAfter(startTime)) {
+			if (NOW.isAfter(startTime) || NOW.isEqual(startTime)) {
 	            return ResponseEntity.ok("지난 회차는 선택하실 수 없습니다.");
 	        }
 		}
@@ -108,7 +110,9 @@ public class ReservationController {
 		UserVO userVO = (UserVO) session.getAttribute("loginSess");
 		 
 		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
+		ContentScheduleVO scheduleVO = reservationService.findCurrentTickets(reservation.getSchedule_id());
 		model.addAttribute("contentVO",contentVO);
+		model.addAttribute("scheduleVO", scheduleVO);
 
 		return "reserve_pay/reservation";
 	}
@@ -263,8 +267,12 @@ public class ReservationController {
 
 	//토스페이먼츠에서 결제 실패 콜백
 	@GetMapping("/reserve/fail.do")
-	public String paymentFail(@RequestParam String message, Model model) {
+	public String paymentFail(@RequestParam String message, Model model, HttpSession sess) {
 		model.addAttribute("msg", message);
+		
+		sess.removeAttribute("pendingReservation");
+		sess.removeAttribute("paymentDTO");
+	    
 		return "reserve_pay/fail";
 	}
 

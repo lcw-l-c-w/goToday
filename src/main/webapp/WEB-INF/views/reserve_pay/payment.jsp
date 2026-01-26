@@ -247,7 +247,31 @@
                     </li>
                 </ul>
             </div>
-
+            
+			<h2 class="section-title">예약자 정보</h2>
+            <div class="card-box">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">이름</label>
+                        <input type="text" name="reserver_name" class="form-input" value="${receiver_info.name}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">생년월일</label>
+                        <input type="text" name="receiver_birth" class="form-input" value="${receiver_info.birthday}" readonly>
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">이메일</label>
+                        <input type="text" name="receiver_email" class="form-input" value="${receiver_info.email}" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">휴대폰 번호</label>
+                        <input type="text" name="receiver_phone" class="form-input" value="${receiver_info.phone_number}" placeholder="010-0000-0000">
+                    </div>
+                </div>
+                <p class="info-text">
+               		※ 입력하신 정보로 예약 내역을 조회합니다. 정확하게 기입해 주세요.<br>
+                </p>
+            </div>
             <h2 class="section-title">수령인 정보</h2>
             <div class="card-box">
                 <div class="form-grid">
@@ -270,7 +294,7 @@
                 </div>
                 <p class="info-text">
                		※ 기본적으로 회원 정보로 입력됩니다.<br>
-               		※ 입력하신 정보로 티켓이 발송되니 정확하게 확인해주세요.<br>
+               		※ 입장 시, 입력하신 정보로 조회됩니다. 정확하게 기입해 주세요.<br>
                 </p>
             </div>
 
@@ -493,8 +517,8 @@
                     failUrl: window.location.origin + "${pageContext.request.contextPath}/reserve/fail.do",
                 };
 
-                if (method === "CARD_PAY") {
-                    tossPayments.requestPayment("카드 및 간편결제", commonOptions);
+                if (method === "CARD") {
+                    tossPayments.requestPayment("카드", commonOptions);
                 } else if (method === "VIRTUAL_ACCOUNT") {
                     commonOptions.validHours = 24;
                     tossPayments.requestPayment("가상계좌", commonOptions);
@@ -506,15 +530,6 @@
             }
         });
 
-        // 마이페이지 링크 로직
-        const myBtn = document.getElementById('myPageBtn');
-        if(myBtn) {
-            myBtn.onclick = () => {
-                const isLoggedIn = ${not empty loginSess};
-                location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
-            };
-        }
-        
         document.querySelector(".refund-toggle").addEventListener("click", function () {
             const container = document.querySelector(".refund-content");
             const detail = document.querySelector(".refund-detail");

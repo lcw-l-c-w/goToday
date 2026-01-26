@@ -90,7 +90,7 @@
 <body>
 
     <header class="header">
-        <jsp:include page="/WEB-INF/views/common/header.jsp" />
+        <jsp:include page="/WEB-INF/views/common/header.jsp" />s
     </header>
 
     <main class="main-wrapper">
@@ -167,7 +167,8 @@
             child: parseInt("${contentVO.child_price}") || 0
         };
 
-        const MAX_TOTAL_QTY = 10; // 1인당 최대 구매 수량
+        const CURRENT_QTY = parseInt(${scheduleVO.current_ticket});
+        const MAX_TOTAL_QTY = (CURRENT_QTY < 10)? CURRENT_QTY : 10; // 1인당 최대 구매 수량
 
         // 현재 총 수량 계산
         function getTotalQty() {
@@ -189,7 +190,11 @@
             // 총 수량 10개 제한
             const currentTotal = getTotalQty();
             if (delta > 0 && currentTotal >= MAX_TOTAL_QTY) {
-                alert('1인당 최대 ' + MAX_TOTAL_QTY + '매까지 구매 가능합니다.\n단체 구매는 Q&A 게시판에 문의해주세요.');
+            	if (CURRENT_QTY < 10) {
+            		alert('해당 시간대의 남은 티켓 수는 ' + MAX_TOTAL_QTY + '매입니다.');
+            	} else {
+	                alert('1인당 최대 ' + MAX_TOTAL_QTY + '매까지 구매 가능합니다.\n단체 구매는 Q&A 게시판에 문의해주세요.');            		
+            	}
                 return;
             }
 
@@ -216,15 +221,6 @@
             } else {
                 submitBtn.disabled = true;
             }
-        }
-
-        // 마이페이지 이동
-        const myBtn = document.getElementById('myPageBtn');
-        if(myBtn) {
-            myBtn.onclick = () => {
-                const isLoggedIn = ${not empty loginSess};
-                location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
-            };
         }
 
         calculateTotal();
