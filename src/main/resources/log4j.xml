@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="kr.co.gabeen">
+	<logger name="kr.co.gotoday">
 		<level value="info" />
 	</logger>
 	

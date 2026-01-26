@@ -326,7 +326,7 @@ $(function() {
      
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            locale: 'ko',
+            locale: 'local',
             height: 'auto',
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
       
@@ -345,6 +345,7 @@ $(function() {
                 $(".fc-daygrid-day").css("background", ""); // 이전 선택 초기화
                 $(info.dayEl).css("background", "rgba(77, 195, 255, 0.3)"); // 클릭한 날짜 강조
                const todayDate= new Date();
+               todayDate.setHours(0, 0, 0, 0);  
                 if(info.date<todayDate){
             		alert("지난 날짜는 불가합니다. 다른 날짜를 선택해주세요.");
             		return;
@@ -438,11 +439,17 @@ $(function() {
             content_id: $("#content_id").val(),
             reserved_for_at: selectedDate,
             time_zone: selectedTime,
-            schedule_id: scheduleId
-        }).done(function(){
-            location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+            schedule_id: scheduleId,
+            content_time: "${content.content_time}"
+        }).done(function(res){
+        	if (res === "OK") {
+	       		location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+            } else {
+                alert(res);
+            }
         }).fail(function(){
-            alert("예약 요청 중 오류가 발생했습니다.");
+        	const msg = res.responseText;
+            alert(msg || "예약 요청 중 오류가 발생했습니다.");
         });
     });
 

@@ -1,6 +1,8 @@
 package kr.co.gotoday.reservation;
 
 import java.io.BufferedReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -41,14 +43,43 @@ public class ReservationController {
 	private static final Logger log =
 	        LoggerFactory.getLogger(ReservationController.class);
 
-	@PostMapping("/reserve/schedule.do")
+	@PostMapping(
+			value = "/reserve/schedule.do",
+		    produces = "text/plain; charset=UTF-8")
 	@ResponseBody
-	public String selectSchedule(HttpSession session, ReservationDTO dto) {
+	public ResponseEntity<String> selectSchedule(HttpSession session, ReservationDTO dto) {
+		log.info("===== [selectSchedule] dto = {}", dto);
 		// 필수 값 검증
 		if (dto.getReserved_for_at() == null || dto.getReserved_for_at().isEmpty()
 				|| dto.getTime_zone() == null || dto.getTime_zone().isEmpty()
 				|| dto.getContent_id() == 0 || dto.getSchedule_id() == 0) {
-			return "error";
+			return ResponseEntity.ok("날짜 및 시간 정보가 누락 되었습니다.");
+		}
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		LocalDateTime NOW = LocalDateTime.now();
+
+		String[] times = dto.getTime_zone().replace(" ", "").split("~");
+	    String startTimeStr = times[0];
+	    String endTimeStr   = times[1];
+	    
+	    LocalDateTime startTime = LocalDateTime.parse(
+	            dto.getReserved_for_at() + " " + startTimeStr, formatter);
+	    LocalDateTime endTime = LocalDateTime.parse(
+	            dto.getReserved_for_at() + " " + endTimeStr, formatter);
+		
+	    boolean isAllDayType =
+	            dto.getContent_time() != null &&
+	            endTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[1]);
+		
+	    if (isAllDayType) {
+	    	if (NOW.isAfter(endTime)) {
+	            return ResponseEntity.ok("이미 운영 시간이 종료된 전시입니다.");
+	        }
+		} else {
+			if (NOW.isAfter(startTime)) {
+	            return ResponseEntity.ok("지난 회차는 선택하실 수 없습니다.");
+	        }
 		}
 
 		ReservationDTO reservation = new ReservationDTO();
@@ -58,25 +89,26 @@ public class ReservationController {
 		reservation.setSchedule_id(dto.getSchedule_id());
 
 		session.setAttribute("schedule", reservation);
-		return "ok";
+		return ResponseEntity.ok("OK");
 	}
 
 	@GetMapping("/reserve/quantity.do")
 	public String showQuantityForm(HttpSession session, Model model) {
-		 ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
+		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
+		log.info("===== [showQuantityForm] reservation = {}", reservation);
 
-		 if (reservation == null) {
+		if (reservation == null) {
 			 model.addAttribute("cmd", "back");
 			 model.addAttribute("msg", "예약정보가 누락되었습니다.");
 			 return "common/return";
-		 }
+		}
 		 
-		 model.addAttribute("reservationDTO", reservation);
-
-		 UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		model.addAttribute("reservationDTO", reservation);
+	
+		UserVO userVO = (UserVO) session.getAttribute("loginSess");
 		 
-		 ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
-		 model.addAttribute("contentVO",contentVO);
+		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
+		model.addAttribute("contentVO",contentVO);
 
 		return "reserve_pay/reservation";
 	}
