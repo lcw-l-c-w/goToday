@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
@@ -72,6 +73,11 @@ public class ReservationServiceImpl implements ReservationService{
 	@Override
 	public ReservationVO findByReservationId(int reservation_id) {
 		return reservationMapper.findByReservationId(reservation_id);
+	}
+	
+	@Override
+	public ContentScheduleVO findCurrentTickets(int schedule_id) {
+		return reservationMapper.findCurrentTickets(schedule_id);
 	}
 	
 	@Override

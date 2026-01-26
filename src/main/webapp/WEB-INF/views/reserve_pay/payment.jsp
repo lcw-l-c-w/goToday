@@ -94,6 +94,129 @@
             margin-top: 10px;
         }
         .payment-btn:hover { background: #38b2f0; transform: translateY(-3px); }
+        
+        .refund-content {
+		    border: 1px solid var(--border-color);
+		    border-radius: 12px;
+		    overflow: hidden;
+		    background: #fff;
+		    margin-bottom: 20px;
+		}
+		
+		/* 상단 토글 헤더 */
+		.refund-toggle {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    padding: 16px 18px;
+		    cursor: pointer;
+		    background: #f8fbfd;
+		    font-size: 15px;
+		    font-weight: 700;
+		    color: #333;
+		    transition: background 0.25s ease;
+		}
+		
+		.refund-toggle:hover {
+		    background: #eef9ff;
+		}
+		
+		.refund-arrow {
+		    font-size: 14px;
+		    color: #666;
+		    transition: transform 0.3s ease;
+		}
+		
+		/* 열렸을 때 화살표 회전 */
+		.refund-content.open .refund-arrow {
+		    transform: rotate(180deg);
+		}
+		
+		/* 상세 영역 */
+		.refund-detail {
+		    display: none;
+		    padding: 20px 22px;
+		    background: #ffffff;
+		    border-top: 1px solid #eee;
+		}
+		
+		/* 섹션 단위 */
+		.refund-section {
+		    margin-bottom: 20px;
+		}
+		
+		.refund-section:last-child {
+		    margin-bottom: 0;
+		}
+		
+		/* 소제목 */
+		.refund-section h4 {
+		    font-size: 14px;
+		    font-weight: 700;
+		    color: #222;
+		    margin-bottom: 8px;
+		    display: flex;
+		    align-items: center;
+		    gap: 6px;
+		}
+		
+		.refund-section h4::before {
+		    content: '';
+		    width: 4px;
+		    height: 14px;
+		    background: var(--main-color);
+		    border-radius: 2px;
+		}
+		
+		/* 리스트 */
+		.refund-section ul {
+		    padding-left: 18px;
+		    list-style-type: none;
+		}
+		
+		.refund-section li {
+		    font-size: 14px;
+		    color: #555;
+		    line-height: 1.6;
+		    margin-bottom: 6px;
+		}
+		
+		/* 강조 텍스트 */
+		.refund-section strong {
+		    color: #222;
+		    font-weight: 700;
+		}
+		
+		/* 하단 환불 안내 박스 */
+		.refund-notice {
+		    background: #f9f9f9;
+		    border-radius: 10px;
+		    padding: 14px 16px;
+		    font-size: 13px;
+		    color: #666;
+		    line-height: 1.5;
+		}
+		
+		/* 모바일 대응 */
+		@media (max-width: 600px) {
+		    .refund-toggle {
+		        font-size: 14px;
+		        padding: 14px 16px;
+		    }
+		
+		    .refund-detail {
+		        padding: 16px;
+		    }
+		
+		    .refund-section h4 {
+		        font-size: 13px;
+		    }
+		
+		    .refund-section li {
+		        font-size: 13px;
+		    }
+		}
+		        
     </style>
 </head>
 <body>
@@ -111,8 +234,8 @@
             <div class="card-box">
                 <ul class="receipt-list">
                     <li class="receipt-item"><span>상품명</span> <strong>${contentVo.title}</strong></li>
-                    <li class="receipt-item"><span>일정</span> 2026-01-01(목) ~ 2026-02-28(토)</li>
-                    <li class="receipt-item"><span>장소</span> 더서울라이티움(위치)</li>
+                    <li class="receipt-item"><span>예약 일정</span>${reservation.reserved_for_at} | ${reservation.time_zone} 타임</li>
+                    <li class="receipt-item"><span>장소</span>${contentVo.location}</li>
                     <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
                     <li class="receipt-item">
                         <span>선택 수량</span> 
@@ -124,8 +247,32 @@
                     </li>
                 </ul>
             </div>
-
-            <h2 class="section-title">예약자 정보</h2>
+            
+			<h2 class="section-title">예약자 정보</h2>
+            <div class="card-box">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">이름</label>
+                        <input type="text" name="reserver_name" class="form-input" value="${receiver_info.name}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">생년월일</label>
+                        <input type="text" name="receiver_birth" class="form-input" value="${receiver_info.birthday}" disabled>
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">이메일</label>
+                        <input type="text" name="receiver_email" class="form-input" value="${receiver_info.email}" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">휴대폰 번호</label>
+                        <input type="text" name="receiver_phone" class="form-input" value="${receiver_info.phone_number}" placeholder="010-0000-0000">
+                    </div>
+                </div>
+                <p class="info-text">
+               		※ 입력하신 정보로 예약 내역을 조회합니다. 정확하게 기입해 주세요.<br>
+                </p>
+            </div>
+            <h2 class="section-title">수령인 정보</h2>
             <div class="card-box">
                 <div class="form-grid">
                     <div class="form-group">
@@ -145,7 +292,10 @@
                         <input type="text" name="receiver_phone" class="form-input" value="${receiver_info.phone_number}" placeholder="010-0000-0000">
                     </div>
                 </div>
-                <p class="info-text">※ 입력하신 정보로 티켓이 발송되니 정확하게 확인해주세요.</p>
+                <p class="info-text">
+               		※ 기본적으로 회원 정보로 입력됩니다.<br>
+               		※ 입장 시, 입력하신 정보로 조회됩니다. 정확하게 기입해 주세요.<br>
+                </p>
             </div>
 
             <h2 class="section-title">수령 및 결제 선택</h2>
@@ -167,11 +317,7 @@
 					  <div class="radio-group">
 					    <label class="radio-option">
 					      <input type="radio" name="payMethod" value="CARD" checked>
-					      <span class="radio-box">신용/체크카드</span>
-					    </label>
-					    <label class="radio-option">
-					      <input type="radio" name="payMethod" value="EASY_PAY">
-					      <span class="radio-box">간편결제</span>
+					      <span class="radio-box">신용/체크카드 및 간편결제</span>
 					    </label>
 					    <label class="radio-option">
 					      <input type="radio" name="payMethod" value="VIRTUAL_ACCOUNT">
@@ -180,6 +326,76 @@
 					  </div>
 					</div>
             </div>
+            
+            <div class="refund-content">
+
+		    <!-- 토글 헤더 -->
+		    <div class="refund-toggle">
+		      <span>결제 · 취소 · 환불 정책 안내</span>
+		      <span class="refund-arrow">▼</span>
+		    </div>
+		 	
+			  <!-- 토글 본문 -->
+			  <div class="refund-detail">
+			
+			    <div class="refund-section">
+			      <h4>예매 정책</h4>
+			      <ul>
+			        <li>1인당 최대 <strong>10매</strong>까지 예매 가능합니다.</li>
+			        <li>
+			          관람일 당일 00:00 이후 예약 건은
+			          <strong>취소 및 환불이 불가</strong>합니다.
+			        </li>
+			      </ul>
+			    </div>
+			
+			    <div class="refund-section">
+			      <h4>취소 및 환불 정책</h4>
+			      <ul>
+			        <li>
+			          취소 및 환불은
+			          <strong>관람일 전일 23:59:59까지</strong> 가능합니다.
+			        </li>
+			        <li>
+			          관람일 당일 관람 시작 시간 이후 미입장(No-Show) 시
+			          <strong>환불이 불가</strong>합니다.
+			        </li>
+			      </ul>
+			    </div>
+			
+			    <div class="refund-section">
+			      <h4>취소 수수료 안내</h4>
+			      <ul>
+			        <li>관람일 7일 전까지: 티켓 금액의 <strong>10%</strong></li>
+			        <li>관람일 3일 전까지: 티켓 금액의 <strong>30%</strong></li>
+			        <li>관람일 1일 전까지: 티켓 금액의 <strong>50%</strong></li>
+			      </ul>
+			    </div>
+			
+			    <div class="refund-section">
+			      <h4>예매 변경 안내</h4>
+			      <ul>
+			        <li>
+			          동일 상품에 대해 날짜, 시간, 수량, 결제수단 등의 변경을 원하는 경우,
+			          <strong>기존 예매 건을 취소한 후 재예매</strong>해야 합니다.
+			        </li>
+			        <li>
+			          단,취소 시점에 따라
+			          <strong>취소 수수료가 부과</strong>될 수 있습니다.
+			        </li>
+			      </ul>
+			    </div>
+			
+			    <div class="refund-section refund-notice">
+			      <p>
+			        환불 완료 후 실제 환불 시점은 결제수단에 따라 상이하며<br>
+			        <strong>영업일 기준 3~7일</strong> 정도 소요될 수 있습니다.<br>
+			        ※ 취소 및 환불 가능 여부는 당사 시스템 시간을 기준으로 판단됩니다.
+			      </p>
+			    </div>
+			
+			  </div>
+			</div>
 
             <h2 class="section-title">약관 동의</h2>
             <div class="card-box">
@@ -303,8 +519,6 @@
 
                 if (method === "CARD") {
                     tossPayments.requestPayment("카드", commonOptions);
-                } else if (method === "EASY_PAY") {
-                    tossPayments.requestPayment("간편결제", commonOptions);
                 } else if (method === "VIRTUAL_ACCOUNT") {
                     commonOptions.validHours = 24;
                     tossPayments.requestPayment("가상계좌", commonOptions);
@@ -316,14 +530,19 @@
             }
         });
 
-        // 마이페이지 링크 로직
-        const myBtn = document.getElementById('myPageBtn');
-        if(myBtn) {
-            myBtn.onclick = () => {
-                const isLoggedIn = ${not empty loginSess};
-                location.href = isLoggedIn ? "${pageContext.request.contextPath}/member/mypage" : "${pageContext.request.contextPath}/member/login";
-            };
-        }
+        document.querySelector(".refund-toggle").addEventListener("click", function () {
+            const container = document.querySelector(".refund-content");
+            const detail = document.querySelector(".refund-detail");
+
+            container.classList.toggle("open");
+
+            if (detail.style.display === "block") {
+              detail.style.display = "none";
+            } else {
+              detail.style.display = "block";
+            }
+        });
+        
     </script>
 </body>
 </html>
