@@ -401,4 +401,10 @@ WHERE
 	AND c.content_status IN ( 'STATUS_APPROVAL','STATUS_REQUESTED')
 	</select>
 	
+	
+<select id="findVendorId" resultType="int">
+	SELECT user_id
+	FROM content
+	WHERE content_id=#{content_id}
+</select>
 </mapper>

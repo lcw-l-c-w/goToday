@@ -280,61 +280,75 @@ width: 100%;           /* 1. 상자 너비에 딱 맞게! */
 
 <script>
 $(function() {
-    let selectedDate = null;
-    let selectedTime = null;
-    let scheduleId = null;
+      //탭전환
+      $(".tab-item").click(function() {
+      	// 클릭한 탭의 순서 (0, 1, 2)
+      	const index = $(this).index(); 
+      	//탭 이름 
+      	const tabCategory=$(this).data("type");
+      	const content_id=$("#content_id").val();
+      	
+          //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
+      	$(".tab-item").removeClass("active");
+          $(this).addClass("active");
+          
+          // 패널 표시 전환 -> 모든패널을 숨기고 클릭한 순서에 맞는거만 보여줌 
+          $(".tab-panel").removeClass("active").hide();
+          const currentPanel = $(".tab-panel").eq(index);
+          currentPanel.addClass("active").show();
+          
+          if(tabCategory !== "detail") {   
+          //패널 가시성 조절
+          
+          $.ajax({
+          	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
+          	type:"GET", //목록 조회는 get
+          	data:{
+          		content_id:content_id
+          	},
+          	success:function(data){
+          		 currentPanel.html(data);
+          	}
+          	
+          	
+          })
+          }
 
-    if("${content.content_id}"=='' ) {
-    	$(".container").hide();
-    	setTimeout(function() {
-            alert("해당 콘텐츠를 찾을 수 없습니다.");
-        }, 10);
-        return;
-    }
-      const isReservable= "${content.contentReservation}" === "1" ? 1:0;
-      if(isReservable==0) {$(".btn-reserve").prop("disabled", true)
-   							 			  .addClass("is-disabled")
-  							    $("#btn-reservation-detail").html("이 컨텐츠는 현장 대기만 가능하므로, 예매가 불가합니다.");
+    
+      });
+      
+  	//이전페이지로 이동한 것처럼 
+  	const urlParams = new URLSearchParams(window.location.search);
+      const tabName = urlParams.get('tab');
+
+      if (tabName === 'inquiry') {
+          // 탭 메뉴 중에서 inquiry 타입을 찾아서 클릭 시뮬레이션
+          $(".tab-item[data-type='inquiry']").trigger("click");
+          
+          $('html, body').animate({
+              scrollTop: $(".tab-wrapper").offset().top - 100
+          }, 300);
       }
-      else{
-    	  $("#btn-reservation-detail").hide();
-}
-    // 탭 전환
-    $(".tab-item").click(function() {
-    	// 클릭한 탭의 순서 (0, 1, 2)
-    	const index = $(this).index(); 
-    	//탭 이름 
-    	const tabCategory=$(this).data("type");
-    	const content_id=$("#content_id").val();
-    	
-        //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
-    	$(".tab-item").removeClass("active");
-        $(this).addClass("active");
-        
-        // 패널 표시 전환 -> 모든패널을 숨기고 클릭한 순서에 맞는거만 보여줌 
-        $(".tab-panel").removeClass("active").hide();
-        const currentPanel = $(".tab-panel").eq(index);
-        currentPanel.addClass("active").show();
-        
-        if(tabCategory !== "detail") {   
-        //패널 가시성 조절
-        
-        $.ajax({
-        	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
-        	type:"GET", //목록 조회는 get
-        	data:{
-        		content_id:content_id
-        	},
-        	success:function(data){
-        		 currentPanel.html(data);
-        	}
-        	
-        	
-        })
+      let selectedDate = null;
+      let selectedTime = null;
+      let scheduleId = null;
+
+      if("${content.content_id}"=='' ) {
+      	$(".container").hide();
+      	setTimeout(function() {
+              alert("해당 콘텐츠를 찾을 수 없습니다.");
+          }, 10);
+          return;
+      }
+        const isReservable= "${content.contentReservation}" === "1" ? 1:0;
+        if(isReservable==0) {$(".btn-reserve").prop("disabled", true)
+     							 			  .addClass("is-disabled")
+    							    $("#btn-reservation-detail").html("이 컨텐츠는 현장 대기만 가능하므로, 예매가 불가합니다.");
         }
-  
-    });
-	
+        else{
+      	  $("#btn-reservation-detail").hide();
+  }
+        
     // 달력 로드
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
@@ -356,6 +370,7 @@ $(function() {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'ko',
+            timeZone: 'local',     // 한국시간기준으로 바꿔주는것
             height: 'auto',
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
       
@@ -516,7 +531,7 @@ $(function() {
     	})
     	
 
-  // url 공유 하는 마법
+  // url 공유 -> web share API
 $("#link").click(async function() { // async 사용 해야하는 이유
     const shareData = {
         title: "GoToday ! " + "${content.title}", 
@@ -683,8 +698,10 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 						src="${pageContext.request.contextPath}${content.main_image_path}"
 						class="detail-img">
 				</section>
-				<section class="tab-panel"></section>
-				<section class="tab-panel"></section>
+				<section class="tab-panel">
+					<jsp:include page="/WEB-INF/views/review/review_list_by_content.jsp" />
+				</section>
+				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
 			</div>
 		</div>
 	</div>

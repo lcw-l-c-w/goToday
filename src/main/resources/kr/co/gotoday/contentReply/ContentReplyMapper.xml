@@ -33,7 +33,7 @@
 		#{secret},
 		0
 	)
-	<selectKey keyProperty="reply_id" order="AFTER" resultType="int">
+	<selectKey keyProperty="creply_id" order="AFTER" resultType="int">
 
 		SELECT LAST_INSERT_ID()
 
@@ -103,10 +103,11 @@
 </select>
 
 <!--  상세보기 gno같은 경우 selectGNO로 서비스단에서 사용하기 -->
-<select id="showDetail" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
+<select id="showDetail" parameterType="int">
 	SELECT *
 	FROM content_reply
-	WHERE gno = #{gno}
+	WHERE gno = (SELECT gno FROM content_reply WHERE creply_id = #{creply_id})
+    ORDER BY nested ASC, ono ASC
 </select>
 
 <!-- 유저별 게시물 조회 -->
@@ -130,7 +131,7 @@
 	FROM content_reply
 	WHERE creply_id=#{creply_id}
 		AND user_id=#{user_id}
-		AND writer=#{writer}
+		
 </delete>
 <!--  벤더가 삭제한 경우 reply_status 업데이트 해주기  -->
 <update id="updateReplyStatus">
@@ -153,4 +154,10 @@
 	FROM content_reply 
 	WHERE creply_id = #{creply_id}
 </select>
+<delete id="deleteVendorReplyByGno" parameterType="int">
+	DELETE	
+	FROM content_reply
+	WHERE gno=#{gno} 
+	AND ono>0
+</delete>
 </mapper>

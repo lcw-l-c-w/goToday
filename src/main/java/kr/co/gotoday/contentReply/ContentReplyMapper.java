@@ -18,7 +18,7 @@ public interface ContentReplyMapper {
 	int updateReply(ContentReplyVO vo);
 	
 	//게시판 전체 조회
-	List<ContentReplyVO> selectAllQA(@Param("creply_id") int content_id);
+	List<ContentReplyVO> selectAllQA(@Param("content_id") int content_id);
 		
 	//유저 개인이 작성한 게시판만 조회
 	List<ContentReplyVO> selectQAByID(@Param("user_id") int user_id);
@@ -30,7 +30,7 @@ public interface ContentReplyMapper {
 	int count(@Param("content_id") int content_id);
 	
 	//상세보기 -> 답변까지 보여줌 
-	List<ContentReplyVO> showDetail(ContentReplyVO vo);
+	List<ContentReplyVO> showDetail(@Param("creply_id") int creply_id);
 	
 	//gno 업데이트
 	int updateGno(@Param("creply_id") int creply_id);
@@ -43,8 +43,10 @@ public interface ContentReplyMapper {
             @Param("reply_status") int reply_status);
 	
 	//벤터 답변 여부 확인
-	int countVendorReplyByGno(int gno);
+	int countVendorReplyByGno(@Param("gno") int gno);
 	
+	//벤더 답변 삭제
+	int deleteVendorReplyByGno(@Param("gno") int gno);
 	
 	
 	

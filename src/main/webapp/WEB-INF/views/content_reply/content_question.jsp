@@ -72,8 +72,7 @@
     <div class="wrap">
         <div class="dynamic-list-container">
             <div class="list-info-header">
-                <div class="total-count">총 <strong>${list.size()}</strong>건의 문의가 있습니다.</div>
-                <button type="button" class="btn-write" onclick="goWriteForm()">문의하기</button>
+                <button type="button" class="btn-write" onclick="goWriteForm()" >문의하기</button>
             </div>
 
             <table class="custom-table">
@@ -114,7 +113,9 @@
                                     </td>
                                     <td>${item.writer}</td>
                                     <td style="color: #999;">
-                                        <fmt:formatDate value="${item.created_at}" pattern="yyyy-MM-dd"/>
+                                        <fmt:parseDate value="${item.created_at}" var="parsedDate" pattern="yyyy-MM-dd HH:mm:ss"/>
+    
+  										  <fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd"/>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -134,18 +135,22 @@
         // 글쓰기 페이지 이동
         function goWriteForm() {
             
-        	const contentId = "${content_id}";
-        	if(!contentId) {
-                alert("콘텐츠 정보를 불러올 수 없습니다.");
-                return;
-            }
-            
+    	var content_id= $("#content_id").val();
+    	if(!content_id) {
+            // 부모창에 id="content_id"가 없을 경우를 대비한 2차 시도
+            content_id = "${list[0].content_id}"; 
+        }
+
+        if(!content_id) {
+            alert("게시글 정보를 가져올 수 없습니다.");
+            return;
+        }
             // 단순 이동이 가장 확실하고 빠릅니다.
-            location.href = "${pageContext.request.contextPath}/inquiry/write";
+            location.href = "${pageContext.request.contextPath}/detail/tab/inquiry/write/"+content_id;
                     }
 
         // 상세 보기 이동
-        function goDetail(creplyId, isSecret, authorId) {
+        function goDetail(creply_id, isSecret, authorId) {
             // 비밀글이고 본인이 아닌 경우에 대한 처리
             // 비밀글(1)인 경우
     if(isSecret === '1') {

@@ -16,5 +16,5 @@ public interface ContentService {
 	List<MainContentViewDTO> getSearchList(ContentSearchDTO dto);
 	PageInfo getSearchPageInfo(ContentSearchDTO dto);
 	ContentVO getDetailContentsForTicket(int content_id, Integer user_id);
-	
+	int selectIdByContentId(int content_id);
 }

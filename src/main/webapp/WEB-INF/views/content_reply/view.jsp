@@ -70,34 +70,35 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* 관리자 답변 영역 */
-        .admin-section {
-            margin-top: 30px;
-            background-color: var(--admin-bg);
-            border-radius: 12px;
-            padding: 30px;
-            border-left: 4px solid var(--main-color);
-        }
+  /* 게시판 형식의 답변 스타일 */
+.admin-section {
+    margin-top: 20px;
+    border: 1px solid var(--border-color);
+    background-color: var(--light-bg);
+    border-radius: 4px;
+}
 
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-        }
+.admin-header {
+    padding: 12px 20px;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
 
-        .admin-title {
-            font-weight: 700;
-            font-size: 18px;
-            color: #2b7fc2;
-        }
+.admin-title {
+    font-weight: bold;
+    color: #444;
+}
 
-        .admin-date {
-            font-size: 13px;
-            color: #888;
-        }
+.admin-content {
+    padding: 20px;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100px;
+}
 
         /* 하단 버튼 영역 */
         .btn-group {
@@ -130,11 +131,23 @@
     </style>
 
     <script>
-    function del() {
-        if (confirm('이 문의사항을 정말 삭제하시겠습니까?')) {
-            location.href='delete.do?reply_id=${vo.reply_id}';
+    function del(creply_id, content_id,gno) {
+    	if (confirm('이 문의사항을 정말 삭제하시겠습니까?')) {
+            // jQuery의 $.post(주소, 보낼데이터, 성공시실행할함수)
+            $.post('${ctx}/detail/tab/inquiry/delete', {
+                creply_id: creply_id,
+                content_id: content_id,
+                gno:gno
+            }, function(res) {
+                // 삭제 후 처리는 컨트롤러의 리턴 방식에 따라 달라집니다.
+                // 만약 컨트롤러가 알림창을 띄우는 common/return 페이지를 준다면, 
+                // 아래처럼 바로 리다이렉트 주소를 지정하는 게 속 편합니다.
+                alert("삭제되었습니다.");
+                location.href = "${ctx}/detail/" + content_id + "?tab=inquiry";
+            });
         }
     }
+  
     </script>
 </head> 
 <body>
@@ -142,45 +155,72 @@
 
     <div class="container">
         <header class="view-header">
-            <span class="category">Question #${vo.reply_id}</span>
             <h1>${vo.title}</h1>
             <div class="view-meta">
                 <span>작성자: ${vo.writer}</span>
-                <span>작성일: <fmt:formatDate value="${vo.created_at}" pattern="yyyy-MM-dd HH:mm"/></span>
-            </div>
+                <span>작성일: 
+                <c:if test="${not empty vo.created_at}">
+            <fmt:parseDate value="${vo.created_at}" var="parsedDate" pattern="yyyy-MM-dd HH:mm:ss"/>
+            <fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd HH:mm"/>
+        </c:if>
+                </span>   </div>
         </header>
 
-        <div class="content-box" style="white-space: pre-wrap;">${vo.body}</div>
+        <div class="content-box" style="white-space: pre-wrap;">${vo.body}
+        <c:if test="${not empty vo.file_path}">
+        <div class="attached-photo" style="margin-top:20px;">
+            <img src="${pageContext.request.contextPath}${vo.file_path}" 
+                 style="max-width:100%; border-radius:8px; border:1px solid #eee;">
+        </div>
+    </c:if>
+    </div>
 
-        <c:if test="${not empty adminReply}">
+        <c:if test="${not empty vendorList}">
             <div class="admin-section">
                 <div class="admin-header">
                     <div class="admin-title">
-                        <span>💡</span> 담당자 답변
+                        <span></span> 담당자 답변
                     </div>
                     <div class="admin-date">
-                        <fmt:formatDate value="${adminReply.created_at}" pattern="yyyy-MM-dd HH:mm"/>
+                        <c:if test="${not empty vendorList.created_at}">
+            <fmt:parseDate value="${vendorList.created_at}" var="parsedDate" pattern="yyyy-MM-dd HH:mm:ss"/>
+            <fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd HH:mm"/>
+        </c:if>
                     </div>
                 </div>
-                <div class="admin-content" style="white-space: pre-wrap;">${adminReply.body}</div>
+                <div class="admin-content" style="white-space: pre-wrap;">${vendorList.body}</div>
             </div>
         </c:if>
 
         <div class="btn-group">
             <div class="left-btns">
-                <a href="index.do" class="btn btn-list">목록으로</a>
+                <a href="${ctx}/detail/${vo.content_id}?tab=inquiry" class="btn btn-list" ">목록으로</a>
             </div>
             
             <div class="right-btns">
-                <%-- 본인인 경우에만 삭제 버튼 노출 --%>
-                <c:if test="${!empty login and login.user_id == vo.writer}">
-                    <a href="javascript:del();" class="btn btn-delete">삭제하기</a>
-                </c:if>
-                
-                <%-- 관리자(벤더)이고 아직 답변이 없을 때만 답변 버튼 노출 --%>
-                <c:if test="${Admin and empty adminReply}">
-                    <a href="reply.do?reply_id=${vo.reply_id}" class="btn btn-reply">답변 등록</a>
-                </c:if>
+           <div class="right-btns">
+    <%-- 1. 유저 본인인 경우: 질문글 수정 & 삭제 --%>
+    <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id}">
+        <a href="${ctx}/detail/tab/inquiry/modify?creply_id=${vo.creply_id}" class="btn btn-list">수정하기</a>
+        <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});" class="btn btn-delete">삭제하기</a>
+    </c:if>
+    
+    <%-- 2. 관리자(Vendor)인 경우 --%>
+    <c:if test="${loginSess.role == 1 and loginSess.user_id == vo.vendor_id}">
+        <c:choose>
+            <%-- 답변이 아직 없는 경우: '답변 등록' --%>
+            <c:when test="${empty vendorList}">
+                <a href="${ctx}/detail/inquiry/write/vendor.do?creply_id=${vo.creply_id}" class="btn btn-reply">답변 등록</a>
+            </c:when>
+            <%-- 답변이 이미 있는 경우: '답변 수정' --%>
+            <c:otherwise>
+                <a href="${ctx}/detail/inquiry/modify/vendor.do?creply_id=${vendorList.creply_id}" class="btn btn-list">답변 수정</a>
+            </c:otherwise>
+        </c:choose>
+          <a href="${ctx}/detail/inquiry/modify/vendor.do?creply_id=${vendorList.creply_id}" class="btn btn-list">답변 삭제</a>
+        
+    </c:if>
+</div>
             </div>
         </div>
     </div>

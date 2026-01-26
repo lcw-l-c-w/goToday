@@ -14,12 +14,16 @@ public class ContentReplyVO { // 테이블 :content_reply
 	private int gno;
 	private int ono;
 	private int nested;
-	private int writer; //숫자로 받는게 편함 
+	private String writer; //이름
 	private int user_id; //첫 작성자 아이디 
+	private int userType; // 유형 분리 
 	private int content_id;
 	private String creply_category;
 	private int secret;
 	private int reply_status;
 	private String update_at;
 	private String file_path;
+	private int num; // 총 몇건인지 
+	private int vendor_id; //벤더아이디 확인용
+	private int role; // 0이면 개인/ 1이면 vendor
 }
