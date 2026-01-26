@@ -21,4 +21,8 @@ public class ReviewVO {
     // 조인용 필드 (리뷰 목록 조회 시 사용)
     private String title;
     private String main_image_path;
+    
+    //작성자: 이메일 앞 3글자로 표시
+    private String email;
+    private String maskedEmail;
 }

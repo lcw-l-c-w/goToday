@@ -160,4 +160,18 @@ public class ReplyController {
 		}
 		return "common/return";
 	}
+	
+	@GetMapping("/reply/deleteAdminOnly.do")
+	public String deleteAdminOnly(Model model, HttpServletRequest request, ReplyVO vo) {
+		int r = service.deleteAdminOnly(vo.getReply_id());
+		if (r > 0) {
+			model.addAttribute("cmd", "move");
+			model.addAttribute("msg", "정상적으로 삭제되었습니다.");
+			model.addAttribute("url", "index.do");
+		} else {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "등록 오류");
+		}
+		return "common/return";
+	}
 }

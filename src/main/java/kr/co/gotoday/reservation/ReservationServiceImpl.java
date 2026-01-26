@@ -268,9 +268,12 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 
 	@Override
-	public List<ReservationListDTO> findReservationListByUserId(int user_id) {
-		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(user_id);
+	public List<ReservationListDTO> findReservationListByUserId(int user_id, String filter) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("user_id", user_id);
+		map.put("filter", filter);
 		
+		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(map);
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		
 		for(ReservationListDTO dto : listDTO) {

@@ -1,6 +1,7 @@
 package kr.co.gotoday.review;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ReviewService {
 	void createReview(ReviewVO reviewVO);
@@ -10,4 +11,8 @@ public interface ReviewService {
 	ReviewVO findReviewByReservationId(int reservation_id);
 	boolean checkReviewExists(int reservation_id);
 	List<ReviewVO> findReviewsByUserId(int user_id);
+    List<ReviewVO> getReviewsByContentPaged(int content_id, int page, String sortType );
+    Map<String, Object> getRatingSummary(int content_id);
+    Map<String, Double> getAvgRatingByTimeZone(int content_id);
+	
 }

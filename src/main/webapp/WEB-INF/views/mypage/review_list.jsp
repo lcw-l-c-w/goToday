@@ -11,9 +11,33 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif; }
-.container { max-width: 900px; margin: 40px auto; }
-.page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #f5f5f5;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+}
+.container {
+    max-width: 900px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+}
+.page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; flex-shrink: 0; }
+
+.list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* 스크롤바 스타일 */
+.list-wrapper::-webkit-scrollbar { width: 6px; }
+.list-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+.list-wrapper::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+.list-wrapper::-webkit-scrollbar-thumb:hover { background: #aaa; }
 
 .review-item {
     background: #ffffff;
@@ -101,8 +125,9 @@ body { background: #ffffff; font-family: 'Pretendard', -apple-system, sans-serif
     padding: 60px 20px;
     color: #888;
     font-size: 16px;
-    background: #f9f9f9;
+    background: #fff;
     border-radius: 20px;
+    border: 1px solid #eee;
 }
 
 .review-image {

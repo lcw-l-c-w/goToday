@@ -216,7 +216,6 @@ html {
 /* 리스트 섹션 */
 .content-list {
     background: #fff;
-    height:80%;
     border: 1px solid #eee;
     border-radius: 0 0 12px 12px;
     overflow: hidden;

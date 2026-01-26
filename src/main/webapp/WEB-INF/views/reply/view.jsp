@@ -22,6 +22,11 @@
     		location.href='delete.do?reply_id=${vo.reply_id}';
     	}
     }
+    function delAdminOnly() {
+    	if (confirm('답변을 삭제하시겠습니까?')) {
+    		location.href='deleteAdminOnly.do?reply_id=${vo.reply_id}';
+    	}
+    }
     </script>
 </head> 
 <body>
@@ -58,9 +63,12 @@
                         <div class="btnSet clear">
                             <div class="fl_l">
                             	<a href="index.do" class="btn">목록</a>
-                            	<c:if test="${!empty login and login.user_id == vo.writer}">
-	                            	<a href="javascript:del();" class="btn">삭제</a>
+                            	<c:if test="${!empty login and login.user_id == vo.writer || !empty login and not empty adminReply}">
+	                            	<a href="javascript:del();" class="btn btn-red">문의 삭제</a>
                             	</c:if>
+                            	<c:if test="${!empty login and not empty adminReply}">
+				                    <a href="javascript:delAdminOnly();" class="btn btn-red">답변 삭제</a>
+			                    </c:if>
                             	<c:if test="${Admin and empty adminReply}">
 							        <a href="reply.do?reply_id=${vo.reply_id}" class="btn">답변하기</a>
 							    </c:if>

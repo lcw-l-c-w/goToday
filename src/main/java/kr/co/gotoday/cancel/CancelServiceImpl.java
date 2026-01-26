@@ -43,53 +43,64 @@ public class CancelServiceImpl implements CancelService{
         ReservationVO reservation = cancelMapper.findReservationByReservationId(targetReservationId);
         if (reservation == null) throw new Exception("예약 정보를 찾을 수 없습니다.");
 
-        // 3. 날짜 계산 및 환불 금액 산정 [핵심 로직 변경]
-        
-        // (1) 날짜 변환 (DB String -> Java LocalDate)
-        String dateStr = reservation.getReserved_for_at(); // "2026-01-26"
-        LocalDate reservedDate = LocalDate.parse(dateStr); 
-        LocalDate today = LocalDate.now();
+        // 유무료 분기 - 가빈 추가
+        boolean isFreePayment = payment.getOrder_key().startsWith("FREE");
 
-        // (2) D-Day 계산
-        long daysBetween = ChronoUnit.DAYS.between(today, reservedDate);
-        
-        // (3) 정책 적용 (수수료 제외한 '환불해줄 금액' 계산)
-        long totalAmount = payment.getAmount_price();
-        int cancelAmount = 0; // 토스에 보낼 최종 환불 금액
-        String refundStatusLog = ""; // DB에 남길 로그
+        int cancelAmount = 0;
+        String refundStatusLog = "";
 
-        
-        
-        if(daysBetween>=8) {
-        	cancelAmount = (int)totalAmount;
-        	refundStatusLog = "D-"+daysBetween + "_100%";
-        }
-       
-        else if (daysBetween >= 7) {
-            // 7일 전: 수수료 10% (환불 90%)
-            cancelAmount = (int)(totalAmount * 0.9);
-            refundStatusLog = "D-" + daysBetween + "_90%";
-        } else if (daysBetween >= 3) {
-            // 3일 전: 수수료 30% (환불 70%)
-            cancelAmount = (int)(totalAmount * 0.7);
-            refundStatusLog = "D-" + daysBetween + "_70%";
-        } else if (daysBetween >= 1) {
-            // 1일 전: 수수료 50% (환불 50%)
-            cancelAmount = (int)(totalAmount * 0.5);
-            refundStatusLog = "D-" + daysBetween + "_50%";
+        if (isFreePayment) {
+            // ✅ 0원 취소
+            cancelAmount = 0;
+            refundStatusLog = "FREE_CANCEL";
         } else {
-            // 당일 혹은 지난 날짜: 환불 불가
-            throw new Exception("관람일 당일 및 지난 일정은 취소/환불이 불가합니다.");
+	        // 3. 날짜 계산 및 환불 금액 산정 [핵심 로직 변경]
+	        
+	        // (1) 날짜 변환 (DB String -> Java LocalDate)
+	        String dateStr = reservation.getReserved_for_at(); // "2026-01-26"
+	        LocalDate reservedDate = LocalDate.parse(dateStr); 
+	        LocalDate today = LocalDate.now();
+	
+	        // (2) D-Day 계산
+	        long daysBetween = ChronoUnit.DAYS.between(today, reservedDate);
+	        
+	        // (3) 정책 적용 (수수료 제외한 '환불해줄 금액' 계산)
+	        long totalAmount = payment.getAmount_price();
+	        cancelAmount = 0; // 토스에 보낼 최종 환불 금액
+	        refundStatusLog = ""; // DB에 남길 로그
+	
+	        
+	        
+	        if(daysBetween>=8) {
+	        	cancelAmount = (int)totalAmount;
+	        	refundStatusLog = "D-"+daysBetween + "_100%";
+	        }
+	       
+	        else if (daysBetween >= 7) {
+	            // 7일 전: 수수료 10% (환불 90%)
+	            cancelAmount = (int)(totalAmount * 0.9);
+	            refundStatusLog = "D-" + daysBetween + "_90%";
+	        } else if (daysBetween >= 3) {
+	            // 3일 전: 수수료 30% (환불 70%)
+	            cancelAmount = (int)(totalAmount * 0.7);
+	            refundStatusLog = "D-" + daysBetween + "_70%";
+	        } else if (daysBetween >= 1) {
+	            // 1일 전: 수수료 50% (환불 50%)
+	            cancelAmount = (int)(totalAmount * 0.5);
+	            refundStatusLog = "D-" + daysBetween + "_50%";
+	        } else {
+	            // 당일 혹은 지난 날짜: 환불 불가
+	            throw new Exception("관람일 당일 및 지난 일정은 취소/환불이 불가합니다.");
+	        }
+	        
+	        // 4. 토스페이먼츠 API 호출
+	        // 금액(cancelAmount)이 있을 때만 호출
+	        if (cancelAmount > 0) {
+	            String paymentKey = payment.getPayment_key();
+	            // [수정] 금액을 같이 보냄
+	            sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);
+	        }
         }
-        
-        // 4. 토스페이먼츠 API 호출
-        // 금액(cancelAmount)이 있을 때만 호출
-        if (cancelAmount > 0) {
-            String paymentKey = payment.getPayment_key();
-            // [수정] 금액을 같이 보냄
-            sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);
-        }
-
         // --- 5. DB 업데이트 진행 ---
         
         // (1) 캘린더 삭제

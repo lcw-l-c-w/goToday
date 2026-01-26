@@ -7,6 +7,7 @@ html {
     scrollbar-gutter: stable;
 }
 
+
 body { 
     background-color: #f3f5f9; 
     font-family: 'Pretendard', sans-serif; 
@@ -194,10 +195,19 @@ body {
     min-width: 100px;         /* 버튼 최소 너비 확보 */
 }
 
+/* 기본 버튼 호버 (남색 -> 파란색) */
 .btn:hover { 
-    background-color: #4d4dff !important; /* 호버 시 밝은 파란색 */
+    background-color: #4d4dff !important; 
     color: #ffffff !important;
     box-shadow: 0 4px 12px rgba(77, 77, 255, 0.3);
+}
+
+/* 삭제 버튼 전용 호버 (남색 -> 빨간색) */
+.btn.btn-red:hover { 
+    background-color: #ff4d4d !important; /* 부드러운 빨간색 */
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
+    border: none;
 }
 /* 페이지네이션 */
 .pagenate { 

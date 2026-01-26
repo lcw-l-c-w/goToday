@@ -38,7 +38,13 @@ public class ReplyServiceImpl implements ReplyService {
 
 	@Override
 	public int delete(int reply_id) {
+		mapper.deleteAdmin(reply_id);
 		return mapper.delete(reply_id);
+	}
+	
+	@Override
+	public int deleteAdminOnly(int reply_id) {
+		return mapper.deleteAdmin(reply_id);
 	}
 
 	@Override
