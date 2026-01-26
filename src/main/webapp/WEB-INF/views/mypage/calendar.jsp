@@ -100,7 +100,7 @@ body {
                             // [CASE 1] 파란색(예약) -> 상세 페이지 이동
                             // contextPath 변수 사용
                             var html = "<div class='event-item'>";
-                            html += "<a href='" + contextPath + "/mypage/reservations/" + event.reservation_id + "'>";
+                            html += "<a href='" + contextPath + "/mypage/reservation/" + event.reservation_id + "'>";
                             html += colorDot + " " + event.title;
                             html += "</a></div>";
                             
