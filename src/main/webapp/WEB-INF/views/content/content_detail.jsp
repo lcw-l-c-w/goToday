@@ -440,8 +440,7 @@ $(function() {
             reserved_for_at: selectedDate,
             time_zone: selectedTime,
             schedule_id: scheduleId,
-            content_time: "${content.content_time}"
-        }).done(function(res){
+            content_time: "${content.content_time}"{}        }).done(function(res){
         	if (res === "OK") {
 	       		location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
             } else {

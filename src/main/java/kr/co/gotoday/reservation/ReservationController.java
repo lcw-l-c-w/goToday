@@ -144,7 +144,9 @@ public class ReservationController {
 	@GetMapping("/reserve/payment.do")
 	public String showPaymentForm(HttpSession session, Model model){
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-		if (reservation == null) {
+		int totalQty = reservation.getAdult_qty()+ reservation.getChild_qty() + reservation.getTeen_qty();
+		log.info("totalQty = {}", totalQty);
+		if (reservation == null || totalQty == 0) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "예약정보가 누락되었습니다.");
 			return "common/return";
@@ -193,7 +195,9 @@ public class ReservationController {
 
 		try {
 			ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-			if (reservation == null) {
+			int totalQty = reservation.getAdult_qty()+ reservation.getChild_qty() + reservation.getTeen_qty();
+			log.info("totalQty = {}", totalQty);
+			if (reservation == null || totalQty == 0) {
 				result.put("success", false);
 	            result.put("msg", "예약 정보가 없습니다.");
 				return ResponseEntity.badRequest().body(result);

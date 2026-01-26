@@ -253,11 +253,11 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">이름</label>
-                        <input type="text" name="reserver_name" class="form-input" value="${receiver_info.name}" readonly>
+                        <input type="text" name="reserver_name" class="form-input" value="${receiver_info.name}" disabled>
                     </div>
                     <div class="form-group">
                         <label class="form-label">생년월일</label>
-                        <input type="text" name="receiver_birth" class="form-input" value="${receiver_info.birthday}" readonly>
+                        <input type="text" name="receiver_birth" class="form-input" value="${receiver_info.birthday}" disabled>
                     </div>
                     <div class="form-group full">
                         <label class="form-label">이메일</label>

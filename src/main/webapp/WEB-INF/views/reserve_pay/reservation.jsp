@@ -90,7 +90,7 @@
 <body>
 
     <header class="header">
-        <jsp:include page="/WEB-INF/views/common/header.jsp" />s
+        <jsp:include page="/WEB-INF/views/common/header.jsp" />
     </header>
 
     <main class="main-wrapper">
