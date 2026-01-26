@@ -34,4 +34,5 @@ public class ReservationVO {
     private String imgPath;
     
     
+    
 }

@@ -109,4 +109,20 @@
 	<select id="loginByNaverKey" parameterType="string"  resultType="kr.co.gotoday.user.UserVO">
 		SELECT * FROM user WHERE naver_key = #{naver_key} AND login_type = 'N'
 	</select>
+	
+	<!-- 아이디, 비밀번호 찾기 -->
+	<select id="findEmail" resultType="kr.co.gotoday.user.UserVO">
+	    SELECT email FROM user 
+	    WHERE name = #{name} AND birthday = #{birthday} AND phone_number = #{phone_number}
+	</select>
+	
+	<select id="findUserForPw" resultType="kr.co.gotoday.user.UserVO">
+	    SELECT user_id, email FROM user 
+	    WHERE email = #{email} AND phone_number = #{phone_number}
+	</select>
+	
+	<update id="updateTempPassword">
+	    UPDATE user SET password = MD5(#{tempPw}) WHERE user_id = #{user_id}
+	</update>
+
 </mapper>

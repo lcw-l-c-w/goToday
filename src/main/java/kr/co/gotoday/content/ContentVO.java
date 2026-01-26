@@ -35,6 +35,9 @@ public class ContentVO {
     
     private int like_count;// 각 content에 대한 like수
     private int liked; //새로고침시 like되어있으면 파란색이 들어오게끔 설정해야함
+    
+    //현장대기 여부 
+    private int contentReservation; // 0: 현장대기 | 1: 예약가능
     public String getReservationTypeLabel() {
         if (reservation_type == null) return "";
 

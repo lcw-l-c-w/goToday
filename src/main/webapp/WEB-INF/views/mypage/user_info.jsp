@@ -63,9 +63,10 @@ function beforeSubmit() {
 
     .form-row { display: flex; align-items: center; margin-bottom: 20px; }
     .form-label { width: 150px; font-weight: 700; }
+    .form-input-wrapper { flex: 1; max-width: 250px; }
     .form-input { 
-        flex: 1; height: 45px; background: #eee; border: none; 
-        border-radius: 8px; padding: 0 15px; 
+        width: 100%; height: 45px; background: #eee; border: none; 
+        border-radius: 8px; padding: 0 15px; box-sizing: border-box;
     }
     /* 수정 불가(이메일) 스타일 */
     .form-input[readonly] {

@@ -91,28 +91,29 @@
 </style>
 
 <aside class="sidebar">
-    <div class="user-profile">
-        <div class="user-name">
-            <a href="${pageContext.request.contextPath}/mypage/main" target="_top" style="text-decoration: none; color: inherit;">
-        	<strong>${not empty sessionScope.userName ? sessionScope.userName : '홍길동'}</strong> 님
-    </a>
-        </div>
-        <div class="user-email">
-            ${not empty sessionScope.userEmail ? sessionScope.userEmail : 'user@email.com'}
-        </div>
-        <button type="button" class="logout-btn" onclick="logout()">로그아웃</button>
-    </div>
+	<div class="user-profile">
+	    <div class="user-name">
+	        <a href="${pageContext.request.contextPath}/mypage/main" target="_top" style="text-decoration: none; color: inherit;">
+	            <strong>${not empty sessionScope.userName ? sessionScope.userName : '홍길동'}</strong> 님
+	        </a>
+	    </div>
+	    <div class="user-email">
+	        ${not empty sessionScope.userEmail ? sessionScope.userEmail : 'user@email.com'}
+	    </div>
+	    <button type="button" class="logout-btn" onclick="logout()">로그아웃</button>
+	</div>
 
     <div class="sidebar-section">
         <h2 class="sidebar-title">주문 관리</h2>
         <a href="${pageContext.request.contextPath}/mypage/reservation" class="sidebar-item" target="mainFrame">예약 관리</a>
-        <a href="${pageContext.request.contextPath}/mypage/review_list" class="sidebar-item" target="mainFrame">나의 리뷰</a>
+        <a href="${pageContext.request.contextPath}/mypage/myreviews.do" class="sidebar-item" target="mainFrame">나의 리뷰</a>
         <a href="${pageContext.request.contextPath}/mypage/like_list" class="sidebar-item" target="mainFrame">찜 관리</a>
     </div>
 
     <div class="sidebar-section">
         <h2 class="sidebar-title">문의 내역</h2>
-        <a href="${pageContext.request.contextPath}/mypage/reply_list" class="sidebar-item" target="mainFrame">1:1문의</a>
+        <a href="${pageContext.request.contextPath}/mypage/reply_list" class="sidebar-item" target="mainFrame">Q & A</a>
+        <a href="${pageContext.request.contextPath}/mypage/content_reply_list" class="sidebar-item" target="mainFrame">1:1 문의사항</a>
     </div>
 
     <div class="sidebar-section">

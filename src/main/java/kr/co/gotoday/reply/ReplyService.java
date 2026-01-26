@@ -14,4 +14,5 @@ public interface ReplyService {
 	int delete(int reply_id);
 	ReplyVO detail(ReplyVO vo);
 	ReplyVO getAdminReply(int reply_id);
+	int deleteAdminOnly(int reply_id);
 }

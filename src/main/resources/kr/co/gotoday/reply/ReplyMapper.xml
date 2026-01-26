@@ -5,9 +5,9 @@
 	<!-- 유저와 벤더의 문의 -->
 	<insert id="create" parameterType="kr.co.gotoday.reply.ReplyVO">
 		INSERT INTO reply (
-			title, body, created_at,reply_status, writer , user_id
+			title, body, created_at, reply_status, writer, user_id
 		) VALUES (
-			#{title}, #{body}, NOW(), 0, #{writer}, #{user_id}
+			#{title}, #{body}, NOW(), #{reply_status}, #{writer}, #{user_id}
 		)
 		<selectKey keyProperty="reply_id" order="AFTER" resultType="int">
 			SELECT LAST_INSERT_ID()
@@ -17,10 +17,10 @@
 	<!-- 관리자 답글 -->
 	<insert id="adminCreate" parameterType="kr.co.gotoday.reply.ReplyVO">
 		INSERT INTO reply (
-			title, body, created_at,reply_status,
+			title, body, created_at, reply_status,
 			gno, writer, admin_id 
 		) VALUES (
-			#{title}, #{body}, NOW(), 1,
+			#{title}, #{body}, NOW(), #{reply_status},
 			#{gno}, #{writer}, #{admin_id}
 		)
 	</insert>
@@ -39,6 +39,10 @@
 	
 	<delete id="delete" parameterType="int">
 		DELETE FROM reply  WHERE reply_id = #{reply_id}
+	</delete>
+	
+	<delete id="deleteAdmin" parameterType="int">
+		DELETE FROM reply  WHERE gno = #{reply_id}
 	</delete>
 	
 	<sql id="searchSql">

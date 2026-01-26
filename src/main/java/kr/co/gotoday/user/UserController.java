@@ -61,6 +61,19 @@ public class UserController {
                 model.addAttribute("cmd", "back");
                 return "common/return";
             } else {
+            	
+            	// 선택한 role과 DB의 role 비교
+                if (vo.getRole() != userVO.getRole()) {
+                    if (userVO.getRole() == 0) {
+                        model.addAttribute("msg", "개인 회원입니다. 개인 회원으로 로그인해주세요.");
+                    } else if (userVO.getRole() == 1) {
+                        model.addAttribute("msg", "기업 회원입니다. 기업 회원으로 로그인해주세요.");
+                    }
+                    model.addAttribute("cmd", "back");
+                    return "common/return";
+                }
+            	
+                // 로그인 성공 처리
                 sess.setAttribute("loginSess", userVO);
                 String redirect = (String) sess.getAttribute("redirectAfterLogin");
                 sess.removeAttribute("redirectAfterLogin");
@@ -232,12 +245,12 @@ public class UserController {
     
 
     // 관리자 로그인
-    @GetMapping("/member/loginForAdmin")
-    public void loginForAdmin() {
-       
+    @GetMapping("/member/login/admin")
+    public String loginForAdmin() {
+       return "member/loginForAdmin";
     }
   
-    @PostMapping("/member/loginForAdmin")
+    @PostMapping("/member/login/admin")
     public String loginForAdmin(HttpSession session
     		, UserVO vo, Model model) {
 
@@ -333,4 +346,63 @@ public class UserController {
 	            return "네이버 로그인 중 오류가 발생했습니다. 다시 시도해주세요.";
 	    }
 	}
+    //페이지 이동
+    @GetMapping("/login/process")
+    public String movePage(HttpSession sess, Model model) {
+    	try{
+    		UserVO vo= (UserVO) sess.getAttribute("loginSess");
+    		if(vo==null) {
+    			model.addAttribute("msg","로그인이 필요한 서비스입니다.");
+    			model.addAttribute("cmd", "back");
+    			
+    			return "member/login";
+    	}
+    	if(!vo.getEmail().contains("@")) {
+    		  sess.setAttribute("loginSess", vo);
+    		return "redirect:/admin/content_manage";
+    	}
+    	UserVO login= userService.getUserById(vo.getUser_id());
+    	
+    	if(login.getRole()==1) {
+    		sess.setAttribute("loginSess", login);
+    		return "redirect:/vendor/content_manage";
+    	}
+    	// admin인경우
+    	//개인 회원인 경우
+    	else if(login.getRole()==0) {
+    		sess.setAttribute("loginSess", login);
+    		return "redirect:/mypage/main";
+    	}
+    	}
+    	catch(Exception e) {
+    		System.out.println("에러가 발생하였습니다.");
+    		return "/main";
+    	}
+		return null;
+    	
+    }
+    
+    // 찾기 페이지 이동
+    @GetMapping("/member/find_account")
+    public String findAccount() {
+        return "member/find_account";
+    }
+
+    // 아이디 찾기 처리
+    @PostMapping("/member/find_id")
+    @ResponseBody
+    public String findId(@RequestParam String name, @RequestParam String birthday, @RequestParam String phone_number) {
+        String email = userService.findEmail(name, birthday, phone_number);
+        return (email != null) ? email : "fail";
+    }
+
+    // 비밀번호 찾기 처리
+    @PostMapping("/member/find_pw")
+    @ResponseBody
+    public String findPw(@RequestParam String email, @RequestParam String phone_number) {
+        String tempPw = userService.resetPassword(email, phone_number);
+        return (tempPw != null) ? tempPw : "fail";
+    }
+    
+  
 }

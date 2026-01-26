@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,6 +30,13 @@ $(function() {
   
 });
 </script>
+<!-- header.jsp or layout.jsp -->
+<c:if test="${not empty msg}">
+<script>
+    alert("${msg}");
+</script>
+</c:if>
+
 <style>
 /* 디자인 토큰 및 기본 스타일 */
 :root {
@@ -92,6 +100,22 @@ body { font-family: 'Roboto', sans-serif; background-color: var(--color-bg-prima
 
 .kakao-icon { width: 18px; height: 18px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.712 4.8 4.348 6.148l-.845 3.097c-.102.373.121.754.495.845.132.032.27.022.395-.028l3.633-2.422c.322.033.65.055.974.055 4.97 0 9-3.185 9-7.115S16.97 3 12 3z'/%3E%3C/svg%3E") no-repeat center/contain; }
 .naver-icon { width: 14px; height: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z'/%3E%3C/svg%3E") no-repeat center/contain; }
+
+/*아이디 비밀번호 찾기*/
+.find-links {
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+.find-links a {
+    color: #888;
+    text-decoration: none;
+}
+.find-links span {
+    color: #ddd;
+    margin: 0 10px;
+}
 </style>
 </head>
 <body>
@@ -120,6 +144,13 @@ body { font-family: 'Roboto', sans-serif; background-color: var(--color-bg-prima
         </div>
         
         <button type="submit" class="btn btn-primary">LOGIN</button>
+        
+        <div class="find-links">
+		    <a href="${pageContext.request.contextPath}/member/find_account?type=id">아이디 찾기</a>
+		    <span>|</span>
+		    <a href="${pageContext.request.contextPath}/member/find_account?type=pw">비밀번호 찾기</a>
+		</div>
+
         회원이 아니신가요? 
         <button type="button" id="btnRegister" class="btn btn-secondary">SIGN IN</button>
         

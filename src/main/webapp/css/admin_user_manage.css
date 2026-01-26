@@ -8,6 +8,8 @@ html {
     /* 스크롤바 공간을 미리 계산해 화면 중앙을 유지합니다. */
     scrollbar-gutter: stable;
 }
+
+
 /* 이름과 아이콘을 가로로 배치 */
 .name-wrapper {
     display: flex;
@@ -60,7 +62,7 @@ html {
         .content-header { margin-bottom: 30px; }
         .title-group h2 { font-size: 26px; font-weight: 700; }
         .title-group p { color: #888; font-size: 14px; margin-top: 5px; }
-        .content-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .content-card {/*  height: 88%; */ background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 
         /* 4. 툴바 */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }

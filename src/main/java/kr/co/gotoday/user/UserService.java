@@ -38,4 +38,8 @@ public interface UserService {
 	public String getNaverAccessToken(String code, String savedState);
 	
 	public UserVO loginByNaverKey(String naver_key);
+	// 아이디 비밀번호 찾기
+	String findEmail(String name, String birthday, String phone_number);
+	String resetPassword(String email, String phone_number);
+	
 }

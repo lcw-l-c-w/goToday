@@ -33,7 +33,8 @@
 		FROM content c
 		WHERE 	
 		<include refid="USER_VISIBLE_CONTENT" />
-		AND c.end_at >= NOW()
+			AND c.start_at &lt;= NOW()
+			AND c.end_at >= NOW()  
 		<if test="content_kind != null and content_kind != ''">
             AND c.content_kind = #{content_kind}
         </if>
@@ -351,7 +352,10 @@ SELECT
     c.reservation_type AS reservation_type,
     c.category 			AS category,
     c.content_time 		AS 	content_time,
-    c.content_kind		AS content_kind
+    c.content_kind		AS content_kind,
+    c.x_url 			AS x_url,
+    c.instagram_url 	AS instagram_url,
+    c.reservation_type 	AS reservation_type
    
 FROM content c
 WHERE 
@@ -373,4 +377,28 @@ WHERE
 	AND scheduled_at= #{scheduled_at}
 	ORDER BY time_zone
 	</select>
+	
+		<select id="selectTicketDetail" resultType="kr.co.gotoday.content.ContentVO">
+SELECT
+    c.title            AS title,
+    c.content_id       AS content_id,
+    c.start_at         AS start_at,
+    c.end_at           AS end_at,
+    c.location         AS location,
+    c.adult_price      AS adult_price,
+    c.teen_price       AS teen_price,
+    c.child_price      AS child_price,
+    c.main_image_path  AS main_image_path,
+    c.reservation_type AS reservation_type,
+    c.category 			AS category,
+    c.content_kind		AS content_kind
+    
+FROM content c 
+WHERE 
+		c.content_id = #{content_id}
+	AND c.is_delete = 0
+	AND c.is_active = 1
+	AND c.content_status IN ( 'STATUS_APPROVAL','STATUS_REQUESTED')
+	</select>
+	
 </mapper>
