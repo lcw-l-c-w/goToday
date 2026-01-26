@@ -156,6 +156,7 @@ public class UserServiceImpl implements UserService{
     public UserVO getUserById(int userId) {
         return userMapper.getUserById(userId);
     }
+    
     //회원정보 수정
     @Override
     @Transactional
