@@ -196,8 +196,8 @@ $(document).ready(function() {
 
             <div id="formPw" class="find-form">
                 <div class="form-group">
-                    <label class="form-label">이메일 주소</label>
-                    <input type="email" id="email" class="form-input" placeholder="가입한 이메일을 입력해주세요.">
+                    <label class="form-label">아이디</label>
+                    <input type="email" id="email" class="form-input" placeholder="아이디(가입한 이메일)를 입력해주세요.">
                 </div>
                 <div class="form-group">
                     <label class="form-label">휴대폰 번호</label>

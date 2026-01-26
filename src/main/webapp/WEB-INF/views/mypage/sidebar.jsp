@@ -119,7 +119,7 @@
     <div class="sidebar-section">
         <h2 class="sidebar-title">회원 관리</h2>
         <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="sidebar-item" target="mainFrame">관심사 수정</a>
-        <a href="${pageContext.request.contextPath}/mypage/user_info" class="sidebar-item" target="mainFrame">내정보 수정</a>
+        <a href="${pageContext.request.contextPath}/mypage/user_info" class="sidebar-item" target="mainFrame">내 정보 수정</a>
     </div>
 </aside>
 

@@ -6,10 +6,8 @@ pageEncoding="UTF-8"%>
 <head>
 <meta charset="UTF-8">
 <title>내 정보 수정 | GoToday</title>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_user_info.css">
 <script>
 $(document).ready(function() {
     // 성별 데이터 세팅
@@ -49,47 +47,7 @@ function beforeSubmit() {
     return true;
 }
 </script>
-    
-<style>
-    :root { --main-color: #4dc3ff; --color-primary: #41b6e6; }
-    body { font-family: 'Pretendard', sans-serif; background-color: transparent; margin: 0; padding: 0; }
-    
-    .page-title { font-size: 32px; font-weight: 700; margin-bottom: 40px; color: #111; }
-    
-    .form-wrapper { 
-        width: 100%; max-width: 700px; background: #fff; padding: 40px; 
-        border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-    }
-
-    .form-row { display: flex; align-items: center; margin-bottom: 20px; }
-    .form-label { width: 150px; font-weight: 700; }
-    .form-input-wrapper { flex: 1; max-width: 250px; }
-    .form-input { 
-        width: 100%; height: 45px; background: #eee; border: none; 
-        border-radius: 8px; padding: 0 15px; box-sizing: border-box;
-    }
-    /* 수정 불가(이메일) 스타일 */
-    .form-input[readonly] {
-        background-color: #f5f5f5;
-        color: #888;
-        cursor: not-allowed;
-        border: 1px solid #e0e0e0;
-    }
-    
-    /* 성별 라디오 버튼 스타일 */
-    .gender-group { display: flex; gap: 20px; }
-    .gender-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .gender-label input { width: 18px; height: 18px; cursor: pointer; }
-    
-   	 .btn-submit {
-     width: 100%; max-width: 300px; padding: 15px; background: #333; color: #fff;
-     border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px;
-	 }
-	 .btn-submit:hover { background: #000; }
-</style>
-
 </head>
-
 <body>
 	<h1 class="page-title">내 정보 수정</h1>
      <form id="frm" action="${pageContext.request.contextPath}/mypage/user_info" method="POST" class="form-wrapper" onsubmit="return beforeSubmit();">

@@ -37,7 +37,18 @@ public interface UserMapper {
     UserVO loginByNaverKey(String naver_key);
 
     // 아이디, 비밀번호 찾기
-    UserVO findEmail(@Param("name") String name, @Param("birthday") String birthday, @Param("phone_number") String phone_number);
-    UserVO findUserForPw(@Param("email") String email, @Param("phone_number") String phone_number);
-    int updateTempPassword(@Param("user_id") int user_id, @Param("tempPw") String tempPw);
-}
+    UserVO findEmail(
+    		@Param("name") String name
+    		, @Param("birthday") String birthday
+    		, @Param("phone_number") String phone_number
+    	);
+    
+    UserVO findUserForPw(
+    		@Param("email") String email
+    		, @Param("phone_number") String phone_number
+    	);
+    
+    int updateTempPassword(
+    		@Param("user_id") int user_id
+    		, @Param("tempPw") String tempPw);
+	}

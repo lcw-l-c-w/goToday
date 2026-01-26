@@ -1,0 +1,139 @@
+@charset "UTF-8";
+/* 페이지 기본 */
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: transparent;  /* 배경 투명 */
+    margin: 0;  /* 브라우저 기본 여백 제거 */
+    padding: 0;  /* 브라우저 기본 패딩 제거 */
+    color: #333;   /* 기본 글자색 진한 회색 */
+}
+
+/* 페이지 제목 */
+.page-title {
+    font-size: 28px;     /* 글자 크기 */
+    font-weight: 700;    /* 글자 두껍게 */
+    margin-bottom: 30px; /* 아래 여백 */
+    color: #111;         /* 글자 색상 */
+}
+
+/*컨테이너 */
+.container {
+    max-width: 900px;     /* 최대 900px */
+    margin: 40px auto;    /* 위/아래 40px, 좌우 가운데 정렬 */
+}
+
+
+/* 찜 항목 박스 */
+.like-item {
+    background: #ffffff;                      /* 흰색 배경 */
+    border-radius: 20px;                      /* 둥근 모서리 */
+    padding: 22px 26px;                       /* 안쪽 여백 */
+    margin-bottom: 20px;                      /* 아래 여백 */
+    display: flex;                            /* 가로 정렬 */
+    justify-content: space-between;           /* 좌우 공간 균등 배치 */
+    gap: 20px;                                /* 항목 간 간격 */
+    border: 1px solid #eee;                   /* 연한 테두리 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06); /* 가벼운 그림자 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* hover 애니메이션 */
+}
+
+/* hover 효과 */
+.like-item:hover {
+    transform: translateY(-4px);              /* 살짝 위로 이동 */
+    box-shadow: 0 8px 22px rgba(77,195,255,0.18); /* 그림자 강조 */
+}
+
+/* 항목 정보 영역 */
+.item-info {
+    flex: 1;                        /* 남은 공간 차지 */
+    display: flex;                  /* 가로 정렬 */
+    flex-direction: column;         /* 세로 배치 */
+    gap: 8px;                       /* 항목 간 간격 */
+}
+
+/* 제목 라인 */
+.title-line {
+    display: flex;                  /* 가로 정렬 */
+    align-items: center;            /* 세로 중앙 정렬 */
+    gap: 8px;                       /* 요소 간 간격 */
+}
+
+/* 뱃지 기본 */
+.badge {
+    padding: 4px 10px;             /* 안쪽 여백 */
+    border-radius: 14px;           /* 둥근 모서리 */
+    font-size: 12px;               /* 글자 크기 */
+    font-weight: 700;              /* 글자 굵게 */
+    background: #e1f5fe;           /* 연한 하늘색 배경 */
+    color: #03a9f4;                /* 파란 글자 */
+}
+
+/* D-Day 뱃지 */
+.badge.dday {
+    background: #fff9c4; /* 연한 노란색 */
+    color: #f57f17;      /* 노란색 글자 */
+}
+
+/* 종료 뱃지 */
+.badge.end {
+    background: #f5f5f5; /* 회색 배경 */
+    color: #666;          /* 글자 회색 */
+}
+
+/* 제목 */
+.title {
+    font-size: 17px;      /* 글자 크기 */
+    font-weight: 700;     /* 글자 굵게 */
+    color: #333;          /* 진한 회색 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+/* 기간 텍스트 */
+.period {
+    font-size: 13px;
+    color: #555;          /* 회색 글자 */
+}
+
+/* (예약하러 가기)버튼 감싸는 컨테이너*/
+.btn-group {
+    display: flex;        /* 가로 정렬 */
+    gap: 8px;             /* 버튼 간격 */
+    margin-top: auto;     /* 버튼 아래로 정렬 */
+}
+
+/* (예약하러 가기)버튼 */
+.reserve-btn {
+	background: white;        /* 흰색 배경 */
+    border: 1px solid #4dc3ff; /* 파란색 테두리 */
+    color: #4dc3ff;           /* 파란 글자 */
+	padding: 8px 16px;        /* 안쪽 여백 */
+    border-radius: 8px;       /* 둥근 모서리 */
+    font-size: 13px;          /* 글자 크기 */
+    font-weight: 600;         /* 글자 굵게 */
+    cursor: pointer;          /* 클릭 가능 표시 */
+    transition: all 0.2s ease; /* hover 시 부드러운 변화 */
+}
+
+/* 예약 버튼 hover*/
+.reserve-btn:hover {
+    background: #4dc3ff;      /* 파란색 배경 */
+    color: white;              /* 글자 흰색 */
+}
+
+/* 포스터 이미지 */
+.poster img {
+    width: 100px;            /* 가로 100px */
+    height: 140px;           /* 세로 140px */
+    border-radius: 12px;     /* 둥근 모서리 */
+    object-fit: cover;       /* 이미지 비율 유지하며 크기 맞춤 */
+}
+
+/*  찜 내역 없는 경우 */
+.empty-box {
+    text-align: center;      /* 가운데 정렬 */
+    padding: 100px 0;        /* 위아래 여백 */
+    background: #fff;        /* 흰색 배경 */
+    border-radius: 20px;     /* 둥근 모서리 */
+    color: #666;             /* 글자 회색 */
+    font-size: 16px;         /* 글자 크기 */
+}
