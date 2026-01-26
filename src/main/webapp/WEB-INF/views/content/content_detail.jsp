@@ -369,17 +369,29 @@ $(function() {
                     html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
                 } else {
                     res.forEach(sch => {
+                    	const isSoldOut = sch.current_ticket === 0;
+                        const disabledAttr = isSoldOut ? 'disabled' : '';
+                        const soldOutClass = isSoldOut ? 'sold-out' : '';
+                        const ticketText = isSoldOut ? '매진' : `\${sch.current_ticket}석`;
+                        
+                    	
                         html += `
-                            <label class="time-option">
+                            <label class="time-option \${soldOutClass}">
                                 <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}" data-time="\${sch.time_zone}">
                                 <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
-                                <span style="font-size:12px;">\${sch.current_ticket}석</span>
+                                <span style="font-size:12px; \${isSoldOut ? 'color:#e74c3c; font-weight:bold;' : ''}">\${ticketText}</span>
                             </label>`;
                     });
                 }
                 $(".reservation_timezone").html(html);
                 selectedTime = null;
                 scheduleId = null;
+                
+                $(".time-option.sold-out").on("click", function(e) {
+                    e.preventDefault();
+                    alert("해당 시간대는 매진되었습니다.");
+                    return false;
+                });
             }
         });
     }
@@ -440,7 +452,8 @@ $(function() {
             reserved_for_at: selectedDate,
             time_zone: selectedTime,
             schedule_id: scheduleId,
-            content_time: "${content.content_time}"{}        }).done(function(res){
+            content_time: "${content.content_time}"        
+        	}).done(function(res){
         	if (res === "OK") {
 	       		location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
             } else {
