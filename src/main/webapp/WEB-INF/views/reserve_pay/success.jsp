@@ -1,140 +1,206 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <title>결제 처리 중</title>
-    <style>
-      body { font-family: 'Malgun Gothic', sans-serif; margin: 40px; text-align: center; }
-      .loading { font-size: 18px; color: #666; }
-      .success { color: #27ae60; }
-      .error { color: #e74c3c; }
-      .result-box { margin-top: 30px; padding: 20px; border-radius: 8px; }
-      .result-box.success { background: #d5f5e3; }
-      .result-box.error { background: #fadbd8; }
-    </style>
-  </head>
-  <body>
-    <h2 id="title" class="loading">결제 승인 처리 중...</h2>
-    <div id="result" class="result-box" style="display:none;">
-      <p id="message"></p>
-      <p id="reservationCode"></p>
-      <div class="actions" style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
-		  <button id="btn-mypage" style="padding: 10px 18px; border-radius: 6px; border: none; background: #2c7be5; color: #fff; cursor: pointer;">
-		  	예약 내역 확인하기
-		  </button>
-		
-		  <button id="btn-home" style="padding: 10px 18px; border-radius: 6px; border: none; background: #6c757d; color: #fff; cursor: pointer;">
-		    메인으로 가기
-		  </button>
-		</div>
-    </div>
+<head>
+  <meta charset="utf-8" />
+  <title>결제 처리 중 | GoToday</title>
 
-    <script>
-      // 서버에서 전달받은 토스 파라미터
-      const paymentKey = "${paymentKey}";
-      const orderId = "${orderId}";
-      const amount = "${amount}";
-      const contextPath = "${pageContext.request.contextPath}";
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #222;
+    }
 
-      async function confirm() {
-        const requestData = {
-          paymentKey: paymentKey,
-          orderId: orderId,
-          amount: amount,
-        };
+    .payment-wrapper {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 36px 32px 32px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      text-align: center;
+    }
 
-        try {
-          const response = await fetch(contextPath + "/reserve/confirm", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestData),
-          });
+    .logo {
+      margin-bottom: 18px;
+    }
 
-          const json = await response.json();
-          const titleEl = document.getElementById("title");
-          const resultEl = document.getElementById("result");
-          const messageEl = document.getElementById("message");
-          const codeEl = document.getElementById("reservationCode");
+    .logo img {
+      height: 42px;
+      object-fit: contain;
+    }
 
-          if (json.success) {
-            // 성공
-            titleEl.textContent = "결제가 완료되었습니다!";
-            titleEl.className = "success";
-            resultEl.className = "result-box success";
-            resultEl.style.display = "block";
-            messageEl.textContent = json.msg;
-            codeEl.textContent = "예약코드: " + json.reservationCode;
-            
-            bindActionButtons();
-          } else {
-            // 실패
-            titleEl.textContent = "결제 처리 실패";
-            titleEl.className = "error";
-            resultEl.className = "result-box error";
-            resultEl.style.display = "block";
-            messageEl.textContent = json.msg;
-            
-            bindActionButtons();
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
 
-            // 3초 후 fail 페이지로 이동
-            setTimeout(function() {
-              window.location.href = contextPath + "/reserve/fail.do?message=" + encodeURIComponent(json.msg);
-            }, 3000);
-          }
-        } catch (error) {
-          console.error("결제 승인 오류:", error);
-          document.getElementById("title").textContent = "결제 처리 중 오류 발생";
-          document.getElementById("title").className = "error";
+    .title.loading { color: #555; }
+    .title.success { color: #2c7be5; }
+    .title.error { color: #e74c3c; }
 
-          setTimeout(function() {
-            window.location.href = contextPath + "/reserve/fail.do?message=" + encodeURIComponent("결제 처리 중 오류가 발생했습니다.");
-          }, 3000);
-        }
-      }
+    .message {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
 
-      function bindActionButtons() {
-   	    const mypageBtn = document.getElementById("btn-mypage");
-   	    const homeBtn = document.getElementById("btn-home");
+    .reservation-code {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 26px;
+    }
 
-   	    if (mypageBtn) {
-   	      mypageBtn.addEventListener("click", function () {
-   	        window.location.href = contextPath + "/mypage";
-   	      });
-   	    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
 
-   	    if (homeBtn) {
-   	      homeBtn.addEventListener("click", function () {
-   	        window.location.href = contextPath + "/main.do";
-   	      });
-   	    }
-   	  }
-      
-      const isFreePayment = (amount === "0" || amount === 0 || amount === "");
+    .btn {
+      flex: 1;
+      padding: 12px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-      if (isFreePayment) {
-        //0원 결제: 서버에서 이미 처리 끝난 상태
-        const titleEl = document.getElementById("title");
-        const resultEl = document.getElementById("result");
-        const messageEl = document.getElementById("message");
-        const codeEl = document.getElementById("reservationCode");
+    .btn-primary {
+      background: #2c7be5;
+      color: #fff;
+    }
 
-        titleEl.textContent = "예약이 완료되었습니다!";
-        titleEl.className = "success";
-        resultEl.className = "result-box success";
-        resultEl.style.display = "block";
+    .btn-secondary {
+      background: #e9ecef;
+      color: #333;
+    }
+  </style>
+</head>
 
-        messageEl.textContent = "무료 전시 예약이 정상적으로 완료되었습니다.";
-        codeEl.textContent = "예약코드: ${reservationCode}";
+<body>
 
+<div class="payment-wrapper">
+  <!-- 로고 -->
+  <div class="logo">
+    <img src="${pageContext.request.contextPath}/resources/img/logo.png" alt="GoToday">
+  </div>
+
+  <!-- 타이틀 -->
+  <div id="title" class="title loading">결제 승인 처리 중...</div>
+
+  <!-- 메시지 -->
+  <div id="message" class="message" style="display:none;"></div>
+
+  <!-- 예약 코드 -->
+  <div id="reservationCode" class="reservation-code" style="display:none;"></div>
+
+  <!-- 버튼 -->
+  <div class="actions" id="actions" style="display:none;">
+    <button id="btn-mypage" class="btn btn-primary">예약 내역 확인</button>
+    <button id="btn-home" class="btn btn-secondary">메인으로 가기</button>
+  </div>
+</div>
+
+<script>
+  const paymentKey = "${paymentKey}";
+  const orderId = "${orderId}";
+  const amount = "${amount}";
+  const reservationCode = "${reservation_code}"
+  const contextPath = "${pageContext.request.contextPath}";
+
+  const titleEl = document.getElementById("title");
+  const messageEl = document.getElementById("message");
+  const codeEl = document.getElementById("reservationCode");
+  const actionsEl = document.getElementById("actions");
+
+  async function confirm() {
+    const requestData = {
+      paymentKey: paymentKey,
+      orderId: orderId,
+      amount: amount,
+    };
+
+    try {
+      const response = await fetch(contextPath + "/reserve/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
+
+      const json = await response.json();
+
+      if (json.success) {
+        //성공
+        titleEl.textContent = "결제가 완료되었습니다!";
+        titleEl.className = "title success";
+
+        messageEl.style.display = "block";
+        messageEl.textContent = json.msg || "결제가 정상적으로 완료되었습니다.";
+
+        codeEl.style.display = "block";
+        codeEl.textContent = "예약코드: " + reservationCode;
+
+        actionsEl.style.display = "flex";
         bindActionButtons();
+
       } else {
-        //유료 결제만 토스 승인 호출
-        confirm();
+        //실패 → 즉시 fail 페이지로 이동
+        window.location.href =
+          contextPath + "/reserve/fail.do?message=" + encodeURIComponent(json.msg || "결제 처리에 실패했습니다.");
       }
-      
-    </script>
-  </body>
+
+    } catch (error) {
+      console.error("결제 승인 오류:", error);
+      window.location.href =
+        contextPath + "/reserve/fail.do?message=" + encodeURIComponent("결제 처리 중 오류가 발생했습니다.");
+    }
+  }
+
+  function bindActionButtons() {
+    const mypageBtn = document.getElementById("btn-mypage");
+    const homeBtn = document.getElementById("btn-home");
+
+    mypageBtn.addEventListener("click", function () {
+      window.location.href = contextPath + "/mypage";
+    });
+
+    homeBtn.addEventListener("click", function () {
+      window.location.href = contextPath + "/main.do";
+    });
+  }
+
+  // 0원 결제 여부
+  const isFreePayment = (amount === "0" || amount === 0 || amount === "");
+
+  if (isFreePayment) {
+    //무료 결제: 서버에서 이미 처리 끝난 상태
+    titleEl.textContent = "예약이 완료되었습니다!";
+    titleEl.className = "title success";
+
+    messageEl.style.display = "block";
+    messageEl.textContent = "무료 전시 예약이 정상적으로 완료되었습니다.";
+
+    codeEl.style.display = "block";
+    codeEl.textContent = "예약코드: ${reservationCode}";
+
+    actionsEl.style.display = "flex";
+    bindActionButtons();
+
+  } else {
+    //유료 결제만 토스 승인 호출
+    confirm();
+  }
+</script>
+
+</body>
 </html>

@@ -179,7 +179,8 @@ public class ReservationServiceImpl implements ReservationService{
 		            reservationVO.getSchedule_id(),
 		            total_qty
 					);
-			throw new Exception("잔여 티켓 수량이 부족합니다.");
+			throw new Exception("티켓이 모두 소진되어 결제가 진행되지 않았습니다.\r\n"
+					+ "결제 금액은 청구되지 않습니다.");
 		}
 		
 		return result;
