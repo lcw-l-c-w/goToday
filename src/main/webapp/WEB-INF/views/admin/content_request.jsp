@@ -21,7 +21,7 @@
 		<div class="search-box">
 			<span class="material-symbols-outlined">search</span> <input
 				type="text" class="searchInput" id="searchInput"
-				placeholder="전시회 명으로 검색..." />
+				placeholder="전시회 명, 유저 아이디로 검색..." />
 		</div>
 		<div class="filter-tabs">
 			<button class="filter-btn active" data-status="STATUS_REQUESTED">승인요청</button>
