@@ -16,12 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.reservation.ReservationVO;
+import kr.co.gotoday.reservation.TossPaymentClient;
 
 @Service
 public class CancelServiceImpl implements CancelService{
 
     @Autowired
     CancelMapper cancelMapper;
+    @Autowired
+    TossPaymentClient tossPaymentClient;
     
     @Value("${toss.payments.secret-key}")
     private String secretKey;
@@ -50,10 +53,13 @@ public class CancelServiceImpl implements CancelService{
         String refundStatusLog = "";
 
         if (isFreePayment) {
-            // ✅ 0원 취소
+            //0원 취소
             cancelAmount = 0;
             refundStatusLog = "FREE_CANCEL";
+        } else if ("가상계좌".equals(payment.getPayment_method()) && "WAITING_FOR_DEPOSIT".equals(payment.getPayment_status())) {
+        	tossPaymentClient.cancelPayment(payment.getPayment_key(), cancelReason);
         } else {
+        
 	        // 3. 날짜 계산 및 환불 금액 산정 [핵심 로직 변경]
 	        
 	        // (1) 날짜 변환 (DB String -> Java LocalDate)
