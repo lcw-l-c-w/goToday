@@ -22,7 +22,7 @@
 		)
 	</insert>
 	
-	<select id="selectContentList" resultType="kr.co.gotoday.content.ContentVO">
+	<select id="selectContentList" parameterType="map" resultType="kr.co.gotoday.content.ContentVO">
     SELECT
 	        content_id, user_id, content_kind, category, location, title, description, reservation_type,
 	        start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
@@ -53,11 +53,33 @@
 	            )
 	        )
 	    </if>	
-
+	    ORDER BY content_id DESC
+	    LIMIT #{offset}, #{pageSize}
+	</select>
+	
+	<select id="selectContentListCount" parameterType="map" resultType="int">
+    SELECT COUNT(*)
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0 AND is_active = 1
+	    <if test="keyword != null and keyword != ''">
+	        AND title LIKE CONCAT('%', #{keyword}, '%')
+	    </if>
+	    <if test="status != null and status != ''">
+	        AND (
+	            (content_status IN ('STATUS_REQUESTED','STATUS_REJECTED') AND content_status = #{status})
+	            OR
+	            (content_status = 'STATUS_APPROVAL' AND
+	                CASE
+	                    WHEN <![CDATA[NOW() < start_at]]> THEN 'STATUS_SCHEDULED'
+	                    WHEN <![CDATA[NOW() BETWEEN start_at AND end_at]]> THEN 'STATUS_OPEN'
+	                    WHEN <![CDATA[NOW() > end_at]]> THEN 'STATUS_CLOSED'
+	                END = #{status}
+	            )
+	        )
+	    </if>	
 	    ORDER BY content_id DESC
 	</select>
-
-
 	
 	<select id="selectContentOne" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
 		SELECT content_id, user_id, content_kind, category, location, title, description, reservation_type,

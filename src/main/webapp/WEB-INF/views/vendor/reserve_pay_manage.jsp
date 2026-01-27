@@ -1,116 +1,76 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<link
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+	rel="stylesheet" />
+<link rel="stylesheet" href="${ctx}/css/reserve_pay_manage.css">
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8" />
-    <title>예약 및 결제 관리</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="${ctx}/css/reserve_pay_manage.css">
-    <style>
-        
-    </style>
-</head>
-<body>
-
-<div class="admin-layout">
-    <aside class="sidebar">
-        <div class="sidebar-top">
-            <h1 class="logo">ExhibiReserve</h1>
-            <p class="subtitle">VENDOR MANAGEMENT</p>
-        </div>
-        <nav class="sidebar-menu">
-            <ul>
-                <li><a href="${ctx}/vendor/content_manage"><span class="material-symbols-outlined">description</span> 콘텐츠 관리</a></li>
-                <li class="active"><a href="#"><span class="material-symbols-outlined">person</span> 예약 관리</a></li>
-                <li><a href="${ctx}/reply/index.do"><span class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
-                <li><a href="${ctx}/mypage/logout" onclick="return confirmLogout();"><span class="material-symbols-outlined">logout</span> 로그아웃</a></li>
-            </ul>
-        </nav>
-        <div class="sidebar-bottom">
-	    <div class="admin-info">
-	        <p class="role">Signed in as</p>
-	        <div class="name-wrapper"> <strong class="name">
-	                <c:choose>
-	                    <c:when test="${not empty loginSess}">
-	                        ${loginSess.name}
-	                    </c:when>
-	                    <c:otherwise>
-	                        잘못된 접근입니다.
-	                    </c:otherwise>
-	                </c:choose>
-	            </strong>
-	            <a href="${ctx}/main" class="home-icon-btn" title="메인으로 이동">
-	                <span class="material-symbols-outlined">home</span>
-	            </a>
-	        </div>
-	    </div>
+<main class="main-content">
+	<div class="page-header">
+		<div class="page-title">
+			<h2>예약 및 결제 관리</h2>
+			<p>실시간 예약 현황을 확인하고 관리하세요.</p>
+		</div>
 	</div>
-    </aside>
 
-    <main class="main-content">
-        <div class="page-header">
-            <div class="page-title">
-                <h2>예약 및 결제 관리</h2>
-                <p>실시간 예약 현황을 확인하고 관리하세요.</p>
-            </div>
-        </div>
+	<section class="filter-bar">
+		<input type="text" class="searchInput" id="searchInput"
+			placeholder="예약번호, 수령인 검색" /> <select id="contentFilter"><option
+				value="">모든 콘텐츠</option></select> <input type="date" id="dateFilter" /> <select
+			id="statusFilter">
+			<option value="">전체 예약상태</option>
+			<option value="DONE">예약 확정</option>
+			<option value="CANCELLED">예약 취소</option>
+			<option value="PENDING">예약 보류</option>
+			<option value="VISITED">이용 완료</option>
+		</select>
+	</section>
 
-        <section class="filter-bar">
-            <input type="text" class="searchInput" id="searchInput" placeholder="예약번호, 수령인 검색" />
-            <select id="contentFilter"><option value="">모든 콘텐츠</option></select>
-            <input type="date" id="dateFilter" />
-            <select id="statusFilter">
-                <option value="">전체 예약상태</option>
-                <option value="DONE">예약 확정</option>
-				<option value="CANCELLED">예약 취소</option>
-				<option value="PENDING">예약 보류</option>
-				<option value="VISITED">이용 완료</option>
-            </select>
-        </section>
-
-        <section class="table-wrap">
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th>예약번호</th>
-                        <th>콘텐츠명</th>
-                        <th>수령인</th>
-                        <th>방문일시</th>
-                        <th>인원</th>
-                        <th>예약상태</th>
-                        <th>결제상태</th>
-                        <th>관리</th>
-                    </tr>
-                </thead>
-                <tbody id="reserveList">
-                    </tbody>
-            </table>
-        </section>
-    </main>
-</div>
+	<section class="table-wrap">
+		<div class="table-scroll-area"> <table class="user-table">
+			<thead>
+				<tr>
+					<th>예약번호</th>
+					<th>콘텐츠명</th>
+					<th>수령인</th>
+					<th>방문일시</th>
+					<th>인원</th>
+					<th>예약상태</th>
+					<th>결제상태</th>
+					<th>관리</th>
+				</tr>
+			</thead>
+			<tbody id="reserveList">
+			</tbody>
+		</table>
+	</section>
+</main>
 
 <div class="modal-overlay" id="userModal">
-    <div class="modal">
-        <header class="modal-header">
-            <h3>예약 상세 정보 <span id="modalReserveId"></span></h3>
-            <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#999;" onclick="closeModal()">✕</button>
-        </header>
-        <div class="modal-body" id="modalBody">
-            </div>
-        <footer class="modal-footer">
-            <span style="font-size: 12px; color: #bbb; font-weight:500;">ADMIN ACTION</span>
-            <div class="footer-btns">
-                <button class="btn-action" id="btnAction">
-                    <span class="material-symbols-outlined" style="margin:0; font-size:18px;">check_circle</span>
-                    이용 완료 처리
-                </button>
-                <button class="btn-close" onclick="closeModal()">닫기</button>
-            </div>
-        </footer>
-    </div>
+	<div class="modal">
+		<header class="modal-header">
+			<h3>
+				예약 상세 정보 <span id="modalReserveId"></span>
+			</h3>
+			<button
+				style="border: none; background: none; font-size: 20px; cursor: pointer; color: #999;"
+				onclick="closeModal()">✕</button>
+		</header>
+		<div class="modal-body" id="modalBody"></div>
+		<footer class="modal-footer">
+			<span style="font-size: 12px; color: #bbb; font-weight: 500;">ADMIN
+				ACTION</span>
+			<div class="footer-btns">
+				<button class="btn-action" id="btnAction">
+					<span class="material-symbols-outlined"
+						style="margin: 0; font-size: 18px;">check_circle</span> 이용 완료 처리
+				</button>
+				<button class="btn-close" onclick="closeModal()">닫기</button>
+			</div>
+		</footer>
+	</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
