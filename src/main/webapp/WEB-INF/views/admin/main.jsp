@@ -40,6 +40,13 @@ html, body {
             display: block;
         }
 </style>
+<script>
+    // iframe 안에서 열렸다면 최상위로 끌어올림
+    if (window.top !== window.self) {
+        window.top.location.href = window.location.href;
+    }
+</script>
+
 <link
 	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
 	rel="stylesheet" />
