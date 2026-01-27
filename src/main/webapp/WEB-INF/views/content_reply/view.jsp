@@ -10,125 +10,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     
-    <style>
-        :root {
-            --main-color: #4dc3ff;
-            --dark-gray: #333;
-            --light-bg: #f9f9f9;
-            --border-color: #eee;
-            --admin-bg: #f0faff;
-        }
+<style>
+    :root {
+        --main-color: #4dc3ff;
+        --dark-gray: #333;
+        --text-gray: #666;
+        --light-bg: #f9f9f9;
+        --border-color: #eee;
+        --danger-color: #e74c3c;
+    }
 
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: #fff;
-            color: var(--dark-gray);
-            margin: 0; padding: 0;
-            line-height: 1.6;
-        }
+    body {
+        font-family: 'Pretendard', sans-serif;
+        background-color: #fff;
+        color: var(--dark-gray);
+        margin: 0; padding: 0;
+        line-height: 1.6;
+    }
 
-        .container {
-            max-width: 900px;
-            margin: 60px auto;
-            padding: 0 20px;
-        }
+    .container {
+        max-width: 900px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
 
-        /* 헤더 섹션 */
-        .view-header {
-            border-bottom: 2px solid var(--dark-gray);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
+    /* 헤더 섹션 */
+    .view-header {
+        border-bottom: 2px solid var(--dark-gray);
+        padding-bottom: 25px;
+        margin-bottom: 30px;
+    }
 
-        .view-header .category {
-            color: var(--main-color);
-            font-weight: 700;
-            font-size: 14px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
-        }
+    .view-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 15px 0;
+        letter-spacing: -1px;
+    }
 
-        .view-header h1 {
-            font-size: 26px;
-            margin: 0 0 15px 0;
-            letter-spacing: -1px;
-        }
+    .view-meta {
+        display: flex;
+        color: #888;
+        font-size: 14px;
+        gap: 20px;
+    }
 
-        .view-meta {
-            display: flex;
-            color: #888;
-            font-size: 14px;
-            gap: 20px;
-        }
+    /* 본문 영역 */
+    .content-box {
+        padding: 40px 10px;
+        min-height: 200px;
+        font-size: 16px;
+        border-bottom: 1px solid var(--border-color);
+        color: #444;
+    }
 
-        /* 본문 영역 */
-        .content-box {
-            padding: 40px 10px;
-            min-height: 200px;
-            font-size: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
+    /* 관리자 답변 섹션 */
+    .admin-section {
+        margin-top: 30px;
+        border: 1px solid var(--border-color);
+        background-color: #fcfcfc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
 
-  /* 게시판 형식의 답변 스타일 */
-.admin-section {
-    margin-top: 20px;
-    border: 1px solid var(--border-color);
-    background-color: var(--light-bg);
-    border-radius: 4px;
-}
+    .admin-header {
+        padding: 15px 20px;
+        background-color: #f4f4f4;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.admin-header {
-    padding: 12px 20px;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid var(--border-color);
+    .admin-title {
+        font-weight: 700;
+        color: var(--dark-gray);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .admin-title::before {
+        content: 'A.';
+        color: var(--main-color);
+        font-size: 18px;
+    }
+
+    .admin-content {
+        padding: 25px 20px;
+        font-size: 15px;
+        color: #333;
+        line-height: 1.7;
+    }
+
+ /* 하단 버튼 그룹 레이아웃 */
+.btn-group {
+    margin-top: 50px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+/* 왼쪽 [목록으로] 버튼 전용 */
+.btn-list { 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 25px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
     font-size: 14px;
+    background: #eee; 
+    color: #666; 
+    transition: 0.3s;
+}
+.btn-list:hover { background: #ddd; }
+
+/* 오른쪽 [수정/삭제/등록] 버튼들 통일 */
+.right-btns {
+    display: flex;
+    gap: 10px;
 }
 
-.admin-title {
-    font-weight: bold;
-    color: #444;
+.right-btns .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 25px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    
+    /* 기본 상태: 회색 */
+    background-color: #eee !important;
+    color: #666 !important;
 }
 
-.admin-content {
-    padding: 20px;
-    font-size: 15px;
-    color: #333;
-    line-height: 1.6;
-    min-height: 100px;
+/* 우측 버튼들만 호버 시 하늘색 */
+.right-btns .btn:hover {
+    background-color: var(--main-color) !important; /* #4dc3ff */
+    color: #fff !important;
 }
-
-        /* 하단 버튼 영역 */
-        .btn-group {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: 0.3s;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-list { background: #eee; color: #555; }
-        .btn-list:hover { background: #ddd; }
-
-        .btn-delete { background: #ffeded; color: #e74c3c; margin-left: 8px; }
-        .btn-delete:hover { background: #ffdada; }
-
-        .btn-reply { background: var(--dark-gray); color: #fff; }
-        .btn-reply:hover { background: #555; }
-    </style>
+ 
+</style>
 
     <script>
     function del(creply_id, content_id,gno) {
@@ -194,30 +223,32 @@
 
         <div class="btn-group">
             <div class="left-btns">
-                <a href="${ctx}/detail/${vo.content_id}?tab=inquiry" class="btn btn-list" ">목록으로</a>
+                <a href="${ctx}/detail/${vo.content_id}?tab=inquiry" class="btn btn-list" >목록으로</a>
             </div>
             
             <div class="right-btns">
-           <div class="right-btns">
+         
+           
     <%-- 1. 유저 본인인 경우: 질문글 수정 & 삭제 --%>
-    <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id}">
-        <a href="${ctx}/detail/tab/inquiry/modify?creply_id=${vo.creply_id}" class="btn btn-list">수정하기</a>
-        <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});" class="btn btn-delete">삭제하기</a>
+    <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id and not empty vo.creply_id}">
+        <a href="${ctx}/detail/inquiry/modify?creply_id=${vo.creply_id}" class="btn">수정하기</a>
+        <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});" class="btn">삭제하기</a>
     </c:if>
     
     <%-- 2. 관리자(Vendor)인 경우 --%>
-    <c:if test="${loginSess.role == 1 and loginSess.user_id == vo.vendor_id}">
+    <c:if test="${loginSess.role == 1 and loginSess.user_id == vo.vendor_id and not empty vo.creply_id}">
         <c:choose>
             <%-- 답변이 아직 없는 경우: '답변 등록' --%>
             <c:when test="${empty vendorList}">
-                <a href="${ctx}/detail/inquiry/write/vendor.do?creply_id=${vo.creply_id}" class="btn btn-reply">답변 등록</a>
+                <a href="${ctx}/detail/inquiry/write/vendor.do?creply_id=${vo.creply_id}" class="btn">답변 등록</a>
             </c:when>
             <%-- 답변이 이미 있는 경우: '답변 수정' --%>
             <c:otherwise>
-                <a href="${ctx}/detail/inquiry/modify/vendor.do?creply_id=${vendorList.creply_id}" class="btn btn-list">답변 수정</a>
+                <a href="${ctx}/detail/inquiry/modify?creply_id=${vendorList.creply_id}" class="btn">답변 수정</a>
+         		 
+         		 <a class="btn" href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});">답변 삭제</a>
             </c:otherwise>
         </c:choose>
-          <a href="${ctx}/detail/inquiry/modify/vendor.do?creply_id=${vendorList.creply_id}" class="btn btn-list">답변 삭제</a>
         
     </c:if>
 </div>

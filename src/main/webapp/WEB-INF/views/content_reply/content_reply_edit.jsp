@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 <!DOCTYPE html>
 <html lang="ko">
 <head> 
@@ -7,8 +10,7 @@
     <title>GoToday | 문의 수정</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="/project/smarteditor/js/HuskyEZCreator.js"></script>
-    
+    <script src="${ctx}/smarteditor/js/HuskyEZCreator.js"></script> 
     <style>
         :root {
             --main-color: #4dc3ff;
@@ -145,7 +147,7 @@
         nhn.husky.EZCreator.createInIFrame({
             oAppRef: oEditors,
             elPlaceHolder: "content",
-            sSkinURI: "/project/smarteditor/SmartEditor2Skin.html",    
+            sSkinURI: "${ctx}/smarteditor/SmartEditor2Skin.html",    
             htParams : {
                 bUseToolbar : true,
                 bUseVerticalResizer : true,
@@ -157,7 +159,7 @@
 
     function goSave() {
         oEditors.getById['content'].exec('UPDATE_CONTENTS_FIELD',[]);
-        if(!$("#title").val().trim()) {
+        if ($("#title").length > 0 && !$("#title").val().trim()) {
             alert("제목을 입력해주세요.");
             $("#title").focus();
             return;
@@ -171,34 +173,36 @@
     <div class="container">
         <header class="page-header">
             <h1 class="page-title">문의 내용 수정</h1>
-            <span style="color: #999; font-size: 14px;">관리자가 확인 후 답변드립니다.</span>
+           
         </header>
 
-        <form method="post" name="frm" id="frm" action="/detail/tab/inquiry/write" enctype="multipart/form-data">
-            <input type="hidden" name="no" value="${vo.no}">
-            
+        <form method="post" name="frm" id="frm" action="/gotoday/detail/tab/inquiry/modify" enctype="multipart/form-data">
+           <input type="hidden" name="creply_id" value="${item.creply_id}" />
+  		  <input type="hidden" name="content_id" value="${item.content_id}" />
             <table class="edit-form-table">
                 <tbody>
+                <c:if test="${loginSess.role==0}">
                     <tr>
                         <th>제목</th>
                         <td>
-                            <input type="text" name="title" id="title" placeholder="제목을 입력하세요" value="${vo.title}"/>
+                            <input type="text" name="title" id="title"value="${item.title}"/>
                         </td>
                     </tr>
+                    </c:if>
                     <tr>
                         <th>내용</th>
                         <td>
-                            <textarea name="text" id="content" style="width:100%; height:400px;"></textarea>
+                            <textarea name="body" id="content" style="width:100%; height:400px;">${item.body}</textarea>
                         </td>
                     </tr>
                     <tr>
                         <th>첨부파일</th>
                         <td>
                             <div class="file-upload-wrapper">
-                                <c:if test="${!empty vo.filename_org}">
+                                <c:if test="${!empty item.file_path}">
                                     <div class="existing-file">
                                         <input type="checkbox" name="fileDelete" id="fileDel" value="ok"> 
-                                        <label for="fileDel" style="cursor:pointer">기존 파일 삭제 (${vo.filename_org})</label>
+                                        <label for="fileDel" style="cursor:pointer">기존 파일 삭제 (${item.file_path})</label>
                                     </div>
                                 </c:if>
                                 <input type="file" name="file" id="file" class="wid100"/>

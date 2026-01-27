@@ -492,10 +492,16 @@ $(function() {
 
     // 좋아요 토글 - 깨짐 방지를 위해 코드로 변경
     $("#likeBtn").click(function() {
-        const heart = $(this).find(".heart-icon");
+    	const userRole = "${loginSess.role}"; 
+        
+        if (userRole === "1") {
+            alert("관리자 계정은 '좋아요' 기능을 이용할 수 없습니다.");
+            return; // AJAX 실행 방지
+        }
+    	const heart = $(this).find(".heart-icon");
         const count = $(this).find(".like-count-num");
         const content_id = heart.data("content-id");
-
+       
         $.ajax({
             url: "${pageContext.request.contextPath}/heart",
             type: "POST",
@@ -517,7 +523,7 @@ $(function() {
                 }
                 count.text(res.count_num);
             },
-            error: function() { alert("오류가 발생했습니다."); }
+            error: function() {  }
         });
     });
     //트위터 클릭시 해당 프로필로 이동 . 근데 만약 트위터 주소가 없으면 버튼 블락 처리해야하지 않을까? 클릭을 못하도록 . 
@@ -625,6 +631,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 				<img class="poster-img"
 					src="${pageContext.request.contextPath}${content.main_image_path}"
 					alt="포스터">
+					<c:if test="${loginSess.role==0}">
 				<button type="button"
 					class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}"
 					id="likeBtn">
@@ -635,6 +642,18 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 						</c:choose>
 					</span> <span class="like-count-num">${content.like_count}</span>
 				</button>
+				</c:if>
+				<c:if test="${loginSess.role==1}">
+				<button type="button" class="poster-like-btn" style="cursor: default; opacity: 0.8;">
+                <span class="heart-icon">
+                    <c:choose>
+                        <c:when test="${content.liked == 1}">&#x1F499;</c:when>
+                        <c:otherwise>&#x1F90D;</c:otherwise>
+                    </c:choose>
+                </span> 
+                <span class="like-count-num">${content.like_count}</span>
+            </button>
+				</c:if>
 			</section>
 
 			<section class="info-side">

@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import kr.co.gotoday.user.UserMapper;
 import kr.co.gotoday.user.UserVO;
-
+@Transactional
 @Service
 public class ContentReplyServiceImpl implements ContentReplyService{
 	
@@ -47,15 +47,9 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	public int vendorCreate(ContentReplyVO vo) {
 		// TODO Auto-generated method stub
 		//벤더가 insert
-		int success=contentReplyMapper.insertVendorQA(vo);
-		if(success==1) {
-			//성공하면 업데이트 해주기 
-			int success2=contentReplyMapper.updateReplyStatus(vo.getCreply_id(),1);
-			return success2;
-		}
-		return 0;
+		return contentReplyMapper.insertVendorQA(vo);
 	}
-	
+	//
 	//업데이트
 	@Override
 	public int updateQA(ContentReplyVO vo) {
@@ -66,11 +60,13 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 
 	//게시물 삭제(이게 유저가 삭제한 경우 => 답변 여부 체크 후 vendor껏도 삭제하기
 	// 벤더가 삭제한 경우-> 답변 여부만 업데이트 해주기 (1->0)
+	@Transactional
 	@Override
 	public int deleteQA(ContentReplyVO vo) {
 		// TODO Auto-generated method stub
 		System.out.println("삭제 요청 유저: " + vo.getUser_id());
 	    System.out.println("삭제 대상 글번호: " + vo.getCreply_id());
+	    System.out.println("글에 저장된 Vendor ID: " + vo.getVendor_id());
 	    System.out.println("삭제 대상 그룹번호(gno): " + vo.getGno()); // 이게 0이면 JSP 확인 필요!
 		if(vo.getUser_id()!=vo.getVendor_id()) {
 			//user인경우에 
@@ -78,17 +74,14 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 				if(contentReplyMapper.countVendorReplyByGno(vo.getGno())>0) {
 					//벤더가 답변해준 경우-> 벤더 게시물 삭제하기(매퍼 생성해야함) 
 					contentReplyMapper.deleteVendorReplyByGno(vo.getGno());
-				
 				}
 				return contentReplyMapper.deleteReply(vo);
 				
 		}
 		else {
-			//vendor인경우
-			int success=contentReplyMapper.deleteReply(vo);
-			if(success==1)
-				return contentReplyMapper.updateReplyStatus(vo.getCreply_id(), 0); // 0이면 답변 안 한 상태  
-			return 0;
+			//vendor가 삭제한 경우에 
+			 contentReplyMapper.updateReplyStatus(vo.getGno(), 0); // 0이면 답변 안 한 상태  
+				return contentReplyMapper.deleteReply(vo);
 			
 		}
 	}
@@ -118,6 +111,19 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	public List<ContentReplyVO> showDetailByID(int creply_id) {
 		// TODO Auto-generated method stub
 		return contentReplyMapper.showDetail(creply_id);
+	}
+
+	@Override
+	public ContentReplyVO getReplyForUser(int creply_id, int user_id) {
+		
+		return contentReplyMapper.showQADetail(creply_id, user_id);
+	}
+
+	@Override
+	public int updateStatus(int gno) {
+		// TODO Auto-generated method stub
+		
+		return contentReplyMapper.updateReplyStatus(gno, 1);
 	}
 
 

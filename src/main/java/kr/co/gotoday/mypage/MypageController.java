@@ -1,7 +1,6 @@
 package kr.co.gotoday.mypage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import kr.co.gotoday.contentReply.ContentReplyService;
+import kr.co.gotoday.contentReply.ContentReplyVO;
 import kr.co.gotoday.reply.ReplyVO;
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
@@ -32,7 +33,7 @@ public class MypageController {
 	private final ReservationService reservationService;
 	private final MypageService mypageService;
 	private final ReviewService reviewService;
-	
+	private final ContentReplyService contentReplyService;
 	// 메인 화면
     @GetMapping("/mypage/main")
     public String mypageMain(HttpSession session, Model model) {
@@ -290,4 +291,29 @@ public class MypageController {
 		model.addAttribute("reviewList", reviewList);
 		return "mypage/review_list";
 	}
+	
+    // 문의사항 목록
+    @GetMapping("/mypage/inquiry_list")
+    public String myInquiryList(HttpSession session, Model model, ReplyVO vo) {
+        UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+        
+        // 내가 작성한 문의만 조회하도록 user_id 설정
+        vo.setUser_id(loginUser.getUser_id());
+        
+        // 서비스에서 목록 가져오기
+        //List<ContentReplyVO> result = contentReplyService.showQAByID(loginUser.getUser_id());
+       // int q= contentReplyService.CountQA(loginUser.getUser_id());
+        //result.g
+        //model.addAttribute("map", result);
+        //model.addAttribute("vo", vo);
+        
+        return "mypage/inquiry_list";
+    }
 }

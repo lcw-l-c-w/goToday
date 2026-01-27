@@ -9,64 +9,84 @@
     <title>GoToday | 문의사항</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     
-    <style>
-        /* 기초 레이아웃 */
-        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: #fff; }
-        .wrap { width: 100%; }
-        
-        /* 탭 내부 컨테이너 */
-        .dynamic-list-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-        
-        /* 헤더 영역 (총 건수 & 버튼) */
-        .list-info-header { 
-            display: flex; justify-content: space-between; align-items: flex-end;
-            padding-bottom: 20px; border-bottom: 2px solid #333; margin-bottom: 10px;
-        }
-        .total-count { font-size: 16px; color: #333; }
-        .total-count strong { color: #4dc3ff; font-size: 18px; }
-        
-        /* 작성하기 버튼 */
-        .btn-write {
-            padding: 10px 24px; background: #333; color: #fff;
-            border-radius: 4px; font-weight: 500; font-size: 14px;
-            transition: 0.2s; border: none; cursor: pointer;
-        }
-        .btn-write:hover { background: #555; transform: translateY(-1px); }
+<style>
+    :root {
+        --main-color: #4dc3ff;
+        --text-dark: #333;
+        --text-gray: #666;
+        --text-light: #999;
+        --border-color: #eee;
+        --bg-light: #fcfcfc;
+    }
 
-        /* 리스트 테이블 */
-        .custom-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .custom-table th { 
-            padding: 15px 10px; text-align: center; color: #666;
-            font-weight: 600; font-size: 15px; border-bottom: 1px solid #eee;
-        }
-        .custom-table td { 
-            padding: 20px 10px; text-align: center; border-bottom: 1px solid #f9f9f9;
-            font-size: 15px; color: #444; vertical-align: middle;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        
-        /* 제목(문의내용) 왼쪽 정렬 및 들여쓰기 */
-        .text-left { text-align: left !important; padding-left: 20px !important; }
-        .title-link { color: #333; text-decoration: none; font-weight: 500; cursor: pointer; }
-        .title-link:hover { color: #4dc3ff; text-decoration: underline; }
-        
-        /* 답변(들여쓰기) 아이콘 */
-        .reply-icon { color: #999; font-size: 13px; margin-right: 4px; }
+    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: var(--text-dark); }
 
-        /* 배지 스타일 */
-        .badge {
-            padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
-            display: inline-block;
-        }
-        .badge-waiting { background: #f2f2f2; color: #888; }
-        .badge-done { background: #eaf7ff; color: #2b7fc2; }
-        
-        /* 데이터 없을 때 */
-        .empty-msg { 
-            text-align: center; padding: 100px 0 !important; color: #bbb; 
-            font-size: 16px; background: #fafafa; border-radius: 8px;
-        }
-    </style>
+    .dynamic-list-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+
+    /* 헤더 영역 */
+    .list-info-header { 
+        display: flex; justify-content: flex-end; /* 버튼만 우측 정렬 */
+        padding-bottom: 15px; margin-bottom: 0;
+    }
+
+    .btn-write {
+        padding: 10px 22px; background: var(--text-dark); color: #fff;
+        border-radius: 6px; font-weight: 600; font-size: 14px;
+        transition: 0.3s; border: none; cursor: pointer;
+    }
+    .btn-write:hover { background: #555; }
+
+    /* 테이블 스타일 */
+    .custom-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text-dark); }
+    
+    .custom-table th { 
+        background-color: #fcfcfc; padding: 16px 10px; text-align: center; 
+        color: #444; font-weight: 600; font-size: 14px; border-bottom: 1px solid #ddd;
+    }
+    
+    .custom-table td { 
+        padding: 18px 10px; text-align: center; border-bottom: 1px solid var(--border-color);
+        font-size: 15px; color: #555; vertical-align: middle;
+    }
+
+    /* 제목 영역 특화 */
+    .text-left { text-align: left !important; padding-left: 20px !important; }
+    .title-wrapper { display: flex; align-items: center; gap: 8px; }
+    .title-link { 
+        color: var(--text-dark); text-decoration: none; font-weight: 500; 
+        cursor: pointer; transition: color 0.2s;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .title-link:hover { color: var(--main-color); }
+
+    /* 답변 아이콘 & 비밀글 아이콘 */
+    .reply-icon { color: var(--text-light); font-size: 13px; font-weight: 400; }
+    .secret-icon { font-size: 12px; color: #ffb800; }
+
+    /* 배지(상태) 스타일 */
+    .badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 70px; height: 26px; border-radius: 4px; font-size: 11px; font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .badge-waiting { background: #f5f5f5; color: #999; border: 1px solid #e0e0e0; }
+    .badge-done { background: #eaf7ff; color: #2b7fc2; border: 1px solid #cde9ff; }
+
+    /* 담당자 텍스트 스타일 */
+    .vendor-label { 
+        background: #f0f0f0; color: #777; padding: 2px 6px; 
+        border-radius: 3px; font-size: 12px; font-weight: 500; 
+    }
+
+    /* 빈 목록 */
+    .empty-msg { 
+        text-align: center; padding: 80px 0 !important; color: var(--text-light); 
+        background: var(--bg-light);
+    }
+    
+    /* 호버 효과 */
+    .custom-table tbody tr:hover { background-color: #f9fdff; }
+</style>
 </head>
 <body>
     <div class="wrap">
@@ -92,9 +112,11 @@
                             <c:forEach var="item" items="${list}">
                                 <tr>
                                     <td>
+                                     <c:if test="${item.nested==0}">
                                         <span class="badge ${item.reply_status == 1 ? 'badge-done' : 'badge-waiting'}">
                                             ${item.reply_status == 1 ? '답변완료' : '답변대기'}
                                         </span>
+                                         </c:if>
                                     </td>
                                     <td class="text-left">
                                         <div style="padding-left: ${item.nested * 20}px;">
@@ -111,7 +133,13 @@
                                             </a>
                                         </div>
                                     </td>
-                                    <td>${item.writer}</td>
+                                    <td> <c:if test="${item.nested > 0}">
+                                                <span class="reply-icon">담당자</span>
+                                            </c:if>
+                                           <c:if test="${item.nested == 0}">
+                                            ${item.writer}
+                                            </c:if>
+                                            </td>
                                     <td style="color: #999;">
                                         <fmt:parseDate value="${item.created_at}" var="parsedDate" pattern="yyyy-MM-dd HH:mm:ss"/>
     

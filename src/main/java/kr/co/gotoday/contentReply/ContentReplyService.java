@@ -2,6 +2,8 @@ package kr.co.gotoday.contentReply;
 
 import java.util.List;
 
+import kr.co.gotoday.user.UserVO;
+
 public interface ContentReplyService {
 
 	//게시판 글 작성
@@ -10,6 +12,8 @@ public interface ContentReplyService {
 	//벤더가 답변 달아주는 것
 	int vendorCreate(ContentReplyVO vo);
 	
+	//-> 상태 변경해줌
+	int updateStatus(int gno);
 	// 게시판 글 수정
 	int updateQA(ContentReplyVO vo);
 	
@@ -27,5 +31,8 @@ public interface ContentReplyService {
 	
 	//게시판 조회
 	List<ContentReplyVO> showDetailByID(int creply_id);
+	
+	//게시판 수정시에 사용할 조회해오기 
+	ContentReplyVO getReplyForUser(int creply_id,int user_id);
 }
 

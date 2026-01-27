@@ -142,7 +142,7 @@
 </head>
 <body>
 
-    <h1 class="page-title">나의 문의사항</h1>
+    <h1 class="page-title">나의 Q&A</h1>
 
     <div class="inquiry-container">
         <div class="inquiry-header">
@@ -169,7 +169,7 @@
                         <c:forEach var="item" items="${map.list}">
                             <tr>
                                 <td>${item.reply_id}</td>
-                                <td class="inquiry-title" onclick="goView(${item.reply_id})">${item.title}</td>
+                                <td class="inquiry-title" onclick="goView(${item.creply_id})">${item.title}</td>
                                 <td><fmt:formatDate value="${item.created_at}" pattern="yyyy-MM-dd"/></td>
                                 <td>
                                     <span class="status-badge">

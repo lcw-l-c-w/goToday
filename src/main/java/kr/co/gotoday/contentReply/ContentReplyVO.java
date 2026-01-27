@@ -26,4 +26,8 @@ public class ContentReplyVO { // 테이블 :content_reply
 	private int num; // 총 몇건인지 
 	private int vendor_id; //벤더아이디 확인용
 	private int role; // 0이면 개인/ 1이면 vendor
+	
+	
+	//언니
+	private int answer_count;
 }

@@ -152,10 +152,10 @@
     }
         oEditors[0].exec('UPDATE_CONTENTS_FIELD',[]);
         
-        if(!$("#title").val().trim()) {
+        if ($("#title").length > 0 && !$("#title").val().trim()) {
             alert("제목을 입력해주세요.");
             $("#title").focus();
-            return false;
+            return;
         }
         
         // 에디터 내용 유효성 검사 (선택사항)
@@ -184,12 +184,14 @@
   				<input type="hidden" name="nested" value="${parent.nested}" />
             <table class="edit-form-table">
                 <tbody>
+                   <c:if test="${loginSess.role==0}">
                     <tr>
                         <th>제목</th>
                         <td>
-                            <input type="text" name="title" id="title" placeholder="제목을 입력하세요"/>
+                            <input type="text" name="title" id="title"value="${item.title}"/>
                         </td>
                     </tr>
+                    </c:if>
                     <tr>
                         <th>내용</th>
                         <td>
