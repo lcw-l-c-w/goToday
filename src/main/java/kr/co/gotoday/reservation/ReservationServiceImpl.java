@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
@@ -72,6 +73,11 @@ public class ReservationServiceImpl implements ReservationService{
 	@Override
 	public ReservationVO findByReservationId(int reservation_id) {
 		return reservationMapper.findByReservationId(reservation_id);
+	}
+	
+	@Override
+	public ContentScheduleVO findCurrentTickets(int schedule_id) {
+		return reservationMapper.findCurrentTickets(schedule_id);
 	}
 	
 	@Override
@@ -173,7 +179,8 @@ public class ReservationServiceImpl implements ReservationService{
 		            reservationVO.getSchedule_id(),
 		            total_qty
 					);
-			throw new Exception("잔여 티켓 수량이 부족합니다.");
+			throw new Exception("티켓이 모두 소진되어 결제가 진행되지 않았습니다.\r\n"
+					+ "결제 금액은 청구되지 않습니다.");
 		}
 		
 		return result;

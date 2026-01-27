@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,10 @@ public class UserController {
     private String kakaoRestApiKey;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
-    
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.redirect-uri}")
+    private String naverRedirectUri;
     // 로그인 폼
     @GetMapping("/member/login")
 	public String login(@RequestParam(required = false) String redirect
@@ -36,8 +40,14 @@ public class UserController {
             session.setAttribute("redirectAfterLogin", redirect);
         }
     	
+    	String state = OAuthStateUtil.generateState();
+        session.setAttribute("NAVER_STATE", state);
+
     	model.addAttribute("REST_API_KEY", kakaoRestApiKey);
         model.addAttribute("REDIRECT_URI", kakaoRedirectUri);
+        model.addAttribute("NAVER_CLIENT_ID", naverClientId);
+        model.addAttribute("NAVER_REDIRECT_URI", naverRedirectUri);
+        model.addAttribute("NAVER_STATE", state);
         return "member/login";		
 	}
     
@@ -255,6 +265,87 @@ public class UserController {
         return "redirect:/admin/main";
     }
     
+	@GetMapping("/naverlogin")
+	public String naverCallback(@RequestParam(required = false) String code,
+            					@RequestParam(required = false) String state, 
+            			        @RequestParam(required=false) String error,
+            			        @RequestParam(required=false) String error_description,
+            					HttpSession session,
+            			        RedirectAttributes ra ) {
+		
+		// 이미 로그인된경우 다시 로그인 방지
+		if(session.getAttribute("loginSess") != null ) {
+			return "redirect:/main";
+		}
+
+        // 1) 세션에 저장해둔 state 꺼내기
+        String savedState = (String) session.getAttribute("NAVER_STATE");
+        
+        // 2) 재사용 방지: 한 번 쓰면 지우는게 안전
+        session.removeAttribute("NAVER_STATE");
+
+
+        // 3) 검증
+        if (savedState == null || state == null || !savedState.equals(state)) {
+            // state 불일치 = CSRF 의심
+            ra.addFlashAttribute("loginError", "비정상적인 로그인 요청입니다. 다시 시도해주세요.");
+            return "redirect:/member/login";
+        }
+        
+        // 2) 네이버가 error를 준 경우(사용자 취소 포함)
+        if (error != null) {
+            ra.addFlashAttribute("loginError", mapNaverError(error)); // 아래 매핑함수
+            return "redirect:/member/login";
+        }
+		
+        // 3) code 없으면 실패
+        if (code == null) {
+            ra.addFlashAttribute("loginError", "네이버 로그인에 실패했습니다. 다시 시도해주세요.");
+            return "redirect:/member/login";
+        }
+        
+		// 네이버 엑세스 토큰 받기
+		String naverAccessToken = userService.getNaverAccessToken(code ,savedState);
+		
+		UserVO naverUser = userService.getNaverUserInfo(naverAccessToken);
+		
+	       // DB에 해당 이메일로 가입된 유저가 있는지 확인
+        UserVO dbUser = userService.loginByNaverKey(naverUser.getNaver_key());
+        
+        
+        if (dbUser == null) {
+            // 신규 회원) DB에 저장
+            userService.insertNaverUser(naverUser);
+            dbUser = userService.loginByNaverKey(naverUser.getNaver_key());
+            System.out.println("신규 네이버 유저 등록 완료: " + dbUser.getEmail());
+        } else {
+            // 기존 회원) 이미 DB에 있으므로 insert 과정 건너뜀
+            System.out.println("기존 네이버 유저 로그인: " + dbUser.getEmail());
+        }
+        
+        session.setAttribute("loginSess", dbUser); 
+
+		
+		return "redirect:/main";
+	}
+	
+	private String mapNaverError(String error) {
+	    // 팀플용 간단 매핑(정교하게 해도 됨)
+	    switch (error) {
+	        case "access_denied":
+	            return "네이버 로그인 동의가 취소되었습니다.";
+	        case "invalid_request":
+	            return "요청이 올바르지 않습니다. 다시 시도해주세요.";
+	        case "unauthorized_client":
+	            return "클라이언트 인증에 실패했습니다. 관리자에게 문의하세요.";
+	        case "server_error":
+	            return "네이버 서버 오류입니다. 잠시 후 다시 시도해주세요.";
+	        case "temporarily_unavailable":
+	            return "네이버 서비스가 일시적으로 불가합니다. 잠시 후 다시 시도해주세요.";
+	        default:
+	            return "네이버 로그인 중 오류가 발생했습니다. 다시 시도해주세요.";
+	    }
+	}
     //페이지 이동
     @GetMapping("/login/process")
     public String movePage(HttpSession sess, Model model) {

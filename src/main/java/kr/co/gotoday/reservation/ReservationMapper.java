@@ -23,4 +23,5 @@ public interface ReservationMapper {
 	int updateReservationStatusById(int reservation_id);
 	List<ReservationListDTO> findReservationListByUserId(Map<String, Object> map);
 	ReservationDetailDTO findReservationDetailById(Map<String, Object> map);
+	ContentScheduleVO findCurrentTickets(int schedule_id);
 }

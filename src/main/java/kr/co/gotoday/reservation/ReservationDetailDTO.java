@@ -26,4 +26,6 @@ public class ReservationDetailDTO {
 	private String payment_status;
 	private String payment_method;
 	private int amount_price;
+	
+	private int cancel_amount;
 }

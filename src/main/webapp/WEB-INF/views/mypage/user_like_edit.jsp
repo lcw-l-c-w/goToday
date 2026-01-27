@@ -7,7 +7,7 @@
 <title>관심사 수정 | GoToday</title>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_user_like_edit.css">
 <script>
 $(document).ready(function() {
     $('#frm').on('submit', function(e) {
@@ -21,60 +21,6 @@ $(document).ready(function() {
     });
 });
 </script>
-
-<style>
-	 :root { --main-color: #4dc3ff; --color-button-inactive: #d9d9d9; }
-	 body { font-family: 'Pretendard', sans-serif; background-color: transparent; margin: 0; padding: 0; }
-	 
-	 /* 공통 제목 스타일 */
-	 .page-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; }
-	
-	 /* 공통 흰색 박스 스타일 */
-	 .form-wrapper { 
-	     width: 100%; max-width: 700px; background: #fff; padding: 40px; 
-	     border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-	 }
-	
-	 .form-section { margin-bottom: 35px; }
-	 .section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
-	 .button-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
-	 
-	 input[type="radio"], input[type="checkbox"] { display: none; }
-	 .btn-option {
-	     padding: 10px 24px; border-radius: 50px; background: var(--color-button-inactive);
-	     cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s;
-	 }
-	 input:checked + .btn-option { background: var(--main-color); color: white; }
-	 
-	 /* 전시/팝업 섹션 - 2개 가로 배치 */
-	 .event-grid { display: flex; gap: 20px; justify-content: center; }
-	 
-	 /* 핫플레이스 섹션 - 3-3 배치 */
-	 .location-grid {
-	     display: grid;
-	     grid-template-columns: repeat(3, auto);
-	     gap: 18px;
-	     row-gap: 22px;
-	     justify-content: center;
-	     max-width: 500px;
-	     margin: 0 auto;
-	 }
-	 
-	 /* 관심분야 섹션 - 4-3-2 배치 */
-	 .interest-grid {
-	     display: flex;
-	     flex-direction: column;
-	     gap: 22px;
-	     align-items: center;
-	 }
-	 .interest-row { display: flex; gap: 25px; justify-content: center; }
-	 
-   	 .btn-submit {
-	     width: 100%; max-width: 300px; padding: 15px; background: #333; color: #fff;
-	     border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px;
-	 }
-	 .btn-submit:hover { background: #000; }
-</style>
 </head>
 <body>
 	<h1 class="page-title">관심사 수정</h1>
@@ -97,7 +43,7 @@ $(document).ready(function() {
 	    </div>
 	
 	    <div class="form-section">
-	        <h2 class="section-title">사람들이 많이가는 핫 플레이스</h2>
+	        <h2 class="section-title">사람들이 많이가는 핫 플레이스!</h2>
 	        <div class="location-grid">
 	            <c:forEach var="loc" items="seongsu,hongdae,yeouido,gangnam,hyehwa,hannam">
 	                <label>

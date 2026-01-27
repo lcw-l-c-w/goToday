@@ -174,22 +174,22 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 	
 	    <div class="filter-bar">
 	        <a class="filter-btn ticket-btn ${currentFilter eq 'ALL' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservations?filter=ALL">
+	           href="${pageContext.request.contextPath}/mypage/reservation?filter=ALL">
 	            전체
 	        </a>
 	
 	        <a class="filter-btn ticket-btn ${currentFilter eq 'UPCOMING' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservations?filter=UPCOMING">
+	           href="${pageContext.request.contextPath}/mypage/reservation?filter=UPCOMING">
 	            이용 예정
 	        </a>
 	
 	        <a class="filter-btn ticket-btn ${currentFilter eq 'END' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservations?filter=END">
+	           href="${pageContext.request.contextPath}/mypage/reservation?filter=END">
 	            종료된 내역
 	        </a>
 	
 	        <a class="filter-btn ticket-btn ${currentFilter eq 'CANCELED' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservations?filter=CANCELED">
+	           href="${pageContext.request.contextPath}/mypage/reservation?filter=CANCELED">
 	            예약 취소
 	        </a>
 	    </div>
