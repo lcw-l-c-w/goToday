@@ -252,7 +252,7 @@ public class UserController {
         }
 
         session.setAttribute("loginSess", userVO);
-        return "redirect:/admin/content_manage";
+        return "redirect:/admin/main";
     }
     
     //페이지 이동
@@ -268,13 +268,13 @@ public class UserController {
     	}
     	if(!vo.getEmail().contains("@")) {
     		  sess.setAttribute("loginSess", vo);
-    		return "redirect:/admin/content_manage";
+    		return "redirect:/admin/main";
     	}
     	UserVO login= userService.getUserById(vo.getUser_id());
     	
     	if(login.getRole()==1) {
     		sess.setAttribute("loginSess", login);
-    		return "redirect:/vendor/content_manage";
+    		return "redirect:/vendor/main";
     	}
     	// admin인경우
     	//개인 회원인 경우

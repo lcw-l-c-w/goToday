@@ -8,6 +8,7 @@ html, body {
             height: 100% !important;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
 
         /* 2. HTML 구조에 맞춘 클래스명 수정 */
@@ -28,6 +29,7 @@ html, body {
             flex: 1;
             height: 100%;
             padding: 0; /* padding은 자식(iframe 내부)에서 처리 */
+            margin:0;
         }
 
         /* 3. iframe을 부모 크기에 꽉 채우기 */

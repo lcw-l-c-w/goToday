@@ -28,6 +28,25 @@ public class VendorController {
 	@Autowired
 	private VendorService vendorService;
 	
+	@GetMapping("/vendor/main")
+	public String adminMain(HttpSession session, Model model) {
+		UserVO login = (UserVO)session.getAttribute("loginSess");
+		 // 로그인 체크
+	    if (login == null) {
+	        model.addAttribute("cmd", "move");
+	        model.addAttribute("msg", "로그인이 필요합니다.");
+	        model.addAttribute("url", "login");
+	        return "common/return";
+	    }
+		if(login.getRole()==0) {
+			model.addAttribute("cmd", "move");
+			model.addAttribute("msg", "업체 전용 페이지입니다.");
+			model.addAttribute("url", "main");
+			return "common/return";
+		}
+		return "vendor/main";
+	}
+	
 	//content 관리 페이지
 	@GetMapping("/vendor/content_manage")
 	public String contentManage() {
@@ -41,6 +60,7 @@ public class VendorController {
 	public Map<String, Object> contentList(
 			@RequestParam(required = false) String keyword,
 			@RequestParam(required = false) String status,
+			@RequestParam(required = false) Integer page,
 			HttpSession session
 			){
 		UserVO login = (UserVO) session.getAttribute("loginSess");
@@ -50,7 +70,7 @@ public class VendorController {
 		if (keyword != null) keyword = keyword.trim();
 	    if (status != null && status.trim().isEmpty()) status = null;
 		
-		Map<String, Object> map = vendorService.getFilterList(login.getUser_id(), keyword, status);
+		Map<String, Object> map = vendorService.getFilterList(login.getUser_id(), keyword, status, page);
 		
 		return map;
 	}

@@ -17,4 +17,5 @@ public interface VendorMapper {
 	ContentVO selectContentOne(Integer content_id);
 	List<ContentScheduleVO> selectContentScheduleList(Integer content_id);
 	int updateContent(ContentVO contentVO);
+	int selectContentListCount(Map<String, Object> param);
 }

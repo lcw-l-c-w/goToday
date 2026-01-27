@@ -162,13 +162,21 @@ html {
 }
 
 .content-card {
-	height: 82vh;
+	height: 84vh;
 	background: white;
 	border-radius: 16px;
 	padding: 25px;
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 }
 
+.table-section {
+	flex: 1; /* 남는 모든 중간 공간을 차지해서 페이지네이션을 아래로 밉니다 */
+	overflow-y: auto; /* 데이터가 많아질 경우 이 안에서만 스크롤 발생 */
+	margin-bottom: 20px; /* 페이지네이션과의 간격 */
+}
 /* 4. 툴바 */
 .toolbar {
 	display: flex;
@@ -309,11 +317,13 @@ html {
 
 /* 8. 페이지네이션 */
 .pagination {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 8px;
-	margin-top: 30px;
+    margin-top: auto; /* flex:1에 의해 밀려나 바닥에 붙음 */
+    padding-top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: white; /* 스크롤 시 겹침 방지 */
 }
 
 .pagination button {

@@ -31,7 +31,7 @@
 		<div class="wrap">
 			<div class="sub">
 				<div class="size">
-					<h3 class="sub_title">문의사항</h3>
+					<h3 class="sub_title">고객 문의사항</h3>
 					<div class="bbs">
 						<div class="list-wrap">
 							<table class="list">

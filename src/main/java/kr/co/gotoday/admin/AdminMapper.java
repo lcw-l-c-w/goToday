@@ -20,5 +20,9 @@ public interface AdminMapper {
 
 	List<ContentVO> requestContentList(Map<String, Object> param);
 	List<UserVO> userList(Map<String, Object> param);
+	
+	int selectContentListCount(Map<String, Object> param);
+	int requestContentListCount(Map<String, Object> param);
+	int userListCount(Map<String, Object> param);
 
 }

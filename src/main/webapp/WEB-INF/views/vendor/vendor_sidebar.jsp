@@ -4,28 +4,26 @@
 	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
 	rel="stylesheet" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_sidebar.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_user_manage.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_content_manage.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_content_request.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/reserve_pay_manage.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_content_manage.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_content_create.css">
 
 <aside class="sidebar">
 	<div class="sidebar-header">
 		<h1 class="logo">ExhibiReserve</h1>
-		<p class="logo-sub">ADMIN MANAGEMENT</p>
+		<p class="logo-sub">VENDOR MANAGEMENT</p>
 	</div>
 
 	<nav class="sidebar-nav">
 		<ul>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/admin/content_request?isIframe=true"  target="adminFrame"><span
-					class="material-symbols-outlined">dashboard</span> 승인 요청</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/admin/content_manage?isIframe=true"  target="adminFrame"><span
-					class="material-symbols-outlined">description</span> 전시 관리</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/admin/user_manage?isIframe=true"  target="adminFrame"><span
-					class="material-symbols-outlined">person</span> 사용자 관리</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="adminFrame"><span
-					class="material-symbols-outlined">support_agent</span> 고객 문의 답변</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="adminFrame"><span
-					class="material-symbols-outlined">support_agent</span> 업체 문의 답변</a></li>
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/content_manage?isIframe=true"  target="vendorFrame"><span
+					class="material-symbols-outlined">dashboard</span> 콘텐츠 관리</a></li>
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/reserve_pay_manage?isIframe=true"  target="vendorFrame"><span
+					class="material-symbols-outlined">description</span> 예약 관리</a></li>
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="vendorFrame"><span
+					class="material-symbols-outlined">person</span> 고객 문의 답변</a></li>
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="vendorFrame"><span
+					class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/mypage/logout"
 				onclick="return confirmLogout();"><span
 					class="material-symbols-outlined">logout</span> 로그아웃</a></li>
@@ -38,7 +36,7 @@
 			<div class="name-wrapper user-name-trigger">
 				<strong class="user-name"> <c:choose>
 						<c:when test="${not empty loginSess}">
-		                        관리자
+		                        ${loginSess.name}
 		                    </c:when>
 						<c:otherwise>
 		                        잘못된 접근입니다.
@@ -63,21 +61,11 @@
 			return false;
 		}
 	}
-    // 사이드바의 active 클래스를 동적으로 변경
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentPath = window.location.pathname;
-        const sidebarItems = document.querySelectorAll('.sidebar-item');
-        sidebarItems.forEach(item => {
-            if(item.getAttribute('href') === currentPath) {
-                item.classList.add('active');
-            }
-        });
-    });
     
     document.addEventListener('DOMContentLoaded', function() {
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         // 현재 메인의 iframe이 전시 관리(content_manage)를 띄우고 있으므로 이를 기본값으로 설정
-        const defaultPath = "${pageContext.request.contextPath}/admin/content_manage";
+        const defaultPath = "${pageContext.request.contextPath}/vendor/content_manage";
 
         sidebarItems.forEach(item => {
             const link = item.querySelector('a');

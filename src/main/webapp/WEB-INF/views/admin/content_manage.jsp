@@ -4,7 +4,8 @@
 <link
 	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
 	rel="stylesheet" />
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_content_manage.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/admin_content_manage.css">
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
@@ -69,14 +70,20 @@ $(function () {
 	loadContentList();
 })	
 
-function loadContentList() {
+let currentPage = 1;
+
+function loadContentList(page = 1) {
+	currentPage = page;
 	
     const keyword = $('#searchInput').val();
     // active 클래스가 붙은 버튼의 data-status를 가져옴
     let status = $('.filter-btn.active').data('status');
     
     // 데이터 전송 객체 구성
-    const searchData = { keyword };
+    const searchData = { 
+    		keyword : keyword,
+    		page : page
+    	};
     
     // status가 빈 문자열("")이 아닐 때만 파라미터에 추가 (전체 선택 시 제외)
     if (status !== "" && status !== undefined) {
@@ -89,6 +96,12 @@ function loadContentList() {
         data: searchData,
         success(res) {
             renderList(res.list);
+            if(res.pageInfo) {
+            renderPagination(res.pageInfo);
+            }else{
+            	console.error('pafeInfo 없음', res);
+            	$('.pagination').empty();
+            }
         },
         error() {
             alert('목록을 불러오지 못했습니다.');
@@ -100,13 +113,13 @@ function loadContentList() {
 $('.filter-btn').on('click', function() {
 	$('.filter-btn').removeClass('active');
 	$(this).addClass('active');
-	loadContentList();
+	loadContentList(1);
 });
 
 //검색 서치 시
 $('#searchInput').on('keyup', function(e){
 	if(e.key ==='Enter'){
-		loadContentList();
+		loadContentList(1);
 	}
 });
 
@@ -146,6 +159,28 @@ $(document).on('click', '.btn-delete', function () {
     });
 });
 
+function renderPagination(p){
+	const $pagination = $('.pagination');
+	$pagination.empty();
+	
+	if(p.prev){
+		$pagination.append(
+				'<button class="arrow" onclick="loadContentList(' +(p.startPage -1)+ ')">◀</button>'
+				);
+	}
+	
+	for(let i=p.startPage; i<=p.endPage; i++){
+		const activeClass = (i === p.page) ? 'active' : '';
+		$pagination.append(
+				 '<button class="' + activeClass + '" onclick="loadContentList(' + i + ')">' + i + '</button>'
+		);
+	}
+	if(p.next) {
+		$pagination.append(
+				'<button class="arrow" onclick="loadContentList('+(p.endPage +1) + ')">▶</button>'
+				);
+	}
+}
 
 function formatDate(dateStr) {
     if (!dateStr) return '';

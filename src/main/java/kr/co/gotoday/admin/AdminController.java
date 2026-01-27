@@ -60,6 +60,7 @@ public class AdminController {
 	public Map<String, Object> contentList(
 			@RequestParam(required = false) String keyword,
 			@RequestParam(required = false) Integer is_active,
+			@RequestParam(required = false) Integer page,
 			HttpSession session
 			) {
 		UserVO login = (UserVO) session.getAttribute("loginSess");
@@ -70,8 +71,7 @@ public class AdminController {
 		if(keyword != null) {
 			keyword = keyword.trim();
 		}
-		
-		Map<String, Object> map = adminService.getFilterList(login.getUser_id(), keyword, is_active);
+		Map<String, Object> map = adminService.getFilterList(login.getUser_id(), keyword, is_active, page);
 		
 		return map;
 	}
@@ -81,6 +81,7 @@ public class AdminController {
 	public Map<String, Object> contentListRequest(
 	        @RequestParam(required = false) String keyword,
 	        @RequestParam String content_status,
+	        @RequestParam(required = false) Integer page,
 	        HttpSession session
 			) {
 	    UserVO login = (UserVO) session.getAttribute("loginSess");
@@ -95,7 +96,8 @@ public class AdminController {
 	    return adminService.getRequestList(
 	            login.getUser_id(),
 	            keyword,
-	            content_status
+	            content_status,
+	            page
 	    );
 	}
 	
@@ -104,6 +106,7 @@ public class AdminController {
 	public Map<String, Object> userList(
 			@RequestParam(required = false) String keyword,
 			@RequestParam(required = false) Integer role,
+			@RequestParam(required = false) Integer page,
 			HttpSession session
 			) {
 		UserVO login = (UserVO) session.getAttribute("loginSess");
@@ -118,7 +121,8 @@ public class AdminController {
 		return adminService.getUserList(
 				login.getUser_id(),
 				keyword,
-				role
+				role,
+	            page
 				);
 	}
 	
