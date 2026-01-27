@@ -10,6 +10,41 @@ pageEncoding="UTF-8"%>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_user_info.css">
 <script>
 $(document).ready(function() {
+    //  DB에서 가져온 전화번호 하이픈 적용
+    let phoneVal = $("input[name='phone_number']").val();
+    if (phoneVal) {
+        phoneVal = phoneVal.replace(/[^0-9]/g, ""); // 숫자만 추출
+        let formatted = "";
+        if(phoneVal.length < 4) {
+            formatted = phoneVal;
+        } else if(phoneVal.length < 7) {
+            formatted = phoneVal.substr(0, 3) + "-" + phoneVal.substr(3);
+        } else if(phoneVal.length <= 11) {
+            formatted = phoneVal.substr(0, 3) + "-" + phoneVal.substr(3, 4) + "-" + phoneVal.substr(7);
+        } else {
+            formatted = phoneVal.substr(0, 3) + "-" + phoneVal.substr(3, 4) + "-" + phoneVal.substr(7, 4);
+        }
+        $("input[name='phone_number']").val(formatted);
+    }
+
+    // 입력 시 자동 하이픈
+    $("input[name='phone_number']").on("input", function() {
+        let number = $(this).val().replace(/[^0-9]/g, "");
+        let formatted = "";
+        if(number.length < 4) {
+            formatted = number;
+        } else if(number.length < 7) {
+            formatted = number.substr(0, 3) + "-" + number.substr(3);
+        } else if(number.length <= 11) {
+            formatted = number.substr(0, 3) + "-" + number.substr(3, 4) + "-" + number.substr(7);
+        } else {
+            formatted = number.substr(0, 3) + "-" + number.substr(3, 4) + "-" + number.substr(7, 4);
+        }
+        $(this).val(formatted);
+    });
+});
+
+$(document).ready(function() {
     // 성별 데이터 세팅
     var genderVal = "${user.gender}"; 
     if (genderVal) {
@@ -27,7 +62,7 @@ $(document).ready(function() {
 });
 
 function beforeSubmit() {
-    // 날짜 input 값을 8자리 숫자로 변환하여 hidden input에 저장
+    // (생년월일 처리)날짜 input 값을 8자리 숫자로 변환하여 hidden input에 저장
     let dateVal = $("#birthday_date").val();
     if (!dateVal) {
         alert("생년월일을 선택해주세요.");
@@ -43,6 +78,10 @@ function beforeSubmit() {
         return false;
     }
 
+ // 전화번호 하이픈 제거 후 전송
+    let phoneNumber = $("input[name='phone_number']").val().replace(/-/g, "");
+    $("input[name='phone_number']").val(phoneNumber);
+    
     alert('정보가 성공적으로 수정되었습니다.');
     return true;
 }
@@ -131,6 +170,27 @@ function beforeSubmit() {
                 <input type="hidden" id="birthday" name="birthday">
             </div>
         </div>
+        
+        <script>
+			const dateInput = document.getElementById('birthday_date');
+			const hiddenInput = document.getElementById('birthday');
+			
+			// 오늘 날짜 구하기 (YYYY-MM-DD)
+			const today = new Date();
+			const yyyy = today.getFullYear();
+			const mm = String(today.getMonth() + 1).padStart(2, '0'); // 0~11월이므로 +1
+			const dd = String(today.getDate()).padStart(2, '0');
+			const maxDate = `${yyyy}-${mm}-${dd}`;
+			
+			// 오늘 이후 날짜 선택 불가
+			dateInput.max = maxDate;
+			
+			// 사용자가 날짜 선택 시 hidden input에 값 넣기
+			dateInput.addEventListener('change', () => {
+			    hiddenInput.value = dateInput.value;
+			});
+		</script>
+
 		
 		<div class="form-row">
 		    <label class="form-label">성별</label>

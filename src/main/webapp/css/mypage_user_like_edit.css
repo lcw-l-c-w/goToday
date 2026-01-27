@@ -29,6 +29,8 @@ body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);  /* 그림자 */
     width: 100%;                               /* 가로 100% */
     max-width: 700px;                          /* 최대 700px */
+    box-sizing: border-box;  /* 패딩 포함 너비 계산 */
+    margin: 0 auto;  /* 중앙 정렬 */
 }
 
 /* 각 섹션 간 간격 */

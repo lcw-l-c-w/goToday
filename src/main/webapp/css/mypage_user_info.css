@@ -22,12 +22,12 @@ body {
 
 /* 공통 흰색 박스 */
 .form-wrapper {
+	background: #fff;                          /* 흰색 배경 */
+    border-radius: 20px;                       /* 둥근 모서리 */
+    padding: 40px;                             /* 안쪽 여백 */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);  /* 그림자 */	
     width: 100%;                               /* 가로 100% */
     max-width: 700px;                          /* 최대 700px */
-    background: #fff;                          /* 흰색 배경 */
-    padding: 40px;                             /* 안쪽 여백 */
-    border-radius: 20px;                       /* 둥근 모서리 */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);  /* 그림자 */
 }
 
 /* 각 입력 행 */
