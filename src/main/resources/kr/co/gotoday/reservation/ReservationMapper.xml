@@ -35,6 +35,11 @@
 	    WHERE reservation_id = #{reservation_id}
 	</select>
 	
+	<select id="findByPaymentKey" parameterType="String"  resultType="kr.co.gotoday.payment.PaymentVO">
+	    SELECT * FROM payment 
+	    WHERE payment_key = #{payment_key}
+	</select>
+	
 	<select id="findReservationByVendor"
 	    parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
 	    resultType="kr.co.gotoday.reservation.VendorReservationListDTO">

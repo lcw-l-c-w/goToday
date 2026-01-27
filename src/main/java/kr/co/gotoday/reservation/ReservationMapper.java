@@ -19,6 +19,7 @@ public interface ReservationMapper {
 	int addCurrentTicket(Map<String, Object> map);
 	int createScheduleByReservation(CalendarVO calendarVO);
 	PaymentVO findByOrderId(String order_key);
+	PaymentVO findByPaymentKey(String payment_key);
 	int updatePaymentStatus(Map<String, Object> map);
 	int updateReservationStatusById(int reservation_id);
 	List<ReservationListDTO> findReservationListByUserId(Map<String, Object> map);
