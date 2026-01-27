@@ -198,6 +198,11 @@
 			AND r.reservation_id = #{reservation_id}
 	</select>
 	
+	<select id="findCurrentTickets" parameterType="int" resultType="kr.co.gotoday.content.ContentScheduleVO" >
+		SELECT * FROM content_schedule
+		WHERE schedule_id = #{schedule_id}
+	</select>
+	
 	<update id="updateReservationStatusById" parameterType="int">
 		UPDATE reservation r
 		JOIN payment p ON r.reservation_id = p.reservation_id
