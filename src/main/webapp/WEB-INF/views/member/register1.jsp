@@ -6,9 +6,7 @@
 <title>정보 입력 | GoToday</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<style>
-    <%@ include file="register.css" %>
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/member_register.css">
 <script>
     $(function () {
         function ChangeForm() {

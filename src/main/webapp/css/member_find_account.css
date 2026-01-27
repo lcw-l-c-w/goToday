@@ -1,0 +1,101 @@
+@charset "UTF-8";
+:root {
+  --color-bg-primary: #f5f5f5;
+  --color-bg-white: #ffffff;
+  --color-text-secondary: #333333;
+  --color-text-muted: #9da8be;
+  --color-border: #9da8be;
+  --color-button-primary: #1a2c50;
+  --radius-md: 4px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background-color: var(--color-bg-primary); min-height: 100vh; }
+
+/* 컨테이너 및 카드 스타일 통일 */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px); /* 헤더 높이 고려 */
+  padding: 20px 0;
+}
+
+.login-card {
+  background-color: var(--color-bg-white);
+  border-radius: var(--radius-md);
+  padding: 40px 50px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-title { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 30px; text-transform: uppercase; }
+
+/* 탭 메뉴 스타일 */
+.tab-menu { display: flex; margin-bottom: 30px; border-bottom: 1px solid #eee; }
+.tab-menu div { 
+    flex: 1; 
+    text-align: center; 
+    padding: 12px; 
+    cursor: pointer; 
+    color: var(--color-text-muted);
+    font-size: 16px;
+    transition: 0.2s;
+}
+.tab-menu div.active { 
+    color: var(--color-button-primary); 
+    font-weight: 700; 
+    border-bottom: 2px solid var(--color-button-primary); 
+}
+
+/* 폼 요소 스타일 통일 */
+.find-form { display: none; }
+.find-form.active { display: block; }
+.form-group { margin-bottom: 25px; }
+.form-label { display: block; font-size: 15px; margin-bottom: 6px; color: var(--color-text-secondary); font-weight: 500; }
+.form-input { 
+    border: none; 
+    border-bottom: 1px solid var(--color-border); 
+    padding: 8px 0; 
+    font-size: 16px; 
+    width: 100%; 
+    outline: none; 
+    transition: border-color 0.2s;
+}
+.form-input:focus { border-bottom-color: var(--color-button-primary); }
+
+/* 버튼 스타일 통일 */
+.btn { 
+    width: 100%; 
+    padding: 12px; 
+    font-size: 17px; 
+    border: none; 
+    border-radius: var(--radius-md); 
+    cursor: pointer; 
+    font-weight: 600;
+}
+.btn-primary { background-color: var(--color-button-primary); color: white; margin-top: 10px; }
+
+/* 결과창 스타일 */
+.result-box { 
+    margin-top: 25px; 
+    padding: 20px; 
+    background: #f8f9fa; 
+    display: none; 
+    text-align: center; 
+    border-radius: var(--radius-md); 
+    font-size: 15px;
+    line-height: 1.6;
+    border: 1px dashed var(--color-border);
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+}
+.back-link:hover { text-decoration: underline; }
