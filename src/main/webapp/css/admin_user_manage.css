@@ -226,11 +226,11 @@ html {
 
 /* 5. 테이블 (요청하신 grid 간격 적용) */
 .table-header, .table-row {
-	display: grid;
-	/* 요청하신 간격: 상태(90px) 이메일(1fr) 이름(1fr) 핸드폰(160px) 생년월일(180px) */
-	grid-template-columns: 90px 1fr 0.7fr 1fr 200px;
-	align-items: center;
-	gap: 0;
+    display: grid;
+    /* 상태(90px), 이메일(자유), 이름(좁게), 유저번호(100px), 핸드폰(160px), 생년월일(160px) */
+    grid-template-columns: 90px 0.9fr 0.6fr 200px 200px 200px;
+    align-items: center;
+    gap: 0;
 }
 
 .table-header {
@@ -253,34 +253,35 @@ html {
 }
 
 /* [핵심] 컨텐츠 리스트 정렬 클래스를 헤더에도 동일하게 적용 */
-.col-status {
-	text-align: center;
+.col-status { text-align: center; }
+
+.col-email { 
+    text-align: left; 
+    padding-left: 20px; 
 }
 
-.col-email {
-	text-align: left;
-	padding-left: 40px;
-} /* 상태와 간격 벌림 */
-.col-name {
-	text-align: left;
-	padding-left: 5px;
-} /* 이메일과 밀착 */
-.col-phone {
-	text-align: left;
-	padding-left: 10px;
-} /* 이름과 밀착 */
-.col-birth {
-	text-align: left;
-	padding-left: 10px;
-} /* 번호와 밀착 및 왼쪽 정렬 */
+.col-name { 
+    text-align: left; 
+    padding-left: 10px; 
+}
 
+.col-user_id { 
+    text-align: center; 
+}
+
+.col-phone { 
+    text-align: center; 
+}
+
+.col-birth { 
+    text-align: center; 
+}
 /* 텍스트 스타일 */
-.table-row .email {
-	font-weight: 500;
-	color: #222;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+.table-row .col-email {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 15px;
 }
 
 .table-row .name {

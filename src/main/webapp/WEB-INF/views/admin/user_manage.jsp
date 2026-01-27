@@ -21,7 +21,7 @@
 		<div class="search-box">
 			<span class="material-symbols-outlined">search</span> <input
 				type="text" class="searchInput" id="searchInput"
-				placeholder="사용자 이름으로 검색..." />
+				placeholder="사용자 이름, 아이디로 검색..." />
 		</div>
 		<div class="filter-tabs">
 			<button class="filter-btn active" data-status="">전체</button>
@@ -33,7 +33,7 @@
 	<section class="table-section">
 		<div class="table-header">
 			<span class="col-status">상태</span> <span class="col-email">이메일</span>
-			<span class="col-name">이름</span> <span class="col-phone">핸드폰
+			<span class="col-name">이름</span> <span class="col-user_id">유저 번호</span> <span class="col-phone">핸드폰
 				번호</span> <span class="col-birth">생년월일</span>
 		</div>
 
@@ -195,6 +195,7 @@ function renderList(list) {
 	                '<div class="col-status"><span class="badge ' + userInfo.className + '">' + userInfo.text + '</span></div>' + 
 	                '<span class="email col-email">' + item.email + '</span>' +
 	                '<span class="name col-name">' + item.name + '</span>' +
+	                '<span class="name col-user_id">' + item.user_id + '</span>' +
 	                '<span class="phone col-phone">' + formatPhone(item.phone_number) + '</span>' +
 	                '<span class="birth col-birth">' + formatBirth(item.birthday) + '</span>' +
             '</li>'
