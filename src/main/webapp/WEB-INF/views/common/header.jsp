@@ -209,7 +209,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
         <div class="logo">
             <a href="${pageContext.request.contextPath}/main">
                 <img
-                    src="<c:url value='/resources/images/logo.png'/>"
+                    src="<c:url value='/img/logo.png'/>"
                     alt="Logo"
                 />
             </a>
