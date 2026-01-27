@@ -18,18 +18,18 @@ public class ReplyController {
 	@Autowired
 	private ReplyService service;
 	
-	@GetMapping("/reply/index.do")
+	@GetMapping("/reply/index")
 	public String index(Model model, ReplyVO vo) {
 		model.addAttribute("map", service.list(vo));
 		return "reply/index";
 	}
 	
-	@GetMapping("/reply/write.do")
+	@GetMapping("/reply/write")
 	public String write() {
 		return "reply/write";
 	}
 	
-	@GetMapping("/reply/view.do")
+	@GetMapping("/reply/view")
 	public String view(Model model, ReplyVO vo, HttpServletRequest request, RedirectAttributes ra) {
 		HttpSession sess = request.getSession();
 		UserVO login = (UserVO)sess.getAttribute("loginSess");
@@ -67,7 +67,7 @@ public class ReplyController {
 		return "reply/view";
 	}
 	
-	@PostMapping("/reply/insert.do")
+	@PostMapping("/reply/insert")
 	public String insert(Model model, HttpServletRequest request, ReplyVO vo, RedirectAttributes ra) {
 		HttpSession sess = request.getSession();
 		UserVO login = (UserVO)sess.getAttribute("loginSess");
@@ -78,6 +78,7 @@ public class ReplyController {
 		vo.setWriter(login.getUser_id());
 		
 		boolean isAdmin = !login.getEmail().contains("@");
+		String isIframe = request.getParameter("isIframe");
 		
 		if(isAdmin) {
 			vo.setReply_status(0); // 명시적으로
@@ -86,7 +87,7 @@ public class ReplyController {
 			if (r > 0) {
 				model.addAttribute("cmd", "move");
 				model.addAttribute("msg", "정상적으로 등록되었습니다.");
-				model.addAttribute("url", "index.do");
+				model.addAttribute("url", "index?isIframe=" + isIframe);
 			} else {
 				model.addAttribute("cmd", "back");
 				model.addAttribute("msg", "등록 오류");
@@ -97,7 +98,7 @@ public class ReplyController {
 			if (r > 0) {
 				model.addAttribute("cmd", "move");
 				model.addAttribute("msg", "정상적으로 저장되었습니다.");
-				model.addAttribute("url", "index.do");
+				model.addAttribute("url", "index?isIframe=" + isIframe);
 			} else {
 				model.addAttribute("cmd", "back");
 				model.addAttribute("msg", "등록 오류");
@@ -107,14 +108,15 @@ public class ReplyController {
 		return "common/return";
 	}
 	
-	@GetMapping("/reply/reply.do")
+	@GetMapping("/reply/reply")
 	public String reply(Model model, ReplyVO vo, HttpServletRequest request) {
 		HttpSession sess = request.getSession();
 		UserVO login = (UserVO)sess.getAttribute("loginSess");
 		if(login.getEmail().contains("@")) {
-			return "redirect:/reply/index.do";
+			String isIframe = request.getParameter("isIframe");
+			return "redirect:/reply/index?isIframe=" + isIframe;
 		}
-		
+		String isIframe = request.getParameter("isIframe");
 		ReplyVO origin = service.detail(vo);
 		ReplyVO replyVo = new ReplyVO();
 		replyVo.setGno(origin.getReply_id());
@@ -126,10 +128,11 @@ public class ReplyController {
 		return "reply/reply";
 	}
 	
-	@PostMapping("/reply/reply.do")
+	@PostMapping("/reply/reply")
 	public String replyProcess(Model model, HttpServletRequest request, ReplyVO vo) {
 		HttpSession sess = request.getSession();
 		UserVO login = (UserVO)sess.getAttribute("loginSess");
+		String isIframe = request.getParameter("isIframe");
 		if(!login.getEmail().contains("@")) {
 			vo.setReply_status(1); // 명시적으로
 			vo.setWriter(login.getUser_id());
@@ -139,7 +142,7 @@ public class ReplyController {
 			if (r > 0) {
 				model.addAttribute("cmd", "move");
 				model.addAttribute("msg", "정상적으로 등록되었습니다.");
-				model.addAttribute("url", "index.do");
+				model.addAttribute("url", "index?isIframe=" + isIframe);
 			} else {
 				model.addAttribute("cmd", "back");
 				model.addAttribute("msg", "등록 오류");
@@ -147,13 +150,14 @@ public class ReplyController {
 		}
 		return "common/return";
 	}
-	@GetMapping("/reply/delete.do")
+	@GetMapping("/reply/delete")
 	public String delete(Model model, HttpServletRequest request, ReplyVO vo) {
 		int r = service.delete(vo.getReply_id());
+		String isIframe = request.getParameter("isIframe");
 		if (r > 0) {
 			model.addAttribute("cmd", "move");
 			model.addAttribute("msg", "정상적으로 삭제되었습니다.");
-			model.addAttribute("url", "index.do");
+			model.addAttribute("url", "index?isIframe=" + isIframe);
 		} else {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "등록 오류");
@@ -161,13 +165,14 @@ public class ReplyController {
 		return "common/return";
 	}
 	
-	@GetMapping("/reply/deleteAdminOnly.do")
+	@GetMapping("/reply/deleteAdminOnly")
 	public String deleteAdminOnly(Model model, HttpServletRequest request, ReplyVO vo) {
 		int r = service.deleteAdminOnly(vo.getReply_id());
+		String isIframe = request.getParameter("isIframe");
 		if (r > 0) {
 			model.addAttribute("cmd", "move");
 			model.addAttribute("msg", "정상적으로 삭제되었습니다.");
-			model.addAttribute("url", "index.do");
+			model.addAttribute("url", "index?isIframe=" + isIframe);
 		} else {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "등록 오류");

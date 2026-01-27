@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="isIframe" value="${param.isIframe}" />
 <!DOCTYPE html>
 <html lang="ko">
 <head> 
@@ -43,15 +44,19 @@
     </script>
 </head> 
 <body>
-<jsp:include page="/WEB-INF/views/common/header.jsp" />
+<c:if test="${isIframe != 'true'}">
+		<jsp:include page="/WEB-INF/views/common/header.jsp" />
+	</c:if>
+	<div class="wrap ${isIframe == 'true' ? 'no-header' : ''}">
     <div class="wrap">
         <div class="sub">
             <div class="size">
                 <h3 class="sub_title">관리자 답변</h3>
     
                 <div class="bbs">
-                <form method="post" name="frm" id="frm" action="reply.do" enctype="multipart/form-data" >
+                <form method="post" name="frm" id="frm" action="reply" enctype="multipart/form-data" >
                 <input type="hidden" name="gno" value="${vo.gno}">
+                <input type="hidden" name="isIframe" value="${isIframe}">
                     <table class="board_write">
                         <tbody>
                         <tr>
@@ -69,13 +74,14 @@
                         </tbody>
                     </table>
                     <div class="btnSet"  style="text-align:right;">
-                    	<a class="btn" href="view.do?reply_id=${origin.reply_id}" style="background-color: #888 !important; margin-right: 5px;">취소</a>
+                    	<a class="btn" href="view?reply_id=${origin.reply_id}&isIframe=${isIframe}" style="background-color: #888 !important; margin-right: 5px;">취소</a>
                         <a class="btn" href="javascript:goSave();">저장 </a>
                     </div>
                     </form>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </body> 
 </html>

@@ -38,7 +38,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
         height: 70px;
     }
     .logo img {
-        height: 32px;
+        height: 28px;
         cursor: pointer;
         display: block;
     }
@@ -208,15 +208,16 @@ uri="http://java.sun.com/jsp/jstl/core"%>
     <div class="nav-container">
         <div class="logo">
             <a href="${pageContext.request.contextPath}/main">
-                <img
-                    src="<c:url value='/img/logo.png'/>"
-                    alt="Logo"
-                />
+                <img src="<c:url value='/img/logo.png'/>" alt="Logo" />
             </a>
         </div>
 
         <ul class="nav-menu">
-            <li><a href="${pageContext.request.contextPath}/reply/index.do">Q&A</a></li>
+            <li>
+                <a href="${pageContext.request.contextPath}/reply/index.do"
+                    >Q&A</a
+                >
+            </li>
             <li>
                 <a href="${pageContext.request.contextPath}/popup">PopUp</a>
             </li>

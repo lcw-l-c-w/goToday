@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.reply.ReplyMapper">
 	
-	<!-- 유저와 벤더의 문의 -->
+	<!-- 유저의 문의 -->
 	<insert id="create" parameterType="kr.co.gotoday.reply.ReplyVO">
 		INSERT INTO reply (
 			title, body, created_at, reply_status, writer, user_id
