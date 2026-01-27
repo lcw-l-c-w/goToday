@@ -144,11 +144,17 @@ public class ReservationController {
 	@GetMapping("/reserve/payment.do")
 	public String showPaymentForm(HttpSession session, Model model){
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-		int totalQty = reservation.getAdult_qty()+ reservation.getChild_qty() + reservation.getTeen_qty();
-		log.info("totalQty = {}", totalQty);
-		if (reservation == null || totalQty == 0) {
+		
+		if (reservation == null ) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "예약정보가 누락되었습니다.");
+			return "common/return";
+		}
+		int totalQty = reservation.getAdult_qty()+ reservation.getChild_qty() + reservation.getTeen_qty();
+		log.info("totalQty = {}", totalQty);
+		if(totalQty == 0) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "올바른 접근이 아닙니다.");
 			return "common/return";
 		}
 		//스케줄 관련 세션 정보를 예약 정보로 모델에 저장
@@ -195,9 +201,8 @@ public class ReservationController {
 
 		try {
 			ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-			int totalQty = reservation.getAdult_qty()+ reservation.getChild_qty() + reservation.getTeen_qty();
-			log.info("totalQty = {}", totalQty);
-			if (reservation == null || totalQty == 0) {
+		
+			if (reservation == null) {
 				result.put("success", false);
 	            result.put("msg", "예약 정보가 없습니다.");
 				return ResponseEntity.badRequest().body(result);
@@ -214,15 +219,17 @@ public class ReservationController {
 			int total_price = reservation.getTotal_price();
 			if (total_price == 0) {
 				ReservationVO resultVO = reservationService.confirmAndCreateReservation(reservationVO, null, null, 0);
-				
+				result.put("success", true);
+				result.put("free", true);   // ⭐ 프론트 분기용
+				result.put("reservationCode", resultVO.getReservation_code());
+
 				// 세션 정리
 	            session.removeAttribute("schedule");
 	            session.removeAttribute("pendingReservation");
 	            session.removeAttribute("paymentDTO");
-
-	            result.put("success", true);
-	            result.put("free", true);   // ⭐ 프론트 분기용
-	            result.put("reservationCode", resultVO.getReservation_code());
+	            
+	            //success get 접근을 막기 위한 예약코드
+	            session.setAttribute("LAST_RESERVATION_CODE", resultVO.getReservation_code());
 
 	            return ResponseEntity.ok(result);
 			}
@@ -257,21 +264,33 @@ public class ReservationController {
 			@RequestParam(required=false) String paymentKey,
 			@RequestParam(required=false) String orderId,
 			@RequestParam(required=false) Integer amount,
-			@RequestParam(required=false) String reservation_code,
-			Model model) {
-
+			Model model,
+			HttpSession session) {
+		
+		String reservationCode = (String) session.getAttribute("LAST_RESERVATION_CODE");
+		
+		if(reservationCode == null) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "올바른 접근이 아닙니다.");
+			return "common/return";
+		}
 		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
 		model.addAttribute("paymentKey", paymentKey);
 		model.addAttribute("orderId", orderId);
 		model.addAttribute("amount", amount ==null ? 0 : amount);
-		model.addAttribute("reservation_code", reservation_code);
+		model.addAttribute("reservationCode", reservationCode);
 
 		return "reserve_pay/success";
 	}
 
 	//토스페이먼츠에서 결제 실패 콜백
 	@GetMapping("/reserve/fail.do")
-	public String paymentFail(@RequestParam String message, Model model, HttpSession sess) {
+	public String paymentFail(@RequestParam(required=false) String message, Model model, HttpSession sess) {
+		if(message == null) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "올바른 접근이 아닙니다.");
+			return "common/return";
+		}
 		model.addAttribute("msg", message);
 		
 		sess.removeAttribute("pendingReservation");
@@ -329,11 +348,15 @@ public class ReservationController {
 			// 4. 예약 프로세스 
 			ReservationVO result = reservationService.confirmAndCreateReservation(
 					reservationVO, paymentKey, orderId, amount);
-
+			
+			response.put("reservationCode", reservationVO.getReservation_code());
 			// 세션 정리
 			session.removeAttribute("schedule");
 			session.removeAttribute("pendingReservation");
 			session.removeAttribute("paymentDTO");
+			
+			//success get 접근을 막기 위한 예약코드
+            session.setAttribute("LAST_RESERVATION_CODE", result.getReservation_code());
 
 			response.put("success", true);
 			response.put("msg", "예약이 완료되었습니다.");

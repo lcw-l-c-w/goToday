@@ -32,7 +32,7 @@
     }
 
     .logo img {
-      height: 42px;
+      height: 100px;
       object-fit: contain;
     }
 
@@ -92,7 +92,7 @@
 <div class="payment-wrapper">
   <!-- 로고 -->
   <div class="logo">
-    <img src="${pageContext.request.contextPath}/resources/img/logo.png" alt="GoToday">
+    <img src="${pageContext.request.contextPath}/uploads/logo/logo.png" alt="GoToday">
   </div>
 
   <!-- 타이틀 -->
@@ -115,7 +115,6 @@
   const paymentKey = "${paymentKey}";
   const orderId = "${orderId}";
   const amount = "${amount}";
-  const reservationCode = "${reservation_code}"
   const contextPath = "${pageContext.request.contextPath}";
 
   const titleEl = document.getElementById("title");
@@ -148,7 +147,7 @@
         messageEl.textContent = json.msg || "결제가 정상적으로 완료되었습니다.";
 
         codeEl.style.display = "block";
-        codeEl.textContent = "예약코드: " + reservationCode;
+        codeEl.textContent = "예약코드: "+ json.reservationCode;
 
         actionsEl.style.display = "flex";
         bindActionButtons();
