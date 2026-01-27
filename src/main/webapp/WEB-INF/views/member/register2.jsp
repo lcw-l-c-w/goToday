@@ -7,78 +7,7 @@
 <title>관심사 입력 | GoToday</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<style>
-    <%@ include file="register.css" %>
-    
-    /* 추가 스타일 */
-    .interest-section h3 {
-        text-align: center;
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 20px;
-    }
-    
-    /* 전시/팝업 섹션 - 2개 가로 배치 */
-    .event-grid {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-bottom: 35px;
-    }
-    
-    /* 핫플레이스 섹션 - 3-3 배치 */
-    .location-grid {
-        display: grid;
-        grid-template-columns: repeat(3, auto);
-        gap: 18px;
-        row-gap: 22px;
-        justify-content: center;
-        max-width: 500px;
-        margin: 0 auto 35px;
-    }
-    
-    /* 관심분야 섹션 - 4-3-2 배치 */
-    .interest-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
-        align-items: center;
-        margin-bottom: 35px;
-    }
-    
-    .interest-row {
-        display: flex;
-        gap: 25px;
-        justify-content: center;
-    }
-    
-    /* 기존 tag-group 스타일 무시 */
-    .tag-group {
-        display: contents;
-    }
-    
-    /* 버튼 스타일 */
-    input[type="radio"], 
-    input[type="checkbox"] {
-        display: none;
-    }
-    
-    .tag-label {
-        padding: 10px 24px;
-        border-radius: 50px;
-        background: #d9d9d9;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        transition: 0.2s;
-        display: inline-block;
-    }
-    
-    input:checked + .tag-label {
-        background: #4dc3ff;
-        color: white;
-    }
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/member_register.css">
 <script>
 function goSave() {
 	$("#frm").submit();

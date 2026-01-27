@@ -1,0 +1,481 @@
+@charset "UTF-8";
+/* =====================
+    Design Tokens
+===================== */
+:root {
+    --bg: #f8f9fa;
+    --white: #fff;
+    --black: #333;
+    --primary: #41b6e6;
+    --border: #e0e0e0;
+    --input-bg: #f1f3f5;
+    --gray: #868e96;
+    --font: 'Roboto', 'Noto Sans KR', sans-serif;
+    --color-button-primary: #1a2c50;
+    --color-bg-white: #ffffff;
+}
+
+/* =====================
+    Reset
+===================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--black);
+    line-height: 1.5;
+}
+
+/* =====================
+    Layout
+===================== */
+.container {
+    max-width: 650px; /* 폭을 900px에서 650px로 대폭 축소 */
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+.form-container {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 40px 50px; /* 내부 여백 최적화 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* =====================
+    Step Tab (세로 높이 축소)
+===================== */
+.tab-nav {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    background: var(--color-bg-white);
+}
+
+.tab-item {
+    flex: 1;
+    padding: 15px 0; /* 세로 높이 축소 */
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    border-right: 1px solid var(--color-border);
+    border: 1px solid #ddd;
+}
+
+.tab-item:last-child {
+    border-right: none;
+}
+
+.tab-item.active {
+    color: white;
+    background-color: var(--color-button-primary);
+}
+
+/* =====================
+    Form Style
+===================== */
+.role-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.role-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.role-group {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-label {
+    width: 120px; /* 라벨 너비 고정 */
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
+}
+
+.form-input-group {
+    flex: 1;
+    display: flex;
+    gap: 8px; /* 요소 간격 최적화 */
+    align-items: center;
+}
+
+.form-input {
+    height: 42px;
+    background: var(--input-bg);
+    border: 1px solid #ddd; /* 경계선을 살짝 주어 비밀번호 칸과 일질감 해소 */
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    width: 100%; /* 기본적으로 꽉 차게 */
+}
+
+/* 이메일 앞자리와 도메인 입력창 비율 조절 */
+#email_prefix, #email_domain {
+    flex: 1.5; /* 입력창이 버튼보다 더 많은 공간을 차지하도록 */
+    min-width: 0; /* flex 박스 안에서 쪼그라들 수 있도록 설정 */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(65, 182, 230, 0.1);
+}
+
+/* =====================
+    Buttons
+===================== */
+.btn-check {
+    flex: 0 0 auto; /* 크기가 변하지 않도록 고정 */
+    width: 90px;    /* 버튼 너비 지정 */
+    height: 42px;
+    border-radius: 6px;
+    background: #444;
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 비밀번호 칸처럼 단독으로 쓰이는 input을 위한 설정 */
+.form-input-group > .form-input:only-child {
+    flex: 1;
+}
+
+.bottom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 35px;
+}
+
+/* 하단 버튼 공통 */
+.btn-bottom {
+    width: 140px;
+    height: 48px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-prev {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.btn-submit {
+    background: #1a2c50;
+    color: var(--white);
+}
+
+.btn-bottom:hover {
+    opacity: 0.9;
+}
+
+/* =====================
+    Social Login (Official Brand Colors & Logos)
+===================== */
+.social-section {
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+}
+
+.social-title {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.social-login-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-social {
+    flex: 1;
+    height: 45px; /* 버튼 높이 살짝 키움 */
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.btn-social:hover {
+    opacity: 0.9;
+}
+
+/* 카카오: 공식 컬러 및 SVG 로고 */
+.btn-kakao {
+    background-color: #FEE500;
+    color: #000000;
+}
+.btn-kakao::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.27 6.054l-.81 2.972c-.105.385.354.69.67.477l3.944-2.656c.3.028.605.043.926.043 4.97 0 9-3.185 9-7.115S16.97 3 12 3z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* 네이버: 공식 컬러 및 SVG 로고 */
+.btn-naver {
+    background-color: #03C75A;
+    color: #ffffff;
+}
+.btn-naver::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* =====================
+    Extra
+===================== */
+.check-message {
+    margin-left: 110px;
+    font-size: 12px;
+    color: var(--primary);
+    margin-top: -12px;
+    margin-bottom: 10px;
+    height: 15px;
+}
+
+.email-at {
+    font-size: 14px;
+    color: #999;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label, .role-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* input 숨기기 */
+.role-label input,
+.radio-label input {
+    display: none;
+}
+
+/* 선택된 경우 볼드 + 색상 변경 */
+.role-label input:checked + span,
+.radio-label input:checked + span {
+    font-weight: 700;       /* 볼드 */
+    color: #1a2c50;         /* 강조 색상 */
+}
+
+/* =====================
+    Interest Selection (Tag Style)
+===================== */
+.interest-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.interest-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* 태그들을 감싸는 컨테이너 */
+.tag-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+/* 실제 input(체크박스, 라디오)은 숨김 */
+.tag-group input[type="checkbox"],
+.tag-group input[type="radio"] {
+    display: none; 
+}
+
+/* 버튼 모양의 라벨 스타일 */
+.tag-label {
+    display: inline-block;
+    padding: 10px 25px;
+    background-color: #e0e0e0; /* 기본 회색 */
+    color: #333;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+/* 마우스 올렸을 때 */
+.tag-label:hover {
+    background-color: #d0d0d0;
+}
+
+/* 선택되었을 때 (input이 체크되었을 때 바로 뒤의 label 스타일 변경) */
+.tag-group input[type="checkbox"]:checked + .tag-label,
+.tag-group input[type="radio"]:checked + .tag-label {
+    background-color: var(--primary); /* 하늘색 */
+    color: #fff;
+}
+
+/* 다음단계 버튼 커스텀 */
+.next-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.next-btn {
+    display: block;
+    width: 200px;
+    height: 50px;
+    line-height: 50px;
+    background: #1a2c50;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+}
+ 
+ 
+ /* == 여기부터 register2.jsp에만 적용*/
+/* 추가 스타일 */
+.interest-section h3 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* 전시/팝업 섹션 - 2개 가로 배치 */
+.event-grid {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+/* 핫플레이스 섹션 - 3-3 배치 */
+.location-grid {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 18px;
+    row-gap: 22px;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto 35px;
+}
+
+/* 관심분야 섹션 - 4-3-2 배치 */
+.interest-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.interest-row {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+}
+
+/* 기존 tag-group 스타일 무시 */
+.tag-group {
+    display: contents;
+}
+
+/* 버튼 스타일 */
+input[type="radio"], 
+input[type="checkbox"] {
+    display: none;
+}
+
+.tag-label {
+    padding: 10px 24px;
+    border-radius: 50px;
+    background: #d9d9d9;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+input:checked + .tag-label {
+    background: #4dc3ff;
+    color: white;
+}
+ /* == 여기까지 register2.jsp에만 적용*/
+ 
+ 
+/* == 여기부터 register3.jsp에만 적용*/
+/* 가입 완료 페이지 전용 정렬 스타일 */
+.complete-box {
+    text-align: center;
+    padding: 60px 0; /* 아이콘이 빠진 만큼 상하 여백을 충분히 주었습니다 */
+}
+.complete-msg {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 50px;
+    line-height: 1.5;
+    color: #333;
+}
+/* 버튼 위치 조정 */
+.next-btn-container {
+    display: flex;
+    justify-content: center;
+}
+/* == 여기까지 registe3.jsp에만 적용*/
+ 
+ 

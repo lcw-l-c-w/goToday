@@ -1,0 +1,101 @@
+@charset "UTF-8";
+
+/* 디자인 토큰 */
+:root {
+    --color-bg-primary: #f5f5f5;
+    --color-bg-white: #ffffff;
+    --color-text-primary: #111;
+    --color-text-secondary: #333;
+    --color-text-muted: #888;
+    --color-border: #ddd;
+    --color-button-primary: #1a2c50;
+    --radius-md: 6px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Pretendard', 'Roboto', sans-serif;
+    background-color: var(--color-bg-primary);
+    min-height: 100vh;
+}
+
+/* 전체 중앙 정렬 */
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 로그인 카드 */
+.login-card {
+    background: var(--color-bg-white);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 45px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 제목 */
+.login-title {
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--color-text-primary);
+}
+
+/* 폼 그룹 */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--color-text-secondary);
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 2px;
+    font-size: 17px;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    outline: none;
+}
+
+/* 체크박스 */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+}
+
+/* 로그인 버튼 */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    background: var(--color-button-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-login:hover {
+    opacity: 0.9;
+}
