@@ -153,8 +153,8 @@
         <div class="modal-header">
             <h3 id="modalTitle">리뷰 작성</h3>
         </div>
-        <button type="button" id="btnDeleteReview" class="delete-icon-btn" style="display:none;" title="리뷰 삭제">
-            🗑        
+        <button type="button" id="btnDeleteReview" class="delete-icon-btn" title="리뷰 삭제">
+        	X
         </button>
         
         <hr>

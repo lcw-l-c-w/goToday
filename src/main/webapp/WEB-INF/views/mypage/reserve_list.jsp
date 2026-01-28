@@ -118,7 +118,8 @@
 								<c:if test="${r.reservation_status eq 'DONE' and r.dday ne 'END' and not empty r.order_id}">
 									<button class="cancel-btn"
 										data-order-id="${r.order_id}"
-										data-reservation-id="${r.reservation_id}">
+										data-reservation-id="${r.reservation_id}"
+										data-payment-method="{}">
 										예약 취소
 									</button>
 								</c:if>
@@ -182,6 +183,9 @@
 	
 			const reason = prompt("취소 사유를 입력해주세요", "단순 변심");
 			if (!reason) return;
+			
+			if()
+			const refundAccount = prompt("환불 계좌를 입력해주세요.")
 	
 			if (!confirm("정말 예약을 취소하시겠습니까?")) return;
 	
@@ -189,7 +193,7 @@
 			    url: "/gotoday/payment/cancel.do",
 			    type: "POST",
 			    contentType: "application/json",
-			    data: JSON.stringify({ orderId: orderId, reason: reason }),
+			    data: JSON.stringify({ orderId: orderId, reason: reason, refundAccount: refundAccount }),
 			    success: function (res) {
 			        // [수정] 성공 여부에 따라 분기 처리
 			        if (res.success) {

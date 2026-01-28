@@ -107,7 +107,6 @@ public class CancelServiceImpl implements CancelService{
 	            
 	            if ("가상계좌".equals(payment.getPayment_method()) && "DONE".equals(payment.getPayment_status())) {
 	            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount, refundAccount);
-	            	
 	            } else {
 	            	// 카드나 간편결제 케이스의 부분취소 호출 
 	            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);	            	
