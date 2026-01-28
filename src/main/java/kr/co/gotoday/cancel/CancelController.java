@@ -45,7 +45,7 @@ public class CancelController {
             e.printStackTrace();
             result.put("success", false);
             result.put("msg", "취소 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(result);
+            return ResponseEntity.ok(result);
         }
     }
 }

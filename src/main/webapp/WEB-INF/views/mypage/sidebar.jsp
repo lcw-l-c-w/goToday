@@ -113,7 +113,7 @@
     <div class="sidebar-section">
         <h2 class="sidebar-title">문의 내역</h2>
         <a href="${pageContext.request.contextPath}/mypage/reply_list" class="sidebar-item" target="mainFrame">Q & A</a>
-        <a href="${pageContext.request.contextPath}/mypage/content_reply_list" class="sidebar-item" target="mainFrame">1:1 문의사항</a>
+        <a href="${pageContext.request.contextPath}/mypage/inquiry_list" class="sidebar-item" target="mainFrame">1:1 문의사항</a>
     </div>
 
     <div class="sidebar-section">
