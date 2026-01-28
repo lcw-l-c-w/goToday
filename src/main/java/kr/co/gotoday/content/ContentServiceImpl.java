@@ -17,7 +17,7 @@ import util.PageInfo;
 @Service
 public class ContentServiceImpl implements ContentService {
 
-	private static final int PAGE_SIZE = 3;
+	private static final int PAGE_SIZE = 8;
 	private static final int BLOCK_SIZE = 10;
 	// mapper를 만들고 돌아올것
 	@Autowired

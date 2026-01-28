@@ -6,159 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <title>GoToday Main</title>
-
-  <style>
-    /* 1. 공통 및 초기화 */
-    :root { --main-color: #4dc3ff; } 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Pretendard', sans-serif; background-color: #fff; line-height: 1.4; }
-    a { text-decoration: none; color: inherit; }
-    ul { list-style: none; } /* 전역 list-style 정리 */
-
-    /* 2. 메인 베너 (최적화) */
-    .main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-    .main-banner { 
-        position: relative; 
-        width: 100%; 
-        height: 500px; 
-        margin: 20px 0 60px; 
-        border-radius: 20px; 
-        overflow: hidden; 
-    }
-    #slideList { 
-        display: flex; 
-        width: 100%; 
-        height: 100%; 
-        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-    }
-    .banner-card { 
-        flex: 0 0 100%; 
-        height: 100%; 
-        position: relative; 
-        cursor: pointer; 
-    }
-    .banner-card img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .banner-info { 
-        position: absolute; 
-        bottom: 0; left: 0; 
-        width: 100%; 
-        padding: 60px 40px; 
-        background: linear-gradient(transparent, rgba(0,0,0,0.8)); 
-        color: white; 
-    }
-    .banner-info h3 { font-size: 32px; margin-bottom: 10px; }
-
-    /* 베너 버튼 공통 */
-    .banner-btn { 
-        position: absolute; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        background: rgba(255,255,255,0.3); 
-        border: none; 
-        color: white; 
-        font-size: 24px; 
-        width: 50px; 
-        height: 50px; 
-        border-radius: 50%; 
-        cursor: pointer; 
-        z-index: 10; 
-        transition: 0.3s; 
-    }
-    .banner-btn:hover { background: rgba(255,255,255,0.5); }
-    .btn-prev { left: 20px; }
-    .btn-next { right: 20px; }
-
-    /* 3. 섹션 공통 */
-    .section-title { font-size: 24px; font-weight: bold; margin: 60px 0 25px; text-align: center; }
-
-    /* 4. 추천 컨텐츠 슬라이드 */
-    .recommend-section { position: relative; margin-bottom: 60px; }
-    .recommend-view { width: 100%; overflow: hidden; }
-    .content-list.horizontal { 
-        display: flex; 
-        gap: 20px; 
-        transition: transform 0.5s ease; 
-        padding: 10px 0; 
-    }
-    .content-card { flex: 0 0 210px; cursor: pointer; transition: 0.3s; }
-    .content-card:hover { transform: translateY(-5px); }
-    
-    .card-img-wrap { 
-        width: 100%; 
-        height: 280px; 
-        border-radius: 15px; 
-        overflow: hidden; 
-        position: relative; 
-        margin-bottom: 12px; 
-        border: 1px solid #eee; 
-    }
-    .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* 추천 슬라이드 버튼 */
-    .recommend-btn { 
-        position: absolute; 
-        top: 50%; 
-        transform: translateY(-50%); 
-        background: #fff; 
-        border: 1px solid #eee; 
-        width: 44px; 
-        height: 44px; 
-        border-radius: 50%; 
-        cursor: pointer; 
-        z-index: 5; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-    }
-    .rec-prev { left: -22px; }
-    .rec-next { right: -22px; }
-
-    /* 블러 및 오버레이 */
-    .blur-container { filter: blur(8px); pointer-events: none; }
-    .cta-overlay { 
-        position: absolute; 
-        top: 50%; left: 50%; 
-        transform: translate(-50%, -50%); 
-        z-index: 100; 
-        background: rgba(255, 255, 255, 0.95); 
-        padding: 40px; 
-        border-radius: 25px; 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
-        text-align: center; 
-        width: 90%; 
-        max-width: 450px; 
-    }
-    .cta-btn { 
-        display: inline-block; 
-        background-color: var(--main-color); 
-        color: white; 
-        padding: 12px 30px; 
-        border-radius: 10px; 
-        font-weight: bold; 
-        margin-top: 20px;
-    }
-
-    /* 5. HOT 그리드 */
-    .hot-grid-container { 
-        display: grid; 
-        grid-template-columns: 1.3fr 2fr; 
-        gap: 15px; 
-        height: 550px; 
-    }
-    .hot-main { border-radius: 18px; overflow: hidden; position: relative; cursor: pointer; }
-    .hot-main img { width: 100%; height: 100%; object-fit: cover; }
-    .hot-sub-grid { 
-        display: grid; 
-        grid-template-columns: repeat(3, 1fr); 
-        grid-template-rows: repeat(2, 1fr); 
-        gap: 12px; 
-    }
-    .sub-card { border-radius: 12px; overflow: hidden; cursor: pointer; }
-    .sub-card img { width: 100%; height: 100%; object-fit: cover; }
-</style>
-   
+    <!-- ✅ main 전용 CSS -->
+<link rel="stylesheet" href="<c:url value='/css/main.css'/>">
+ 
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -211,7 +61,6 @@
 
             <div class="recommend-container">
                 <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
-                
                 <div class="recommend-view">
                     <%-- 조건에 따라 blur-container 클래스 동적 부여 --%>
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
@@ -257,21 +106,34 @@
             </div>
         </section>
 
-        <section style="padding-bottom: 100px;">
-            <h2 class="section-title">오픈 예정 콘텐츠</h2>
-            <div class="content-list horizontal" style="overflow-x: auto; scrollbar-width: none;">
-                <c:forEach var="item" items="${upcomingList}">
-                    <article class="content-card" onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
-                        <div class="card-img-wrap">
-                            <c:if test="${not empty item.dday}"><span style="position: absolute; top: 12px; left: 12px; background: #00d2ff; color: white; padding: 5px 12px; border-radius: 8px; font-weight: bold; font-size: 12px;">D-${item.dday}</span></c:if>
-                            <img src="<c:url value='${item.main_image_path}'/>">
-                        </div>
-                        <h4 style="margin: 8px 0 4px; font-size: 15px;">${item.title}</h4>
-                        <p style="font-size: 13px; color: #999;">${item.periodText}</p>
-                    </article>
-                </c:forEach>
+<section class="upcoming-section" style="padding-bottom: 100px;">
+  <h2 class="section-title">오픈 예정 콘텐츠</h2>
+
+  <div class="upcoming-container">
+    <button class="recommend-btn rec-prev" id="upPrev">&lt;</button>
+
+    <div class="upcoming-view" id="upView">
+      <div class="content-list horizontal" id="upList">
+        <c:forEach var="item" items="${upcomingList}">
+          <article class="content-card"
+              onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
+            <div class="card-img-wrap">
+              <c:if test="${not empty item.dday}">
+                <span class="d-day-badge">D-${item.dday}</span>
+              </c:if>
+              <img src="<c:url value='${item.main_image_path}'/>">
             </div>
-        </section>
+            <h4 style="margin: 8px 0 4px; font-size: 15px;">${item.title}</h4>
+            <p style="font-size: 13px; color: #999;">${item.periodText}</p>
+          </article>
+        </c:forEach>
+      </div>
+    </div>
+
+    <button class="recommend-btn rec-next" id="upNext">&gt;</button>
+  </div>
+</section>
+
     </main>
 
     <script>
@@ -294,6 +156,7 @@
                 resetTimer(); 
             }
 
+        });
             // 5초 자동 재생
             function startTimer() {
                 slideTimer = setInterval(() => {
@@ -346,6 +209,34 @@
             if(document.getElementById('recPrev')) document.getElementById('recPrev').style.display = 'none';
             if(document.getElementById('recNext')) document.getElementById('recNext').style.display = 'none';
         }
+
+
+
+                 // 3. 오픈 예정 컨텐츠: 버튼으로 1개씩 이동
+            const upView = document.getElementById('upView');
+            const upPrev = document.getElementById('upPrev');
+            const upNext = document.getElementById('upNext');
+            const upFirstCard = document.querySelector('#upList .content-card');
+
+            if (upView && upPrev && upNext && upFirstCard) {
+              const upListStyle = getComputedStyle(document.getElementById('upList'));
+              const upGap = parseFloat(upListStyle.gap || upListStyle.columnGap || 0);
+              const upStep = upFirstCard.offsetWidth + upGap;
+
+              upPrev.onclick = () => upView.scrollBy({ left: -upStep, behavior: 'smooth' });
+              upNext.onclick = () => upView.scrollBy({ left: upStep, behavior: 'smooth' });
+
+              // 카드가 5개 이하이면 버튼 숨김(원하면)
+              const upCards = document.querySelectorAll('#upList .content-card');
+              if (upCards.length <= 5) {
+                upPrev.style.display = 'none';
+                upNext.style.display = 'none';
+              }
+            } else {
+              if (upPrev) upPrev.style.display = 'none';
+              if (upNext) upNext.style.display = 'none';
+            }
+
     });
     </script>
 </body>
