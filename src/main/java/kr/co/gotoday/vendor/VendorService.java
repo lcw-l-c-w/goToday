@@ -19,7 +19,7 @@ public interface VendorService {
 			HttpServletRequest request, List<String> timeList, Integer total_ticket);
 
 	//content 관리 리스트
-	Map<String, Object> getFilterList(int user_id, String keyword, String status);
+	Map<String, Object> getFilterList(int user_id, String keyword, String status, Integer page);
 
 	//수정요청 여부 판단 
 	ContentVO getContent(Integer content_id);

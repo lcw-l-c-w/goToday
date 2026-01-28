@@ -165,7 +165,7 @@ public class MypageController {
     }
     
     // 예약 관리
-    @GetMapping("/mypage/reservations")
+    @GetMapping("/mypage/reservation")
     public String showReservationList(
     		@RequestParam(required = false, defaultValue = "ALL") String filter, 
     		HttpSession sess, 

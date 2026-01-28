@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
@@ -75,10 +76,26 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 	
 	@Override
+	public ContentScheduleVO findCurrentTickets(int schedule_id) {
+		return reservationMapper.findCurrentTickets(schedule_id);
+	}
+	
+	@Override
 	public ReservationVO confirmAndCreateReservation(ReservationVO reservationVO, String paymentKey, String orderId, int amount) {
 		PaymentVO paymentVO = null;
 		boolean ticketSucceed = false; 
 		try {
+			//confirm 중복 호출로 인한 결제 내역 중복 저장 방지
+			PaymentVO exist = reservationMapper.findByPaymentKey(paymentKey);
+			if (exist != null) {
+			    log.warn("[DUPLICATE_CONFIRM] paymentKey={}, orderId={}", paymentKey, orderId);
+
+			    ReservationVO existReservation =
+			        reservationMapper.findByReservationId(exist.getReservation_id());
+
+			    return existReservation;
+			}
+			
 			// 잔여 확인 후 티켓 선차감 (중복 결제 방지)
 			trySubCurrentTicket(reservationVO);
 			ticketSucceed = true;
@@ -90,7 +107,6 @@ public class ReservationServiceImpl implements ReservationService{
 	            paymentVO.setOrder_key("FREE_" + UUID.randomUUID());
 	            paymentVO.setAmount_price(0);
 	            paymentVO.setPayment_method("FREE");
-	            paymentVO.setPayment_status("DONE");
 	            paymentVO.setRefund_status("NONE");
 	            
 	        } else {
@@ -155,6 +171,7 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 	
 	@Override
+	@Transactional
 	public int trySubCurrentTicket(ReservationVO reservationVO) throws Exception {
 		
 		int total_qty = reservationVO.getAdult_qty()
@@ -173,13 +190,15 @@ public class ReservationServiceImpl implements ReservationService{
 		            reservationVO.getSchedule_id(),
 		            total_qty
 					);
-			throw new Exception("잔여 티켓 수량이 부족합니다.");
+			throw new Exception("티켓이 모두 소진되어 결제가 진행되지 않았습니다.\r\n"
+					+ "결제 금액은 청구되지 않습니다.");
 		}
 		
 		return result;
 	}
 	
 	@Override
+	@Transactional
 	public int tryAddCurrentTicket(ReservationVO reservationVO) throws Exception {
 	    int total_qty = reservationVO.getAdult_qty()
 	            + reservationVO.getTeen_qty()
@@ -208,12 +227,14 @@ public class ReservationServiceImpl implements ReservationService{
 	public ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, PaymentVO paymentVO) throws Exception {
 		//예약 상태를 완료로 변경
 		reservationVO.setReservation_status("DONE");
-		
 		// 예약 정보 저장
 		int reservationResult = reservationMapper.createReservation(reservationVO);
 		if(reservationResult <= 0 ) {
 			throw new Exception("에약 정보 저장에 실패했습니다.");
 		}
+		
+		// 결제 상태를 완료로 변경
+	    paymentVO.setPayment_status("DONE");
 		// 결제 정보 저장 
 		paymentVO.setReservation_id(reservationVO.getReservation_id());
 		int paymentResult = paymentMapper.createPayment(paymentVO);//			

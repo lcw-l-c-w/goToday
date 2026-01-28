@@ -6,11 +6,44 @@ pageEncoding="UTF-8"%>
 <head>
 <meta charset="UTF-8">
 <title>내 정보 수정 | GoToday</title>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_user_info.css">
 <script>
+$(document).ready(function() {
+    //  DB에서 가져온 전화번호 하이픈 적용
+    let phoneVal = $("input[name='phone_number']").val();
+    if (phoneVal) {
+        phoneVal = phoneVal.replace(/[^0-9]/g, ""); // 숫자만 추출
+        let formatted = "";
+        if(phoneVal.length < 4) {
+            formatted = phoneVal;
+        } else if(phoneVal.length < 7) {
+            formatted = phoneVal.substr(0, 3) + "-" + phoneVal.substr(3);
+        } else if(phoneVal.length <= 11) {
+            formatted = phoneVal.substr(0, 3) + "-" + phoneVal.substr(3, 4) + "-" + phoneVal.substr(7);
+        } else {
+            formatted = phoneVal.substr(0, 3) + "-" + phoneVal.substr(3, 4) + "-" + phoneVal.substr(7, 4);
+        }
+        $("input[name='phone_number']").val(formatted);
+    }
+
+    // 입력 시 자동 하이픈
+    $("input[name='phone_number']").on("input", function() {
+        let number = $(this).val().replace(/[^0-9]/g, "");
+        let formatted = "";
+        if(number.length < 4) {
+            formatted = number;
+        } else if(number.length < 7) {
+            formatted = number.substr(0, 3) + "-" + number.substr(3);
+        } else if(number.length <= 11) {
+            formatted = number.substr(0, 3) + "-" + number.substr(3, 4) + "-" + number.substr(7);
+        } else {
+            formatted = number.substr(0, 3) + "-" + number.substr(3, 4) + "-" + number.substr(7, 4);
+        }
+        $(this).val(formatted);
+    });
+});
+
 $(document).ready(function() {
     // 성별 데이터 세팅
     var genderVal = "${user.gender}"; 
@@ -29,7 +62,7 @@ $(document).ready(function() {
 });
 
 function beforeSubmit() {
-    // 날짜 input 값을 8자리 숫자로 변환하여 hidden input에 저장
+    // (생년월일 처리)날짜 input 값을 8자리 숫자로 변환하여 hidden input에 저장
     let dateVal = $("#birthday_date").val();
     if (!dateVal) {
         alert("생년월일을 선택해주세요.");
@@ -45,51 +78,15 @@ function beforeSubmit() {
         return false;
     }
 
+ // 전화번호 하이픈 제거 후 전송
+    let phoneNumber = $("input[name='phone_number']").val().replace(/-/g, "");
+    $("input[name='phone_number']").val(phoneNumber);
+    
     alert('정보가 성공적으로 수정되었습니다.');
     return true;
 }
 </script>
-    
-<style>
-    :root { --main-color: #4dc3ff; --color-primary: #41b6e6; }
-    body { font-family: 'Pretendard', sans-serif; background-color: transparent; margin: 0; padding: 0; }
-    
-    .page-title { font-size: 32px; font-weight: 700; margin-bottom: 40px; color: #111; }
-    
-    .form-wrapper { 
-        width: 100%; max-width: 700px; background: #fff; padding: 40px; 
-        border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-    }
-
-    .form-row { display: flex; align-items: center; margin-bottom: 20px; }
-    .form-label { width: 150px; font-weight: 700; }
-    .form-input-wrapper { flex: 1; max-width: 250px; }
-    .form-input { 
-        width: 100%; height: 45px; background: #eee; border: none; 
-        border-radius: 8px; padding: 0 15px; box-sizing: border-box;
-    }
-    /* 수정 불가(이메일) 스타일 */
-    .form-input[readonly] {
-        background-color: #f5f5f5;
-        color: #888;
-        cursor: not-allowed;
-        border: 1px solid #e0e0e0;
-    }
-    
-    /* 성별 라디오 버튼 스타일 */
-    .gender-group { display: flex; gap: 20px; }
-    .gender-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .gender-label input { width: 18px; height: 18px; cursor: pointer; }
-    
-   	 .btn-submit {
-     width: 100%; max-width: 300px; padding: 15px; background: #333; color: #fff;
-     border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px;
-	 }
-	 .btn-submit:hover { background: #000; }
-</style>
-
 </head>
-
 <body>
 	<h1 class="page-title">내 정보 수정</h1>
      <form id="frm" action="${pageContext.request.contextPath}/mypage/user_info" method="POST" class="form-wrapper" onsubmit="return beforeSubmit();">
@@ -173,6 +170,27 @@ function beforeSubmit() {
                 <input type="hidden" id="birthday" name="birthday">
             </div>
         </div>
+        
+        <script>
+			const dateInput = document.getElementById('birthday_date');
+			const hiddenInput = document.getElementById('birthday');
+			
+			// 오늘 날짜 구하기 (YYYY-MM-DD)
+			const today = new Date();
+			const yyyy = today.getFullYear();
+			const mm = String(today.getMonth() + 1).padStart(2, '0'); // 0~11월이므로 +1
+			const dd = String(today.getDate()).padStart(2, '0');
+			const maxDate = `${yyyy}-${mm}-${dd}`;
+			
+			// 오늘 이후 날짜 선택 불가
+			dateInput.max = maxDate;
+			
+			// 사용자가 날짜 선택 시 hidden input에 값 넣기
+			dateInput.addEventListener('change', () => {
+			    hiddenInput.value = dateInput.value;
+			});
+		</script>
+
 		
 		<div class="form-row">
 		    <label class="form-label">성별</label>

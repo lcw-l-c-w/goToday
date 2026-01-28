@@ -6,9 +6,7 @@
 <title>정보 입력 | GoToday</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<style>
-    <%@ include file="register.css" %>
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/member_register.css">
 <script>
     $(function () {
         function ChangeForm() {
@@ -93,12 +91,7 @@
         }
         let birthday = birthdayDate.replaceAll("-", "");
         $("#birthday").val(birthday);
-        
-        let phoneRegex = /^[0-9]+$/;
-        if(!phoneRegex.test($("#phone_number").val())) {
-            alert("전화번호는 숫자만 입력해주세요.")
-            return;
-        }
+
         
         if(!$("input[name='gender']:checked").val()) {
             alert("성별을 선택해주세요.");
@@ -109,6 +102,10 @@
             alert("전화번호를 입력해주세요.");
             return;
         }
+        
+        // 전화번호 숫자만 추출해서 hidden에 넣기
+        let phoneNumber = $("#phone_number").val().replace(/-/g, ""); // 하이픈 제거
+        $("#phone_number").val(phoneNumber); // 폼 전송 시 숫자만
         
         $("#frm").submit();
     }
@@ -146,6 +143,26 @@
         $("#email_prefix, #email_domain").on("input change", function() {
             emailChecked = false;
             $("#emailCheckMsg").text("");
+        });
+    });
+    
+    // 전화번호 하이픈(-) 추가
+    $(document).ready(function() {
+        $("#phone_number").on("input", function() {
+            let number = $(this).val().replace(/[^0-9]/g, ""); // 숫자만 추출
+            let formatted = "";
+
+            if(number.length < 4) {
+                formatted = number;
+            } else if(number.length < 7) {
+                formatted = number.substr(0, 3) + "-" + number.substr(3);
+            } else if(number.length <= 11) {
+                formatted = number.substr(0, 3) + "-" + number.substr(3, 4) + "-" + number.substr(7);
+            } else {
+                formatted = number.substr(0, 3) + "-" + number.substr(3, 4) + "-" + number.substr(7, 4);
+            }
+
+            $(this).val(formatted);
         });
     });
 </script>

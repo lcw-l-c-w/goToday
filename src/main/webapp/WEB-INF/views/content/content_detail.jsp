@@ -389,6 +389,7 @@ $(function() {
                 $(".fc-daygrid-day").css("background", ""); // 이전 선택 초기화
                 $(info.dayEl).css("background", "rgba(77, 195, 255, 0.3)"); // 클릭한 날짜 강조
                const todayDate= new Date();
+               todayDate.setHours(0, 0, 0, 0);  
                 if(info.date<todayDate){
             		alert("지난 날짜는 불가합니다. 다른 날짜를 선택해주세요.");
             		return;
@@ -412,17 +413,29 @@ $(function() {
                     html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
                 } else {
                     res.forEach(sch => {
+                    	const isSoldOut = sch.current_ticket === 0;
+                        const disabledAttr = isSoldOut ? 'disabled' : '';
+                        const soldOutClass = isSoldOut ? 'sold-out' : '';
+                        const ticketText = isSoldOut ? '매진' : `\${sch.current_ticket}석`;
+                        
+                    	
                         html += `
-                            <label class="time-option">
+                            <label class="time-option \${soldOutClass}">
                                 <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}" data-time="\${sch.time_zone}">
                                 <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
-                                <span style="font-size:12px;">\${sch.current_ticket}석</span>
+                                <span style="font-size:12px; \${isSoldOut ? 'color:#e74c3c; font-weight:bold;' : ''}">\${ticketText}</span>
                             </label>`;
                     });
                 }
                 $(".reservation_timezone").html(html);
                 selectedTime = null;
                 scheduleId = null;
+                
+                $(".time-option.sold-out").on("click", function(e) {
+                    e.preventDefault();
+                    alert("해당 시간대는 매진되었습니다.");
+                    return false;
+                });
             }
         });
     }
@@ -482,11 +495,17 @@ $(function() {
             content_id: $("#content_id").val(),
             reserved_for_at: selectedDate,
             time_zone: selectedTime,
-            schedule_id: scheduleId
-        }).done(function(){
-            location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+            schedule_id: scheduleId,
+            content_time: "${content.content_time}"        
+        	}).done(function(res){
+        	if (res === "OK") {
+	       		location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+            } else {
+                alert(res);
+            }
         }).fail(function(){
-            alert("예약 요청 중 오류가 발생했습니다.");
+        	const msg = res.responseText;
+            alert(msg || "예약 요청 중 오류가 발생했습니다.");
         });
     });
 
