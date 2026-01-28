@@ -18,6 +18,7 @@ public class ReplyVendorController {
 	@Autowired
 	private ReplyVendorService service;
 	
+	
 	@GetMapping("/replyVendor/index")
 	public String index(Model model, ReplyVendorVO vo, HttpSession sess, RedirectAttributes ra) {
 		UserVO login = (UserVO)sess.getAttribute("loginSess");

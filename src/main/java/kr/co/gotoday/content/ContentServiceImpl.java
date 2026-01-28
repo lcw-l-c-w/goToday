@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import kr.co.gotoday.user.UserMapper;
+import kr.co.gotoday.user.UserTagVO;
 import util.PageInfo;
 
 @Service
@@ -22,6 +24,9 @@ public class ContentServiceImpl implements ContentService {
 	// mapper를 만들고 돌아올것
 	@Autowired
 	private ContentMapper contentMapper;
+	@Autowired
+	private UserMapper userMapper;
+	
 
 	@Override
 	public List<MainContentViewDTO> getRandomContents(MainContentDTO mcd) {
@@ -38,11 +43,21 @@ public class ContentServiceImpl implements ContentService {
 
 	@Override
 	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
-		// TODO Auto-generated method stub
-		List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
-		//System.out.println("리스트 출력"+list);
-		return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());
-	}
+		// 2. 기존 로직 (태그 VO 리스트 세팅)
+	
+		if (mcd != null && mcd.getUser_id() != null) {
+	        // 1. 만약 컨트롤러에서 name 리스트를 못 가져왔을 경우를 대비해 여기서 다시 한번 확실히 채워줍니다.
+	        if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
+	            List<String> tagNames = contentMapper.getTagName(mcd.getUser_id());
+	            mcd.setUser_tag_name(tagNames);
+	        }
+	        
+	    }
+	    // 3. 쿼리 실행
+	    List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
+
+	    // 4. 정책 적용 (이제 mcd 안에는 tag_name이 확실히 들어있으므로 통과됩니다)
+	    return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());}
 
 	@Override
 	public ContentVO getDetailContents(int content_id, Integer user_id) {
@@ -103,11 +118,10 @@ public class ContentServiceImpl implements ContentService {
 		return vo;
 	}
 	
-	// 핵심 메서드
 	private MainContentViewDTO applyViewPolicy(ContentVO vo, MainContentDTO mcd) {
 	    MainContentViewDTO mcv = new MainContentViewDTO(vo);
 	    
-	    // 1. 비로그인 유저 처리 (mcd 자체가 null이거나 user_id가 null인 경우)
+	    // 1. 비로그인 유저 처리
 	    if (mcd == null || mcd.getUser_id() == null) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("로그인하시면 볼 수 있습니다!");
@@ -115,20 +129,19 @@ public class ContentServiceImpl implements ContentService {
 	        return mcv;
 	    }
 
-	    // 2. 회원인 경우: 관심사 리스트(user_tag_id)가 null이거나 비어있는지 체크
-	    // 수정 포인트: mcd.getUser_tag_id() == null 조건을 반드시 앞에 추가
-	    if (mcd.getUser_tag_id() == null || mcd.getUser_tag_id().isEmpty()) {
+	    // 2. 관심사 리스트 체크 (user_tag_name을 기준으로 변경)
+	    // 컨트롤러에서 이미 mcd.setUser_tag_name(likeTagName)을 해줬으므로 여기서 바로 체크 가능합니다.
+	    if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("관심사 설정하시면 볼 수 있습니다!");
 	        mcv.setCtaUrl("/mypage/like_list");
 	        return mcv;
 	    }
 	    
-	    // 3. 정상인 경우
+	    // 3. 정상 (로그인 되어 있고, 관심사 리스트도 들어있는 경우)
 	    mcv.setBlur(false);
 	    return mcv;
 	}
-
 	// 날짜 조회
 	@Override
 	public List<String> getAvailableDatesByContent(Integer content_id) {
@@ -218,6 +231,12 @@ public class ContentServiceImpl implements ContentService {
 		// TODO Auto-generated method stub
 		return contentMapper.findVendorId(content_id);
 		
+	}
+
+	@Override
+	public List<String> getUserTagName(int user_id) {
+		// TODO Auto-generated method stub
+		return contentMapper.getTagName(user_id);
 	}
 
 

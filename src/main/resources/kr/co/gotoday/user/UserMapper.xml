@@ -69,6 +69,12 @@
 	    WHERE ut.user_id = #{userId}
 	</select>
 
+	<!--  관심사 가져오기  -->
+	<select id="getUserTags" resultType="kr.co.gotoday.user.UserTagVO">
+		SELECT 	*
+		FROM user_tag
+		WHERE user_id=#{user_id}
+	</select>
 	<!-- 마이페이지 관심사 수정(사용자 태그 전체 삭제) -->
 	<delete id="deleteUserTags">
 	    DELETE FROM user_tag WHERE user_id = #{userId}

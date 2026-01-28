@@ -284,9 +284,11 @@ public class ContentReplyController {
 			// 성공했을 경우
 			model.addAttribute("msg", "수정되었습니다.");
 			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("cmd","back");
 			return "common/return";
 		} else {
 			model.addAttribute("msg", "게시글 수정에 실패했습니다.다시 시도해주세요.");
+			model.addAttribute("cmd","back");
 			return "common/return";
 		}
 
