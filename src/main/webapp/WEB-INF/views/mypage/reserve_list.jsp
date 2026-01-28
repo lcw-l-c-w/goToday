@@ -119,7 +119,7 @@
 									<button class="cancel-btn"
 										data-order-id="${r.order_id}"
 										data-reservation-id="${r.reservation_id}"
-										data-payment-method="{}">
+										data-payment-method="${r.payment_method}">
 										예약 취소
 									</button>
 								</c:if>
@@ -184,16 +184,50 @@
 			const reason = prompt("취소 사유를 입력해주세요", "단순 변심");
 			if (!reason) return;
 			
-			if()
-			const refundAccount = prompt("환불 계좌를 입력해주세요.")
+			const method = $(this).data("payment-method");
+			if(method === "가상계좌"){
+				const accountNumber = prompt("환불 받을 계좌 번호를 입력해주세요.", "1234-5678-90");
+				const bank = prompt("환불 받을 계좌의 은행명을 입력해주세요", "신한");
+				const holderName = prompt("환불 받을 계좌의 예금주를 입력해주세요.", "홍길동");
+			}
 	
 			if (!confirm("정말 예약을 취소하시겠습니까?")) return;
-	
+			
+			if(method === "가상계좌") {
+				$.ajax({
+				    url: "/gotoday/payment/account/refund.do",
+				    type: "POST",
+				    contentType: "application/json",
+				    data: JSON.stringify({ 
+				    	orderId: orderId, 
+				    	reason: reason, 
+				    	accountNumber: accountNumber, 
+				    	bank: bank, 
+				    	holderName: holderName
+				    }),
+				    success: function (res) {
+				        if (res.success) {
+				            // 진짜 취소 성공 시
+				            alert(res.msg); // "결제가 정상적으로 취소되었습니다."
+				            location.reload();
+				        } else {
+				            // 로직상 실패 (당일 취소 불가, 이미 취소됨 등)
+				            // 서버에서 보낸 e.getMessage()가 res.msg에 들어있음
+				            alert(res.msg); // "관람일 당일 및 지난 일정은 취소/환불이 불가합니다." 출력됨
+				        }
+				    },
+				    error: function () {
+				        // 이건 진짜 네트워크 에러나 404, 서버 다운일 때만 뜸
+				        alert("시스템 오류가 발생했습니다. 관리자에게 문의하세요.");
+				    }
+				});
+				
+			}
 			$.ajax({
 			    url: "/gotoday/payment/cancel.do",
 			    type: "POST",
 			    contentType: "application/json",
-			    data: JSON.stringify({ orderId: orderId, reason: reason, refundAccount: refundAccount }),
+			    data: JSON.stringify({ orderId: orderId, reason: reason}),
 			    success: function (res) {
 			        // [수정] 성공 여부에 따라 분기 처리
 			        if (res.success) {

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.reservation.ReservationVO;
 import kr.co.gotoday.reservation.TossPaymentClient;
@@ -35,7 +34,7 @@ public class CancelServiceImpl implements CancelService{
 
     @Override
     @Transactional
-    public void cancelPayment(String orderId, String cancelReason, String refundAccount) throws Exception {
+    public void cancelPayment(String orderId, String cancelReason) throws Exception {
         
         // 1. 결제 정보 조회
         PaymentVO payment = cancelMapper.findPaymentByOrderId(orderId);
@@ -104,13 +103,8 @@ public class CancelServiceImpl implements CancelService{
 	        // 금액(cancelAmount)이 있을 때만 호출
 	        if (cancelAmount > 0) {
 	            String paymentKey = payment.getPayment_key();
-	            
-	            if ("가상계좌".equals(payment.getPayment_method()) && "DONE".equals(payment.getPayment_status())) {
-	            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount, refundAccount);
-	            } else {
-	            	// 카드나 간편결제 케이스의 부분취소 호출 
-	            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);	            	
-	            }
+            	// 카드나 간편결제 케이스의 부분취소 호출 
+            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);	            	
 	        }
         }
         // --- 5. DB 업데이트 진행 ---
@@ -168,31 +162,9 @@ public class CancelServiceImpl implements CancelService{
         }
     }
     
-    private void sendCancelRequestToToss(String paymentKey, String cancelReason, int cancelAmount, String refund) throws Exception {
-        URL url = new URL("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        
-        String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
-        connection.setDoOutput(true);
-
-        // [수정] JSON Body에 cancelAmount 추가
-        String jsonBody = "{" +
-                          "\"cancelReason\":\"" + cancelReason + "\"," + 
-                          "\"cancelAmount\":" + cancelAmount + 
-                          "}";
-
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = jsonBody.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-
-        int code = connection.getResponseCode();
-        if (code != 200) {
-            throw new Exception("토스 결제 취소 실패: 응답 코드 " + code);
-        }
-    }
+	@Override
+	public void refundPayment(String orderId, String reason, String bank, String accountNumber, String holderName) {
+		// TODO Auto-generated method stub
+		
+	}
 }
