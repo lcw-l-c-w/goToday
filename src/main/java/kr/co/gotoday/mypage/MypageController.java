@@ -196,6 +196,7 @@ public class MypageController {
     }
     
     // 좋아요 목록
+    
     @GetMapping("/mypage/like_list")
     public String myLikeList(HttpSession session, Model model) {
 
