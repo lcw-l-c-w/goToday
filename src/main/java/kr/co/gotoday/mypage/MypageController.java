@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.co.gotoday.contentReply.ContentReplyService;
-import kr.co.gotoday.contentReply.ContentReplyVO;
 import kr.co.gotoday.reply.ReplyVO;
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
