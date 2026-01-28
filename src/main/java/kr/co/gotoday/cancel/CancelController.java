@@ -27,6 +27,7 @@ public class CancelController {
             // ★ JSON 맵에서 하나씩 꺼내기
             String orderId = (String) params.get("orderId");
             String reason = (String) params.get("reason");
+            String refundAccount = (String) params.get("refundAccount");
 
             // 기본값 처리 (reason이 없을 경우)
             if (reason == null || reason.trim().isEmpty()) {
@@ -34,7 +35,7 @@ public class CancelController {
             }
 
             // 서비스 호출
-            cancelService.cancelPayment(orderId, reason);
+            cancelService.cancelPayment(orderId, reason, refundAccount);
             
             result.put("success", true);
             result.put("msg", "결제가 정상적으로 취소되었습니다.");

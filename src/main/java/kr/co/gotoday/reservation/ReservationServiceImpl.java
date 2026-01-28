@@ -147,7 +147,7 @@ public class ReservationServiceImpl implements ReservationService{
 					//결제 승인 후 DB저장 실패 로그
 					log.error("[예약결제 DB저장 실패]",e);
 					// 토스 결제 취소
-					tossPaymentClient.cancelPayment(paymentKey, "DB 저장 실패로 인한 토스 결제 취소");
+					tossPaymentClient.cancelPayment(orderId, "DB 저장 실패로 인한 토스 결제 취소");
 				} catch (Exception cancelException) {
 					log.error("[토스 결제 취소 실패] paymentKey={}, orderId={}", 
 							paymentKey,
@@ -233,8 +233,6 @@ public class ReservationServiceImpl implements ReservationService{
 			throw new Exception("에약 정보 저장에 실패했습니다.");
 		}
 		
-		// 결제 상태를 완료로 변경
-	    paymentVO.setPayment_status("DONE");
 		// 결제 정보 저장 
 		paymentVO.setReservation_id(reservationVO.getReservation_id());
 		int paymentResult = paymentMapper.createPayment(paymentVO);//			

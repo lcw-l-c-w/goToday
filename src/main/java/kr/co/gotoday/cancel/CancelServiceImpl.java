@@ -35,7 +35,7 @@ public class CancelServiceImpl implements CancelService{
 
     @Override
     @Transactional
-    public void cancelPayment(String orderId, String cancelReason) throws Exception {
+    public void cancelPayment(String orderId, String cancelReason, String refundAccount) throws Exception {
         
         // 1. 결제 정보 조회
         PaymentVO payment = cancelMapper.findPaymentByOrderId(orderId);
@@ -58,6 +58,10 @@ public class CancelServiceImpl implements CancelService{
             refundStatusLog = "FREE_CANCEL";
         } else if ("가상계좌".equals(payment.getPayment_method()) && "WAITING_FOR_DEPOSIT".equals(payment.getPayment_status())) {
         	tossPaymentClient.cancelPayment(payment.getPayment_key(), cancelReason);
+        	refundStatusLog = "CANCELED_BEFORE_DEPOSIT";
+        } else if ("가상계좌".equals(payment.getPayment_method()) && "DONE".equals(payment.getPayment_status())) {
+        	tossPaymentClient.cancelPayment(payment.getPayment_key(), cancelReason,refundAccount );
+        	refundStatusLog = "CANCELED_BEFORE_DEPOSIT";
         } else {
         
 	        // 3. 날짜 계산 및 환불 금액 산정 [핵심 로직 변경]
