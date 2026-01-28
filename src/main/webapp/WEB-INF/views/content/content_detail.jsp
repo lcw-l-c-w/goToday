@@ -280,32 +280,75 @@ width: 100%;           /* 1. 상자 너비에 딱 맞게! */
 
 <script>
 $(function() {
-    let selectedDate = null;
-    let selectedTime = null;
-    let scheduleId = null;
+      //탭전환
+      $(".tab-item").click(function() {
+      	// 클릭한 탭의 순서 (0, 1, 2)
+      	const index = $(this).index(); 
+      	//탭 이름 
+      	const tabCategory=$(this).data("type");
+      	const content_id=$("#content_id").val();
+      	
+          //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
+      	$(".tab-item").removeClass("active");
+          $(this).addClass("active");
+          
+          // 패널 표시 전환 -> 모든패널을 숨기고 클릭한 순서에 맞는거만 보여줌 
+          $(".tab-panel").removeClass("active").hide();
+          const currentPanel = $(".tab-panel").eq(index);
+          currentPanel.addClass("active").show();
+          
+          if(tabCategory !== "detail") {   
+          //패널 가시성 조절
+          
+          $.ajax({
+          	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
+          	type:"GET", //목록 조회는 get
+          	data:{
+          		content_id:content_id
+          	},
+          	success:function(data){
+          		 currentPanel.html(data);
+          	}
+          	
+          	
+          })
+          }
 
-    if("${content.content_id}"=='' ) {
-    	$(".container").hide();
-    	setTimeout(function() {
-            alert("해당 콘텐츠를 찾을 수 없습니다.");
-        }, 10);
-        return;
-    }
-      const isReservable= "${content.contentReservation}" === "1" ? 1:0;
-      if(isReservable==0) {$(".btn-reserve").prop("disabled", true)
-   							 			  .addClass("is-disabled")
-  							    $("#btn-reservation-detail").html("이 컨텐츠는 현장 대기만 가능하므로, 예매가 불가합니다.");
+    
+      });
+      
+  	//이전페이지로 이동한 것처럼 
+  	const urlParams = new URLSearchParams(window.location.search);
+      const tabName = urlParams.get('tab');
+
+      if (tabName === 'inquiry') {
+          // 탭 메뉴 중에서 inquiry 타입을 찾아서 클릭 시뮬레이션
+          $(".tab-item[data-type='inquiry']").trigger("click");
+          
+          $('html, body').animate({
+              scrollTop: $(".tab-wrapper").offset().top - 100
+          }, 300);
       }
-      else{
-    	  $("#btn-reservation-detail").hide();
-}
-    // 탭 전환
-    $(".tab-item").click(function() {
-        $(".tab-item").removeClass("active");
-        $(this).addClass("active");
-        $(".tab-panel").hide().eq($(this).index()).show();
-    });
-	
+      let selectedDate = null;
+      let selectedTime = null;
+      let scheduleId = null;
+
+      if("${content.content_id}"=='' ) {
+      	$(".container").hide();
+      	setTimeout(function() {
+              alert("해당 콘텐츠를 찾을 수 없습니다.");
+          }, 10);
+          return;
+      }
+        const isReservable= "${content.contentReservation}" === "1" ? 1:0;
+        if(isReservable==0) {$(".btn-reserve").prop("disabled", true)
+     							 			  .addClass("is-disabled")
+    							    $("#btn-reservation-detail").html("이 컨텐츠는 현장 대기만 가능하므로, 예매가 불가합니다.");
+        }
+        else{
+      	  $("#btn-reservation-detail").hide();
+  }
+        
     // 달력 로드
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
@@ -326,7 +369,8 @@ $(function() {
      
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            locale: 'local',
+            locale: 'ko',
+            timeZone: 'local',     // 한국시간기준으로 바꿔주는것
             height: 'auto',
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
       
@@ -467,10 +511,16 @@ $(function() {
 
     // 좋아요 토글 - 깨짐 방지를 위해 코드로 변경
     $("#likeBtn").click(function() {
-        const heart = $(this).find(".heart-icon");
+    	const userRole = "${loginSess.role}"; 
+        
+        if (userRole === "1") {
+            alert("관리자 계정은 '좋아요' 기능을 이용할 수 없습니다.");
+            return; // AJAX 실행 방지
+        }
+    	const heart = $(this).find(".heart-icon");
         const count = $(this).find(".like-count-num");
         const content_id = heart.data("content-id");
-
+       
         $.ajax({
             url: "${pageContext.request.contextPath}/heart",
             type: "POST",
@@ -492,7 +542,7 @@ $(function() {
                 }
                 count.text(res.count_num);
             },
-            error: function() { alert("오류가 발생했습니다."); }
+            error: function() {  }
         });
     });
     //트위터 클릭시 해당 프로필로 이동 . 근데 만약 트위터 주소가 없으면 버튼 블락 처리해야하지 않을까? 클릭을 못하도록 . 
@@ -506,7 +556,7 @@ $(function() {
     	})
     	
 
-  // url 공유 하는 마법
+  // url 공유 -> web share API
 $("#link").click(async function() { // async 사용 해야하는 이유
     const shareData = {
         title: "GoToday ! " + "${content.title}", 
@@ -600,6 +650,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 				<img class="poster-img"
 					src="${pageContext.request.contextPath}${content.main_image_path}"
 					alt="포스터">
+					<c:if test="${loginSess.role==0}">
 				<button type="button"
 					class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}"
 					id="likeBtn">
@@ -610,6 +661,18 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 						</c:choose>
 					</span> <span class="like-count-num">${content.like_count}</span>
 				</button>
+				</c:if>
+				<c:if test="${loginSess.role==1}">
+				<button type="button" class="poster-like-btn" style="cursor: default; opacity: 0.8;">
+                <span class="heart-icon">
+                    <c:choose>
+                        <c:when test="${content.liked == 1}">&#x1F499;</c:when>
+                        <c:otherwise>&#x1F90D;</c:otherwise>
+                    </c:choose>
+                </span> 
+                <span class="like-count-num">${content.like_count}</span>
+            </button>
+				</c:if>
 			</section>
 
 			<section class="info-side">
@@ -661,9 +724,9 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 
 		<div class="tab-wrapper">
 			<ul class="tab-menu">
-				<li class="tab-item active">상세정보</li>
-				<li class="tab-item">리뷰</li>
-				<li class="tab-item">문의사항</li>
+				<li class="tab-item active" data-type="detail">상세정보</li>
+				<li class="tab-item" data-type="review">리뷰</li>
+				<li class="tab-item" data-type="inquiry">문의사항</li>
 			</ul>
 
 			<div class="tab-content">
