@@ -213,5 +213,12 @@ public class ContentServiceImpl implements ContentService {
 		return PageInfo.of(count, dto.getPage(), PAGE_SIZE, BLOCK_SIZE);
 	}
 
+	@Override
+	public int selectIdByContentId(int content_id) {
+		// TODO Auto-generated method stub
+		return contentMapper.findVendorId(content_id);
+		
+	}
+
 
 }

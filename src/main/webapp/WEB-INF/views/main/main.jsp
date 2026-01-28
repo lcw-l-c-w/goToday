@@ -137,48 +137,82 @@
     </main>
 
     <script>
-        window.addEventListener("load", function() {
-            // 1. 메인 배너
-            const slideList = document.getElementById('slideList');
-            const bannerSlides = slideList ? slideList.querySelectorAll('.banner-card') : [];
-            let bannerIdx = 0;
-            if (bannerSlides.length > 1) {
-                document.getElementById('slidePrev').onclick = () => {
-                    bannerIdx = (bannerIdx - 1 + bannerSlides.length) % bannerSlides.length;
-                    slideList.style.transform = `translateX(-\${bannerIdx * 100}%)`;
-                };
-                document.getElementById('slideNext').onclick = () => {
-                    bannerIdx = (bannerIdx + 1) % bannerSlides.length;
-                    slideList.style.transform = `translateX(-\${bannerIdx * 100}%)`;
-                };
+    window.addEventListener("load", function() {
+        // 1. 메인 배너 로직
+        const slideList = document.getElementById('slideList');
+        const bannerSlides = slideList ? slideList.querySelectorAll('.banner-card') : [];
+        let bannerIdx = 0;
+        let slideTimer;
+
+        if (bannerSlides.length > 1) {
+            // [수정] 슬라이드 이동 핵심 함수
+            function moveSlide(index) {
+                bannerIdx = index;
+                if (bannerIdx >= bannerSlides.length) bannerIdx = 0;
+                if (bannerIdx < 0) bannerIdx = bannerSlides.length - 1;
+                
+                // JSP 환경이므로 \${} 형태로 작성하여 간섭 방지
+                slideList.style.transform = `translateX(-\${bannerIdx * 100}%)`;
+                resetTimer(); 
             }
 
-         // 2. 추천 컨텐츠 슬라이드 로직 (scroll 방식: 1개씩 이동)
-            const view = document.querySelector('.recommend-view');
-            const recPrev = document.getElementById('recPrev');
-            const recNext = document.getElementById('recNext');
-            const firstCard = document.querySelector('#recList .content-card');
-
-            if (view && firstCard && recPrev && recNext) {
-              const listStyle = getComputedStyle(document.getElementById('recList'));
-              const gap = parseFloat(listStyle.gap || listStyle.columnGap || 0);
-              const step = firstCard.offsetWidth + gap;
-
-              recPrev.onclick = () => view.scrollBy({ left: -step, behavior: 'smooth' });
-              recNext.onclick = () => view.scrollBy({ left: step, behavior: 'smooth' });
-
-              // “5개 이하이면 버튼 숨김” (원하면 유지)
-              const recCards = document.querySelectorAll('#recList .content-card');
-              if (recCards.length <= 5) {
-                recPrev.style.display = 'none';
-                recNext.style.display = 'none';
-              }
-            } else {
-              if (recPrev) recPrev.style.display = 'none';
-              if (recNext) recNext.style.display = 'none';
+        });
+            // 5초 자동 재생
+            function startTimer() {
+                slideTimer = setInterval(() => {
+                    moveSlide(bannerIdx + 1);
+                }, 5000);
             }
 
-         // 3. 오픈 예정 컨텐츠: 버튼으로 1개씩 이동
+            function resetTimer() {
+                clearInterval(slideTimer);
+                startTimer();
+            }
+
+            // [수정] 버튼 클릭 시에도 moveSlide 함수를 호출해야 함
+            document.getElementById('slidePrev').onclick = () => {
+                moveSlide(bannerIdx - 1);
+            };
+            
+            document.getElementById('slideNext').onclick = () => {
+                moveSlide(bannerIdx + 1);
+            };
+
+            // 배너에 마우스 올리면 정지, 떼면 다시 시작 (편의기능)
+            const bannerArea = document.querySelector('.main-banner');
+            bannerArea.onmouseenter = () => clearInterval(slideTimer);
+            bannerArea.onmouseleave = () => startTimer();
+
+            startTimer(); // 최초 시작
+        }
+
+        // 2. 추천 컨텐츠 슬라이드 로직
+        const recList = document.getElementById('recList');
+        const recCards = recList ? recList.querySelectorAll('.content-card') : [];
+        let recPosition = 0;
+        const cardWidth = 210 + 20; 
+        const recView = document.querySelector('.recommend-view');
+        const containerWidth = recView ? recView.offsetWidth : 0;
+        const visibleCount = Math.floor(containerWidth / cardWidth);
+
+        if (recCards.length > visibleCount) {
+            document.getElementById('recPrev').onclick = () => {
+                recPosition = Math.min(recPosition + cardWidth, 0);
+                recList.style.transform = `translateX(\${recPosition}px)`;
+            };
+            document.getElementById('recNext').onclick = () => {
+                const maxScroll = -(cardWidth * recCards.length - containerWidth + 10);
+                recPosition = Math.max(recPosition - cardWidth, maxScroll);
+                recList.style.transform = `translateX(\${recPosition}px)`;
+            };
+        } else {
+            if(document.getElementById('recPrev')) document.getElementById('recPrev').style.display = 'none';
+            if(document.getElementById('recNext')) document.getElementById('recNext').style.display = 'none';
+        }
+
+
+
+                 // 3. 오픈 예정 컨텐츠: 버튼으로 1개씩 이동
             const upView = document.getElementById('upView');
             const upPrev = document.getElementById('upPrev');
             const upNext = document.getElementById('upNext');
@@ -203,9 +237,7 @@
               if (upNext) upNext.style.display = 'none';
             }
 
-
-      
-        });
+    });
     </script>
 </body>
 </html>

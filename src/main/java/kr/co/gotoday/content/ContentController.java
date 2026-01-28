@@ -39,19 +39,24 @@ public class ContentController {
 	
 		UserVO user = (UserVO) session.getAttribute("loginSess");
 
+		//기업회원이면 그냥 내보냅시다요 
+			
+		
 		Integer user_id = (user != null) ? user.getUser_id() : null;
 		//content 
 		ContentVO result = contentService.getDetailContents(content_id, user_id);
 		
-		if (user != null && result != null) {
+		if (user != null && result != null ) {
 	        // user도 있고, 컨텐츠도 있다면 
 	        int like = contentLikeService.CheckContentLike( content_id,user.getUser_id());
 	        result.setLiked(like); // VO에 결과 담기
-	        System.out.println("개어렵네."+result.getContentReservation());
+	       
 	    }
 		
 		
+		
 		model.addAttribute("content", result);
+		
 		//리뷰 탭에 내용 뜨게 하기 위해서 추가함-가빈
 		model.addAttribute("reviewList", reviewService.getReviewsByContentPaged(content_id, page, sortType));
 	    model.addAttribute("ratingSummary", reviewService.getRatingSummary(content_id));

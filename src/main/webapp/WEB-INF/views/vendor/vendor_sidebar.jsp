@@ -16,9 +16,9 @@
 
 	<nav class="sidebar-nav">
 		<ul>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/content_manage?isIframe=true"  target="vendorFrame"><span
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/content_manage?"  target="vendorFrame"><span
 					class="material-symbols-outlined">dashboard</span> 콘텐츠 관리</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/reserve_pay_manage?isIframe=true"  target="vendorFrame"><span
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/reserve_pay_manage?"  target="vendorFrame"><span
 					class="material-symbols-outlined">description</span> 예약 관리</a></li>
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="vendorFrame"><span
 					class="material-symbols-outlined">person</span> 고객 문의 답변</a></li>

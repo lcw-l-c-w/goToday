@@ -174,7 +174,7 @@
     });
 
     homeBtn.addEventListener("click", function () {
-      window.location.href = contextPath + "/main.do";
+      window.location.href = contextPath + "/main";
     });
   }
 
