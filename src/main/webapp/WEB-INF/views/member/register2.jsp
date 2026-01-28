@@ -44,28 +44,32 @@ function goSave() {
 					<h3>사람들이 많이가는 핫 플레이스</h3>
 					<div class="location-grid">
 					    <label>
-					        <input type="checkbox" name="location" id="seongsu" value="seongsu">
+					        <input type="checkbox" name="location" id="seongsu" value="성수">
 		                	<span class="tag-label">성수</span>
 					    </label>
 					    <label>
-		                	<input type="checkbox" name="location" id="hongdae" value="hongdae">
+		                	<input type="checkbox" name="location" id="hongdae" value="홍대">
 		                	<span class="tag-label">홍대</span>
 					    </label>
 					    <label>
-		                	<input type="checkbox" name="location" id="yeouido" value="yeouido">
+		                	<input type="checkbox" name="location" id="yeouido" value="여의도">
 		                	<span class="tag-label">여의도</span>
 					    </label>
 					    <label>
-		                	<input type="checkbox" name="location" id="gangnam" value="gangnam">
+		                	<input type="checkbox" name="location" id="gangnam" value="강남">
 		                	<span class="tag-label">강남</span>
 					    </label>
 					    <label>
-		                	<input type="checkbox" name="location" id="hyehwa" value="hyehwa">
+		                	<input type="checkbox" name="location" id="hyehwa" value="혜화">
 		                	<span class="tag-label">혜화</span>
 					    </label>
 					    <label>
-		                	<input type="checkbox" name="location" id="hannam" value="hannam">
+		                	<input type="checkbox" name="location" id="hannam" value="한남">
 		                	<span class="tag-label">한남</span>
+					    </label>
+					    					    <label>
+		                	<input type="checkbox" name="location" id="ect" value="ect">
+		                	<span class="tag-label">etc</span>
 					    </label>
 					</div>
 				</div>
@@ -76,19 +80,19 @@ function goSave() {
 				        <!-- 첫 번째 줄: 4개 -->
 				        <div class="interest-row">
 				            <label>
-				                <input type="checkbox" name="interest" id="food" value="food">
+				                <input type="checkbox" name="interest" id="food" value="식품">
 				                <span class="tag-label">식품</span>
 				            </label>
 				            <label>
-				                <input type="checkbox" name="interest" id="character" value="character">
+				                <input type="checkbox" name="interest" id="character" value="캐릭터">
 				                <span class="tag-label">캐릭터</span>
 				            </label>
 				            <label>
-				                <input type="checkbox" name="interest" id="cosmetics" value="cosmetics">
+				                <input type="checkbox" name="interest" id="cosmetics" value="화장품">
 				                <span class="tag-label">화장품</span>
 				            </label>
 				            <label>
-				                <input type="checkbox" name="interest" id="media" value="media">
+				                <input type="checkbox" name="interest" id="media" value="미디어">
 				                <span class="tag-label">미디어</span>
 				            </label>
 				        </div>
@@ -96,15 +100,15 @@ function goSave() {
 				        <!-- 두 번째 줄: 3개 -->
 				        <div class="interest-row">
 				            <label>
-				                <input type="checkbox" name="interest" id="art" value="art">
+				                <input type="checkbox" name="interest" id="art" value="미술">
 				                <span class="tag-label">미술</span>
 				            </label>
 				            <label>
-				                <input type="checkbox" name="interest" id="fashion" value="fashion">
+				                <input type="checkbox" name="interest" id="fashion" value="패션">
 				                <span class="tag-label">패션</span>
 				            </label>
 				            <label>
-				                <input type="checkbox" name="interest" id="digitaltech" value="digitaltech">
+				                <input type="checkbox" name="interest" id="digitaltech" value="디지털/테크">
 				                <span class="tag-label">디지털/테크</span>
 				            </label>
 				        </div>
@@ -112,12 +116,12 @@ function goSave() {
 				        <!-- 세 번째 줄: 2개 -->
 				        <div class="interest-row">
 				            <label>
-				                <input type="checkbox" name="interest" id="kidspets" value="kidspets">
+				                <input type="checkbox" name="interest" id="kidspets" value="키즈/반려동물">
 				                <span class="tag-label">반려동물</span>
 				            </label>
 				            <label>
 				                <input type="checkbox" name="interest" id="etc" value="etc">
-				                <span class="tag-label">기타</span>
+				                <span class="tag-label">etc</span>
 				            </label>
 				        </div>
 				    </div>
