@@ -5,46 +5,47 @@
 <head>
 <style>
 html, body {
-            height: 100% !important;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
+	height: 100% !important;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
 
-        /* 2. HTML 구조에 맞춘 클래스명 수정 */
-        .container {
-            display: flex;
-            height: 100vh; /* 화면 전체 높이 사용 */
-            width: 100%;
-        }
+/* 2. HTML 구조에 맞춘 클래스명 수정 */
+.container {
+	display: flex;
+	height: 100vh; /* 화면 전체 높이 사용 */
+	width: 100%;
+}
 
-        .content {
-            flex: 1;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
+.content {
+	flex: 1;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
 
-        .main-content {
-            flex: 1;
-            height: 100%;
-            padding: 0; /* padding은 자식(iframe 내부)에서 처리 */
-            margin:0;
-        }
+.main-content {
+	flex: 1;
+	height: 100%;
+	padding: 0; /* padding은 자식(iframe 내부)에서 처리 */
+	margin: 0;
+}
 
-        /* 3. iframe을 부모 크기에 꽉 채우기 */
-        iframe[name="adminFrame"] {
-            width: 100%;
-            height: 100% !important;
-            border: none;
-            display: block;
-        }
+/* 3. iframe을 부모 크기에 꽉 채우기 */
+iframe[name="adminFrame"] {
+	width: 100%;
+	height: 100% !important;
+	border: none;
+	display: block;
+}
+
 </style>
 <script>
-    // iframe 안에서 열렸다면 최상위로 끌어올림
-    if (window.top !== window.self) {
-        window.top.location.href = window.location.href;
-    }
+	// iframe 안에서 열렸다면 최상위로 끌어올림
+	if (window.top !== window.self) {
+		window.top.location.href = window.location.href;
+	}
 </script>
 
 <link
