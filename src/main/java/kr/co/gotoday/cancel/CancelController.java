@@ -60,7 +60,7 @@ public class CancelController {
             String bank = (String) params.get("bank");
             String accountNumber = (String) params.get("accountNumber");
             String holderName = (String) params.get("holderName");
-
+            
             if (reason == null || reason.trim().isEmpty()) {
                 reason = "단순 변심";
             }
@@ -70,7 +70,7 @@ public class CancelController {
             	return ResponseEntity.badRequest().body(result);
             }
             RefundReceiveAccountDTO refundReceiveAccount = new RefundReceiveAccountDTO(bank, accountNumber, holderName);
-            cancelService.cancelPayment(orderId, reason, refundReceiveAccount);
+            cancelService.refundPayment(orderId, reason, refundReceiveAccount);
             
             result.put("success", true);
             result.put("msg", "결제가 정상적으로 취소되었습니다.");

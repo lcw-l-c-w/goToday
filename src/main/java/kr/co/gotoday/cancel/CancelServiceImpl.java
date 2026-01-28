@@ -2,12 +2,14 @@ package kr.co.gotoday.cancel;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;         // [추가]
 import java.time.temporal.ChronoUnit; // [추가]
 import java.util.Base64;
 
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -162,9 +164,126 @@ public class CancelServiceImpl implements CancelService{
         }
     }
     
+
 	@Override
-	public void refundPayment(String orderId, String reason, String bank, String accountNumber, String holderName) {
-		// TODO Auto-generated method stub
+	public void refundPayment(String orderId, String cancelReason, RefundReceiveAccountDTO refundReceiveAccountDTO)
+			throws Exception {
+		// 1. 결제 정보 조회
+        PaymentVO payment = cancelMapper.findPaymentByOrderId(orderId);
+        if (payment == null) throw new Exception("결제 정보를 찾을 수 없습니다.");
+        
+        // 2. 예약 정보 조회
+        int targetReservationId = payment.getReservation_id();
+        ReservationVO reservation = cancelMapper.findReservationByReservationId(targetReservationId);
+        if (reservation == null) throw new Exception("예약 정보를 찾을 수 없습니다.");
+
+        
+        int cancelAmount = 0;
+        String refundStatusLog = "";
+
+
+        String dateStr = reservation.getReserved_for_at();
+        LocalDate reservedDate = LocalDate.parse(dateStr); 
+        LocalDate today = LocalDate.now();
+
+        // (2) D-Day 계산
+        long daysBetween = ChronoUnit.DAYS.between(today, reservedDate);
+        
+        // (3) 정책 적용 (수수료 제외한 '환불해줄 금액' 계산)
+        long totalAmount = payment.getAmount_price();
+        cancelAmount = 0; // 토스에 보낼 최종 환불 금액
+        refundStatusLog = ""; // DB에 남길 로그
+
+        if(daysBetween>=8) {
+        	cancelAmount = (int)totalAmount;
+        	refundStatusLog = "D-"+daysBetween + "_100%";
+        }
+       
+        else if (daysBetween >= 7) {
+            // 7일 전: 수수료 10% (환불 90%)
+            cancelAmount = (int)(totalAmount * 0.9);
+            refundStatusLog = "D-" + daysBetween + "_90%";
+        } else if (daysBetween >= 3) {
+            // 3일 전: 수수료 30% (환불 70%)
+            cancelAmount = (int)(totalAmount * 0.7);
+            refundStatusLog = "D-" + daysBetween + "_70%";
+        } else if (daysBetween >= 1) {
+            // 1일 전: 수수료 50% (환불 50%)
+            cancelAmount = (int)(totalAmount * 0.5);
+            refundStatusLog = "D-" + daysBetween + "_50%";
+        } else {
+            // 당일 혹은 지난 날짜: 환불 불가
+            throw new Exception("관람일 당일 및 지난 일정은 취소/환불이 불가합니다.");
+        }
+        
+        // 4. 토스페이먼츠 API 호출
+        // 금액(cancelAmount)이 있을 때만 호출
+        if (cancelAmount > 0) {
+            String paymentKey = payment.getPayment_key();
+        	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount, refundReceiveAccountDTO);	            	
+        }
+       
+        // --- 5. DB 업데이트 진행 ---
+        
+        // (1) 캘린더 삭제
+        cancelMapper.deleteCalendarByReservationId(targetReservationId);
+        
+        // (2) 재고 복구
+        int cancelTicketCount = reservation.getAdult_qty() + reservation.getChild_qty() + reservation.getTeen_qty();
+        int targetScheduleId = reservation.getSchedule_id();
+        int stockResult = cancelMapper.increaseTicketStock(targetScheduleId, cancelTicketCount);
+        
+        // (3) 결제 정보 업데이트 [수정]
+        // VO에 계산된 값들을 채워서 Mapper로 보냅니다.
+        payment.setPayment_status("CANCELED");
+        payment.setRefund_status(refundStatusLog);
+        payment.setCancel_amount(cancelAmount);
+        
+        int payResult = cancelMapper.updatePaymentCancelInfo(payment); // 메서드 이름 변경됨
+        
+        // (4) 예약 상태 취소
+        int resResult = cancelMapper.updateReservationStatusToCancel(targetReservationId);
+
+        if (payResult == 0 || resResult == 0 || stockResult == 0) {
+            throw new RuntimeException("DB 상태 업데이트 실패");
+        }
+		
+	}
+
+	private void sendCancelRequestToToss(String paymentKey, String cancelReason, int cancelAmount,
+			RefundReceiveAccountDTO refundReceiveAccountDTO) throws Exception {
+		URL url = new URL("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        
+        String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
+        connection.setDoOutput(true);
+
+        JSONObject body = new JSONObject();
+        body.put("cancelReason", cancelReason);
+        body.put("cancelAmount", cancelAmount);
+
+        JSONObject refundAccount = new JSONObject();
+        refundAccount.put("bank", refundReceiveAccountDTO.getBank());
+        refundAccount.put("accountNumber", refundReceiveAccountDTO.getAccountNumber());
+        refundAccount.put("holderName", refundReceiveAccountDTO.getHolderName());
+
+        body.put("refundReceiveAccount", refundAccount);
+
+        String jsonBody = body.toJSONString();
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonBody.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        int code = connection.getResponseCode();
+        if (code != 200) {
+            throw new Exception("토스 결제 취소 실패: 응답 코드 " + code);
+        }
 		
 	}
 }

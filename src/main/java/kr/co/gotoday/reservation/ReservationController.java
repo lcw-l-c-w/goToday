@@ -106,7 +106,7 @@ public class ReservationController {
 		}
 		 
 		UserVO userVO = (UserVO) session.getAttribute("loginSess");
-		if(userVO.getRole() != 0 || userVO.getEmail().contains("@")) {
+		if(userVO.getRole() != 0 || !userVO.getEmail().contains("@")) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "일반 사용자만 예약이 가능합니다.");
 			return "common/return";
