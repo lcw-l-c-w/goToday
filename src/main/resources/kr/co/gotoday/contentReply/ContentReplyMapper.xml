@@ -4,7 +4,6 @@
 
 <insert id="insertContentQA" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
 	INSERT INTO content_reply (
-		creply_category,
 		title,
 		body,
 		writer,
@@ -16,10 +15,10 @@
 		ono,
 		nested,
 		secret,
-		reply_status
+		reply_status,
+		vendor_id
 	)
 	VALUES(
-		#{creply_category},
 		#{title},
 		#{body},
 		#{writer},
@@ -31,7 +30,8 @@
 		#{ono},
 		#{nested},
 		#{secret},
-		0
+		0,
+		#{vendor_id}
 	)
 	<selectKey keyProperty="creply_id" order="AFTER" resultType="int">
 
@@ -79,7 +79,7 @@
 <update id="updateReply" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
 	UPDATE content_reply
 	<set> 
-		creply_category=#{creply_category},
+		secret=#{secret},
 		title=#{title},
 		body=#{body},
 		update_at=NOW(),

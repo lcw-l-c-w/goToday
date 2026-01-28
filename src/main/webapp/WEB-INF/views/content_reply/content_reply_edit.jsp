@@ -164,7 +164,12 @@
             $("#title").focus();
             return;
         }
-        
+        // --- 비밀글 값 처리 추가 ---
+        if ($("#is_secret").is(":checked")) {
+            $("#secret").val("1");
+        } else {
+            $("#secret").val("0");
+        }
         $("#frm").submit();
     }
     </script>
@@ -189,6 +194,16 @@
                         </td>
                     </tr>
                     </c:if>
+                    
+                    <tr>
+            <th>공개 여부</th>
+            <td>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="is_secret" id="is_secret" value="1" style="width: 18px; height: 18px;">
+                    <span style="font-size: 15px; color: #333;">비밀글로 문의하기</span>
+                </label>
+                <input type="hidden" name="secret" id="secret" value="0"> </td>
+        </tr>
                     <tr>
                         <th>내용</th>
                         <td>

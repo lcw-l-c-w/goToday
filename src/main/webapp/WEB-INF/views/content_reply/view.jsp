@@ -9,19 +9,18 @@
     <title>GoToday | 문의 상세</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    
 <style>
     :root {
         --main-color: #4dc3ff;
-        --dark-gray: #333;
+        --dark-gray: #222;
         --text-gray: #666;
-        --light-bg: #f9f9f9;
+        --light-bg: #f8f9fa;
         --border-color: #eee;
-        --danger-color: #e74c3c;
+        --danger-color: #ff4d4d;
     }
 
     body {
-        font-family: 'Pretendard', sans-serif;
+        font-family: 'Pretendard', -apple-system, sans-serif;
         background-color: #fff;
         color: var(--dark-gray);
         margin: 0; padding: 0;
@@ -29,144 +28,151 @@
     }
 
     .container {
-        max-width: 900px;
-        margin: 60px auto;
+        max-width: 800px;
+        margin: 50px auto;
         padding: 0 20px;
     }
 
     /* 헤더 섹션 */
     .view-header {
         border-bottom: 2px solid var(--dark-gray);
-        padding-bottom: 25px;
+        padding-bottom: 20px;
         margin-bottom: 30px;
     }
 
     .view-header h1 {
-        font-size: 28px;
+        font-size: 26px;
         font-weight: 700;
         margin: 0 0 15px 0;
-        letter-spacing: -1px;
+        color: #111;
     }
 
     .view-meta {
         display: flex;
-        color: #888;
+        align-items: center;
+        color: #999;
         font-size: 14px;
-        gap: 20px;
+        gap: 15px;
     }
 
     /* 본문 영역 */
     .content-box {
-        padding: 40px 10px;
+        padding: 20px 0 10px; /* 하단 패딩 조절 */
         min-height: 200px;
         font-size: 16px;
+        color: #333;
         border-bottom: 1px solid var(--border-color);
-        color: #444;
+        position: relative;
+    }
+
+    .attached-photo img {
+        max-width: 100%;
+        border-radius: 12px;
+        margin-top: 20px;
+    }
+
+    .update-date {
+        margin-top: 40px; /* 본문과 간격 확보 */
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #bbb;
+        text-align: right;
+        font-style: italic;
     }
 
     /* 관리자 답변 섹션 */
     .admin-section {
-        margin-top: 30px;
-        border: 1px solid var(--border-color);
-        background-color: #fcfcfc;
-        border-radius: 8px;
-        overflow: hidden;
+        margin-top: 40px;
+        background-color: var(--light-bg);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid #f0f0f0;
     }
 
     .admin-header {
-        padding: 15px 20px;
-        background-color: #f4f4f4;
-        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eef0f2;
+    }
+
+    .admin-title {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--main-color);
+    }
+
+    .admin-date { font-size: 13px; color: #aaa; }
+
+    /* 버튼 그룹 레이아웃 */
+    .btn-group {
+        margin-top: 40px;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .admin-title {
-        font-weight: 700;
-        color: var(--dark-gray);
-        display: flex;
+    .btn {
+        display: inline-flex;
         align-items: center;
-        gap: 6px;
+        justify-content: center;
+        padding: 10px 22px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s ease;
+        cursor: pointer;
+        border: none;
     }
 
-    .admin-title::before {
-        content: 'A.';
-        color: var(--main-color);
-        font-size: 18px;
-    }
+    /* 왼쪽 목록 버튼 */
+    .btn-list { background: #f1f1f1; color: #666; }
+    .btn-list:hover { background: #e5e5e5; }
 
-    .admin-content {
-        padding: 25px 20px;
-        font-size: 15px;
-        color: #333;
-        line-height: 1.7;
-    }
-
- /* 하단 버튼 그룹 레이아웃 */
-.btn-group {
-    margin-top: 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* 왼쪽 [목록으로] 버튼 전용 */
-.btn-list { 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 25px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    background: #eee; 
-    color: #666; 
-    transition: 0.3s;
-}
-.btn-list:hover { background: #ddd; }
-
-/* 오른쪽 [수정/삭제/등록] 버튼들 통일 */
-.right-btns {
-    display: flex;
-    gap: 10px;
-}
-
-.right-btns .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 25px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
+    /* 오른쪽 버튼들 공통 */
+    .right-btns { display: flex; gap: 8px; }
     
-    /* 기본 상태: 회색 */
-    background-color: #eee !important;
-    color: #666 !important;
-}
+    .btn-action { 
+        background-color: #fff; 
+        border: 1px solid #ddd; 
+        color: #555; 
+    }
+    
+    .btn-action:hover { 
+        border-color: var(--main-color); 
+        color: var(--main-color); 
+        background-color: #f9fdff;
+    }
 
-/* 우측 버튼들만 호버 시 하늘색 */
-.right-btns .btn:hover {
-    background-color: var(--main-color) !important; /* #4dc3ff */
-    color: #fff !important;
-}
- 
+    /* 삭제/위험 버튼 커스텀 */
+    .btn-danger:hover { 
+        border-color: var(--danger-color) !important; 
+        color: var(--danger-color) !important; 
+        background-color: #fff5f5 !important;
+    }
+
+    /* 답변 등록용 강조 버튼 */
+    .btn-primary {
+        background-color: var(--main-color);
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #3db2f0;
+    }
 </style>
 
     <script>
-    function del(creply_id, content_id,gno) {
+    function del(creply_id, content_id,gno,vendor_id) {
     	if (confirm('이 문의사항을 정말 삭제하시겠습니까?')) {
             // jQuery의 $.post(주소, 보낼데이터, 성공시실행할함수)
             $.post('${ctx}/detail/tab/inquiry/delete', {
                 creply_id: creply_id,
                 content_id: content_id,
-                gno:gno
+                gno:gno,
+                vendor_id:vendor_id
             }, function(res) {
                 // 삭제 후 처리는 컨트롤러의 리턴 방식에 따라 달라집니다.
                 // 만약 컨트롤러가 알림창을 띄우는 common/return 페이지를 준다면, 
@@ -202,6 +208,12 @@
                  style="max-width:100%; border-radius:8px; border:1px solid #eee;">
         </div>
     </c:if>
+    <c:if test="${not empty vo.update_at}">
+    <div class="update-date" style="margin-top:20px; font-size: 13px; color: #999; text-align: right;">
+        <fmt:parseDate value="${vo.update_at}" var="parsedUpdateDate" pattern="yyyy-MM-dd HH:mm:ss"/>
+        해당 글은 <fmt:formatDate value="${parsedUpdateDate}" pattern="yyyy-MM-dd HH:mm"/>에 수정되었습니다.
+    </div>
+    </c:if>
     </div>
 
         <c:if test="${not empty vendorList}">
@@ -218,42 +230,45 @@
                     </div>
                 </div>
                 <div class="admin-content" style="white-space: pre-wrap;">${vendorList.body}</div>
+				<c:if test="${not empty vendorList.file_path}">
+        		<div class="attached-photo" style="margin-top:20px;">
+            	<img src="${pageContext.request.contextPath}${vendorList.file_path}" 
+                 style="max-width:100%; border-radius:8px; border:1px solid #eee;">
+       			 </div>
+    		</c:if>            
             </div>
         </c:if>
 
-        <div class="btn-group">
-            <div class="left-btns">
-                <a href="${ctx}/detail/${vo.content_id}?tab=inquiry" class="btn btn-list" >목록으로</a>
-            </div>
-            
-            <div class="right-btns">
-         
-           
-    <%-- 1. 유저 본인인 경우: 질문글 수정 & 삭제 --%>
-    <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id and not empty vo.creply_id}">
-        <a href="${ctx}/detail/inquiry/modify?creply_id=${vo.creply_id}" class="btn">수정하기</a>
-        <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});" class="btn">삭제하기</a>
-    </c:if>
+ <div class="btn-group">
+    <div class="left-btns">
+        <a href="${ctx}/detail/${vo.content_id}?tab=inquiry" class="btn btn-list">목록으로</a>
+    </div>
     
-    <%-- 2. 관리자(Vendor)인 경우 --%>
-    <c:if test="${loginSess.role == 1 and loginSess.user_id == vo.vendor_id and not empty vo.creply_id}">
-        <c:choose>
-            <%-- 답변이 아직 없는 경우: '답변 등록' --%>
-            <c:when test="${empty vendorList}">
-                <a href="${ctx}/detail/inquiry/write/vendor.do?creply_id=${vo.creply_id}" class="btn">답변 등록</a>
-            </c:when>
-            <%-- 답변이 이미 있는 경우: '답변 수정' --%>
-            <c:otherwise>
-                <a href="${ctx}/detail/inquiry/modify?creply_id=${vendorList.creply_id}" class="btn">답변 수정</a>
-         		 
-         		 <a class="btn" href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});">답변 삭제</a>
-            </c:otherwise>
-        </c:choose>
+    <div class="right-btns">
+        <%-- 1. 유저 본인인 경우: 수정 & 삭제 --%>
+        <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id}">
+            <a href="${ctx}/detail/inquiry/modify?creply_id=${vo.creply_id}" class="btn btn-action">수정하기</a>
+            <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});" class="btn btn-action btn-danger">삭제하기</a>
+        </c:if>
         
-    </c:if>
+        <%-- 2. 관리자(Vendor)인 경우 --%>
+        <c:if test="${loginSess.role == 1 and loginSess.user_id == vo.vendor_id}">
+            <c:choose>
+                <%-- 답변 등록 --%>
+                <c:when test="${empty vendorList}">
+                    <a href="${ctx}/detail/inquiry/write/vendor.do?creply_id=${vo.creply_id}" class="btn btn-primary">답변 등록</a>
+                </c:when>
+                <%-- 답변 수정 & 삭제 --%>
+                <c:otherwise>
+                    <a href="${ctx}/detail/inquiry/modify?creply_id=${vendorList.creply_id}" class="btn btn-action">답변 수정</a>
+                    <a href="javascript:del(${vendorList.creply_id}, ${vo.content_id}, ${vendorList.gno},${vendorList.vendor_id});" class="btn btn-action btn-danger">답변 삭제</a>
+                </c:otherwise>
+            </c:choose>
+        </c:if>
+    </div>
 </div>
             </div>
         </div>
-    </div>
+    
 </body> 
 </html>

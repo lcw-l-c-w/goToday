@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoToday | 문의사항</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    
+    <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <style>
     :root {
         --main-color: #4dc3ff;
@@ -128,18 +128,47 @@
                                                 <span title="비밀글">🔒</span>
                                             </c:if>
                                             
-                                            <a class="title-link" onclick="goDetail('${item.creply_id}', '${item.secret}', '${item.user_id}')">
+                                            <a class="title-link" onclick="goDetail('${item.creply_id}', '${item.secret}', '${item.user_id}','${item.vendor_id}')">
                                                 ${item.title}
                                             </a>
                                         </div>
                                     </td>
-                                    <td> <c:if test="${item.nested > 0}">
-                                                <span class="reply-icon">담당자</span>
-                                            </c:if>
-                                           <c:if test="${item.nested == 0}">
-                                            ${item.writer}
-                                            </c:if>
-                                            </td>
+					<td>
+    <c:choose>
+        <%-- 답변글은 무조건 '담당자' 표시 --%>
+        <c:when test="${item.nested > 0}">
+            <span class="reply-icon">담당자</span>
+        </c:when>
+
+        <c:otherwise>
+            <c:choose>
+                <%-- [실명 노출 조건] 본인이거나, 총관리자거나, 해당 벤더인 경우 --%>
+                <c:when test="${
+                                 loginSess.user_id eq item.user_id 
+                                || loginSess.role eq 1 
+                                || loginSess.user_id eq item.vendor_id}">
+                    ${item.writer}
+                </c:when>
+
+                <%-- [마스킹 노출 조건] 권한 없는 타인이 비밀글을 볼 때 --%>
+                <c:otherwise>
+                    <c:set var="wName" value="${item.writer}" />
+                    <span >
+                        <c:choose>
+                            <c:when test="${fn:length(wName) >= 3}">
+                                ${fn:substring(wName, 0, 1)}*${fn:substring(wName, fn:length(wName)-1, fn:length(wName))}
+                            </c:when>
+                            <c:when test="${fn:length(wName) == 2}">
+                                ${fn:substring(wName, 0, 1)}*
+                            </c:when>
+                            <c:otherwise>${wName}</c:otherwise>
+                        </c:choose>
+                    </span>
+                </c:otherwise>
+            </c:choose>
+        </c:otherwise>
+    </c:choose>
+</td>
                                     <td style="color: #999;">
                                         <fmt:parseDate value="${item.created_at}" var="parsedDate" pattern="yyyy-MM-dd HH:mm:ss"/>
     
@@ -160,6 +189,10 @@
     </div>
 
     <script>
+    
+    var currentUserId = '${loginSess.user_id}';
+    var userRole = '${loginSess.role}';
+
         // 글쓰기 페이지 이동
         function goWriteForm() {
             
@@ -177,18 +210,25 @@
             location.href = "${pageContext.request.contextPath}/detail/tab/inquiry/write/"+content_id;
                     }
 
-        // 상세 보기 이동
-        function goDetail(creply_id, isSecret, authorId) {
-            // 비밀글이고 본인이 아닌 경우에 대한 처리
-            // 비밀글(1)인 경우
-    if(isSecret === '1') {
-        // 본인도 아니고 관리자(벤더)도 아닌 경우
-        if(currentUserId != authorId && userRole != '1') {
-            alert("비밀글은 작성자만 확인할 수 있습니다.");
-            return;
-        }
-    }
-            location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;
+        function goDetail(creply_id, isSecret, authorId, vendor_id) {
+            // 1. 공개글이면 누구나 통과
+            if (isSecret !== '1') {
+                location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;
+                return;
+            }
+
+            // 2. 비밀글인 경우 권한 확인
+            var isAuthor = (currentUserId == authorId);
+            var isAdmin = (userRole == '1');
+            var isVendor = (currentUserId == vendor_id);
+
+            // 한 명이라도 해당하면 상세페이지 이동
+            if (isAuthor || isAdmin || isVendor) {
+                location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;
+            } else {
+                // 권한 없으면 차단
+                alert("비밀글은 작성자 및 담당자만 확인할 수 있습니다.");
+            }
         }
     </script>
 </body>

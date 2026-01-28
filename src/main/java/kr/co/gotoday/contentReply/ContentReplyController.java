@@ -108,17 +108,22 @@ public class ContentReplyController {
 		}
 
 		// 작성자 정보 VO에 설정( 세션에서 꺼낸 id를 수동으로 넣어줘야함)
+		int vendor_id = contentService.selectIdByContentId(vo.getContent_id());
 		vo.setUser_id(user.getUser_id());
 		vo.setContent_id(content_id);
+		vo.setVendor_id(vendor_id); //벤더 등록해줘야 나중에 비밀글 확인이 가능함
 		int success = contentReplyService.insertQA(vo);
 		if (success == 1) {
 			// 성공했을 경우
 			model.addAttribute("msg", "등록되었습니다.");
 			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("cmd", "move");
 			return "common/return";
 
 		} else {
 			model.addAttribute("msg", "게시글 등록에 실패했습니다.");
+			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
 	}
@@ -134,7 +139,7 @@ public class ContentReplyController {
 	}
 
 	@PostMapping("/detail/inquiry/write/vendor.do")
-	public String writeVendor(HttpSession sess, ContentReplyVO vo, Model model, MultipartFile file) {
+	public String writeVendor(HttpSession sess, ContentReplyVO vo, Model model,@RequestParam(value = "file", required = false) MultipartFile file,HttpServletRequest request) {
 		UserVO Uservo = (UserVO) sess.getAttribute("loginSess");
 		int vendor_id = contentService.selectIdByContentId(vo.getContent_id());
 		if (Uservo.getUser_id() != vendor_id) {
@@ -147,6 +152,30 @@ public class ContentReplyController {
 		vo.setUser_id(Uservo.getUser_id());
 		vo.setWriter(Uservo.getName()); // 상인 이름을 writer로 설정
 		vo.setVendor_id(Uservo.getUser_id());
+		// --- [파일 업로드 처리 시작] ---
+				if (file != null && !file.isEmpty()) {
+					try {
+						// 1. 저장할 절대 경로 설정 (webapp/resources/upload/inquiry/)
+						String uploadPath = request.getServletContext().getRealPath("/resources/upload/inquiry/");
+						File folder = new File(uploadPath);
+						if (!folder.exists())
+							folder.mkdirs(); // 폴더가 없으면 생성
+
+						// 2. 파일명 중복 방지 (현재시간_원본이름)
+						String originName = file.getOriginalFilename();
+						String saveName = System.currentTimeMillis() + "_" + originName;
+
+						// 3. 실제 서버 폴더에 파일 저장
+						file.transferTo(new File(uploadPath + saveName));
+
+						// 4. DB에 저장할 상대 경로를 VO에 세팅
+						// 나중에 <img src="/resources/upload/inquiry/파일명"> 으로 쓰기 위함
+						vo.setFile_path("/resources/upload/inquiry/" + saveName);
+
+					} catch (Exception e) {
+						System.out.println("파일 업로드 실패: " + e.getMessage());
+					}
+				}
 		int success = contentReplyService.vendorCreate(vo);
 		if (success == 1) {
 			// 성공했을 경우
@@ -155,13 +184,14 @@ public class ContentReplyController {
 			int success2=contentReplyService.updateStatus(vo.getGno());
 			if(success2==1){
 			model.addAttribute("msg", "등록되었습니다.");
-
-			return "redirect:/detail/" + vo.getContent_id() + "?tab=inquiry";
+			model.addAttribute("url","/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("cmd", "move");
+			return "common/return";
 			}
 		}
 		
 			model.addAttribute("msg", "답변 등록에 실패했습니다.");
-			
+			model.addAttribute("cmd","back");
 			return "common/return";
 		
 		
@@ -178,8 +208,8 @@ public class ContentReplyController {
 		// 예외처리
 		if (user == null) {
 			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "back");
 			model.addAttribute("url", "/gotoday/member/login");
+			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
 		// 본인이 아닌경우 막기
@@ -187,8 +217,8 @@ public class ContentReplyController {
 		ContentReplyVO result = contentReplyService.getReplyForUser(creply_id, user.getUser_id());
 		if (result.getUser_id() != user.getUser_id()) {
 			model.addAttribute("msg", "본인이 아닌경우 수정이 어렵습니다..");
-			model.addAttribute("cmd", "back");
 			model.addAttribute("url", "/gotoday/detail/" + result.getContent_id() + "?tab=inquiry");
+			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
 		
@@ -280,9 +310,11 @@ public class ContentReplyController {
 			// 성공했을 경우
 			model.addAttribute("msg", "삭제되었습니다.");
 			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry"); // 이동할 경로
+			model.addAttribute("cmd", "move");
 			return "common/return";
 		} else {
 			model.addAttribute("msg", "게시글 삭제에 실패했습니다.다시 시도해주세요.");
+			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
 	}

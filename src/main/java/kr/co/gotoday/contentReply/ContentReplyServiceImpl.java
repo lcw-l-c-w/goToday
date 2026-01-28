@@ -63,11 +63,18 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	@Transactional
 	@Override
 	public int deleteQA(ContentReplyVO vo) {
+		List<ContentReplyVO> detailList = contentReplyMapper.showDetail(vo.getCreply_id());
 		// TODO Auto-generated method stub
-		System.out.println("삭제 요청 유저: " + vo.getUser_id());
-	    System.out.println("삭제 대상 글번호: " + vo.getCreply_id());
-	    System.out.println("글에 저장된 Vendor ID: " + vo.getVendor_id());
-	    System.out.println("삭제 대상 그룹번호(gno): " + vo.getGno()); // 이게 0이면 JSP 확인 필요!
+		if (detailList == null || detailList.isEmpty()) {
+	        return 0; // 이미 삭제된 글이거나 존재하지 않는 경우
+	    }
+	    
+	    // 가져온 실제 데이터를 vo 객체에 채워줍니다.
+	    ContentReplyVO dbData = detailList.get(0);
+	    vo.setVendor_id(dbData.getVendor_id());
+	    vo.setGno(dbData.getGno());
+	    System.out.println("조회된 진짜 Vendor ID: " + vo.getVendor_id());
+	    System.out.println("조회된 진짜 GNO: " + vo.getGno());
 		if(vo.getUser_id()!=vo.getVendor_id()) {
 			//user인경우에 
 				
@@ -80,6 +87,7 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 		}
 		else {
 			//vendor가 삭제한 경우에 
+			System.out.println("걸리긴 하는지 ");
 			 contentReplyMapper.updateReplyStatus(vo.getGno(), 0); // 0이면 답변 안 한 상태  
 				return contentReplyMapper.deleteReply(vo);
 			
