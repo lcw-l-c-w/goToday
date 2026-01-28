@@ -26,90 +26,65 @@
         parameterType="kr.co.gotoday.content.MainContentDTO"
         resultType="kr.co.gotoday.content.ContentVO">
 
-SELECT
-    c.content_id,
-    c.title,
-    c.main_image_path,
-    c.location,
-    c.start_at,
-    c.end_at,
+SELECT *
+FROM (
+    SELECT
+        c.*,
+        (
+            <!-- event -->
+            <choose>
+                <when test="eventTags != null and eventTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="eventTags" item="t" separator=" OR ">
+                            c.content_kind LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 6 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
 
-    <choose>
-        <when test="user_tag_name != null and user_tag_name.size() > 0">
-            (
-                (CASE WHEN EXISTS (
-                    SELECT 1 FROM tag t
-                    WHERE t.category = 'event'
-                    AND t.tag_name = c.content_kind
-                    AND t.tag_name IN
-                    <foreach collection="user_tag_name" item="n" open="(" separator="," close=")">
-                        #{n}
-                    </foreach>
-                ) THEN 10 ELSE 0 END)
+            +
 
-                +
+            <!-- location -->
+            <choose>
+                <when test="locationTags != null and locationTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="locationTags" item="t" separator=" OR ">
+                            c.location LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 3 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
 
-                (CASE WHEN EXISTS (
-                    SELECT 1 FROM tag t
-                    WHERE t.category = 'location'
-                    AND t.tag_name = c.location
-                    AND t.tag_name IN
-                    <foreach collection="user_tag_name" item="n" open="(" separator="," close=")">
-                        #{n}
-                    </foreach>
-                ) THEN 5 ELSE 0 END)
+            +
 
-                +
+            <!-- interest -->
+            <choose>
+                <when test="interestTags != null and interestTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="interestTags" item="t" separator=" OR ">
+                            c.category LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 1 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+        ) AS weight_score
+    FROM content c
+    <where>
+        <include refid="USER_VISIBLE_CONTENT" />
+        AND c.start_at <![CDATA[<=]]> NOW()
+        AND c.end_at <![CDATA[>=]]> NOW()
+    </where>
+) t
 
-                (CASE WHEN EXISTS (
-                    SELECT 1 FROM tag t
-                    WHERE t.category = 'interest'
-                    AND t.tag_name = c.category
-                    AND t.tag_name IN
-                    <foreach collection="user_tag_name" item="n" open="(" separator="," close=")">
-                        #{n}
-                    </foreach>
-                ) THEN 1 ELSE 0 END)
-            ) AS weight_score
-        </when>
-        <otherwise>
-            0 AS weight_score
-        </otherwise>
-    </choose>
-
-FROM content c
-
-<where>
-    <include refid="USER_VISIBLE_CONTENT" />
-    AND c.start_at <= NOW()
-    AND c.end_at >= NOW()
-
-    <if test="content_kind != null and content_kind != ''">
-        AND c.content_kind = #{content_kind}
-    </if>
-
-    <if test="user_tag_name != null and user_tag_name.size() > 0">
-        AND EXISTS (
-            SELECT 1 FROM tag t
-            WHERE t.tag_name IN
-            <foreach collection="user_tag_name" item="n" open="(" separator="," close=")">
-                #{n}
-            </foreach>
-            AND (
-                (t.category = 'event'    AND t.tag_name = c.content_kind)
-                OR
-                (t.category = 'location' AND t.tag_name = c.location)
-                OR
-                (t.category = 'interest' AND t.tag_name = c.category)
-            )
-        )
-    </if>
-</where>
-
-ORDER BY weight_score DESC, c.start_at DESC
+ORDER BY t.weight_score DESC, t.start_at DESC
 LIMIT #{limit}
 
 </select>
+
+
 
 
 	<select id="getTagName" resultType="string">

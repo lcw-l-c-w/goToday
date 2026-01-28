@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.co.gotoday.user.UserMapper;
-import kr.co.gotoday.user.UserTagVO;
 import util.PageInfo;
+import util.TagVO;
 
 @Service
 public class ContentServiceImpl implements ContentService {
@@ -43,22 +44,47 @@ public class ContentServiceImpl implements ContentService {
 
 	@Override
 	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
-		// 2. 기존 로직 (태그 VO 리스트 세팅)
-	
-		if (mcd != null && mcd.getUser_id() != null) {
-	        // 1. 만약 컨트롤러에서 name 리스트를 못 가져왔을 경우를 대비해 여기서 다시 한번 확실히 채워줍니다.
-	        if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
-	            List<String> tagNames = contentMapper.getTagName(mcd.getUser_id());
-	            mcd.setUser_tag_name(tagNames);
+	    if (mcd != null && mcd.getUser_id() != null) {
+	        
+	        // 1. 무조건 DB에서 유저의 전체 태그 정보(이름+카테고리)를 가져옵니다.
+	        List<TagVO> tagAll = userMapper.getUserTags(mcd.getUser_id());
+	        
+	        List<String> location = new ArrayList<>();
+	        List<String> interest = new ArrayList<>();
+	        List<String> event = new ArrayList<>();
+	        List<String> allNames = new ArrayList<>();
+	        
+	        // 2. 카테고리별로 분류 작업 수행
+	        for (TagVO tag : tagAll) {
+	        	System.out.println("DB 카테고리 확인: [" + tag.getCategory() + "]");
+	            String category = tag.getCategory(); // TagVO 필드명 확인 (getCategory 또는 getTag_category)
+	            String name = tag.getTag_name();
+	            
+	            allNames.add(name); // 전체 이름 리스트 채우기
+	            
+	            if ("location".equals(category)) location.add(name);
+	            else if ("interest".equals(category)) interest.add(name);
+	            else if ("event".equals(category)) event.add(name);
 	        }
 	        
+	        // 3. DTO에 각 리스트 배달 (이제 null이 아님!)
+	        mcd.setLocationTags(location);
+	        mcd.setEventTags(event);
+	        mcd.setInterestTags(interest);
+	        System.out.println("서비스 단DTO 데이터 확인: " + mcd);
+			System.out.println("서비스 태그 리스트 사이즈: " + (mcd.getUser_tag_name() != null ? mcd.getUser_tag_name().size() : "null"));
+			
+	        // 4. (중요) 정책 필터를 위해 user_tag_name도 최신화
+	        mcd.setUser_tag_name(allNames);
 	    }
-	    // 3. 쿼리 실행
+	    
+	    // 5. 이제 데이터가 꽉 찬 DTO를 들고 쿼리 실행
 	    List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
 
-	    // 4. 정책 적용 (이제 mcd 안에는 tag_name이 확실히 들어있으므로 통과됩니다)
-	    return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());}
-
+	    return list.stream()
+	               .map(vo -> applyViewPolicy(vo, mcd))
+	               .collect(Collectors.toList());
+	}
 	@Override
 	public ContentVO getDetailContents(int content_id, Integer user_id) {
 		// 상세페이지 보여주는것

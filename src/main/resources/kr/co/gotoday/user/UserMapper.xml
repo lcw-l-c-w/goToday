@@ -70,11 +70,13 @@
 	</select>
 
 	<!--  관심사 가져오기  -->
-	<select id="getUserTags" resultType="kr.co.gotoday.user.UserTagVO">
-		SELECT 	*
-		FROM user_tag
+	<select id="getUserTags" resultType="util.TagVO">
+		SELECT 	t.category, t.tag_name
+		FROM user_tag u join tag t
+		ON u.tag_id=t.tag_id
 		WHERE user_id=#{user_id}
 	</select>
+	
 	<!-- 마이페이지 관심사 수정(사용자 태그 전체 삭제) -->
 	<delete id="deleteUserTags">
 	    DELETE FROM user_tag WHERE user_id = #{userId}

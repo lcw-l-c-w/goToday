@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import util.TagVO;
+
 @Mapper
 public interface UserMapper {
 	UserVO login(UserVO vo);
@@ -24,7 +26,7 @@ public interface UserMapper {
     List<String> getUserTagNames(int userId);
     void deleteUserTags(int userId);
     void insertUserTag(UserTagVO vo);
-    List<UserTagVO> getUserTags(@Param("user_id") int user_id);
+    List<TagVO> getUserTags(@Param("user_id") int user_id);
     // 마이페이지 회원정보 수정 및 마이페이지 사이드바
     UserVO getUserById(int userId);
     // 마이페이지 회원정보 수정
