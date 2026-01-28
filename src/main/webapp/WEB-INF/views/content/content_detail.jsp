@@ -451,8 +451,8 @@ $(function() {
     //추가-의선 캘박 
     $(".btn-save-cal").click(function() {
         // 1. 변수에 값이 있는지 확인
-        if(!selectedDate || !selectedTime) {
-            alert("관람하실 날짜와 시간을 먼저 선택해주세요.");
+        if(!selectedDate) {
+            alert("관람하실 날짜를 먼저 선택해주세요.");
             return;
         }
 
@@ -460,19 +460,19 @@ $(function() {
         
         // 2. 캘린더 패키지로 데이터 전송 (AJAX)
         $.ajax({
-            url: "${pageContext.request.contextPath}/calendar/add", // 새로 만들 컨트롤러 주소
+            url: "${pageContext.request.contextPath}/calendar/add", 
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
                 "contentId": contentId,
                 "date": selectedDate,  // 변수에 저장된 날짜 (예: 2026-01-20)
-                "time": selectedTime   // 변수에 저장된 시간 (예: 14:00)
+                "time": selectedTime   
             }),
             success: function(res) {
                 if (res.success) {
                     alert("📅 " + res.msg); // "나의 캘린더에 저장되었습니다!"
                 } else {
-                    alert(res.msg); // "로그인이 필요합니다." 등
+                    alert(res.msg); // "로그인이 필요합니다." 
                     if (res.msg.includes("로그인")) {
                         location.href = "${pageContext.request.contextPath}/member/login";
                     }
