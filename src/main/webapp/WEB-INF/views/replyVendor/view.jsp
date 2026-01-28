@@ -9,7 +9,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title></title>
+<title>업체 문의</title>
 <META name="viewport"
 	content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
 <script
@@ -24,12 +24,12 @@
 <script>
 	function del() {
 		if (confirm('삭제하시겠습니까?')) {
-			location.href = 'delete?reply_id=${vo.reply_id}&isIframe=${param.isIframe}';
+			location.href = 'delete?reply_vendor_id=${vo.reply_vendor_id}&isIframe=${param.isIframe}';
 		}
 	}
 	function delAdminOnly() {
 		if (confirm('답변을 삭제하시겠습니까?')) {
-			location.href = 'deleteAdminOnly?reply_id=${vo.reply_id}&isIframe=${param.isIframe}';
+			location.href = 'deleteAdminOnly?reply_vendor_id=${vo.reply_vendor_id}&isIframe=${param.isIframe}';
 		}
 	}
 </script>
@@ -42,7 +42,7 @@
 		<div class="wrap">
 			<div class="sub">
 				<div class="size">
-					<h3 class="sub_title">고객 문의사항 #${vo.reply_id}</h3>
+					<h3 class="sub_title">업체 문의사항 #${vo.reply_vendor_id}</h3>
 					<div class="bbs">
 						<div class="view">
 							<div class="title">
@@ -83,7 +83,7 @@
 									<a href="javascript:delAdminOnly();" class="btn btn-red">답변 삭제</a>
 								</c:if>
 								<c:if test="${Admin and empty adminReply}">
-									<a href="reply?reply_id=${vo.reply_id}&isIframe=${param.isIframe}" class="btn">답변하기</a>
+									<a href="reply?reply_vendor_id=${vo.reply_vendor_id}&isIframe=${param.isIframe}" class="btn">답변하기</a>
 								</c:if>
 							</div>
 						</div>

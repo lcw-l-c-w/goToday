@@ -39,10 +39,10 @@ public class ReviewServiceImpl implements ReviewService{
 	}
 
 	@Override
-	public void deleteReview(int reviewId, int userId) {
-		int result = reviewMapper.deleteReview(reviewId, userId);
+	public void deleteReview(int review_id, int userId) {
+		int result = reviewMapper.deleteReview(review_id, userId);
 		if (result < 1) {
-			log.error("[리뷰 삭제 실패] reviewId={}, userId={}", reviewId, userId);
+			log.error("[리뷰 삭제 실패] reviewId={}, userId={}", review_id, userId);
 			throw new RuntimeException("리뷰 삭제 실패!");
 		}
 	}

@@ -191,22 +191,25 @@ public class ReviewController {
 	@PostMapping("/review/delete.do")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteReview(
-			@RequestParam("review_id") int reviewId,
+			@RequestParam("review_id") int review_id,
 			HttpSession sess) {
 
 		Map<String, Object> response = new HashMap<>();
 
 		try {
 			UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+			if(userVO == null) {
+				throw new Exception("로그인 객체가 누락되었습니다.");
+			}
 
-			reviewService.deleteReview(reviewId, userVO.getUser_id());
+			reviewService.deleteReview(review_id, userVO.getUser_id());
 
 			response.put("success", true);
 			response.put("message", "리뷰가 삭제되었습니다.");
 			return ResponseEntity.ok(response);
 
 		} catch (Exception e) {
-			log.error("[리뷰 삭제 실패] reviewId={}", reviewId, e);
+			log.error("[리뷰 삭제 실패] reviewId={}", review_id, e);
 			response.put("success", false);
 			response.put("message", "리뷰 삭제에 실패했습니다.");
 			return ResponseEntity.badRequest().body(response);

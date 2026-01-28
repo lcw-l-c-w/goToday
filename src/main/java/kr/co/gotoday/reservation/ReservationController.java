@@ -105,9 +105,14 @@ public class ReservationController {
 			 return "common/return";
 		}
 		 
-		model.addAttribute("reservationDTO", reservation);
-	
 		UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		if(userVO.getRole() != 0) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "일반 사용자만 예약이 가능합니다.");
+			return "common/return";
+		}
+
+		model.addAttribute("reservationDTO", reservation);
 		 
 		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
 		ContentScheduleVO scheduleVO = reservationService.findCurrentTickets(reservation.getSchedule_id());
@@ -208,12 +213,16 @@ public class ReservationController {
 				return ResponseEntity.badRequest().body(result);
 			}
 
-			// 서비스에서 DTO → VO 변환
-			reservationService.convertToVO(reservation, reservationVO);
-
 			// 예약자 설정
 			UserVO userVO = (UserVO) session.getAttribute("loginSess");
 			reservationVO.setUser_id(userVO.getUser_id());
+
+			// 서비스에서 DTO → VO 변환 : 이때 예약 상태 PENDING으로 변경,
+			reservationService.convertToVO(reservation, reservationVO);
+
+			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
+			session.setAttribute("pendingReservation", reservationVO);
+
 			
 			//0원일 때 서비스 분기
 			int total_price = reservation.getTotal_price();
@@ -234,11 +243,11 @@ public class ReservationController {
 	            return ResponseEntity.ok(result);
 			}
 
-			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
-			session.setAttribute("pendingReservation", reservationVO);
 
 			TossInputDTO paymentDTO = (TossInputDTO) session.getAttribute("paymentDTO");
 
+			session.setAttribute("LAST_RESERVATION_CODE", reservationVO.getReservation_code());
+			
 			// 토스페이먼츠 결제 요청 정보
 			result.put("success", true);
 	        result.put("orderId", paymentDTO.getOrderId());
@@ -348,8 +357,6 @@ public class ReservationController {
 			// 4. 예약 프로세스 
 			ReservationVO result = reservationService.confirmAndCreateReservation(
 					reservationVO, paymentKey, orderId, amount);
-			
-			response.put("reservationCode", reservationVO.getReservation_code());
 			// 세션 정리
 			session.removeAttribute("schedule");
 			session.removeAttribute("pendingReservation");
