@@ -135,32 +135,41 @@ public class VendorController {
 			@RequestParam(value="Time[]", required = false) List<String> timeList,
 			@RequestParam(value="total_ticket", required = false) Integer total_ticket
 			) {
-		HttpSession sess = request.getSession();
-		UserVO login = (UserVO)sess.getAttribute("loginSess");
-		if (login == null) {
-		    return "redirect:/member/login"; 
-		}
-		contentVo.setUser_id(login.getUser_id());
-		
-		contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
-		contentVo.setIs_active(true);
-		contentVo.setIs_delete(false);
-		int r = vendorService.createContent(contentVo, contentScheduleVO, file, request, timeList, total_ticket);
-		
-		if (contentScheduleVO != null && contentScheduleVO.getTotal_ticket() != null) {
-		    contentScheduleVO.setCurrent_ticket(contentScheduleVO.getTotal_ticket());
-		}
-		
-		if(r > 0) {
-			model.addAttribute("cmd", "move");
-			model.addAttribute("msg", "정상적으로 등록되었습니다.");
-			model.addAttribute("url", "content_manage");
-		}else {
+		try {
+			HttpSession sess = request.getSession();
+			UserVO login = (UserVO)sess.getAttribute("loginSess");
+			if (login == null) {
+				return "redirect:/member/login"; 
+			}
+			contentVo.setUser_id(login.getUser_id());
+			
+			contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
+			contentVo.setIs_active(true);
+			contentVo.setIs_delete(false);
+			int r = vendorService.createContent(contentVo, contentScheduleVO, file, request, timeList, total_ticket);
+			
+			if (contentScheduleVO != null && contentScheduleVO.getTotal_ticket() != null) {
+				contentScheduleVO.setCurrent_ticket(contentScheduleVO.getTotal_ticket());
+			}
+			
+			if(r > 0) {
+				model.addAttribute("cmd", "move");
+				model.addAttribute("msg", "정상적으로 등록되었습니다.");
+				model.addAttribute("url", "content_manage");
+			}else {
+				model.addAttribute("cmd", "back");
+				model.addAttribute("msg", "등록 오류, 다시 작성해주세요.");
+			}
+			return "common/return";
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "등록 오류, 다시 작성해주세요.");
+			
+			return "common/return";
 		}
-		
-		return "common/return";
 	}
 	//update
 	@PostMapping("/vendor/content_update")

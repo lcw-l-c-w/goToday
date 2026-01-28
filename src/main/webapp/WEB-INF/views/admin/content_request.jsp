@@ -134,6 +134,26 @@ $(document).on('click', '.btn-reject', function () {
     }, loadContentList);
 });
 
+$(document).on('click', '.btn-delete', function () {
+    const contentId = $(this).data('id');
+    
+    if (!confirm('삭제하시겠습니까?')) {
+        return; // 취소 누르면 아무것도 안 함
+    }
+
+    $.ajax({
+        url: ctx + '/admin/content_manage/delete',
+        type: 'get',
+        data: { content_id: contentId },
+        success() {
+            loadContentList(); // 다시 로드
+        },
+        error() {
+            alert('삭제 실패');
+        }
+    });
+});
+
 function renderPagination(p){
 	const $pagination = $('.pagination');
 	$pagination.empty();
@@ -186,6 +206,13 @@ function renderList(list) {
                         '<span class="material-symbols-outlined">close</span>' +
                     '</button>' +
                 '</div>';
+        } else if (item.content_status === 'STATUS_REJECTED'){
+        	actionHtml =
+                '<div class="actions">' +
+	                '<button class="btn-icon btn-delete" data-id="' + item.content_id + '" title="삭제">' +
+		                '<span class="material-symbols-outlined" style="font-size:18px;">delete</span>' +
+		            '</button>' +	
+                '</div>';
         }
 
         $list.append(
@@ -196,7 +223,8 @@ function renderList(list) {
 	            '</a>' +
                 '<span class="date">' + formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) + '</span>' +
                 '<span class="location">' + item.location + '</span>' +
-                '<span class="user_id">' + item.user_id + '</span>' +
+                '<span class="user_id">' + item.user_id + '</span>' + 
+                
                 actionHtml +
             '</li>'
         );
