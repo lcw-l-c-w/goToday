@@ -345,17 +345,26 @@ body { background: #f5f5f5; font-family: 'Pretendard', -apple-system, sans-serif
 			if (!confirm("정말 예약을 취소하시겠습니까?")) return;
 	
 			$.ajax({
-				url: "/gotoday/payment/cancel.do",
-				type: "POST",
-				contentType: "application/json",
-				data: JSON.stringify({ orderId: orderId, reason: reason }),
-				success: function (res) {
-					alert(res.msg);
-					location.reload();
-				},
-				error: function () {
-					alert("서버 오류");
-				}
+			    url: "/gotoday/payment/cancel.do",
+			    type: "POST",
+			    contentType: "application/json",
+			    data: JSON.stringify({ orderId: orderId, reason: reason }),
+			    success: function (res) {
+			        // [수정] 성공 여부에 따라 분기 처리
+			        if (res.success) {
+			            // 진짜 취소 성공 시
+			            alert(res.msg); // "결제가 정상적으로 취소되었습니다."
+			            location.reload();
+			        } else {
+			            // 로직상 실패 (당일 취소 불가, 이미 취소됨 등)
+			            // 서버에서 보낸 e.getMessage()가 res.msg에 들어있음
+			            alert(res.msg); // "관람일 당일 및 지난 일정은 취소/환불이 불가합니다." 출력됨
+			        }
+			    },
+			    error: function () {
+			        // 이건 진짜 네트워크 에러나 404, 서버 다운일 때만 뜸
+			        alert("시스템 오류가 발생했습니다. 관리자에게 문의하세요.");
+			    }
 			});
 		});
 	});

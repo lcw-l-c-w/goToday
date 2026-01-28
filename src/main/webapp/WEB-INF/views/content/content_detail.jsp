@@ -407,8 +407,8 @@ $(function() {
     //추가-의선 캘박 
     $(".btn-save-cal").click(function() {
         // 1. 변수에 값이 있는지 확인
-        if(!selectedDate || !selectedTime) {
-            alert("관람하실 날짜와 시간을 먼저 선택해주세요.");
+        if(!selectedDate) {
+            alert("관람하실 날짜를 먼저 선택해주세요.");
             return;
         }
 
