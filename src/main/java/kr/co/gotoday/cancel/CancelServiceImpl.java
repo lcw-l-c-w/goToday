@@ -59,9 +59,6 @@ public class CancelServiceImpl implements CancelService{
         } else if ("가상계좌".equals(payment.getPayment_method()) && "WAITING_FOR_DEPOSIT".equals(payment.getPayment_status())) {
         	tossPaymentClient.cancelPayment(payment.getPayment_key(), cancelReason);
         	refundStatusLog = "CANCELED_BEFORE_DEPOSIT";
-        } else if ("가상계좌".equals(payment.getPayment_method()) && "DONE".equals(payment.getPayment_status())) {
-        	tossPaymentClient.cancelPayment(payment.getPayment_key(), cancelReason,refundAccount );
-        	refundStatusLog = "CANCELED_BEFORE_DEPOSIT";
         } else {
         
 	        // 3. 날짜 계산 및 환불 금액 산정 [핵심 로직 변경]
@@ -107,8 +104,14 @@ public class CancelServiceImpl implements CancelService{
 	        // 금액(cancelAmount)이 있을 때만 호출
 	        if (cancelAmount > 0) {
 	            String paymentKey = payment.getPayment_key();
-	            // [수정] 금액을 같이 보냄
-	            sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);
+	            
+	            if ("가상계좌".equals(payment.getPayment_method()) && "DONE".equals(payment.getPayment_status())) {
+	            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount, refundAccount);
+	            	
+	            } else {
+	            	// 카드나 간편결제 케이스의 부분취소 호출 
+	            	sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);	            	
+	            }
 	        }
         }
         // --- 5. DB 업데이트 진행 ---
@@ -139,6 +142,34 @@ public class CancelServiceImpl implements CancelService{
 
     // [수정] 파라미터에 int cancelAmount 추가
     private void sendCancelRequestToToss(String paymentKey, String cancelReason, int cancelAmount) throws Exception {
+        URL url = new URL("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        
+        String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
+        connection.setDoOutput(true);
+
+        // [수정] JSON Body에 cancelAmount 추가
+        String jsonBody = "{" +
+                          "\"cancelReason\":\"" + cancelReason + "\"," + 
+                          "\"cancelAmount\":" + cancelAmount + 
+                          "}";
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonBody.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        int code = connection.getResponseCode();
+        if (code != 200) {
+            throw new Exception("토스 결제 취소 실패: 응답 코드 " + code);
+        }
+    }
+    
+    private void sendCancelRequestToToss(String paymentKey, String cancelReason, int cancelAmount, String refund) throws Exception {
         URL url = new URL("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
