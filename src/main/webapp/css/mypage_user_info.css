@@ -18,6 +18,7 @@ body {
     font-weight: 700;    /* 글자 두껍게 */
     margin-bottom: 30px; /* 아래 여백 */
     color: #111;         /* 글자 색상 */
+    margin-top: 0px;
 }
 
 /* 공통 흰색 박스 */
