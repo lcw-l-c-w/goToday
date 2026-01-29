@@ -36,5 +36,7 @@ public interface ContentMapper {
 	//티켓 조회 (승인/ 승인 대기 상태에도 다 보이게끔)
 	ContentVO selectTicketDetail(@Param("content_id") int content_id);
 
+	//
+	List<String> getTagName(@Param("user_id") int user_id);
 	int findVendorId(@Param("content_id") int content_id);
 }

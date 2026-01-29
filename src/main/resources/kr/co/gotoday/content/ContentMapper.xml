@@ -22,41 +22,77 @@
 	
 	</select>
 
-	<select id="findRecommendedContents" parameterType="kr.co.gotoday.content.MainContentDTO" resultType="kr.co.gotoday.content.ContentVO">
-	SELECT 
-		c. content_id 		AS content_id,
-		c. title 			AS title,
-		c. main_image_path 	AS main_image_path,
-		c. location 		AS location,
-		c.start_at			AS start_at,
-		c.end_at			AS end_at
-		FROM content c
-		WHERE 	
-		<include refid="USER_VISIBLE_CONTENT" />
-			AND c.start_at &lt;= NOW()
-			AND c.end_at >= NOW()  
-		<if test="content_kind != null and content_kind != ''">
-            AND c.content_kind = #{content_kind}
-        </if>
-		 <if test="content_kind !=null and user_tag_id != null and user_tag_id.size > 0">
-      	 AND c.content_id IN (
-    SELECT DISTINCT ct.content_id
-    FROM content_tag ct
-    WHERE ct.tag_id IN
-    <foreach collection="user_tag_id"
-             item="ut"
-             open="("
-             separator=","
-             close=")">
-      #{ut.tag_id}
-    </foreach>
-  )
-      </if>	 
-      	
-		LIMIT #{limit}	
-	
-	</select>
+<select id="findRecommendedContents"
+        parameterType="kr.co.gotoday.content.MainContentDTO"
+        resultType="kr.co.gotoday.content.ContentVO">
 
+SELECT *
+FROM (
+    SELECT
+        c.*,
+        (
+            <!-- event -->
+            <choose>
+                <when test="eventTags != null and eventTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="eventTags" item="t" separator=" OR ">
+                            c.content_kind LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 6 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+
+            +
+
+            <!-- location -->
+            <choose>
+                <when test="locationTags != null and locationTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="locationTags" item="t" separator=" OR ">
+                            c.location LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 3 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+
+            +
+
+            <!-- interest -->
+            <choose>
+                <when test="interestTags != null and interestTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="interestTags" item="t" separator=" OR ">
+                            c.category LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 1 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+        ) AS weight_score
+    FROM content c
+    <where>
+        <include refid="USER_VISIBLE_CONTENT" />
+        AND c.start_at <![CDATA[<=]]> NOW()
+        AND c.end_at <![CDATA[>=]]> NOW()
+    </where>
+) t
+
+ORDER BY t.weight_score DESC, t.start_at DESC
+LIMIT #{limit}
+
+</select>
+
+
+
+
+	<select id="getTagName" resultType="string">
+	SELECT t.tag_name 
+	FROM tag t JOIN user_tag ut 
+	ON t.tag_id = ut.tag_id 
+    WHERE ut.user_id = #{user_id}
+	</select>
 
 	<sql id="USER_VISIBLE_CONTENT">
 		c.is_delete = 0
