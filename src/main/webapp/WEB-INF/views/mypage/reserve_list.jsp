@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html>
+<html id="top">
 <head>
 <meta charset="UTF-8">
 <title>예약 관리 | GoToday</title>
@@ -24,6 +24,11 @@
 	            이용 예정
 	        </a>
 	
+	        <a class="filter-btn ticket-btn ${currentFilter eq 'VISITED' ? 'active' : ''}"
+	           href="${pageContext.request.contextPath}/mypage/reservation?filter=VISITED">
+	            이용 완료
+	        </a>
+
 	        <a class="filter-btn ticket-btn ${currentFilter eq 'END' ? 'active' : ''}"
 	           href="${pageContext.request.contextPath}/mypage/reservation?filter=END">
 	            종료된 내역
@@ -33,6 +38,7 @@
 	           href="${pageContext.request.contextPath}/mypage/reservation?filter=CANCELED">
 	            예약 취소
 	        </a>
+	        
 	    </div>
 	</div>
 
@@ -145,7 +151,7 @@
 			<%-- 이전 블록 --%>
 			<c:choose>
 				<c:when test="${pageInfo.prev}">
-					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}" class="prev">&laquo;</a>
+					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}#top" class="prev">&laquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="prev disabled">&laquo;</span>
@@ -159,7 +165,7 @@
 						<span class="active">${i}</span>
 					</c:when>
 					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}">${i}</a>
+						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}#top">${i}</a>
 					</c:otherwise>
 				</c:choose>
 			</c:forEach>
@@ -167,7 +173,7 @@
 			<%-- 다음 블록 --%>
 			<c:choose>
 				<c:when test="${pageInfo.next}">
-					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}" class="next">&raquo;</a>
+					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}#top" class="next">&raquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="next disabled">&raquo;</span>
@@ -261,6 +267,9 @@
 <script src="${pageContext.request.contextPath}/resources/js/review/write.js"></script>
 <script>
 	$(function() {
+		// 페이지 로드 시 맨 위로 스크롤
+		window.scrollTo(0, 0);
+
 		$(".info-btn").click(
 				function() {
 					const reservation_id = $(this).data("reservation-id");

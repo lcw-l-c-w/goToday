@@ -327,7 +327,7 @@ public class MypageController {
         }
 
         // --- 페이징 로직 시작 ---
-        int limit = 5;      // 한 페이지에 보여줄 글 개수
+        int limit = 4;      // 한 페이지에 보여줄 글 개수
         int pageBlock = 5;  // 하단에 보여줄 페이지 번호 개수 (1,2,3,4,5)
 
         // 1. 전체 게시물 수 조회

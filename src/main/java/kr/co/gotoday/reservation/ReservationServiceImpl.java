@@ -109,6 +109,7 @@ public class ReservationServiceImpl implements ReservationService{
 	            paymentVO.setAmount_price(0);
 	            paymentVO.setPayment_method("FREE");
 	            paymentVO.setRefund_status("NONE");
+	            paymentVO.setPayment_status("DONE");
 	            
 	        } else {
 	            //유료 결제 로직
@@ -148,7 +149,7 @@ public class ReservationServiceImpl implements ReservationService{
 					//결제 승인 후 DB저장 실패 로그
 					log.error("[예약결제 DB저장 실패]",e);
 					// 토스 결제 취소
-					tossPaymentClient.cancelPayment(orderId, "DB 저장 실패로 인한 토스 결제 취소");
+					tossPaymentClient.cancelPayment(paymentKey, "DB 저장 실패로 인한 토스 결제 취소");
 				} catch (Exception cancelException) {
 					log.error("[토스 결제 취소 실패] paymentKey={}, orderId={}", 
 							paymentKey,
@@ -329,7 +330,7 @@ public class ReservationServiceImpl implements ReservationService{
 
 	@Override
 	public Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page) {
-		final int PAGE_SIZE = 10;
+		final int PAGE_SIZE = 5;
 		final int BLOCK_SIZE = 5;
 
 		Map<String, Object> param = new HashMap<>();
@@ -362,7 +363,7 @@ public class ReservationServiceImpl implements ReservationService{
 			else if (diff == 0) dto.setDday("D-Day");
 			else dto.setDday("END");
 		}
-
+		
 		Map<String, Object> result = new HashMap<>();
 		result.put("list", listDTO);
 		result.put("pageInfo", pageInfo);

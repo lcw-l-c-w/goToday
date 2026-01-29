@@ -193,23 +193,35 @@
 		JOIN payment p ON r.reservation_id = p.reservation_id
 		LEFT JOIN review r2 ON r.reservation_id = r2.reservation_id
 		WHERE r.user_id = #{user_id}
-		   <choose>
+	   <choose>
 	        <when test="filter == 'CANCELED'">
 	            AND r.reservation_status = 'CANCELED'
 	        </when>
-
+	
 	        <when test="filter == 'UPCOMING'">
-	            AND r.reserved_for_at >= NOW()
+	            AND DATE(r.reserved_for_at) >= CURDATE()
 	            AND r.reservation_status = 'DONE'
 	        </when>
-
+	
 	    	<when test="filter == 'END'">
-	            AND r.reserved_for_at &lt; NOW()
+	            AND DATE(r.reserved_for_at) &lt; CURDATE()
 	        </when>
-
+	        
+          	<when test="filter == 'VISITED'">
+          		AND (DATE(r.reserved_for_at) &lt; CURDATE() 
+          			OR DATE(r.reserved_for_at) = CURDATE())
+	            AND r.reservation_status = 'VISITED'
+	        </when>
+	        
 	        <otherwise></otherwise>
 	    </choose>
-		ORDER BY r.reserved_for_at, r.time_zone
+		ORDER BY 
+			CASE 
+	        WHEN r.reserved_for_at >= CURDATE() THEN 0 
+	        ELSE 1 
+	    END,
+	    ABS(DATEDIFF(r.reserved_for_at, CURDATE())),
+	    r.time_zone
 		<if test="pageSize != null and offset != null">
 			LIMIT #{pageSize} OFFSET #{offset}
 		</if>

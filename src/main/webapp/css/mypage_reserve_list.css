@@ -402,38 +402,37 @@ body {
 .pagination {
     display: flex;
     justify-content: center;
-    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
     gap: 5px;
-    margin-top: 30px;
 }
 
 .pagination a,
 .pagination span {
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 36px;
-    height: 36px;
-    padding: 0 10px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    color: #666;
-    background: #fff;
+    width: 32px;
+    height: 32px;
     border: 1px solid #ddd;
-    transition: all 0.2s ease;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
 .pagination a:hover {
-    background: #f5f5f5;
+    background-color: #f0f0f0;
     border-color: #ccc;
 }
 
 .pagination .active {
-    background: #4dc3ff;
+    background-color: #333;
     color: #fff;
-    border-color: #4dc3ff;
+    border-color: #333;
+    font-weight: bold;
 }
 
 .pagination .disabled {

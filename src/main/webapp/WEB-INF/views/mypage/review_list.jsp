@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
-<html>
+<html id="top">
 <head>
 <meta charset="UTF-8">
 <title>나의 리뷰 | GoToday</title>
@@ -94,15 +94,15 @@
     <c:if test="${paging.totalPage > 0}">
         <div class="pagination">
             <c:if test="${paging.startPage > 1}">
-                <a href="?page=${paging.startPage - 1}" class="page-btn prev">&lt;</a>
+                <a href="?page=${paging.startPage - 1}#top" class="page-btn prev">&lt;</a>
             </c:if>
 
             <c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
-                <a href="?page=${p}" class="page-btn ${p == paging.page ? 'active' : ''}">${p}</a>
+                <a href="?page=${p}#top" class="page-btn ${p == paging.page ? 'active' : ''}">${p}</a>
             </c:forEach>
 
             <c:if test="${paging.endPage < paging.totalPage}">
-                <a href="?page=${paging.endPage + 1}" class="page-btn next">&gt;</a>
+                <a href="?page=${paging.endPage + 1}#top" class="page-btn next">&gt;</a>
             </c:if>
         </div>
     </c:if>
@@ -116,6 +116,9 @@
 
 <script>
 $(function() {
+    // 페이지 로드 시 맨 위로 스크롤
+    window.scrollTo(0, 0);
+
     // 수정 버튼 클릭
     $(".edit-btn").click(function() {
         const resId = $(this).data("reservation-id");

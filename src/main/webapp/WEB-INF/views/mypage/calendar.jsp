@@ -26,6 +26,12 @@ body {
 	max-width: 100%;
 }
 
+.fc .fc-daygrid-day-top {
+    flex-direction: row; /* 기존 column(위아래)에서 row(좌우)로 변경 */
+    justify-content: flex-start; /* 요소를 왼쪽으로 정렬 */
+    padding: 2px; /* 여백 조정 */
+}
+
 .fc-toolbar-title {
 	font-size: 20px !important;
 }
