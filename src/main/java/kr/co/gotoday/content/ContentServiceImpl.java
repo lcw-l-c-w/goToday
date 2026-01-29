@@ -56,8 +56,7 @@ public class ContentServiceImpl implements ContentService {
 	        
 	        // 2. 카테고리별로 분류 작업 수행
 	        for (TagVO tag : tagAll) {
-	        	System.out.println("DB 카테고리 확인: [" + tag.getCategory() + "]");
-	            String category = tag.getCategory(); // TagVO 필드명 확인 (getCategory 또는 getTag_category)
+	        	String category = tag.getCategory(); // TagVO 필드명 확인 (getCategory 또는 getTag_category)
 	            String name = tag.getTag_name();
 	            
 	            allNames.add(name); // 전체 이름 리스트 채우기
@@ -71,9 +70,7 @@ public class ContentServiceImpl implements ContentService {
 	        mcd.setLocationTags(location);
 	        mcd.setEventTags(event);
 	        mcd.setInterestTags(interest);
-	        System.out.println("서비스 단DTO 데이터 확인: " + mcd);
-			System.out.println("서비스 태그 리스트 사이즈: " + (mcd.getUser_tag_name() != null ? mcd.getUser_tag_name().size() : "null"));
-			
+	       
 	        // 4. (중요) 정책 필터를 위해 user_tag_name도 최신화
 	        mcd.setUser_tag_name(allNames);
 	    }
@@ -154,7 +151,6 @@ public class ContentServiceImpl implements ContentService {
 	        mcv.setCtaUrl("/member/login");
 	        return mcv;
 	    }
-
 	    // 2. 관심사 리스트 체크 (user_tag_name을 기준으로 변경)
 	    // 컨트롤러에서 이미 mcd.setUser_tag_name(likeTagName)을 해줬으므로 여기서 바로 체크 가능합니다.
 	    if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
@@ -163,6 +159,7 @@ public class ContentServiceImpl implements ContentService {
 	        mcv.setCtaUrl("/mypage/like_list");
 	        return mcv;
 	    }
+
 	    
 	    // 3. 정상 (로그인 되어 있고, 관심사 리스트도 들어있는 경우)
 	    mcv.setBlur(false);

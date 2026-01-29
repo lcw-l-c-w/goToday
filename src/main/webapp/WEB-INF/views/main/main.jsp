@@ -36,8 +36,8 @@
             
             <%-- 통합 로직: 로그인 여부 및 추천 리스트 비어있음 확인 --%>
             <c:set var="isLoggedIn" value="${not empty loginSess}" />
-            <c:set var="isTagEmpty" value="${empty recommend}" />
-            <c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
+            <c:set var="isTagEmpty" value="${not empty recommend and recommend[0].blur}" />
+            <c:set var="isBlur" value="${!isLoggedIn or recommend[0].blur}" />
 
             <%-- 블러 조건 충족 시 안내 오버레이 표시 --%>
             <c:if test="${isBlur}">
