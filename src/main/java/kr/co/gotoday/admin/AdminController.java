@@ -22,12 +22,10 @@ import kr.co.gotoday.vendor.VendorService;
 
 @Controller
 public class AdminController {
-	
 	@Autowired
 	private AdminService adminService;
 	@Autowired
 	private VendorService vendorService;
-	
 	
 	@GetMapping("/admin/main")
 	public String adminMain(HttpSession session, Model model) {
@@ -51,7 +49,6 @@ public class AdminController {
 	//content 관리 페이지
 	@GetMapping("/admin/content_manage")
 	public String adminManage() {
-		
 		return "/admin/content_manage";
 	}
 	

@@ -104,7 +104,6 @@ public class ReplyController {
 				model.addAttribute("msg", "등록 오류");
 			}
 		}
-		
 		return "common/return";
 	}
 	

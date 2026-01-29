@@ -97,7 +97,6 @@ public class AdminServiceImpl implements AdminService {
 		return result;
 		
 	}
-
 	
 	@Override
 	public int updateActive(int content_id) {
@@ -112,17 +111,11 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public int updateRequest(int content_id) {
 		return adminMapper.updateContentStatus(content_id, "STATUS_APPROVAL");
-
 	}
 	
 	@Override
 	public int updateRejected(int content_id) {
 		return adminMapper.updateContentStatus(content_id, "STATUS_REJECTED");
-
 	}
-
-
-	
-	
 
 }

@@ -24,7 +24,6 @@ import kr.co.gotoday.user.UserVO;
 
 @Controller
 public class VendorController {
-	
 	@Autowired
 	private VendorService vendorService;
 	
@@ -132,7 +131,6 @@ public class VendorController {
 		} else {
 			model.addAttribute("isEdit", false);
 		}
-		
 		return "vendor/content_create";
 	}
 	
@@ -218,7 +216,6 @@ public class VendorController {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "등록 오류, 다시 작성해주세요.");
 		}
-		
 		return "common/return";
 	}
 	
