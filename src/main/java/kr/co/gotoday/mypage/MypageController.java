@@ -302,7 +302,8 @@ public class MypageController {
 		return "mypage/review_list";
 	}
 	
-    // 문의사항 목록
+/*	
+    // 문의사항 목록(채원)
     @GetMapping("/mypage/inquiry_list")
     public String myInquiryList(HttpSession session, Model model, ReplyVO vo) {
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
@@ -326,4 +327,52 @@ public class MypageController {
         
         return "mypage/inquiry_list";
     }
+*/
+    
+    // 1:1 문의사항
+	@GetMapping("/mypage/inquiry_list")
+	public String myInquiryList(HttpSession session, Model model, MypageDTO dto) {
+
+	    UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+	    
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+        
+        
+	    dto.setUser_id(loginUser.getUser_id());
+
+	    Map<String, Object> map = mypageService.getMyInquiryList(dto);
+
+	    model.addAttribute("map", map);
+	    model.addAttribute("dto", dto);
+
+	    return "mypage/inquiry_list";
+	}
+	
+	// 1:1 문의사항 상세보기
+	@GetMapping("/mypage/inquiry_detail")
+	public String inquiryDetail(@RequestParam("creply_id") int creplyId, Model model, HttpSession session) {
+
+	    UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+	    if (loginUser == null) {
+	        model.addAttribute("msg", "로그인이 필요합니다.");
+	        model.addAttribute("cmd", "move");
+	        model.addAttribute("url", "/gotoday/member/login");
+	        return "common/return";
+	    }
+
+	    // 문의 + 답변 내용 조회
+	    List<MypageDTO> detailList = mypageService.getInquiryDetail(creplyId);
+	    
+	    model.addAttribute("detailList", detailList);
+	    model.addAttribute("userName", loginUser.getName());
+	    
+	    return "mypage/inquiry_detail";
+	}
+
+
 }

@@ -14,4 +14,13 @@ public interface MypageService {
     ReplyVO getReplyDetail(int reply_id);
     // 문의 답변 가져오기
     ReplyVO getReplyAnswer(int reply_id);
+    
+    // 1:1 문의사항 list 
+    Map<String, Object> getMyInquiryList(MypageDTO dto);
+
+    // 1:1 문의사항 본문
+    List<MypageDTO> getInquiryDetail(int creplyId);
+	// 1:1 문의사항 답변
+	MypageDTO getInquiryAnswer(int creply_id);
+
 }

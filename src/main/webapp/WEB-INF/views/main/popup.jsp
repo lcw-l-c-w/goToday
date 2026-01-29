@@ -148,7 +148,7 @@
 </section>
 
 	</main>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 	<script>
         window.addEventListener("load", function() {
             // --- 1. 입체 캐러셀 배너 로직 ---
