@@ -4,7 +4,7 @@
     .site-footer {
         background-color: #fff;
         border-top: 1px solid #eee;
-        padding: 50px 0; /* 위아래 여백을 조금 더 넓게 */
+        padding: 50px 0; 
         color: #666;
         font-family: 'Pretendard', sans-serif;
     }
@@ -14,25 +14,21 @@
         margin: 0 auto;
         padding: 0 20px;
         display: flex;
-        align-items: flex-start; /* 상단 정렬 */
-        gap: 50px; /* 로고와 정보 사이 간격 */
+        align-items: flex-start; 
+        gap: 50px; 
     }
 
-    /* 로고 영역 */
     .footer-logo {
-        flex-shrink: 0; /* 크기 고정 */
-        width: 150px;   /* 로고 이미지 크기에 맞춰 조절 */
+        flex-shrink: 0; 
+        width: 150px;   
     }
 
     .footer-logo img {
         width: 100%;
         height: auto;
         display: block;
-        /* 로고가 너무 밝으면 아래 속성 사용 */
-        /* filter: grayscale(100%); opacity: 0.8; */
     }
 
-    /* 중앙 정보 영역 */
     .footer-content {
         flex: 1;
         font-size: 13px;
@@ -58,7 +54,6 @@
         position: relative;
     }
 
-    /* 구분선 (|) 추가 */
     .info-line span:not(:last-child)::after {
         content: "";
         display: inline-block;
@@ -85,7 +80,6 @@
         letter-spacing: 0.5px;
     }
 
-    /* 우측 보증보험 영역 */
     .footer-right {
         flex-shrink: 0;
         width: 220px;

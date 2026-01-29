@@ -148,9 +148,6 @@ $(document).ready(function() {
                         <c:if test="${userTags.contains('디지털/테크')}">checked</c:if>>
                     <span class="btn-option">디지털/테크</span>
                 </label>
-            </div>
-
-            <div class="interest-row">
                 <label>
                     <input type="checkbox" name="interest" value="키즈/반려동물"
                         <c:if test="${userTags.contains('키즈/반려동물')}">checked</c:if>>

@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title></title>
+<title>문의 작성</title>
 <META name="viewport"
 	content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
 <script
@@ -35,8 +35,6 @@
 				}
 			}, //boolean
 			fOnAppLoad : function() {
-				//예제 코드
-				//oEditors.getById["contents"].exec("PASTE_HTML", ["로딩이 완료된 후에 본문에 삽입되는 text입니다."]);
 			},
 			fCreator : "createSEditor2"
 		});
@@ -44,7 +42,6 @@
 	function goSave() {
 		oEditors[0].exec('UPDATE_CONTENTS_FIELD', []);
 
-		// 2. 제목 유효성 검사
 		var title = document.getElementById("title");
 		if (title.value.trim() == "") {
 			alert("제목을 입력해주세요.");
@@ -54,7 +51,6 @@
 
 		// 3. 내용 유효성 검사 (스마트 에디터 공백 체크)
 		var body = document.getElementById("body").value;
-		// 에디터 특성상 아무것도 안 써도 <p>&nbsp;</p> 등이 들어갈 수 있음
 		if (body == "" || body == null || body == "&nbsp;"
 				|| body == "<p>&nbsp;</p>" || body == "<p><br></p>") {
 			alert("내용을 입력해주세요.");

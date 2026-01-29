@@ -9,7 +9,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title></title>
+<title>문의 상세</title>
 <META name="viewport"
 	content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
 <script
@@ -21,6 +21,7 @@
 	href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 <link rel="stylesheet" href="${ctx}/css/reset.css" />
 <link rel="stylesheet" href="${ctx}/css/contents.css" />
+
 <script>
 	function del() {
 		if (confirm('삭제하시겠습니까?')) {

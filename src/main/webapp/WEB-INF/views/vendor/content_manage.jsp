@@ -76,7 +76,7 @@ const STATUS_MAP = {
 
 
 $(function () {
-    loadContentList(); // 최초 전체 목록
+    loadContentList(); 
 });
 
 let currentPage = 1;

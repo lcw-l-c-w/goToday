@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 //@RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
-	
 	@Autowired
 	private ReplyMapper mapper;
 	

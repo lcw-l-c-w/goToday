@@ -64,7 +64,6 @@
     
     document.addEventListener('DOMContentLoaded', function() {
         const sidebarItems = document.querySelectorAll('.sidebar-item');
-        // 현재 메인의 iframe이 전시 관리(content_manage)를 띄우고 있으므로 이를 기본값으로 설정
         const defaultPath = "${pageContext.request.contextPath}/vendor/content_manage";
 
         sidebarItems.forEach(item => {
@@ -72,12 +71,11 @@
             const href = link.getAttribute('href');
 
             // 1. 초기 로드 시 활성화 체크
-            // 현재 주소에 href가 포함되어 있거나, 첫 진입 시 defaultPath와 일치하면 active 추가
             if (href.includes(defaultPath)) {
                 item.classList.add('active');
             }
 
-            // 2. 클릭 시 활성화 변경 (기존 로직)
+            // 2. 클릭 시 활성화 변경
             link.addEventListener('click', function() {
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');

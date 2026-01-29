@@ -14,7 +14,6 @@ import kr.co.gotoday.user.UserVO;
 
 @Controller
 public class ReplyVendorController {
-
 	@Autowired
 	private ReplyVendorService service;
 	
@@ -128,7 +127,6 @@ public class ReplyVendorController {
 				model.addAttribute("msg", "등록 오류");
 			}
 		}
-		
 		return "common/return";
 	}
 	
