@@ -129,7 +129,7 @@
 
 						<div class="poster">
 							<a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
-								<img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
+								<img src="<c:url value='${r.main_image_path}'/>" alt="포스터">
 							</a>
 						</div>
 

@@ -43,7 +43,7 @@
 
                             <c:if test="${not empty r.image_new}">
                                 <div class="review-image">
-                                    <img src="/uploads/${r.image_new}" alt="리뷰 이미지">
+                                    <img src="/upload/${r.image_new}" alt="리뷰 이미지">
                                 </div>
                             </c:if>
 
@@ -66,7 +66,7 @@
 
                         <div class="poster">
                             <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
-                                <img src="${pageContext.request.contextPath}${r.main_image_path}" alt="포스터">
+                                <img src="<c:url value='${r.main_image_path}'/>" alt="포스터">
                             </a>
                         </div>
                     </div>

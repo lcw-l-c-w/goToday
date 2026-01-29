@@ -289,7 +289,7 @@
 		
 		                <c:if test="${not empty r.image_new}">
 		                    <div class="review-images">
-		                        <img src="${pageContext.request.contextPath}/uploads/${r.image_new}">
+		                        <img src="${pageContext.request.contextPath}/upload/${r.image_new}">
 		                    </div>
 		                </c:if>
 		            </div>
@@ -322,7 +322,7 @@ const ratingSummary = {
 
 let currentPage = 1;
 let currentSortType = "latest";
-const contextPath = "${pageContext.request.contextPath}";
+const ctx = "${pageContext.request.contextPath}";
 const contentId = ${content.content_id};
 
 document.addEventListener("click", function (e) {
@@ -341,7 +341,7 @@ function loadMoreReviews() {
   const nextPage = currentPage + 1;
 
   const url =
-    contextPath + "/detail/" + contentId +
+    ctx + "/detail/" + contentId +
     "?page=" + nextPage + "&sortType=" + currentSortType;
 
   console.log("AJAX url =", url);

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +28,9 @@ import util.MyFileRenamePolicy;
 @Controller
 public class ReviewController {
 
-	private static final String UPLOAD_PATH = "C:/gotoday_img";
+	@Value("${upload.path}")
+	private String uploadPath;
+
 
 	@Autowired
 	private ReviewService reviewService;
@@ -222,13 +225,13 @@ public class ReviewController {
 		String imageNew = null;
 
 		if (imageFile != null && !imageFile.isEmpty()) {
-			File dir = new File(UPLOAD_PATH);
+			File dir = new File(uploadPath);
 			if (!dir.exists()) {
 				dir.mkdirs();
 			}
 
 			imageOrg = imageFile.getOriginalFilename();
-			File originFile = new File(UPLOAD_PATH, imageOrg);
+			File originFile = new File(uploadPath, imageOrg);
 
 			MyFileRenamePolicy policy = new MyFileRenamePolicy();
 			File renamedFile = policy.rename(originFile);

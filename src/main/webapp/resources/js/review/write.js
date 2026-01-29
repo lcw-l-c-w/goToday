@@ -144,7 +144,7 @@ function openReviewModal(dto) {
 	const removeBtn = overlay.querySelector('#btnRemoveImage');
 	
 	if (review.image_new) {
-	    const imageUrl = `${window.location.origin}/uploads/${review.image_new}`;
+	    const imageUrl = contextPath + '/upload/' + review.image_new;
 	    currentImage.src = imageUrl;
 	    imageArea.style.display = 'block';
 	    keepImageInput.value = 'true';
@@ -250,7 +250,7 @@ function fillReviewData(overlay, review) {
         const imageArea = overlay.querySelector('#currentImageArea');
         const currentImage = overlay.querySelector('#currentImage');
         imageArea.style.display = 'block';
-        currentImage.src = `/uploads/${review.image_new}`;
+        currentImage.src = contextPath + '/upload/' + review.image_new;
         overlay.querySelector('#m_keepImage').value = 'true';
 
         // 이미지 삭제 버튼 이벤트
