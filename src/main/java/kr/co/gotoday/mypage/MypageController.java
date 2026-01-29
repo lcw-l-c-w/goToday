@@ -185,21 +185,23 @@ public class MypageController {
     // 예약 관리
     @GetMapping("/mypage/reservation")
     public String showReservationList(
-    		@RequestParam(required = false, defaultValue = "ALL") String filter, 
-    		HttpSession sess, 
+    		@RequestParam(required = false, defaultValue = "ALL") String filter,
+    		@RequestParam(required = false, defaultValue = "1") Integer page,
+    		HttpSession sess,
     		Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-    	
+
     	if (userVO == null) {
             model.addAttribute("cmd", "back");
             model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
             return "common/return";
         }
-    	
-    	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id(), filter);
-    	model.addAttribute("reservationList", reservationList);
+
+    	Map<String, Object> result = reservationService.findReservationListByUserId(userVO.getUser_id(), filter, page);
+    	model.addAttribute("reservationList", result.get("list"));
+    	model.addAttribute("pageInfo", result.get("pageInfo"));
     	model.addAttribute("currentFilter", filter);
-    	
+
     	return "mypage/reserve_list";
     }
     // 예약 관리
@@ -325,7 +327,7 @@ public class MypageController {
         }
 
         // --- 페이징 로직 시작 ---
-        int limit = 5;      // 한 페이지에 보여줄 글 개수
+        int limit = 4;      // 한 페이지에 보여줄 글 개수
         int pageBlock = 5;  // 하단에 보여줄 페이지 번호 개수 (1,2,3,4,5)
 
         // 1. 전체 게시물 수 조회
