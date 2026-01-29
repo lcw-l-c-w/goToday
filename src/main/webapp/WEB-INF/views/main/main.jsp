@@ -156,7 +156,7 @@
                 resetTimer(); 
             }
 
-        });
+       
             // 5초 자동 재생
             function startTimer() {
                 slideTimer = setInterval(() => {
