@@ -71,7 +71,7 @@
 			</c:if>
 
 			<div class="recommend-container">
-				<button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
+				
 				<div class="recommend-view">
 					<div id="recList"
 						class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
@@ -92,7 +92,6 @@
 						</c:if>
 					</div>
 				</div>
-				<button class="recommend-btn rec-next" id="recNext">&gt;</button>
 			</div>
 		</section>
 

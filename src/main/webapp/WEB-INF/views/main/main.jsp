@@ -53,14 +53,14 @@
                         <c:when test="${isTagEmpty}">
                             <h3>관심사 등록 전이신가요?</h3>
                             <p>관심사를 설정하면 당신만을 위한<br>특별한 맞춤 전시를 추천해드려요!</p>
-							<a href="${pageContext.request.contextPath}/mypage/main?page=user_like_edit" class="cta-btn">관심사 설정하기</a>
+                            <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="cta-btn">관심사 설정하기</a>
                         </c:when>
                     </c:choose>
                 </div>
             </c:if>
 
             <div class="recommend-container">
-                <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
+               
                 <div class="recommend-view">
                     <%-- 조건에 따라 blur-container 클래스 동적 부여 --%>
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <button class="recommend-btn rec-next" id="recNext">&gt;</button>
+                
             </div>
         </section>
 

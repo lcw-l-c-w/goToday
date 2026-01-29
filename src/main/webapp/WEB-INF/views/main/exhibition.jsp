@@ -59,7 +59,7 @@
             </c:if>
 
             <div class="recommend-container">
-                <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
+           
                 <div class="recommend-view">
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
                         <c:forEach var="item" items="${recommend}">
@@ -76,7 +76,7 @@
                         </c:if>
                     </div>
                 </div>
-                <button class="recommend-btn rec-next" id="recNext">&gt;</button>
+               
             </div>
         </section>
 
@@ -175,7 +175,7 @@
             const cardWidth = 210 + 20; 
             const view = document.querySelector('.recommend-view');
             if (recCards.length > 0 && view) {
-                const containerWidth = view.offsetWidth;
+                const containerWidth = view.scrollWidth;
                 const visibleCount = Math.floor(containerWidth / cardWidth);
                 document.getElementById('recPrev').onclick = () => { recPosition = Math.min(recPosition + cardWidth, 0); recList.style.transform = `translateX(${recPosition}px)`; };
                 document.getElementById('recNext').onclick = () => { recPosition = Math.max(recPosition - cardWidth, -(cardWidth * recCards.length - containerWidth + 10)); recList.style.transform = `translateX(${recPosition}px)`; };
