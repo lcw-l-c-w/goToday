@@ -92,7 +92,7 @@
 <div class="payment-wrapper">
   <!-- 로고 -->
   <div class="logo">
-    <img src="${pageContext.request.contextPath}/uploads/logo/logo.png" alt="GoToday">
+    <img src="/uploads/logo/logo.png" alt="GoToday">
   </div>
 
   <!-- 타이틀 -->

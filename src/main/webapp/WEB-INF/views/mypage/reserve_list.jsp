@@ -362,13 +362,16 @@
 }
 </style>
 
-<script src="/gotoday/resources/js/review/write.js"></script>
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+</script>
+<script src="${pageContext.request.contextPath}/resources/js/review/write.js"></script>
 <script>
 	$(function() {
 		$(".info-btn").click(
 				function() {
 					const reservation_id = $(this).data("reservation-id");
-					window.location.href = "/gotoday/mypage/reservation/"
+					window.location.href = "${pageContext.request.contextPath}/mypage/reservation/"
 							+ reservation_id;
 				});
 		$(".review-btn, .review-check-btn").click(function(e) {
@@ -378,7 +381,7 @@
 
             // 서버에서 전시명, 위치, 시간대 가져옴
             $.ajax({
-                url: "/gotoday/review/getData",
+                url: "${pageContext.request.contextPath}/review/getData",
                 type: "GET",
                 data: { reservation_id: resId},
                 success: function(data) {
@@ -393,7 +396,7 @@
 
 		$(".ticket-btn").not(".review-check-btn").click(function () {
 			const reservationId = $(this).data("reservation-id");
-			location.href = "/gotoday/ticket/" + reservationId;
+			location.href = "${pageContext.request.contextPath}/ticket/" + reservationId;
 		});
 
 		// 취소 모달 관련 변수
@@ -495,7 +498,7 @@
 
 			if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
 				$.ajax({
-				    url: "/gotoday/payment/account/refund.do",
+				    url: "${pageContext.request.contextPath}/payment/account/refund.do",
 				    type: "POST",
 				    contentType: "application/json",
 				    data: JSON.stringify({
@@ -520,12 +523,12 @@
 
 			} else {
 				$.ajax({
-				    url: "/gotoday/payment/cancel.do",
+				    url: "${pageContext.request.contextPath}/payment/cancel.do",
 				    type: "POST",
 				    contentType: "application/json",
 				    data: JSON.stringify({ orderId: currentOrderId, reason: reason}),
 				    success: function (res) {
-				        // [수정] 성공 여부에 따라 분기 처리
+				        // 성공 여부에 따라 분기 처리
 				        if (res.success) {
 				            // 진짜 취소 성공 시
 				            alert(res.msg); // "결제가 정상적으로 취소되었습니다."

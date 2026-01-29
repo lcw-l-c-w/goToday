@@ -43,7 +43,7 @@
 
                             <c:if test="${not empty r.image_new}">
                                 <div class="review-image">
-                                    <img src="/gotoday/uploads/${r.image_new}" alt="리뷰 이미지">
+                                    <img src="/uploads/${r.image_new}" alt="리뷰 이미지">
                                 </div>
                             </c:if>
 
@@ -77,7 +77,10 @@
 </div>
 
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
-<script src="/gotoday/resources/js/review/write.js"></script>
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+</script>
+<script src="${pageContext.request.contextPath}/resources/js/review/write.js"></script>
 
 <script>
 $(function() {
@@ -86,7 +89,7 @@ $(function() {
         const resId = $(this).data("reservation-id");
 
         $.ajax({
-            url: "/gotoday/review/getData",
+            url: "${pageContext.request.contextPath}/review/getData",
             type: "GET",
             data: { reservation_id: resId },
             success: function(data) {
@@ -107,7 +110,7 @@ $(function() {
         const reviewId = $(this).data("review-id");
 
         $.ajax({
-            url: "/gotoday/review/delete.do",
+            url: "${pageContext.request.contextPath}/review/delete.do",
             type: "POST",
             data: { review_id: reviewId },
             success: function(res) {
