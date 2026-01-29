@@ -135,7 +135,7 @@
 </section>
 
     </main>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
     <script>
     window.addEventListener("load", function() {
         // 1. 메인 배너 로직
@@ -156,7 +156,7 @@
                 resetTimer(); 
             }
 
-        });
+       
             // 5초 자동 재생
             function startTimer() {
                 slideTimer = setInterval(() => {

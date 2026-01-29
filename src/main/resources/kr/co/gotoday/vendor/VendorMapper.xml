@@ -81,6 +81,15 @@
 	    ORDER BY content_id DESC
 	</select>
 	
+	<select id="selectAllContentForFilter" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
+	    SELECT content_id, title
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0
+	      AND is_active = 1
+	    ORDER BY content_id DESC
+	</select>
+	
 	<select id="selectContentOne" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
 		SELECT content_id, user_id, content_kind, category, location, title, description, reservation_type,
 			DATE(start_at) AS start_at, DATE(end_at) AS end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
