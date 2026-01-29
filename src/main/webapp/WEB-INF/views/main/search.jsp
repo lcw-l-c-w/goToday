@@ -10,6 +10,7 @@
 
 <!-- ✅ search 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/css/search.css'/>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body>
 
@@ -25,7 +26,7 @@
       <div class="search-input-wrap">
         <input class="search-input" type="search" name="q" value="${search.q}" placeholder="검색어를 입력하세요" autocomplete="off">
         <button type="button" class="clear-btn" id="clearQBtn" aria-label="clear">×</button>
-        <button type="submit" class="submit-btn" aria-label="search">🔍</button>
+        <button type="submit" class="submit-btn" aria-label="search"><span class="material-symbols-outlined">search</span></button>
       </div>
 
       <div class="search-top-right">
@@ -202,7 +203,7 @@
 
   </div>
 </div>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 <script>
 (function () {
   const form = document.getElementById("searchForm");
