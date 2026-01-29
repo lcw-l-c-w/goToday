@@ -19,6 +19,7 @@ body {
 	margin: 0;
 	padding: 20px;
 	font-family: 'Malgun Gothic', sans-serif;
+	
 }
 
 /* 캘린더 스타일 미세 조정 */
