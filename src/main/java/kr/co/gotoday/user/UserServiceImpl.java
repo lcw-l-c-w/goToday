@@ -47,8 +47,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Long findTagIdByName(String tagName) {
-        return userMapper.findTagIdByName(tagName);
+    public Long findTagIdByNameAndCategory(String tagName, String category) {
+        return userMapper.findTagIdByNameAndCategory(tagName, category);
     }
 
     @Override
@@ -135,21 +135,53 @@ public class UserServiceImpl implements UserService{
     // 관심사 수정
     @Override
     @Transactional
-    public boolean updateUserTags(int userId, List<String> tagNames) {
-    	// 기존 태그 삭제
-        userMapper.deleteUserTags(userId);
-        // 새로운 태그 추가
-        for (String tagName : tagNames) {
-            Long tagId = userMapper.findTagIdByName(tagName);
-            // 태그가 존재하지 않는 경우 스킵
-            if (tagId == null) continue;
-            UserTagVO ut = new UserTagVO();
-            ut.setUser_id(userId);
-            ut.setTag_id(tagId.intValue());
-            userMapper.insertUserTag(ut);
-        }
-        return true;
-    }
+    public boolean updateUserTags(int userId,
+	            String event,
+	            List<String> locations,
+	            List<String> interests) {
+	
+	// 기존 태그 삭제
+	userMapper.deleteUserTags(userId);
+	
+	// event (radio)
+	if (event != null) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(event, "event");
+	if (tagId != null) {
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	// location (checkbox)
+	if (locations != null) {
+	for (String loc : locations) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(loc, "location");
+	if (tagId == null) continue;
+	
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	// interest (checkbox)
+	if (interests != null) {
+	for (String interest : interests) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(interest, "interest");
+	if (tagId == null) continue;
+	
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	return true;
+	}
     
     //회원정보 수정+회원 조회해서 사업자/ 개인/ admin 분기 
     @Override

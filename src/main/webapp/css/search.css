@@ -5,7 +5,7 @@ body { background: pink !important; }
 
 .search-page {
   width: 100%;
-  background: #f3f3f3;
+  background: #fff;
   min-height: 100vh;
 }
 
@@ -211,6 +211,11 @@ body { background: pink !important; }
   color: var(--main-color);
   font-size: 12px;
   font-weight: 700;
+}
+/* 상태 차이만 override */
+.mini-tag1 {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
 }
 
 .title-link {

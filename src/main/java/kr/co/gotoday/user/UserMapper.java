@@ -10,7 +10,12 @@ public interface UserMapper {
 	UserVO login(UserVO vo);
     int register(UserVO vo);
     void createUserTags(UserTagVO vo);
-    Long findTagIdByName(String tagName);
+    
+    Long findTagIdByNameAndCategory(
+    	    @Param("tagName") String tagName,
+    	    @Param("category") String category
+    	);
+    
     Integer emailCheck(String email);
     
     // 카카오 로그인 

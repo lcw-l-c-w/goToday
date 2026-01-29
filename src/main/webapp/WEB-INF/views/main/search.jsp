@@ -148,12 +148,11 @@
 
           <div class="col-title">
             <!-- 예약태그 -->
-            <div class="mini-tag">
-              <c:choose>
-                <c:when test="${item.reservation_type == 'true'}">예매 필수</c:when>
-                <c:otherwise>현장 입장</c:otherwise>
-              </c:choose>
-            </div>
+			<div class="mini-tag
+     			${item.reservation_type == 'true' ? '' : 'mini-tag1'}">
+  				${item.reservation_type == 'true' ? '예매 필수' : '현장 입장'}
+			</div>
+
 
             <a class="title-link" href="${pageContext.request.contextPath}/detail/${item.content_id}">
               ${item.title}

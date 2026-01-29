@@ -6,366 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>POPUP</title>
-<style>
-/* 1. 공통 기본 스타일 */
-:root { 
-	--main-color: #4dc3ff;
-}
-
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-
-body {
-	font-family: 'Pretendard', sans-serif;
-	overflow-x: hidden;
-	background-color: #fff;
-}
-
-a {
-	text-decoration: none;
-	color: inherit;
-}
-
-
-
-.main-wrapper {
-	max-width: 1100px;
-	margin: 0 auto;
-	padding: 0 20px;
-}
-
-/* 2. 입체 캐러셀 배너 스타일 */
-.exhibit-banner-section {
-	position: relative;
-	width: 100%;
-	height: 500px;
-	margin: 40px 0 80px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.banner-container {
-	position: relative;
-	width: 100%;
-	height: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	perspective: 1200px;
-}
-
-.banner-track {
-	position: relative;
-	width: 420px;
-	height: 450px;
-	transform-style: preserve-3d;
-	margin: 0 auto;
-	list-style: none;
-}
-
-.exhibit-banner-card {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	border-radius: 20px;
-	overflow: hidden;
-	transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s;
-	opacity: 0;
-	z-index: 0;
-	pointer-events: none;
-	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-	background: #eee;
-}
-
-.exhibit-banner-card img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.exhibit-banner-card.active {
-	opacity: 1;
-	z-index: 10;
-	transform: translateX(0) scale(1.1);
-	pointer-events: auto;
-}
-
-.exhibit-banner-card.prev {
-	opacity: 0.5;
-	z-index: 5;
-	transform: translateX(-105%) scale(0.85) rotateY(10deg);
-}
-
-.exhibit-banner-card.next {
-	opacity: 0.5;
-	z-index: 5;
-	transform: translateX(105%) scale(0.85) rotateY(-10deg);
-}
-
-.banner-overlay {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	padding: 40px 30px;
-	background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-	color: white;
-	opacity: 0;
-	transition: opacity 0.4s;
-}
-
-.exhibit-banner-card.active .banner-overlay {
-	opacity: 1;
-}
-
-.banner-overlay h3 {
-	font-size: 24px;
-	margin-bottom: 5px;
-}
-
-.banner-overlay p {
-	font-size: 14px;
-	opacity: 0.8;
-}
-
-.slide-btn {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	background: none;
-	border: none;
-	font-size: 50px;
-	cursor: pointer;
-	z-index: 100;
-	transition: 0.3s;
-	color: #333;
-}
-
-.btn-l {
-	left: -10px;
-}
-
-.btn-r {
-	right: -10px;
-}
-
-.indicator-dots {
-	display: flex;
-	gap: 8px;
-	margin-top: 20px;
-}
-
-.dot {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background: #ddd;
-	cursor: pointer;
-	transition: 0.3s;
-}
-
-.dot.active {
-	background: var(- -main-color);
-	width: 22px;
-	border-radius: 10px;
-}
-
-/* 3. 추천 콘텐츠 슬라이더 및 블러 (PopUp 스타일 적용) */
-.recommend-section {
-	position: relative;
-	width: 100%;
-	margin-bottom: 80px;
-	min-height: 450px;
-	border-radius: 25px;
-	padding: 40px 0;
-}
-
-.recommend-container {
-	position: relative;
-	width: 100%;
-	padding: 0 30px;
-}
-
-.recommend-view {
-	width: 100%;
-	overflow: hidden;
-	min-height: 340px;
-}
-
-.content-list.horizontal {
-	display: flex;
-	gap: 20px;
-	transition: transform 0.5s ease;
-	padding: 10px 0;
-	list-style: none;
-}
-
-.content-card {
-	flex: 0 0 210px;
-	cursor: pointer;
-	transition: 0.3s;
-}
-
-.content-card:hover {
-	transform: translateY(-5px);
-}
-
-.card-img-wrap {
-	width: 100%;
-	height: 280px;
-	border-radius: 15px;
-	overflow: hidden;
-	position: relative;
-	margin-bottom: 15px;
-	border: 1px solid #eee;
-	background: #fff;
-}
-
-.card-img-wrap img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.recommend-btn {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	background: #fff;
-	border: 1px solid #eee;
-	width: 44px;
-	height: 44px;
-	border-radius: 50%;
-	cursor: pointer;
-	z-index: 110;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 18px;
-	transition: 0.2s;
-}
-
-.rec-prev {
-	left: -5px;
-}
-
-.rec-next {
-	right: -5px;
-}
-
-.blur-container {
-	filter: blur(15px);
-	pointer-events: none;
-	user-select: none;
-	opacity: 0.4;
-}
-
-.cta-overlay {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -40%);
-	z-index: 120;
-	background: rgba(255, 255, 255, 0.98);
-	padding: 50px 70px;
-	border-radius: 30px;
-	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-	text-align: center;
-	width: 90%;
-	max-width: 520px;
-	border: 1px solid #eee;
-}
-
-.cta-overlay h3 {
-	font-size: 26px;
-	font-weight: bold;
-	margin-bottom: 15px;
-	color: #111;
-}
-
-.cta-overlay p {
-	font-size: 16px;
-	color: #666;
-	margin-bottom: 30px;
-	line-height: 1.6;
-}
-
-.cta-btn {
-	display: inline-block;
-	background-color: var(- -main-color);
-	color: white;
-	padding: 16px 40px;
-	border-radius: 15px;
-	font-weight: bold;
-	font-size: 16px;
-}
-
-/* 4. 공통 섹션 (HOT & 오픈 예정) */
-.section-title {
-	font-size: 26px;
-	font-weight: bold;
-	margin: 60px 0 30px;
-	text-align: center;
-}
-
-.hot-grid-container {
-	display: grid;
-	grid-template-columns: 1.3fr 2fr;
-	gap: 15px;
-	height: 550px;
-	margin-bottom: 80px;
-}
-
-.hot-main {
-	border-radius: 18px;
-	overflow: hidden;
-	position: relative;
-	cursor: pointer;
-}
-
-.hot-main img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.hot-sub-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	grid-template-rows: repeat(2, 1fr);
-	gap: 12px;
-}
-
-.sub-card {
-	border-radius: 12px;
-	overflow: hidden;
-	cursor: pointer;
-}
-
-.sub-card img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.d-day {
-	position: absolute;
-	top: 12px;
-	left: 12px;
-	background: #00d2ff;
-	color: white;
-	padding: 5px 12px;
-	border-radius: 8px;
-	font-weight: bold;
-	font-size: 12px;
-}
-</style>
+<!-- ✅ popup 전용 CSS -->
+<link rel="stylesheet" href="<c:url value='/css/popup.css'/>">
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -478,25 +120,33 @@ a {
 			</div>
 		</section>
 
-		<h2 class="section-title">오픈 예정 콘텐츠</h2>
-		<section style="padding-bottom: 100px;">
-			<div class="content-list horizontal"
-				style="overflow-x: auto; scrollbar-width: none;">
-				<c:forEach var="item" items="${upcomingList}">
-					<article class="content-card"
-						onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
-						<div class="card-img-wrap">
-							<c:if test="${not empty item.dday}">
-								<span class="d-day">D-${item.dday}</span>
-							</c:if>
-							<img src="<c:url value='${item.main_image_path}'/>">
-						</div>
-						<h4 style="margin: 8px 0 4px; font-size: 15px;">${item.title}</h4>
-						<p style="font-size: 13px; color: #999;">${item.periodText}</p>
-					</article>
-				</c:forEach>
-			</div>
-		</section>
+<h2 class="section-title">오픈 예정 콘텐츠</h2>
+<section class="upcoming-section" style="padding-bottom: 100px;">
+  <div class="upcoming-container">
+    <button class="recommend-btn rec-prev" id="upPrev">&lt;</button>
+
+    <div class="upcoming-view" id="upView">
+      <div class="content-list horizontal" id="upList">
+        <c:forEach var="item" items="${upcomingList}">
+          <article class="content-card"
+              onclick="location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
+            <div class="card-img-wrap">
+              <c:if test="${not empty item.dday}">
+                <span class="d-day">D-${item.dday}</span>
+              </c:if>
+              <img src="<c:url value='${item.main_image_path}'/>">
+            </div>
+            <h4 style="margin: 8px 0 4px; font-size: 15px;">${item.title}</h4>
+            <p style="font-size: 13px; color: #999;">${item.periodText}</p>
+          </article>
+        </c:forEach>
+      </div>
+    </div>
+
+    <button class="recommend-btn rec-next" id="upNext">&gt;</button>
+  </div>
+</section>
+
 	</main>
 
 	<script>
@@ -557,6 +207,30 @@ a {
                 }
             }
 
+            // 3. 오픈 예정 컨텐츠: 버튼으로 1개씩 이동
+            const upView = document.getElementById('upView');
+            const upPrev = document.getElementById('upPrev');
+            const upNext = document.getElementById('upNext');
+            const upFirstCard = document.querySelector('#upList .content-card');
+
+            if (upView && upPrev && upNext && upFirstCard) {
+              const upListStyle = getComputedStyle(document.getElementById('upList'));
+              const upGap = parseFloat(upListStyle.gap || upListStyle.columnGap || 0);
+              const upStep = upFirstCard.offsetWidth + upGap;
+
+              upPrev.onclick = () => upView.scrollBy({ left: -upStep, behavior: 'smooth' });
+              upNext.onclick = () => upView.scrollBy({ left: upStep, behavior: 'smooth' });
+
+              // 카드가 5개 이하이면 버튼 숨김(원하면)
+              const upCards = document.querySelectorAll('#upList .content-card');
+              if (upCards.length <= 5) {
+                upPrev.style.display = 'none';
+                upNext.style.display = 'none';
+              }
+            } else {
+              if (upPrev) upPrev.style.display = 'none';
+              if (upNext) upNext.style.display = 'none';
+            }
     
         });
     </script>
