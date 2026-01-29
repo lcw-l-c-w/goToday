@@ -1,10 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<link
-	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-	rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin_user_manage.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
@@ -19,9 +16,8 @@
 <div class="content-card">
 	<div class="toolbar">
 		<div class="search-box">
-			<span class="material-symbols-outlined">search</span> <input
-				type="text" class="searchInput" id="searchInput"
-				placeholder="사용자 이름, 아이디로 검색..." />
+			<span class="material-symbols-outlined">search</span> 
+			<input type="text" class="searchInput" id="searchInput" placeholder="사용자 이름, 아이디로 검색..." />
 		</div>
 		<div class="filter-tabs">
 			<button class="filter-btn active" data-status="">전체</button>
@@ -33,8 +29,10 @@
 	<section class="table-section">
 		<div class="table-header">
 			<span class="col-status">상태</span> <span class="col-email">이메일</span>
-			<span class="col-name">이름</span> <span class="col-user_id">유저 번호</span> <span class="col-phone">핸드폰
-				번호</span> <span class="col-birth">생년월일</span>
+			<span class="col-name">이름</span> 
+			<span class="col-user_id">유저 번호</span> 
+			<span class="col-phone">핸드폰 번호</span> 
+			<span class="col-birth">생년월일</span>
 		</div>
 
 		<ul class="table-body" id="contentList">
@@ -77,7 +75,6 @@ let currentPage = 1;
 function loadContentList(page = 1) {
 	
     const keyword = $('#searchInput').val();
-    // active 클래스가 붙은 버튼의 data-status를 가져옴
     let status = $('.filter-btn.active').data('status');
     
     // 데이터 전송 객체 구성
@@ -86,7 +83,6 @@ function loadContentList(page = 1) {
         page : page
     };
     
-    // status가 빈 문자열("")이 아닐 때만 파라미터에 추가 (전체 선택 시 제외)
     if (status !== "" && status !== undefined) {
         searchData.role = status;
     }

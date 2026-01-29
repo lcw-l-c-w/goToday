@@ -84,7 +84,6 @@
             const href = link.getAttribute('href');
 
             // 1. 초기 로드 시 활성화 체크
-            // 현재 주소에 href가 포함되어 있거나, 첫 진입 시 defaultPath와 일치하면 active 추가
             if (href.includes(defaultPath)) {
                 item.classList.add('active');
             }

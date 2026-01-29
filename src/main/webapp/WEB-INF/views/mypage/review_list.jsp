@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
@@ -9,6 +9,40 @@
 <title>나의 리뷰 | GoToday</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_review_list.css">
+<style>
+    /* 페이징 버튼 스타일 추가 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        gap: 5px;
+    }
+    .page-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        color: #555;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .page-btn:hover {
+        background-color: #f0f0f0;
+        border-color: #ccc;
+    }
+    .page-btn.active {
+        background-color: #333; /* 원하시는 포인트 컬러로 변경 가능 */
+        color: #fff;
+        border-color: #333;
+        font-weight: bold;
+    }
+</style>
 </head>
 <body>
 <h1 class="page-title">나의 리뷰</h1>
@@ -22,13 +56,15 @@
             <c:otherwise>
                 <c:forEach var="r" items="${reviewList}">
                     <div class="review-item">
-                        <div class="review-info">
-                            <div class="review-date">
-                                <fmt:formatDate value="${r.created_at}" pattern="yyyy.MM.dd"/>
+                        <div class="review-left">
+                            <div class="review-header">
+                                <span class="review-date"><fmt:formatDate value="${r.created_at}" pattern="yyyy.MM.dd"/> 작성</span>
+                                <span class="visit-info">| 방문일: ${r.visited_at}<c:if test="${not empty r.visited_time_zone}"> (${r.visited_time_zone})</c:if></span>
                             </div>
-
                             <div class="title-line">
-                                <span class="title">${r.title}</span>
+                                <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
+                                    <span class="title">${r.title}</span>
+                                </a>
                                 <span class="star-rating">
                                     <c:forEach begin="1" end="5" var="i">
                                         <c:choose>
@@ -38,43 +74,39 @@
                                     </c:forEach>
                                 </span>
                             </div>
-
                             <div class="review-content">${r.content}</div>
-
-                            <c:if test="${not empty r.image_new}">
-                                <div class="review-image">
-                                    <img src="/upload/${r.image_new}" alt="리뷰 이미지">
-                                </div>
-                            </c:if>
-
-                            <div class="visit-info">
-                                방문일: ${r.visited_at}
-                                <c:if test="${not empty r.visited_time_zone}">
-                                    (${r.visited_time_zone})
-                                </c:if>
-                            </div>
-
-                            <div class="btn-group">
-                                <button class="edit-btn" data-reservation-id="${r.reservation_id}">
-                                    수정
-                                </button>
-                                <button class="delete-btn" data-review-id="${r.review_id}">
-                                    삭제
-                                </button>
-                            </div>
                         </div>
-
-                        <div class="poster">
-                            <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
-                                <img src="<c:url value='${r.main_image_path}'/>" alt="포스터">
-                            </a>
+                        <c:if test="${not empty r.image_new}">
+                            <div class="review-image">
+                                <img src="${pageContext.request.contextPath}/upload/${r.image_new}" alt="리뷰 이미지"/>
+                            </div>
+                        </c:if>
+                        <div class="btn-group">
+                            <button class="edit-btn" data-reservation-id="${r.reservation_id}">수정</button>
+                            <button class="delete-btn" data-review-id="${r.review_id}">삭제</button>
                         </div>
                     </div>
                 </c:forEach>
             </c:otherwise>
         </c:choose>
     </div>
-</div>
+
+    <c:if test="${paging.totalPage > 0}">
+        <div class="pagination">
+            <c:if test="${paging.startPage > 1}">
+                <a href="?page=${paging.startPage - 1}" class="page-btn prev">&lt;</a>
+            </c:if>
+
+            <c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
+                <a href="?page=${p}" class="page-btn ${p == paging.page ? 'active' : ''}">${p}</a>
+            </c:forEach>
+
+            <c:if test="${paging.endPage < paging.totalPage}">
+                <a href="?page=${paging.endPage + 1}" class="page-btn next">&gt;</a>
+            </c:if>
+        </div>
+    </c:if>
+    </div>
 
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 <script>

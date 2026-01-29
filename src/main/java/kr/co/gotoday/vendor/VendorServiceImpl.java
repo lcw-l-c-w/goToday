@@ -22,7 +22,6 @@ import util.PageInfo;
 
 @Service
 public class VendorServiceImpl implements VendorService {
-
 	@Autowired
 	private VendorMapper vendorMapper;
 	@Autowired
@@ -35,7 +34,6 @@ public class VendorServiceImpl implements VendorService {
 		if (contentScheduleVO == null) {
 			contentScheduleVO = new ContentScheduleVO();
 		}
-
 		// 파일 명명
 		if (file != null && !file.isEmpty()) {
 			String uploadDir = request.getServletContext().getRealPath("/upload/poster");
@@ -146,7 +144,6 @@ public class VendorServiceImpl implements VendorService {
 			// 최초 1개만 저장
 			uniqueMap.putIfAbsent(time, vo);
 		}
-
 		return List.copyOf(uniqueMap.values());
 	}
 
@@ -164,7 +161,6 @@ public class VendorServiceImpl implements VendorService {
 				contentVo.setMain_image_path(origin.getMain_image_path());
 			}
 		}
-
 		int r = vendorMapper.updateContent(contentVo);
 
 		if (r <= 0)
@@ -177,5 +173,4 @@ public class VendorServiceImpl implements VendorService {
 	public int updateReservationStatus(int reservation_id) { // 여기에 int가 중복되진 않았나요?
 		return reservationMapper.updateReservationStatusById(reservation_id);
 	}
-
 }

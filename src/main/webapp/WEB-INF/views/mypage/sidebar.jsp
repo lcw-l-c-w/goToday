@@ -88,7 +88,6 @@
         color: #999;
     }
 
-    /* 활성화된 메뉴 강조 */
     .sidebar-item.active {
         color: var(--color-primary);
         font-weight: 700;

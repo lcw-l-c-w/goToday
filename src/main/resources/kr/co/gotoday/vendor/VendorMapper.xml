@@ -14,6 +14,7 @@
 			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}, #{place_tag}
 		)
 	</insert>
+	
 	<insert id="createSchedule" parameterType="kr.co.gotoday.content.ContentScheduleVO">
 		INSERT INTO content_schedule (
 			schedule_id, scheduled_at, time_zone, total_ticket, current_ticket, content_id 
