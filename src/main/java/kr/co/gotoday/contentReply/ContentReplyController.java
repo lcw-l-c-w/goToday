@@ -42,12 +42,12 @@ public class ContentReplyController {
 	public String writeQuestion(@PathVariable("content_id") int content_id, Model model, HttpSession sess) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 
-		// 2. 로그인 안 되어 있으면 로그인 페이지로 쫓아내기
+		// 2. 로그인 안 되어 있으면 로그인 페이지로
 		if (user == null) {
 			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
 			model.addAttribute("cmd", "move");
 			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return"; // 알림창 띄우고 이동하는 공통 뷰
+			return "common/return";
 		}
 
 		if (user.getRole() == 1) {
@@ -78,6 +78,7 @@ public class ContentReplyController {
 		if (user.getRole() == 1) {
 			// vendor인경우
 			model.addAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
+			model.addAttribute("url", "/gotoday/detail/" + content_id + "?tab=inquiry");
 			model.addAttribute("cmd", "move");
 			return "common/return";
 		}
@@ -122,7 +123,6 @@ public class ContentReplyController {
 
 		} else {
 			model.addAttribute("msg", "게시글 등록에 실패했습니다.");
-			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
 			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
@@ -208,8 +208,8 @@ public class ContentReplyController {
 		// 예외처리
 		if (user == null) {
 			model.addAttribute("msg", "로그인이 필요합니다.");
+			model.addAttribute("cmd", "move");
 			model.addAttribute("url", "/gotoday/member/login");
-			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
 		// 본인이 아닌경우 막기
@@ -217,11 +217,17 @@ public class ContentReplyController {
 		ContentReplyVO result = contentReplyService.getReplyForUser(creply_id, user.getUser_id());
 		if (result.getUser_id() != user.getUser_id()) {
 			model.addAttribute("msg", "본인이 아닌경우 수정이 어렵습니다..");
-			model.addAttribute("url", "/gotoday/detail/" + result.getContent_id() + "?tab=inquiry");
 			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
-		
+		int status=contentReplyService.showStatus(result.getGno());
+		System.out.println(status);
+		if(status>=1) {
+			//답변 여부가 있는경우-> 유저는 수정이 어려움
+			model.addAttribute("msg", "답변완료된 글은 수정할 수 없습니다.");
+			model.addAttribute("cmd", "back");
+			return "common/return";
+		}
 		
 		model.addAttribute("item", result);
 		return "content_reply/content_reply_edit";
@@ -234,7 +240,7 @@ public class ContentReplyController {
 
 		if (user == null) {
 			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "back");
+			model.addAttribute("cmd", "move");
 			model.addAttribute("url", "/gotoday/member/login");
 			return "common/return";
 		}
@@ -284,7 +290,7 @@ public class ContentReplyController {
 			// 성공했을 경우
 			model.addAttribute("msg", "수정되었습니다.");
 			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
-			model.addAttribute("cmd","back");
+			model.addAttribute("cmd","move");
 			return "common/return";
 		} else {
 			model.addAttribute("msg", "게시글 수정에 실패했습니다.다시 시도해주세요.");
@@ -301,7 +307,7 @@ public class ContentReplyController {
 
 		if (user == null) {
 			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "back");
+			model.addAttribute("cmd", "move");
 			model.addAttribute("url", "/gotoday/member/login");
 			return "common/return";
 		}
@@ -327,7 +333,7 @@ public class ContentReplyController {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 		if (user == null) {
 			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "back");
+			model.addAttribute("cmd", "move");
 			model.addAttribute("url", "/gotoday/member/login");
 			return "common/return";
 		}

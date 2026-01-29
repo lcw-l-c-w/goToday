@@ -46,7 +46,6 @@ public class ContentServiceImpl implements ContentService {
 	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
 	    if (mcd != null && mcd.getUser_id() != null) {
 	        
-	        // 1. 무조건 DB에서 유저의 전체 태그 정보(이름+카테고리)를 가져옵니다.
 	        List<TagVO> tagAll = userMapper.getUserTags(mcd.getUser_id());
 	        
 	        List<String> location = new ArrayList<>();
@@ -54,9 +53,9 @@ public class ContentServiceImpl implements ContentService {
 	        List<String> event = new ArrayList<>();
 	        List<String> allNames = new ArrayList<>();
 	        
-	        // 2. 카테고리별로 분류 작업 수행
+	        //카테고리별로 분류 작업 수행
 	        for (TagVO tag : tagAll) {
-	        	String category = tag.getCategory(); // TagVO 필드명 확인 (getCategory 또는 getTag_category)
+	        	String category = tag.getCategory();
 	            String name = tag.getTag_name();
 	            
 	            allNames.add(name); // 전체 이름 리스트 채우기
@@ -71,7 +70,7 @@ public class ContentServiceImpl implements ContentService {
 	        mcd.setEventTags(event);
 	        mcd.setInterestTags(interest);
 	       
-	        // 4. (중요) 정책 필터를 위해 user_tag_name도 최신화
+	        // 4. user_tag_name도 최신화
 	        mcd.setUser_tag_name(allNames);
 	    }
 	    
@@ -125,7 +124,7 @@ public class ContentServiceImpl implements ContentService {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	    LocalDate startDateTime = LocalDate.parse(vo.getStart_at().substring(0, 10));
 	    LocalDate endDateTime= LocalDate.parse(vo.getEnd_at().substring(0,10));
-	 // !start.isAfter(today) 는 (오늘 >= 시작일) 과 같습니다.
+	 // !start.isAfter(today) 는 (오늘 >= 시작일) 과 같음.
 	    if(!startDateTime.isAfter(today) && !endDateTime.isBefore(today)) {
 	    	//진행형이면
 	    	vo.setContent_status_current("STATUS_OPEN");
@@ -152,7 +151,6 @@ public class ContentServiceImpl implements ContentService {
 	        return mcv;
 	    }
 	    // 2. 관심사 리스트 체크 (user_tag_name을 기준으로 변경)
-	    // 컨트롤러에서 이미 mcd.setUser_tag_name(likeTagName)을 해줬으므로 여기서 바로 체크 가능합니다.
 	    if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("관심사 설정하시면 볼 수 있습니다!");
@@ -239,7 +237,7 @@ public class ContentServiceImpl implements ContentService {
 	public List<MainContentViewDTO> getSearchList(ContentSearchDTO dto) {
 		int offset = PageInfo.offset(dto.getPage(), PAGE_SIZE);
 		List<MainContentViewDTO> list = contentMapper.search(dto, offset, PAGE_SIZE);
-		fillViewFields(list); // 검색결과에도 기간 표시를 원하면
+		fillViewFields(list); // 검색결과에도 기간 표시
 		return list;
 	}
 
