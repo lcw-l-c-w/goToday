@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,9 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 				.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 		return "Basic " + new String(encodedBytes);
 	}
+	
+	@Autowired 
+	ReservationMapper reservationMapper;
 	
 	//토스 API 공통 호출 메서드
 	private JSONObject callTossApi(String endpoint, JSONObject requestBody) {
@@ -133,11 +137,25 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 	public void cancelPayment(String paymentKey, String cancelReason) {
 		// 요청 데이터 생성
 		JSONObject requestBody = new JSONObject();
+		requestBody.put("paymentKey", paymentKey);
 		requestBody.put("cancelReason", cancelReason);
 
 		// API 호출
 		callTossApi("/" + paymentKey + "/cancel", requestBody);
 		
-		log.info("[토스 결제 취소 성공] paymentKey={}, reason={}", paymentKey, cancelReason);
+		log.info("[토스 결제 취소 성공] orderId={}, reason={}", paymentKey, cancelReason);
+	}
+	
+	public void cancelPayment(String paymentKey, String cancelReason, String refundAccount) {
+		// 요청 데이터 생성
+		JSONObject requestBody = new JSONObject();
+		requestBody.put("paymentKey", paymentKey);
+		requestBody.put("cancelReason", cancelReason);
+		requestBody.put("refundAccount", refundAccount);
+
+		// API 호출
+		callTossApi("/" + paymentKey + "/cancel", requestBody);
+		
+		log.info("[토스 결제 취소 성공] orderId={}, reason={}", paymentKey, cancelReason);
 	}
 }

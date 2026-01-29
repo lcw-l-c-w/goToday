@@ -51,48 +51,50 @@ $(document).ready(function() {
     <div class="form-section">
         <h2 class="section-title">사람들이 많이가는 핫 플레이스!</h2>
         <div class="location-grid">
-
-            <label>
-                <input type="checkbox" name="location" value="성수"
-                    <c:if test="${userTags.contains('성수')}">checked</c:if>>
-                <span class="btn-option">성수</span>
-            </label>
-
-            <label>
-                <input type="checkbox" name="location" value="홍대"
-                    <c:if test="${userTags.contains('홍대')}">checked</c:if>>
-                <span class="btn-option">홍대</span>
-            </label>
-
-            <label>
-                <input type="checkbox" name="location" value="여의도"
-                    <c:if test="${userTags.contains('여의도')}">checked</c:if>>
-                <span class="btn-option">여의도</span>
-            </label>
-
-            <label>
-                <input type="checkbox" name="location" value="강남"
-                    <c:if test="${userTags.contains('강남')}">checked</c:if>>
-                <span class="btn-option">강남</span>
-            </label>
-
-            <label>
-                <input type="checkbox" name="location" value="혜화"
-                    <c:if test="${userTags.contains('혜화')}">checked</c:if>>
-                <span class="btn-option">혜화</span>
-            </label>
-
-            <label>
-                <input type="checkbox" name="location" value="한남"
-                    <c:if test="${userTags.contains('한남')}">checked</c:if>>
-                <span class="btn-option">한남</span>
-            </label>
-
-            <label>
-                <input type="checkbox" name="location" value="etc"
-                    <c:if test="${userTags.contains('etc')}">checked</c:if>>
-                <span class="btn-option">etc</span>
-            </label>
+			<div class="line-1">
+	            <label>
+	                <input type="checkbox" name="location" value="성수"
+	                    <c:if test="${userTags.contains('성수')}">checked</c:if>>
+	                <span class="btn-option">성수</span>
+	            </label>
+	
+	            <label>
+	                <input type="checkbox" name="location" value="홍대"
+	                    <c:if test="${userTags.contains('홍대')}">checked</c:if>>
+	                <span class="btn-option">홍대</span>
+	            </label>
+	
+	            <label>
+	                <input type="checkbox" name="location" value="여의도"
+	                    <c:if test="${userTags.contains('여의도')}">checked</c:if>>
+	                <span class="btn-option">여의도</span>
+	            </label>
+			</div>
+			<div class="line-2">
+	            <label>
+	                <input type="checkbox" name="location" value="강남"
+	                    <c:if test="${userTags.contains('강남')}">checked</c:if>>
+	                <span class="btn-option">강남</span>
+	            </label>
+	
+	            <label>
+	                <input type="checkbox" name="location" value="혜화"
+	                    <c:if test="${userTags.contains('혜화')}">checked</c:if>>
+	                <span class="btn-option">혜화</span>
+	            </label>
+	
+	            <label>
+	                <input type="checkbox" name="location" value="한남"
+	                    <c:if test="${userTags.contains('한남')}">checked</c:if>>
+	                <span class="btn-option">한남</span>
+	            </label>
+	
+	            <label>
+	                <input type="checkbox" name="location" value="etc"
+	                    <c:if test="${userTags.contains('etc')}">checked</c:if>>
+	                <span class="btn-option">etc</span>
+	            </label>
+	         </div>
 
         </div>
     </div>
@@ -108,7 +110,7 @@ $(document).ready(function() {
                         <c:if test="${userTags.contains('식품')}">checked</c:if>>
                     <span class="btn-option">식품</span>
                 </label>
-
+			
                 <label>
                     <input type="checkbox" name="interest" value="캐릭터"
                         <c:if test="${userTags.contains('캐릭터')}">checked</c:if>>
@@ -120,7 +122,7 @@ $(document).ready(function() {
                         <c:if test="${userTags.contains('화장품')}">checked</c:if>>
                     <span class="btn-option">화장품</span>
                 </label>
-
+			
                 <label>
                     <input type="checkbox" name="interest" value="미디어"
                         <c:if test="${userTags.contains('미디어')}">checked</c:if>>

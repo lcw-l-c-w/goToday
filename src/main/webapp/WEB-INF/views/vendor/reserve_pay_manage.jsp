@@ -16,10 +16,12 @@
 	</div>
 
 	<section class="filter-bar">
-		<input type="text" class="searchInput" id="searchInput"
-			placeholder="예약번호, 수령인 검색" /> <select id="contentFilter"><option
-				value="">모든 콘텐츠</option></select> <input type="date" id="dateFilter" /> <select
-			id="statusFilter">
+		<input type="text" class="searchInput" id="searchInput" placeholder="예약번호, 수령인 검색" /> 
+			<select id="contentFilter">
+				<option value="">모든 콘텐츠</option>
+			</select> 
+			<input type="date" id="dateFilter" />
+		<select id="statusFilter">
 			<option value="">전체 예약상태</option>
 			<option value="DONE">예약 확정</option>
 			<option value="CANCELLED">예약 취소</option>
@@ -74,6 +76,9 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 <script>
 const ctx = '${pageContext.request.contextPath}';
 
@@ -103,10 +108,14 @@ const PAY_MAP = {
 
 function loadContentFilter() {
 	$.ajax({
-		url : ctx + '/vendor/content_manage/list',
+		url : ctx + '/vendor/content_manage/all',
 		type : 'get',
 		success : function(res) {
 			const $select = $('#contentFilter');
+			
+			if ($select.data('select2')) {
+                $select.select2('destroy');
+            }
 			
 			$select.empty();
 			$select.append('<option value="">모든 콘텐츠</option>');
@@ -120,6 +129,14 @@ function loadContentFilter() {
 						</option>`
 						);
 			});
+			
+			$select.select2({
+                placeholder: "콘텐츠 선택",
+                allowClear: true,
+                width: '100%'
+            }).on('change', function() {
+                loadReserveList();
+            });
 		},
 		error: function() {
 			console.log('콘텐츠 목록 로드 실패')
