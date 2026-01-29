@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
@@ -9,6 +9,40 @@
 <title>나의 리뷰 | GoToday</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_review_list.css">
+<style>
+    /* 페이징 버튼 스타일 추가 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        gap: 5px;
+    }
+    .page-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        color: #555;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .page-btn:hover {
+        background-color: #f0f0f0;
+        border-color: #ccc;
+    }
+    .page-btn.active {
+        background-color: #333; /* 원하시는 포인트 컬러로 변경 가능 */
+        color: #fff;
+        border-color: #333;
+        font-weight: bold;
+    }
+</style>
 </head>
 <body>
 <h1 class="page-title">나의 리뷰</h1>
@@ -56,7 +90,23 @@
             </c:otherwise>
         </c:choose>
     </div>
-</div>
+
+    <c:if test="${paging.totalPage > 0}">
+        <div class="pagination">
+            <c:if test="${paging.startPage > 1}">
+                <a href="?page=${paging.startPage - 1}" class="page-btn prev">&lt;</a>
+            </c:if>
+
+            <c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
+                <a href="?page=${p}" class="page-btn ${p == paging.page ? 'active' : ''}">${p}</a>
+            </c:forEach>
+
+            <c:if test="${paging.endPage < paging.totalPage}">
+                <a href="?page=${paging.endPage + 1}" class="page-btn next">&gt;</a>
+            </c:if>
+        </div>
+    </c:if>
+    </div>
 
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 <script>

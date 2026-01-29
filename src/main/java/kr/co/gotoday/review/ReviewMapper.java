@@ -24,5 +24,8 @@ public interface ReviewMapper {
 	int checkReviewExistsById(int reservation_id);
 	int countReviewsByContentId(int content_id);
 	ReviewVO findReviewByReservationId(int reservation_id);
+	
+	List<ReviewVO> findReviewsByUserIdPaged(Map<String, Object> map);
+	int countReviewsByUserId(int user_id);
 
 }

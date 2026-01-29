@@ -129,6 +129,24 @@ public class ReviewServiceImpl implements ReviewService{
 	    return result;
 	}
 	
+	
+	@Override
+	public List<ReviewVO> findReviewsByUserIdPaged(int user_id, int page, int limit) {
+	    int offset = (page - 1) * limit;
+	    
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("user_id", user_id);
+	    map.put("limit", limit);
+	    map.put("offset", offset);
+	    
+	    return reviewMapper.findReviewsByUserIdPaged(map);
+	}
+
+	@Override
+	public int countReviewsByUserId(int user_id) {
+	    return reviewMapper.countReviewsByUserId(user_id);
+	}
+	
 	private String maskEmail(String email) {
 	    if (email == null || email.length() < 3) return "***";
 	    return email.substring(0, 3) + "****";
