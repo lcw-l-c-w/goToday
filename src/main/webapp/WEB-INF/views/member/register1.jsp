@@ -9,6 +9,13 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/member_register.css">
 <script>
     $(function () {
+    	// 생년월일 오늘 이후 날짜 선택 제한
+        const now = new Date();
+        const todayStr = now.getFullYear() + "-" + 
+                         String(now.getMonth() + 1).padStart(2, '0') + "-" + 
+                         String(now.getDate()).padStart(2, '0');
+        $("#birthday_date").attr("max", todayStr);
+        
         function ChangeForm() {
             let role = $("input[name='role']:checked").val();
             $("#vendorNo").css('display', role === "1" ? 'flex' : 'none');

@@ -17,6 +17,11 @@
         padding: 40px 30px;
         height: fit-content;
         font-family: 'Pretendard', sans-serif;
+		position: sticky;
+	    top: 130px;         
+	    height: fit-content; 
+	    align-self: flex-start; 
+	    z-index: 10;
     }
 
     .user-profile {

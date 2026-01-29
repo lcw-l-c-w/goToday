@@ -7,10 +7,11 @@
 <title>마이페이지 | GoToday</title>
 <style>
 	* { margin: 0; padding: 0; box-sizing: border-box; }
-	body { font-family: 'Pretendard', sans-serif; background-color: #f5f5f5; }
+	body { font-family: 'Pretendard', sans-serif; background-color: #ffffff; }
 	
 	.container {
 	    display: flex;
+	    align-items: flex-start;
 	    gap: 60px;
 	    padding: 60px 8%;
 	    max-width: 1400px;
