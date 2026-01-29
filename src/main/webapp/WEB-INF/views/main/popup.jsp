@@ -43,7 +43,7 @@
 
 			<%-- 2. 추천 리스트가 비어있는지 확인 --%>
 			<%-- 기존의 recommand[0].blur 조건이 까다로워서 오작동할 확률이 높으므로 단순화합니다 --%>
-			<c:set var="isTagEmpty" value="${empty recommend}" />
+			<c:set var="isTagEmpty" value="${ not empty recommend and recommend[0].blur}" />
 
 			<%-- 3. 블러 처리 여부 결정: 로그인을 안 했거나, 추천 데이터가 아예 없을 때 --%>
 			<c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
@@ -63,7 +63,7 @@
 							<p>
 								관심사를 설정하면 당신만을 위한<br>특별한 맞춤 전시를 추천해드려요!
 							</p>
-							<a href="${pageContext.request.contextPath}/mypage/interest"
+							<a href="${pageContext.request.contextPath}/mypage/user_like_edit"
 								class="cta-btn">관심사 설정하기</a>
 						</c:when>
 					</c:choose>
@@ -148,7 +148,7 @@
 </section>
 
 	</main>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 	<script>
         window.addEventListener("load", function() {
             // --- 1. 입체 캐러셀 배너 로직 ---

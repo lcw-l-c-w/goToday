@@ -1,19 +1,11 @@
 @charset "UTF-8";
-/* 색상 변수 정의 */
-:root {
-    --main-color: #4dc3ff;             /* 선택된 버튼 색상 */
-    --color-button-inactive: #d9d9d9;  /* 선택되지 않은 버튼 색상 */
-}
 
-/* 페이지 기본 */
+/* 기본 설정 */
 body {
     font-family: 'Pretendard', sans-serif;
-    background-color: transparent;          /* 배경 투명 */
     margin: 0;
-    padding: 0;
 }
 
-/* 페이지 제목 */
 .page-title {
     margin-top: 0px;
     font-size: 28px;       /* 글자 크기 */
@@ -22,109 +14,109 @@ body {
     color: #111;         /* 글자 색상 */
 }
 
-/* 공통 흰색 박스 */
 .form-wrapper {
     background: #fff;                          /* 흰색 배경 */
     border-radius: 20px;                       /* 둥근 모서리 */
     padding: 40px;                             /* 안쪽 여백 */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);  /* 그림자 */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);  /* 그림자 */	
     width: 100%;                               /* 가로 100% */
-    max-width: 700px;                          /* 최대 700px */
-    box-sizing: border-box;  /* 패딩 포함 너비 계산 */
-    margin: 0 auto;  /* 중앙 정렬 */
+    max-width: 700px;   
 }
 
-/* 각 섹션 간 간격 */
 .form-section {
-    margin-bottom: 35px;  /* 섹션 사이 아래 여백 */
+    margin-bottom: 40px;
 }
 
-/* 섹션 제목 */
 .section-title {
-    font-size: 18px;       /* 글자 크기 */
-    font-weight: 700;      /* 글자 두껍게 */
-    margin-bottom: 20px;   /* 아래 여백 */
-    text-align: center;    /* 가운데 정렬 */
+    font-size: 15px;
+    font-weight: 700;
+    color: #999;
+    text-align: center;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
 }
 
-/* 버튼 그룹 정렬 */
-.button-grid {
-    display: flex;         /* 가로 정렬 */
-    flex-wrap: wrap;       /* 여러 줄 가능 */
-    gap: 15px;             /* 버튼 간 간격 */
-    justify-content: center; /* 가운데 정렬 */
+.section-title::before, .section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #f0f0f0;
+    margin: 0 15px;
 }
 
-/* 숨기는 기본 input */
+/* 📌 그리드 레이아웃: 줄바꿈 허용 및 중앙 정렬 */
+.event-grid, .location-grid, .interest-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* 📌 지역구 & 관심분야 줄 설정 (필요 시) */
+.line-1, .line-2, .interest-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* 체크박스 숨기기 */
 input[type="radio"], input[type="checkbox"] {
-    display: none;         /* 기본 라디오/체크박스 숨김 */
+    display: none;
 }
 
-/* 버튼 모양 */
+/* 📌 [핵심] 버튼 스타일: 글자 길이에 맞춰서만 크기 가짐 */
 .btn-option {
-    padding: 10px 24px;                   /* 안쪽 여백 */
-    border-radius: 50px;                  /* 둥근 버튼 */
-    background: var(--color-button-inactive); /* 기본 회색 배경 */
-    cursor: pointer;                      /* 클릭 가능 표시 */
-    font-weight: 600;                     /* 글자 약간 두껍게 */
-    font-size: 14px;                      /* 글자 크기 */
-    transition: 0.2s;                     /* 색상 전환 부드럽게 */
+    display: inline-flex;  /* 글자 크기만큼만 너비 가짐 */
+    align-items: center;
+    justify-content: center;
+    
+    /* 너비 고정 해제 및 글자 비례 여백 */
+    width: auto !important; 
+    padding: 12px 20px !important; 
+    min-width: fit-content;
+    
+    background: #f4f6f8;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap; /* 글자 줄바꿈 방지 */
 }
 
-/* 선택된 버튼 */
+.btn-option:hover {
+    background: #ebedf0;
+}
+
+/* ✅ 선택되었을 때 */
 input:checked + .btn-option {
-    background: var(--main-color); /* 선택 시 파란색 */
-    color: white;                  /* 글자 흰색 */
+    background: #fff;
+    border: 2px solid #4dc3ff;
+    color: #4dc3ff;
+    font-weight: 700;
 }
 
-/* 전시 or 팝업 섹션 - 2개씩 배치 */
-.event-grid {
-    display: flex;             /* 가로 정렬 */
-    gap: 20px;                 /* 버튼 간 간격 */
-    justify-content: center;   /* 가운데 정렬 */
-}
-
-/* 핫플레이스 섹션 - 3개씩 배치 */
-.location-grid {
-    display: grid;                         /* 그리드 배치 */
-    grid-template-columns: repeat(3, auto);/* 3개 컬럼 */
-    gap: 18px;                             /* 컬럼 간격 */
-    row-gap: 22px;                          /* 행 간격 */
-    justify-content: center;               /* 가운데 정렬 */
-    max-width: 500px;                       /* 최대 너비 */
-    margin: 0 auto;                        /* 가운데 정렬 */
-}
-
-/* 관심있는 분야 섹션 - 세로 + 줄 단위 배치 ===== */
-.interest-grid {
-    display: flex;               /* 세로 정렬 */
-    flex-direction: column;      /* 위에서 아래로 배치 */
-    gap: 22px;                   /* 줄 간격 */
-    align-items: center;         /* 가운데 정렬 */
-}
-
-/*  관심 분야 각 줄  */
-.interest-row {
-    display: flex;               /* 가로 정렬 */
-    gap: 25px;                   /* 버튼 간격 */
-    justify-content: center;     /* 가운데 정렬 */
-}
-
-/* 제출 버튼 */
+/* 하단 버튼 */
 .btn-submit {
-    width: 100%;             /* 가로 100% */
-    max-width: 300px;        /* 최대 300px */
-    padding: 15px;           /* 안쪽 여백 */
-    background: #333;        /* 배경 어두운 회색 */
-    color: #fff;             /* 글자 흰색 */
-    border: none;            /* 테두리 없음 */
-    border-radius: 12px;     /* 둥근 모서리 */
-    font-weight: 700;        /* 글자 굵게 */
-    cursor: pointer;         /* 클릭 가능 표시 */
-    margin-top: 10px;        /* 위 여백 */
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 240px;
+    padding: 16px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
 }
 
-/* 제출 버튼 hover */
 .btn-submit:hover {
-    background: #000;        /* 마우스 올리면 검정색 */
+    background: #000;
 }
