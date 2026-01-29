@@ -2,6 +2,7 @@
 let reviewOverlay = null;
 let currentRating = 5;
 let isEditMode = false;
+const contextPath = window.contextPath;
 
 // 상시 전시 여부 판단 (시간 차이 5시간 이상이면 상시)
 function checkAllDayExhibition(timeZone) {
@@ -137,15 +138,30 @@ function openReviewModal(dto) {
     }
 
     // 현재 이미지 세팅
-    if (review.image_new) {
-        const imageUrl = `/gotoday/uploads/${review.image_new}`;
-        overlay.querySelector('#currentImage').src = imageUrl;
-        overlay.querySelector('#currentImageArea').style.display = 'block';
-        overlay.querySelector('#m_keepImage').value = 'true';
-    } else {
-        overlay.querySelector('#currentImageArea').style.display = 'none';
-        overlay.querySelector('#m_keepImage').value = 'false';
-    }
+    const imageArea = overlay.querySelector('#currentImageArea');
+	const currentImage = overlay.querySelector('#currentImage');
+	const keepImageInput = overlay.querySelector('#m_keepImage');
+	const removeBtn = overlay.querySelector('#btnRemoveImage');
+	
+	if (review.image_new) {
+	    const imageUrl = `${window.location.origin}/uploads/${review.image_new}`;
+	    currentImage.src = imageUrl;
+	    imageArea.style.display = 'block';
+	    keepImageInput.value = 'true';
+	} else {
+	    imageArea.style.display = 'none';
+	    currentImage.src = '';
+	    keepImageInput.value = 'false';
+	}
+	
+	// 삭제 버튼 이벤트 (중복 방지 위해 onclick 추천)
+	if (removeBtn) {
+	    removeBtn.onclick = function () {
+	        imageArea.style.display = 'none';
+	        currentImage.src = '';        // ⭐ 중요: src까지 비우기
+	        keepImageInput.value = 'false';
+	    };
+	}
 
 } else {
     // ===== 신규 등록 모드 =====
@@ -234,7 +250,7 @@ function fillReviewData(overlay, review) {
         const imageArea = overlay.querySelector('#currentImageArea');
         const currentImage = overlay.querySelector('#currentImage');
         imageArea.style.display = 'block';
-        currentImage.src = '/gotoday_img/' + review.image_new;
+        currentImage.src = `/uploads/${review.image_new}`;
         overlay.querySelector('#m_keepImage').value = 'true';
 
         // 이미지 삭제 버튼 이벤트
@@ -427,7 +443,7 @@ function submitReview() {
     }
 
     $.ajax({
-        url: "/gotoday/review/create.do",
+        url: contextPath+"/review/create.do",
         type: "POST",
         data: formData,
         contentType: false,
@@ -466,7 +482,7 @@ function updateReview() {
     }
 
     $.ajax({
-        url: "/gotoday/review/update.do",
+        url: contextPath+"/review/update.do",
         type: "POST",
         data: formData,
         contentType: false,
@@ -501,7 +517,7 @@ function deleteReview() {
     }
 
     $.ajax({
-        url: "/gotoday/review/delete.do",
+        url: contextPath+"/review/delete.do",
         type: "POST",
         data: { review_id: reviewId },
         success: function(res) {

@@ -122,7 +122,8 @@ public class MvcConfig implements WebMvcConfigurer{
 		PropertyPlaceholderConfigurer config = new PropertyPlaceholderConfigurer();
 		config.setLocations(
 				new ClassPathResource("db.properties"),
-				new ClassPathResource("api.properties")
+				new ClassPathResource("api.properties"),
+				new ClassPathResource("application.properties")
 			);
 		return config;
 	}
@@ -158,11 +159,13 @@ public class MvcConfig implements WebMvcConfigurer{
 			
 	}
 	
-	//리뷰 이미지 업로드하면 저장되는 경로
+	@Value("${upload.path}")
+	private String uploadPath;
+	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 	    registry.addResourceHandler("/uploads/**")
-	            .addResourceLocations("file:///C:/gotoday_img/");
+	            .addResourceLocations("file:" + uploadPath);
 	}
 	
 }

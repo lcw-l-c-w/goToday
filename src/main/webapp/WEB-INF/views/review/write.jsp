@@ -195,7 +195,7 @@
                 <label style="font-weight:600;">현재 이미지</label>
                 <div class="current-image-preview">
                     <img id="currentImage" src="" alt="현재 이미지">
-                    <span class="remove-image" id="btnRemoveImage">이미지 삭제</span>
+ 					<!-- 이미지 삭제 -->
                 </div>
             </div>
 
@@ -216,3 +216,9 @@
         </form>
     </div>
 </div>
+
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+</script>
+<script src="${pageContext.request.contextPath}/resources/js/review/write.js"></script>
+
