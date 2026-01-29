@@ -86,9 +86,17 @@ public class MypageController {
             HttpSession session,
             @RequestParam(required = false) String event,
             @RequestParam(required = false) String[] location,
-            @RequestParam(required = false) String[] interest) {
+            @RequestParam(required = false) String[] interest,
+            UserVO vo, Model model) {
 
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/member/login");
+            return "common/return";
+        }
+        
         int userId = loginUser.getUser_id();
 
         // 배열 → List 변환
