@@ -31,7 +31,6 @@ public class ContentLikeController {
 	    }
 		Object obj = sess.getAttribute("loginSess");
 		if (obj == null) {
-			// 로그인이 안 된 상태라면 처리 중단
 			return null;
 		}
 		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
