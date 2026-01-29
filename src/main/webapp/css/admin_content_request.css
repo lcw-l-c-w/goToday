@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* 1. 기본 초기화 및 폰트 */
+
 * {
 	margin: 0;
 	padding: 0;
@@ -10,7 +10,7 @@ html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	background-color: #f3f5f9; /* 배경색 통일 */
+	background-color: #f3f5f9; 
 }
 
 body {
@@ -20,7 +20,6 @@ body {
 }
 
 html {
-	/* 스크롤바 공간을 미리 계산해 화면 중앙을 유지합니다. */
 	scrollbar-gutter: stable;
 }
 
@@ -29,11 +28,10 @@ html {
 	min-height: 100vh;
 }
 
-/* 이름과 아이콘을 가로로 배치 */
 .name-wrapper {
 	display: flex;
 	align-items: center;
-	justify-content: space-between; /* 이름은 왼쪽, 아이콘은 오른쪽 끝 */
+	justify-content: space-between; 
 	gap: 8px;
 	margin-top: 4px;
 }
@@ -43,25 +41,23 @@ html {
 	align-items: center;
 	justify-content: center;
 	text-decoration: none;
-	color: #666; /* 기본 색상 */
+	color: #666; 
 	transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .home-icon-btn:hover {
-	color: #000; /* 마우스 올렸을 때 색상 */
-	transform: scale(1.1); /* 살짝 커지는 효과 */
+	color: #000; 
+	transform: scale(1.1);
 }
 
 .home-icon-btn .material-symbols-outlined {
-	font-size: 20px; /* 아이콘 크기 조절 */
+	font-size: 20px; 
 }
 
-/* 기존 admin-info 스타일 보정 (필요시) */
 .user-box {
-	padding: 15px; /* 사이드바 하단 여백 */
+	padding: 15px; 
 }
 
-/* 2. 사이드바 (Sidebar) */
 .sidebar {
 	width: 260px;
 	background-color: #1a1f33;
@@ -146,7 +142,6 @@ html {
 	font-weight: 600;
 }
 
-/* 3. 메인 레이아웃 및 상단 헤더 */
 .main-content {
 	flex: 1;
 	margin-left: 260px;
@@ -183,12 +178,11 @@ html {
 }
 
 .table-section {
-	flex: 1; /* 남는 모든 중간 공간을 차지해서 페이지네이션을 아래로 밉니다 */
-	overflow-y: auto; /* 데이터가 많아질 경우 이 안에서만 스크롤 발생 */
-	margin-bottom: 20px; /* 페이지네이션과의 간격 */
+	flex: 1;
+	overflow-y: auto; 
+	margin-bottom: 20px; 
 }
 
-/* 4. 툴바 (검색 및 필터) */
 .toolbar {
 	display: flex;
 	justify-content: space-between;
@@ -235,10 +229,8 @@ html {
 	border-color: #1a1f33;
 }
 
-/* 5. 테이블 (Grid Layout) */
 .table-header, .table-row {
 	display: grid;
-	/* 요청하신대로 전시기간을 왼쪽으로 당긴 비율 설정 */
 	grid-template-columns: 80px 1fr 180px 1fr 70px 100px;
 	padding: 18px 15px;
 	align-items: center;
@@ -283,7 +275,6 @@ html {
 .title-link:hover .title {
 	text-decoration: underline;
 }
-/* 6. 뱃지 (Status Badge) */
 .badge {
 	display: inline-flex;
 	align-items: center;
@@ -330,10 +321,9 @@ html {
 	font-size: 20px;
 	line-height: 1;
 }
-/* 관리 버튼(.btn-icon) 내부의 아이콘만 타겟팅 */
 .btn-icon .material-symbols-outlined {
-	margin-right: 0; /* 글자가 없으므로 마진 제거 */
-	display: flex; /* 텍스트 베이스라인 영향 제거 */
+	margin-right: 0; 
+	display: flex; 
 	align-items: center;
 	justify-content: center;
 }
@@ -360,15 +350,14 @@ html {
 	border-color: #ff4d4d;
 }
 
-/* 8. 페이지네이션 */
 .pagination {
-    margin-top: auto; /* flex:1에 의해 밀려나 바닥에 붙음 */
+    margin-top: auto;
     padding-top: 0px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    background: white; /* 스크롤 시 겹침 방지 */
+    background: white; 
 }
 
 .pagination button {

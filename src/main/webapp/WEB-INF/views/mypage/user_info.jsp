@@ -164,31 +164,37 @@ function beforeSubmit() {
          </div>
 
 		<div class="form-row">
-            <label class="form-label">생년월일</label>
-            <div class="form-input-wrapper">
-                <input type="date" id="birthday_date" class="form-input">
-                <input type="hidden" id="birthday" name="birthday">
-            </div>
-        </div>
-        
-        <script>
-			const dateInput = document.getElementById('birthday_date');
-			const hiddenInput = document.getElementById('birthday');
-			
-			// 오늘 날짜 구하기 (YYYY-MM-DD)
-			const today = new Date();
-			const yyyy = today.getFullYear();
-			const mm = String(today.getMonth() + 1).padStart(2, '0'); // 0~11월이므로 +1
-			const dd = String(today.getDate()).padStart(2, '0');
-			const maxDate = `${yyyy}-${mm}-${dd}`;
-			
-			// 오늘 이후 날짜 선택 불가
-			dateInput.max = maxDate;
-			
-			// 사용자가 날짜 선택 시 hidden input에 값 넣기
-			dateInput.addEventListener('change', () => {
-			    hiddenInput.value = dateInput.value;
-			});
+		    <label class="form-label">생년월일</label>
+		    <div class="form-input-wrapper">
+		        <input type="date" id="birthday_date" class="form-input">
+		        <input type="hidden" id="birthday" name="birthday">
+		    </div>
+		</div>
+		
+		<script>
+		    // 페이지 로드 시 즉시 실행되도록 설정
+		    (function() {
+		        const dateInput = document.getElementById('birthday_date');
+		        
+		        // 서버 시간이 아닌 접속한 클라이언트 PC의 오늘 날짜 기준 (2026-01-29)
+		        const now = new Date();
+		        const year = now.getFullYear();
+		        const month = String(now.getMonth() + 1).padStart(2, '0');
+		        const day = String(now.getDate()).padStart(2, '0');
+		        const todayStr = year + "-" + month + "-" + day;
+		
+		        // [핵심] max 속성을 부여하면 오늘 이후 날짜는 달력에서 선택 불가능(비활성화) 처리됩니다.
+		        dateInput.max = todayStr;
+		
+		        // 기존 데이터 세팅 (jQuery와 혼용 시 충돌 방지 위해 여기서 한 번 더 체크)
+		        var birthVal = "${user.birthday}"; 
+		        if (birthVal && birthVal.length === 8) {
+		            var formattedDate = birthVal.substring(0,4) + '-' + 
+		                                birthVal.substring(4,6) + '-' + 
+		                                birthVal.substring(6,8);
+		            dateInput.value = formattedDate;
+		        }
+		    })();
 		</script>
 
 		

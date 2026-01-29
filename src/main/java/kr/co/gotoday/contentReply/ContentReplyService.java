@@ -34,5 +34,8 @@ public interface ContentReplyService {
 	
 	//게시판 수정시에 사용할 조회해오기 
 	ContentReplyVO getReplyForUser(int creply_id,int user_id);
+	
+	//상태 조회
+	int showStatus(int gno);
 }
 

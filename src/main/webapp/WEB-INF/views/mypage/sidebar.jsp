@@ -18,6 +18,11 @@
         padding: 40px 30px;
         height: fit-content;
         font-family: 'Pretendard', sans-serif;
+		position: sticky;
+	    top: 130px;         
+	    height: fit-content; 
+	    align-self: flex-start; 
+	    z-index: 10;
     }
 
     .user-profile {
@@ -84,7 +89,6 @@
         color: #999;
     }
 
-    /* 활성화된 메뉴 강조 */
     .sidebar-item.active {
         color: var(--color-primary);
         font-weight: 700;

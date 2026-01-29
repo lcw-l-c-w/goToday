@@ -21,15 +21,14 @@ html, body {
 	display: flex;
 	flex-direction: column;
 	background-color: #f3f5f9;
-	min-width: 0; /* 배율 대응을 위한 유연한 너비 */
+	min-width: 0; 
 }
 
 .main-content {
 	flex: 1;
-	position: relative; /* iframe의 높이 기준점 */
+	position: relative; 
 }
 
-/* iframe 설정: 900px 고정 대신 100% 채우기 */
 iframe[name="vendorFrame"] {
 	position: absolute;
 	top: 0;
@@ -41,7 +40,6 @@ iframe[name="vendorFrame"] {
 }
 </style>
 <script>
-    // iframe 안에서 열렸다면 최상위로 끌어올림
     if (window.top !== window.self) {
         window.top.location.href = window.location.href;
     }

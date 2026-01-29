@@ -76,16 +76,13 @@ function loadContentList(page = 1) {
 	currentPage = page;
 	
     const keyword = $('#searchInput').val();
-    // active 클래스가 붙은 버튼의 data-status를 가져옴
     let status = $('.filter-btn.active').data('status');
     
-    // 데이터 전송 객체 구성
     const searchData = { 
     		keyword : keyword,
     		page : page
     	};
     
-    // status가 빈 문자열("")이 아닐 때만 파라미터에 추가 (전체 선택 시 제외)
     if (status !== "" && status !== undefined) {
         searchData.is_active = status;
     }
@@ -131,7 +128,7 @@ $(document).on('click', '.btn-act', function () {
         type: 'get',
         data: { content_id: contentId },
         success() {
-            loadContentList(); // 다시 로드
+            loadContentList(); 
         },
         error() {
             alert('상태 변경 실패');
@@ -143,7 +140,7 @@ $(document).on('click', '.btn-delete', function () {
     const contentId = $(this).data('id');
     
     if (!confirm('삭제하시겠습니까?')) {
-        return; // 취소 누르면 아무것도 안 함
+        return; 
     }
 
     $.ajax({
@@ -151,7 +148,7 @@ $(document).on('click', '.btn-delete', function () {
         type: 'get',
         data: { content_id: contentId },
         success() {
-            loadContentList(); // 다시 로드
+            loadContentList();
         },
         error() {
             alert('삭제 실패');
@@ -202,8 +199,6 @@ function renderList(list) {
         const statusVal = isActive ? 1 : 0;
         const activateInfo = ACTIVATE_MAP[statusVal] || { text: '알수없음', className: 'inactive' };
 
-        // 상태에 따른 아이콘 및 타이틀 설정
-        // 활성 상태면 '비가시성(눈가림)' 아이콘, 비활성 상태면 '가시성(눈뜸)' 아이콘
         const actIcon = isActive ? 'visibility' : 'visibility_off';
         const actTitle = isActive ? '비활성화 하기' : '활성화 하기';
         
@@ -217,7 +212,6 @@ function renderList(list) {
 	                '<span class="location" style="color:#666;">' + item.location + '</span>' +
 	                '<span class="user_id">' + item.user_id + '</span>' +
 	                '<div class="actions">' +
-		             // Material Symbols를 사용하여 아이콘 처리
 	                    '<button class="btn-icon btn-act" data-id="' + item.content_id + '" title="' + actTitle + '">' +
 	                        '<span class="material-symbols-outlined" style="font-size:18px;">' + actIcon + '</span>' +
 	                    '</button>' +

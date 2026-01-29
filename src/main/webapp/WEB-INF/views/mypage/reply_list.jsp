@@ -71,7 +71,7 @@
 	    <ul class='paging'>
 	        <%-- 이전 페이지 버튼 (<-): 현재 페이지가 1보다 크면 무조건 표시 --%>
 	        <c:if test="${vo.page > 1}">
-	            <li><a href="javascript:getComment(${vo.page - 1})">&lt;-</a></li>
+	            <li><a href="javascript:getComment(${vo.page - 1})">&lt;&lt;</a></li>
 	        </c:if>
 	
 	        <%-- 페이지 번호 목록: 기존 map 변수 그대로 사용 --%>
@@ -84,7 +84,7 @@
 	
 	        <%-- 다음 페이지 버튼 (->): 현재 페이지가 마지막 페이지보다 작으면 무조건 표시 --%>
 	        <c:if test="${vo.page < map.totalPage}">
-	            <li><a href="javascript:getComment(${vo.page + 1})">-&gt;</a></li>
+	            <li><a href="javascript:getComment(${vo.page + 1})">&gt;&gt;</a></li>
 	        </c:if>
 	    </ul>
 	</div>

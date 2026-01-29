@@ -90,7 +90,6 @@ function confirmLogout() {
     }
 }
 
-//1. 상태 맵핑
 const RESERVE_MAP = {
     'DONE': { text: '예약 확정', className: 'res-confirm' },
     'CANCELED': { text: '예약 취소', className: 'res-cancel' },
@@ -176,7 +175,7 @@ function loadReserveList() {
     if (date) data.reserved_for_at = date;
     
     $.ajax({
-        url: ctx + '/vendor/reserve_pay_manage/list', // 실제 컨트롤러 URL에 맞게 수정
+        url: ctx + '/vendor/reserve_pay_manage/list',
         type: 'get',
         data: data,
         success: function(res) {
@@ -221,7 +220,7 @@ function renderList(list) {
     
     list.forEach(item => {
     	console.log('renderList item =', item);
-    	// 데이터가 없을 경우를 대비한 기본값 처리 (Optional Chaining 방식)
+    	// 데이터가 없을 경우를 대비한 기본값 처리
         const resKey = item.reserve_status || '';
         const payKey = item.pay_status || '';
         const resInfo = RESERVE_MAP[item.reserve_status] || { text: item.reserve_status, className: '' };
@@ -335,7 +334,7 @@ function openModal(id) {
 
     $('#modalBody').html(modalHtml);
     
-	 // 하단 버튼(btnAction) 제어 및 이벤트 바인딩
+	 // 하단 버튼 제어 및 이벤트 바인딩
     const $actionBtn = $('#btnAction');
     
     if (data.reserve_status === 'VISITED') {

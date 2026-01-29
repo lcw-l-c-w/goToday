@@ -39,12 +39,26 @@
 	    .container { flex-direction: column; padding: 20px; gap: 30px; }
 	}
 </style>
+<script>
+// 페이지 로드 시 URL 파라미터 확인하여 iframe src 변경
+window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page');
+    
+    const iframe = document.querySelector('iframe[name="mainFrame"]');
+    
+    if (page === 'user_like_edit' && iframe) {
+        // 관심사 설정 페이지로 iframe src 변경
+        iframe.src = '${pageContext.request.contextPath}/mypage/user_like_edit';
+    }
+});
+</script>
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
     <div class="container">
-    <jsp:include page="/WEB-INF/views/mypage/sidebar.jsp" />
+        <jsp:include page="/WEB-INF/views/mypage/sidebar.jsp" />
         <div class="content">
             <div class="main-content">
                 <iframe name="mainFrame" src="${pageContext.request.contextPath}/calendar" width="100%" height="900" frameborder="0"></iframe>

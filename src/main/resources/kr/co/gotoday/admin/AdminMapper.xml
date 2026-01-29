@@ -112,5 +112,4 @@
     WHERE content_id = #{content_id}
 </update>
 
-
 </mapper>
