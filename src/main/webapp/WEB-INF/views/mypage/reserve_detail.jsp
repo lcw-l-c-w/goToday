@@ -38,6 +38,7 @@
 							<c:choose>
 								<c:when test="${reservationDetailDTO.reservation_status eq 'DONE'}">예약 완료</c:when>
 								<c:when test="${reservationDetailDTO.reservation_status eq 'CANCELED'}">예약 취소</c:when>
+								<c:when test="${reservationDetailDTO.reservation_status eq 'VISITED'}">이용 완료</c:when>
 								<c:otherwise>${reservationDetailDTO.reservation_status}</c:otherwise>
 							</c:choose> 
 							<c:if test="${reservationDetailDTO.payment_status eq 'WAITING_FOR_DEPOSIT'}">(입금 대기)</c:if>

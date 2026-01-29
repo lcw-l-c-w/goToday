@@ -41,11 +41,10 @@
 </style>
 </head>
 <body>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
-    
     <div class="container">
     <jsp:include page="/WEB-INF/views/mypage/sidebar.jsp" />
-        
         <div class="content">
             <div class="main-content">
                 <iframe name="mainFrame" src="${pageContext.request.contextPath}/calendar" width="100%" height="900" frameborder="0"></iframe>
