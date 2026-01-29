@@ -38,7 +38,7 @@
 		<if test="content_kind != null and content_kind != ''">
             AND c.content_kind = #{content_kind}
         </if>
-		 <if test="content_kind !=null and user_tag_id.size > 0">
+		 <if test="content_kind !=null and user_tag_id != null and user_tag_id.size > 0">
       	 AND c.content_id IN (
     SELECT DISTINCT ct.content_id
     FROM content_tag ct
@@ -401,4 +401,10 @@ WHERE
 	AND c.content_status IN ( 'STATUS_APPROVAL','STATUS_REQUESTED')
 	</select>
 	
+	
+<select id="findVendorId" resultType="int">
+	SELECT user_id
+	FROM content
+	WHERE content_id=#{content_id}
+</select>
 </mapper>

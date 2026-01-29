@@ -76,10 +76,10 @@
 							<div class="fl_l">
 								<a href="index?isIframe=${param.isIframe}" class="btn">목록</a>
 								<c:if
-									test="${!empty login and login.user_id == vo.writer || !empty login and not empty adminReply}">
+									test="${!empty login and login.user_id == vo.writer || !empty login and Admin}">
 									<a href="javascript:del();" class="btn btn-red">문의 삭제</a>
 								</c:if>
-								<c:if test="${!empty login and not empty adminReply}">
+								<c:if test="${!empty login and Admin and !empty adminReply}">
 									<a href="javascript:delAdminOnly();" class="btn btn-red">답변 삭제</a>
 								</c:if>
 								<c:if test="${Admin and empty adminReply}">

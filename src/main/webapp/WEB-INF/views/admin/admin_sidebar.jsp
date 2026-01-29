@@ -24,7 +24,7 @@
 					class="material-symbols-outlined">person</span> 사용자 관리</a></li>
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="adminFrame"><span
 					class="material-symbols-outlined">support_agent</span> 고객 문의 답변</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="adminFrame"><span
+			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/replyVendor/index?isIframe=true"  target="adminFrame"><span
 					class="material-symbols-outlined">support_agent</span> 업체 문의 답변</a></li>
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/mypage/logout"
 				onclick="return confirmLogout();"><span

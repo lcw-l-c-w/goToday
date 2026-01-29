@@ -11,7 +11,7 @@ public interface ReviewMapper {
 
 	int createReview(ReviewVO review);
 	int updateReview(ReviewVO review);
-	int deleteReview(int review_id, int user_id);
+	int deleteReview(@Param("review_id") int review_id, @Param("user_id") int userId);
 
 	ReviewVO findOneReviewById(int review_id);
 	List<ReviewVO> findReviewsByUserId(int user_id);

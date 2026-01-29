@@ -4,28 +4,9 @@
 <style>
 	.modal-header {
 	    display: flex;
-	    justify-content: space-between;
 	    align-items: center;
 	    margin-bottom: 15px;
-	}
-	
-	.delete-icon-btn {
-	    background: none;
-	    border: none;
-	    font-size: 20px;
-	    color: #ff4444;
-	    cursor: pointer;
-	    padding: 5px;
-	    display: flex;
-	    align-items: center;
-	    justify-content: center;
-	    transition: transform 0.2s;
-	}
-	
-	.delete-icon-btn:hover {
-	    transform: scale(1.1);
-	}
-	
+	}	
 	/* 하단 버튼 영역 높이 통일 */
 	.modal-footer-btns {
 	    display: flex;
@@ -52,13 +33,50 @@
         overflow-y: auto;
         padding: 30px 40px;
         border-radius: 15px;
-        position: relative;
     }
 
     .review-modal-content h3 {
         margin-bottom: 15px;
         font-size: 20px;
     }
+    
+  	.delete-icon-btn {
+  		position: absolute;
+  		top: 30px;
+  		right: 30px;
+  	
+	 	background: transparent;       
+	    border: none;
+	    border-radius: 50%;        
+	    width: 32px;
+	    height: 32px;
+	    flex-shrink: 0;
+	
+	    font-size: 20px;      
+	    font-weight: 400;
+	    color: #888;     
+	
+	    cursor: pointer;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	
+	    transition: 
+	        background-color 0.2s ease,
+	        color 0.2s ease,
+	        transform 0.15s ease;
+        z-index: 10;
+	}
+	
+	.delete-icon-btn:hover {
+	    background: #ffecec;          /* 연한 레드 배경 */
+	    color: #ff4444;               /* X 빨간색 */
+	    transform: scale(1.1);
+	}
+	
+	.delete-icon-btn:active {
+	    transform: scale(0.95);
+	}
 
     /* 별점 클릭 스타일 */
     .star-rating {
@@ -134,10 +152,10 @@
     <div class="review-modal-content">
         <div class="modal-header">
             <h3 id="modalTitle">리뷰 작성</h3>
-            <button type="button" id="btnDeleteReview" class="delete-icon-btn" style="display:none;" title="리뷰 삭제">
-                리뷰삭제 
-            </button>
         </div>
+        <button type="button" id="btnDeleteReview" class="delete-icon-btn" style="display:none;" title="리뷰 삭제">
+            🗑        
+        </button>
         
         <hr>
         <div id="targetInfo" style="margin: 15px 0; font-size: 14px; background: #f8f8f8; padding: 15px; border-radius: 8px;">
