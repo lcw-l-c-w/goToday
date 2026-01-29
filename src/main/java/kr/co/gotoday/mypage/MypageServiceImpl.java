@@ -65,4 +65,36 @@ public class MypageServiceImpl implements MypageService {
         return mypageMapper.selectReplyAnswer(reply_id);
     }
     
+    // 1:1 문의사항 
+    @Override
+    public Map<String, Object> getMyInquiryList(MypageDTO dto) {
+
+        int count = mypageMapper.countMyInquiryList(dto);
+
+        int startIdx = (dto.getPage() - 1) * 5;
+        dto.setStartIdx(startIdx);
+
+        List<MypageDTO> list = mypageMapper.selectMyInquiryList(dto);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("count", count);
+        map.put("list", list);
+
+        return map;
+    }
+    
+    // 1:1 문의사항 detail 내용
+    @Override
+    public List<MypageDTO> getInquiryDetail(int creplyId) {
+        return mypageMapper.selectInquiryDetail(creplyId); 
+    }
+
+    // 1:1 문의사항 detail 답변
+    @Override
+    public MypageDTO getInquiryAnswer(int creply_id) {
+        return mypageMapper.selectInquiryAnswer(creply_id);
+    }
+
+    
+    
 }
