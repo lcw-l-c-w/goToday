@@ -8,7 +8,7 @@ public interface UserService {
 	boolean registerUserInfo(UserVO vo);
 	boolean registerUserTags(List<UserTagVO> tagList);
 	
-    Long findTagIdByName(String tagName);
+	Long findTagIdByNameAndCategory(String tagName, String category);
     int emailCheck(String email);
     
     // 인가 코드 → Access Token
@@ -25,7 +25,10 @@ public interface UserService {
 	
 	// 관심사 수정
 	List<String> getUserTagNames(int userId);
-	boolean updateUserTags(int userId, List<String> tagNames);
+	boolean updateUserTags(int userId,
+            String event,
+            List<String> locations,
+            List<String> interests);
 
 	// 회원 정보 수정
 	UserVO getUserById(int userId);

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.co.gotoday.contentReply.ContentReplyService;
-import kr.co.gotoday.contentReply.ContentReplyVO;
 import kr.co.gotoday.reply.ReplyVO;
 import kr.co.gotoday.reservation.ReservationDetailDTO;
 import kr.co.gotoday.reservation.ReservationListDTO;
@@ -92,13 +91,23 @@ public class MypageController {
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
         int userId = loginUser.getUser_id();
 
-        List<String> tagNames = new ArrayList<>();
+        // 배열 → List 변환
+        List<String> locations = new ArrayList<>();
+        if (location != null) {
+            for (String l : location) {
+                locations.add(l);
+            }
+        }
 
-        if (event != null) tagNames.add(event);
-        if (location != null) for (String l : location) tagNames.add(l);
-        if (interest != null) for (String i : interest) tagNames.add(i);
+        List<String> interests = new ArrayList<>();
+        if (interest != null) {
+            for (String i : interest) {
+                interests.add(i);
+            }
+        }
 
-        userService.updateUserTags(userId, tagNames);
+        // 변경된 서비스 메서드 호출
+        userService.updateUserTags(userId, event, locations, interests);
 
         return "redirect:/calendar";
     }

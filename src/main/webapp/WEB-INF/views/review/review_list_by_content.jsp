@@ -175,10 +175,7 @@
      <div class="review-summary-box" style="justify-content: center;">
          <div style="text-align:center; padding: 30px 0; width:100%;">
              <div style="font-size:18px; font-weight:700; margin-bottom:8px;">
-        			아직 등록된 리뷰가 없습니다.
-             </div>
-             <div style="font-size:14px; color:#888;">
-                	이 콘텐츠의 첫 번째 리뷰를 남겨보세요 😊
+        			집계된 점수가 없습니다.
              </div>
          </div>
      </div>
@@ -265,7 +262,10 @@
 	<c:choose>
         <c:when test="${empty reviewList}">
             <div class="no-review-list"style="text-align:center; padding: 40px 0; color:#888;">
-             	 아직 작성된 리뷰가 없습니다.
+             	아직 작성된 리뷰가 없습니다.
+        	  	<div style="font-size:14px; color:#888;">
+                	이 콘텐츠의 첫 번째 리뷰를 남겨보세요 😊
+             	</div>
             </div>
         </c:when>
 	    <c:otherwise>
@@ -289,7 +289,7 @@
 		
 		                <c:if test="${not empty r.image_new}">
 		                    <div class="review-images">
-		                        <img src="${pageContext.request.contextPath}/uploads/${r.image_new}">
+		                        <img src="${pageContext.request.contextPath}/upload/${r.image_new}">
 		                    </div>
 		                </c:if>
 		            </div>

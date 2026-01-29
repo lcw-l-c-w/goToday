@@ -155,7 +155,7 @@ public class UserController {
         List<UserTagVO> userTagList = new ArrayList<>();
 
         if (event != null) {
-            Long tagId = userService.findTagIdByName(event);
+        	Long tagId = userService.findTagIdByNameAndCategory(event, "event");
             if (tagId != null) {
                 UserTagVO ut = new UserTagVO();
                 ut.setTag_id(tagId.intValue());
@@ -166,7 +166,7 @@ public class UserController {
 
         if (location != null) {
             for (String loc : location) {
-                Long tagId = userService.findTagIdByName(loc);
+            	Long tagId = userService.findTagIdByNameAndCategory(loc, "location");
                 if (tagId != null) {
                     UserTagVO ut = new UserTagVO();
                     ut.setTag_id(tagId.intValue());
@@ -178,7 +178,7 @@ public class UserController {
 
         if (interest != null) {
             for (String i : interest) {
-                Long tagId = userService.findTagIdByName(i);
+            	Long tagId = userService.findTagIdByNameAndCategory(i, "interest");
                 if (tagId != null) {
                     UserTagVO ut = new UserTagVO();
                     ut.setTag_id(tagId.intValue());

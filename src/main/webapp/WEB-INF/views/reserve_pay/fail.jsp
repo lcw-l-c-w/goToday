@@ -93,7 +93,7 @@
 
   <!-- 로고 -->
   <div class="logo">
-    <img src="${pageContext.request.contextPath}/uploads/logo/logo.png" alt="GoToday">
+    <img src="/upload/logo/logo.png" alt="GoToday">
   </div>
 
   <!-- 타이틀 -->

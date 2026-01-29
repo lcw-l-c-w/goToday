@@ -43,8 +43,13 @@
 	</insert>
 
     <!-- 태그 이름으로 태그 id 찾기 -->
-    <select id="findTagIdByName" parameterType="String" resultType="long">
-        SELECT tag_id FROM tag WHERE tag_name = #{tagName}
+    <select id="findTagIdByNameAndCategory"
+            parameterType="map"
+            resultType="long">
+        SELECT tag_id
+        FROM tag
+        WHERE tag_name = #{tagName}
+          AND category = #{category}
     </select>
     
     <!-- 이메일 중복 체크 -->
