@@ -17,4 +17,5 @@ public interface ContentService {
 	PageInfo getSearchPageInfo(ContentSearchDTO dto);
 	ContentVO getDetailContentsForTicket(int content_id, Integer user_id);
 	int selectIdByContentId(int content_id);
+	public List<String> getUserTagName(int user_id);
 }

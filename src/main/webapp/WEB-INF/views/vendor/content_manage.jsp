@@ -187,6 +187,12 @@ function renderList(list) {
                 '</div>' +
 
                 '<div class="col-manage">' +
+                    '<a href="' + ctx + '/detail/tab/inquiry?content_id=' + item.content_id + '">' +
+                        '문의관리' +
+                    '</a>' +
+                '</div>' +
+                
+                '<div class="col-manage">' +
                     '<a href="' + ctx + '/vendor/content_create?content_id=' + item.content_id + '">' +
                         '관리하기' +
                     '</a>' +
