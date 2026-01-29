@@ -20,6 +20,7 @@ import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.user.CalendarVO;
+import util.PageInfo;
 
 @Service
 public class ReservationServiceImpl implements ReservationService{
@@ -311,19 +312,61 @@ public class ReservationServiceImpl implements ReservationService{
 		listDTO.sort((a,b)->{
 			boolean aEnd = "END".equals(a.getDday()) || "CANCELED".equals(a.getDday());
 			boolean bEnd = "END".equals(b.getDday()) || "CANCELED".equals(b.getDday());
-			
-			//END 아닌 거가 먼저 오게 
-			if (aEnd && !bEnd) return 1; 
-			if (!aEnd && bEnd) return -1; 
-			//둘 다 END면 최근으로 정렬 
+
+			//END 아닌 거가 먼저 오게
+			if (aEnd && !bEnd) return 1;
+			if (!aEnd && bEnd) return -1;
+			//둘 다 END면 최근으로 정렬
 			if (aEnd && bEnd) {
 	            return b.getReserved_for_at().compareTo(a.getReserved_for_at());
 	        }
 			//둘 다 진행중이면 가까운 날짜순
 	        return a.getReserved_for_at().compareTo(b.getReserved_for_at());
 		});
-		
+
 		return listDTO;
+	}
+
+	@Override
+	public Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page) {
+		final int PAGE_SIZE = 10;
+		final int BLOCK_SIZE = 5;
+
+		Map<String, Object> param = new HashMap<>();
+		param.put("user_id", user_id);
+		param.put("filter", filter);
+
+		// COUNT 조회
+		int count = reservationMapper.countReservationByUserId(param);
+
+		// 페이징 정보 생성
+		PageInfo pageInfo = PageInfo.of(count, page, PAGE_SIZE, BLOCK_SIZE);
+
+		// offset, pageSize 추가
+		param.put("offset", PageInfo.offset(page, PAGE_SIZE));
+		param.put("pageSize", PAGE_SIZE);
+
+		// 목록 조회
+		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(param);
+		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+
+		for (ReservationListDTO dto : listDTO) {
+			if ("CANCELED".equals(dto.getReservation_status())) {
+				dto.setDday("CANCELED");
+				continue;
+			}
+
+			long diff = ChronoUnit.DAYS.between(today, dto.getReserved_for_at());
+
+			if (diff > 0) dto.setDday("D-" + diff);
+			else if (diff == 0) dto.setDday("D-Day");
+			else dto.setDday("END");
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("list", listDTO);
+		result.put("pageInfo", pageInfo);
+		return result;
 	}
 
 	@Override

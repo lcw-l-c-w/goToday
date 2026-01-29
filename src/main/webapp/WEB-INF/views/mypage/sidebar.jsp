@@ -5,7 +5,7 @@
     :root {
         --main-color: #4dc3ff;
         --color-primary: #41b6e6;
-        --color-sidebar-bg: rgba(217, 217, 217, 0.30);
+        --color-sidebar-bg: rgba(238, 238, 238, 0.20);
         --border-radius-sidebar: 30px;
     }
 
@@ -14,6 +14,7 @@
         min-width: 250px;
         background-color: var(--color-sidebar-bg);
         border-radius: var(--border-radius-sidebar);
+        border: 3px solid #eee;
         padding: 40px 30px;
         height: fit-content;
         font-family: 'Pretendard', sans-serif;

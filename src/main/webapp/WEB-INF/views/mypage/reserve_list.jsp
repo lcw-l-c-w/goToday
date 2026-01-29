@@ -138,6 +138,43 @@
 			</c:otherwise>
 		</c:choose>
 	</div>
+
+	<!-- 페이징 -->
+	<c:if test="${pageInfo.totalPage > 1}">
+		<div class="pagination">
+			<%-- 이전 블록 --%>
+			<c:choose>
+				<c:when test="${pageInfo.prev}">
+					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}" class="prev">&laquo;</a>
+				</c:when>
+				<c:otherwise>
+					<span class="prev disabled">&laquo;</span>
+				</c:otherwise>
+			</c:choose>
+
+			<%-- 페이지 번호 --%>
+			<c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="i">
+				<c:choose>
+					<c:when test="${i == pageInfo.page}">
+						<span class="active">${i}</span>
+					</c:when>
+					<c:otherwise>
+						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}">${i}</a>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
+
+			<%-- 다음 블록 --%>
+			<c:choose>
+				<c:when test="${pageInfo.next}">
+					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}" class="next">&raquo;</a>
+				</c:when>
+				<c:otherwise>
+					<span class="next disabled">&raquo;</span>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</c:if>
 </div>
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 

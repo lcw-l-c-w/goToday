@@ -16,8 +16,7 @@
 
 <style>
 body {
-	margin: 0;
-	padding: 20px;
+	margin: 0px;
 	font-family: 'Malgun Gothic', sans-serif;
 }
 
@@ -28,6 +27,10 @@ body {
 
 .fc-toolbar-title {
 	font-size: 20px !important;
+}
+
+.fc-scroller fc-scroller-liquid-absolute{
+	
 }
 
 /* 오른쪽 리스트 스타일 */

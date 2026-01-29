@@ -11,7 +11,7 @@ html {
 }
 
 body {
-	background-color: #f3f5f9;
+	background-color: #fff;
 	font-family: 'Pretendard', sans-serif;
 	margin: 0;
 	padding: 0;
@@ -24,6 +24,7 @@ body {
 	margin: 40px auto;
 	padding: 30px 40px 40px 40px;
 	background: white;
+	border: 3px solid #eee;
 	border-radius: 16px;
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 	box-sizing: border-box; /* 패딩이 크기에 영향을 주지 않도록 추가 */
