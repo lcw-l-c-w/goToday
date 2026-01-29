@@ -131,8 +131,8 @@
 </style>
 
 <script>
-    function goView(replyId) {
-        location.href = '${pageContext.request.contextPath}/mypage/reply_detail?reply_id=' + replyId;
+    function goView(creplyId) {
+        location.href = '${pageContext.request.contextPath}/mypage/inquiry_detail?creply_id=' + creplyId;
     }
 
     function getComment(page) {
@@ -142,7 +142,7 @@
 </head>
 <body>
 
-    <h1 class="page-title">나의 Q&A</h1>
+    <h1 class="page-title">나의 1:1 문의사항</h1>
 
     <div class="inquiry-container">
         <div class="inquiry-header">
@@ -168,7 +168,7 @@
                     <c:otherwise>
                         <c:forEach var="item" items="${map.list}">
                             <tr>
-                                <td>${item.reply_id}</td>
+                                <td>${item.creply_id}</td>
                                 <td class="inquiry-title" onclick="goView(${item.creply_id})">${item.title}</td>
                                 <td><fmt:formatDate value="${item.created_at}" pattern="yyyy-MM-dd"/></td>
                                 <td>
