@@ -28,6 +28,7 @@ public interface VendorService {
 	//예약 확인
 	Map<String, Object> findReservationByVendor(VendorReservationSearchDTO dto);
 	int updateReservationStatus(int reserve_id);
+	List<ContentVO> getAllContentForFilter(int userId);
 
 
 }

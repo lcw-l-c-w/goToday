@@ -87,6 +87,11 @@ public class VendorServiceImpl implements VendorService {
 		}
 		return r;
 	}
+	
+	@Override
+	public List<ContentVO> getAllContentForFilter(int userId) {
+	    return vendorMapper.selectAllContentForFilter(userId);
+	}
 
 	@Override
 	public Map<String, Object> getFilterList(int user_id, String keyword, String status, Integer page) {

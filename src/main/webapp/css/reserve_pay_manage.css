@@ -24,6 +24,7 @@ body {
 	display: flex;
 	min-height: 100vh;
 }
+
 /* CSS 파일 상단이나 <style> 태그 안에 추가 */
 html {
 	/* 스크롤바가 필요 없어도 항상 공간을 유지합니다. */
@@ -214,7 +215,40 @@ html {
 	border-radius: 8px;
 	font-size: 14px;
 	outline: none;
-	height: 42px; /* 높이 통일 */
+	height: auto;
+}
+
+#contentFilter {
+	height: auto;
+}
+
+/* 1. X 버튼(Clear) 위치 조정 - 화살표와 겹치지 않게 왼쪽으로 이동 */
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    margin-right: 0px !important; /* 화살표 아이콘 공간 확보 */
+    font-size: 18px !important;
+    color: #999 !important;
+    font-weight: bold;
+    float: right;
+    cursor: pointer;
+    position: relative;
+    z-index: 1; /* 클릭 우선순위 높임 */
+}
+
+/* 2. X 버튼 호버 시 반응 */
+.select2-container--default .select2-selection--single .select2-selection__clear:hover {
+    color: #4d4dff !important;
+}
+
+/* 3. 화살표 위치 고정 */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    width: 30px !important;
+    right: 5px !important;
+    pointer-events: none; /* 화살표는 클릭 무시하고 아래 요소가 눌리도록 함 */
+}
+
+/* 4. 선택창 내부 텍스트가 X 버튼에 가려지지 않게 우측 여백 추가 */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-right: 35px !important; 
 }
 
 /* 검색창만 다른 필드보다 조금 더 길게 하고 싶다면 (선택 사항) */
@@ -222,6 +256,71 @@ html {
 	flex: 2; /* 검색창은 다른 필터의 2배 길이를 가짐 */
 }
 
+.select2-results__options {
+	max-height: 200px !important;
+}
+/* 1. Select2 컨테이너를 다른 input들과 동일한 비율(flex: 1)로 설정 */
+.filter-bar .select2-container {
+    flex: 1; /* searchInput이 flex: 2라면 이건 flex: 1로 유지 */
+    width: 0 !important; /* flex-basis가 작동하도록 강제 */
+    min-width: 0;
+}
+
+/* 2. 선택창 본체 디자인 (searchInput, dateFilter와 통일) */
+.select2-container--default .select2-selection--single {
+    height: 42px !important; /* 위아래 패딩 10px + 폰트 높이 감안 */
+    background-color: #fff !important;
+    border: 1px solid #eee !important; /* 기존 border: 1px solid #eee와 통일 */
+    border-radius: 8px !important;    /* 기존 border-radius: 8px와 통일 */
+    display: flex;
+    align-items: center;
+    transition: border-color 0.2s;
+}
+
+/* 3. 내부 텍스트 위치 및 폰트 크기 조정 */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #333 !important;
+    font-size: 14px !important; /* 기존 font-size: 14px와 통일 */
+    padding-left: 15px !important; /* 기존 padding: 10px 15px와 통일 */
+    line-height: 40px !important;
+}
+
+/* 4. 화살표 디자인 커스텀 (기존의 투박한 보더 삭제) */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+    right: 10px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #bbb transparent transparent transparent !important;
+}
+
+
+/* 6. 드롭다운 리스트(결과창) 디자인 */
+.select2-dropdown {
+    border: 1px solid #eee !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden;
+    margin-top: 4px; /* 살짝 띄우기 */
+}
+
+/* 7. 리스트 내 각 옵션 스타일 */
+.select2-container--default .select2-results__option {
+    padding: 10px 15px !important;
+    font-size: 14px;
+}
+
+/* 마우스 호버 시 색상 (기존 강조색 활용) */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #4d4dff !important;
+}
+
+/* 8. 5개 노출 후 스크롤 설정 (유지) */
+.select2-results__options {
+    max-height: 200px !important;
+    overflow-y: auto;
+}
 /* 날짜 입력 필드 폰트 보정 */
 input[type="date"] {
 	font-family: inherit;
@@ -246,45 +345,58 @@ input[type="date"] {
 
 /* 테이블 전체 레이아웃 */
 .user-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed; /* 너비 고정을 위해 필수 */
-    border-spacing: 0;
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed; /* 너비 고정을 위해 필수 */
+	border-spacing: 0;
 }
 
 /* 각 컬럼 너비 설정 (합계가 100%가 되도록 유도) */
-.user-table th:nth-child(1) { width: 15%; }  /* 예약번호: 조금 넉넉하게 */
-.user-table th:nth-child(2) { width: 30%; }  /* 콘텐츠명: 가장 넓게 설정 */
-.user-table th:nth-child(3) { width: 12%; }  /* 수령인 */
-.user-table th:nth-child(4) { width: 15%; }  /* 방문일시 */
-.user-table th:nth-child(5) { width: 7%; }   /* 인원: 작게 고정 */
-.user-table th:nth-child(6) { width: 10%; }  /* 예약상태 */
-.user-table th:nth-child(7) { width: 10%; }  /* 결제상태 */
-.user-table th:nth-child(8) { width: 120px; }/* 관리: 버튼 크기에 맞춰 고정 */
-
+.user-table th:nth-child(1) {
+	width: 15%;
+} /* 예약번호: 조금 넉넉하게 */
+.user-table th:nth-child(2) {
+	width: 30%;
+} /* 콘텐츠명: 가장 넓게 설정 */
+.user-table th:nth-child(3) {
+	width: 12%;
+} /* 수령인 */
+.user-table th:nth-child(4) {
+	width: 15%;
+} /* 방문일시 */
+.user-table th:nth-child(5) {
+	width: 7%;
+} /* 인원: 작게 고정 */
+.user-table th:nth-child(6) {
+	width: 10%;
+} /* 예약상태 */
+.user-table th:nth-child(7) {
+	width: 10%;
+} /* 결제상태 */
+.user-table th:nth-child(8) {
+	width: 120px;
+} /* 관리: 버튼 크기에 맞춰 고정 */
 
 /* 텍스트 정렬 및 여백 미세조정 */
 .user-table td {
-    padding: 15px 10px; /* 위아래 간격을 적당히 줄여 밀착감 형성 */
-    word-break: break-all; /* 콘텐츠명이 길면 자동 줄바꿈 */
-    line-height: 1.4;
+	padding: 15px 10px; /* 위아래 간격을 적당히 줄여 밀착감 형성 */
+	word-break: break-all; /* 콘텐츠명이 길면 자동 줄바꿈 */
+	line-height: 1.4;
 }
 
 /* 콘텐츠명 텍스트 스타일 강조 */
 .user-table td:nth-child(2) {
-    /* 너비 한도 내에서 한 줄로 강제 */
-    white-space: nowrap;      
-    /* 박스를 벗어나는 텍스트 숨김 */
-    overflow: hidden;         
-    /* 벗어나는 부분에 ... 표시 */
-    text-overflow: ellipsis;  
-    
-    /* [중요] fixed 레이아웃에서 너비가 보장되어야 작동함 */
-    max-width: 0; 
-    
-    /* 가독성을 위한 설정 */
-    font-weight: 600;
-    padding-right: 20px; 
+	/* 너비 한도 내에서 한 줄로 강제 */
+	white-space: nowrap;
+	/* 박스를 벗어나는 텍스트 숨김 */
+	overflow: hidden;
+	/* 벗어나는 부분에 ... 표시 */
+	text-overflow: ellipsis;
+	/* [중요] fixed 레이아웃에서 너비가 보장되어야 작동함 */
+	max-width: 0;
+	/* 가독성을 위한 설정 */
+	font-weight: 600;
+	padding-right: 20px;
 }
 
 .user-table thead th {
