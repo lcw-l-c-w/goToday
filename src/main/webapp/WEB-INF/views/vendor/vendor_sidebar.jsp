@@ -20,10 +20,10 @@
 					class="material-symbols-outlined">dashboard</span> 콘텐츠 관리</a></li>
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/vendor/reserve_pay_manage?"  target="vendorFrame"><span
 					class="material-symbols-outlined">description</span> 예약 관리</a></li>
-			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/reply/index?isIframe=true"  target="vendorFrame"><span
-					class="material-symbols-outlined">person</span> 고객 문의 답변</a></li>
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/replyVendor/index?isIframe=true"  target="vendorFrame"><span
 					class="material-symbols-outlined">support_agent</span> 관리자 문의하기</a></li>
+		
+					
 			<li class="sidebar-item"><a href="${pageContext.request.contextPath}/mypage/logout"
 				onclick="return confirmLogout();"><span
 					class="material-symbols-outlined">logout</span> 로그아웃</a></li>

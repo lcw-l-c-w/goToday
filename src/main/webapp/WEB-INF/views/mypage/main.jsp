@@ -7,7 +7,7 @@
 <title>마이페이지 | GoToday</title>
 <style>
 	* { margin: 0; padding: 0; box-sizing: border-box; }
-	body { font-family: 'Pretendard', sans-serif; background-color: #f5f5f5; }
+	body { font-family: 'Pretendard', sans-serif; background-color: #ffffff; }
 	
 	.container {
 	    display: flex;
@@ -30,7 +30,7 @@
 	
 	.main-content iframe {
 	    width: 100%;
-	    min-height: 2000px; /* 상세페이지 길이에 맞춰 넉넉히 설정 */
+	    min-height: 1080px; /* 상세페이지 길이에 맞춰 넉넉히 설정 */
 	    border: none;
 	    overflow: hidden; /* iframe 자체 스크롤바 방지 */
 	}

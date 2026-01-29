@@ -36,8 +36,8 @@
             
             <%-- 통합 로직: 로그인 여부 및 추천 리스트 비어있음 확인 --%>
             <c:set var="isLoggedIn" value="${not empty loginSess}" />
-            <c:set var="isTagEmpty" value="${empty recommend}" />
-            <c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
+            <c:set var="isTagEmpty" value="${not empty recommend and recommend[0].blur}" />
+            <c:set var="isBlur" value="${!isLoggedIn or recommend[0].blur}" />
 
             <%-- 블러 조건 충족 시 안내 오버레이 표시 --%>
             <c:if test="${isBlur}">
@@ -53,7 +53,7 @@
                         <c:when test="${isTagEmpty}">
                             <h3>관심사 등록 전이신가요?</h3>
                             <p>관심사를 설정하면 당신만을 위한<br>특별한 맞춤 전시를 추천해드려요!</p>
-                            <a href="${pageContext.request.contextPath}/mypage/interest" class="cta-btn">관심사 설정하기</a>
+                            <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="cta-btn">관심사 설정하기</a>
                         </c:when>
                     </c:choose>
                 </div>

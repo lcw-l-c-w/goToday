@@ -12,8 +12,9 @@ body {
 .page-title { 
     font-size: 28px;       /* 글자 크기 */
     font-weight: 700;      /* 글자 두껍게 */
-    margin-bottom: 30px;   /* 아래 여백 */
+    margin-bottom: 15px;   /* 아래 여백 */
     color: #111;         /* 글자 색상 */
+    margin-top: 0px;
 }
 
 /* 리스트 컨테이너 */

@@ -6,13 +6,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import kr.co.gotoday.user.UserMapper;
 import util.PageInfo;
+import util.TagVO;
 
 @Service
 public class ContentServiceImpl implements ContentService {
@@ -22,6 +25,9 @@ public class ContentServiceImpl implements ContentService {
 	// mapper를 만들고 돌아올것
 	@Autowired
 	private ContentMapper contentMapper;
+	@Autowired
+	private UserMapper userMapper;
+	
 
 	@Override
 	public List<MainContentViewDTO> getRandomContents(MainContentDTO mcd) {
@@ -38,12 +44,44 @@ public class ContentServiceImpl implements ContentService {
 
 	@Override
 	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
-		// TODO Auto-generated method stub
-		List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
-		//System.out.println("리스트 출력"+list);
-		return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());
-	}
+	    if (mcd != null && mcd.getUser_id() != null) {
+	        
+	        // 1. 무조건 DB에서 유저의 전체 태그 정보(이름+카테고리)를 가져옵니다.
+	        List<TagVO> tagAll = userMapper.getUserTags(mcd.getUser_id());
+	        
+	        List<String> location = new ArrayList<>();
+	        List<String> interest = new ArrayList<>();
+	        List<String> event = new ArrayList<>();
+	        List<String> allNames = new ArrayList<>();
+	        
+	        // 2. 카테고리별로 분류 작업 수행
+	        for (TagVO tag : tagAll) {
+	        	String category = tag.getCategory(); // TagVO 필드명 확인 (getCategory 또는 getTag_category)
+	            String name = tag.getTag_name();
+	            
+	            allNames.add(name); // 전체 이름 리스트 채우기
+	            
+	            if ("location".equals(category)) location.add(name);
+	            else if ("interest".equals(category)) interest.add(name);
+	            else if ("event".equals(category)) event.add(name);
+	        }
+	        
+	        // 3. DTO에 각 리스트 배달 (이제 null이 아님!)
+	        mcd.setLocationTags(location);
+	        mcd.setEventTags(event);
+	        mcd.setInterestTags(interest);
+	       
+	        // 4. (중요) 정책 필터를 위해 user_tag_name도 최신화
+	        mcd.setUser_tag_name(allNames);
+	    }
+	    
+	    // 5. 이제 데이터가 꽉 찬 DTO를 들고 쿼리 실행
+	    List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
 
+	    return list.stream()
+	               .map(vo -> applyViewPolicy(vo, mcd))
+	               .collect(Collectors.toList());
+	}
 	@Override
 	public ContentVO getDetailContents(int content_id, Integer user_id) {
 		// 상세페이지 보여주는것
@@ -103,32 +141,30 @@ public class ContentServiceImpl implements ContentService {
 		return vo;
 	}
 	
-	// 핵심 메서드
 	private MainContentViewDTO applyViewPolicy(ContentVO vo, MainContentDTO mcd) {
 	    MainContentViewDTO mcv = new MainContentViewDTO(vo);
 	    
-	    // 1. 비로그인 유저 처리 (mcd 자체가 null이거나 user_id가 null인 경우)
+	    // 1. 비로그인 유저 처리
 	    if (mcd == null || mcd.getUser_id() == null) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("로그인하시면 볼 수 있습니다!");
 	        mcv.setCtaUrl("/member/login");
 	        return mcv;
 	    }
-
-	    // 2. 회원인 경우: 관심사 리스트(user_tag_id)가 null이거나 비어있는지 체크
-	    // 수정 포인트: mcd.getUser_tag_id() == null 조건을 반드시 앞에 추가
-	    if (mcd.getUser_tag_id() == null || mcd.getUser_tag_id().isEmpty()) {
+	    // 2. 관심사 리스트 체크 (user_tag_name을 기준으로 변경)
+	    // 컨트롤러에서 이미 mcd.setUser_tag_name(likeTagName)을 해줬으므로 여기서 바로 체크 가능합니다.
+	    if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("관심사 설정하시면 볼 수 있습니다!");
 	        mcv.setCtaUrl("/mypage/like_list");
 	        return mcv;
 	    }
+
 	    
-	    // 3. 정상인 경우
+	    // 3. 정상 (로그인 되어 있고, 관심사 리스트도 들어있는 경우)
 	    mcv.setBlur(false);
 	    return mcv;
 	}
-
 	// 날짜 조회
 	@Override
 	public List<String> getAvailableDatesByContent(Integer content_id) {
@@ -218,6 +254,12 @@ public class ContentServiceImpl implements ContentService {
 		// TODO Auto-generated method stub
 		return contentMapper.findVendorId(content_id);
 		
+	}
+
+	@Override
+	public List<String> getUserTagName(int user_id) {
+		// TODO Auto-generated method stub
+		return contentMapper.getTagName(user_id);
 	}
 
 

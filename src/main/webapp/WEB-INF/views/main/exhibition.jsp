@@ -38,7 +38,7 @@
         <section class="recommend-section">
             <%-- 컨트롤러 세션명 loginSess와 일치시킴 --%>
             <c:set var="isLoggedIn" value="${not empty loginSess}" />
-            <c:set var="isTagEmpty" value="${ empty recommend }" />
+            <c:set var="isTagEmpty" value="${not empty recommend and recommend[0].blur}" />
             <c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
 
             <c:if test="${isBlur}">

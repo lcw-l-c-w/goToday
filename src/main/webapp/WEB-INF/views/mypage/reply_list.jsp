@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="totalCount" value="${map.count}" />
+<c:set var="totalPage" value="${(totalCount + 4) / 5}" />
+<fmt:parseNumber var="totalPage" value="${totalPage}" integerOnly="true" />
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -64,24 +67,27 @@
             </tbody>
         </table>
 
-        <div class="pagenate clear">
-            <ul class='paging'>
-                <c:if test="${map.isPrev == true}">
-                    <li><a href="javascript:getComment(${map.startPage-1})">&lt;-</a></li>
-                </c:if>
-
-                <c:forEach var="p" begin="${map.startPage}" end="${map.endPage}">
-                    <li>
-                        <a href="javascript:getComment(${p});" 
-                           <c:if test="${vo.page == p}">class='current'</c:if>>${p}</a>
-                    </li>
-                </c:forEach>
-
-                <c:if test="${map.isNext == true}">
-                    <li><a href="javascript:getComment(${map.endPage+1})">-&gt;</a></li>
-                </c:if>
-            </ul>
-        </div>
+	<div class="pagenate clear">
+	    <ul class='paging'>
+	        <%-- 이전 페이지 버튼 (<-): 현재 페이지가 1보다 크면 무조건 표시 --%>
+	        <c:if test="${vo.page > 1}">
+	            <li><a href="javascript:getComment(${vo.page - 1})">&lt;-</a></li>
+	        </c:if>
+	
+	        <%-- 페이지 번호 목록: 기존 map 변수 그대로 사용 --%>
+	        <c:forEach var="p" begin="${map.startPage}" end="${map.endPage}">
+	            <li>
+	                <a href="javascript:getComment(${p});" 
+	                   <c:if test="${vo.page == p}">class='current'</c:if>>${p}</a>
+	            </li>
+	        </c:forEach>
+	
+	        <%-- 다음 페이지 버튼 (->): 현재 페이지가 마지막 페이지보다 작으면 무조건 표시 --%>
+	        <c:if test="${vo.page < map.totalPage}">
+	            <li><a href="javascript:getComment(${vo.page + 1})">-&gt;</a></li>
+	        </c:if>
+	    </ul>
+	</div>
         
     </div>
 </body>

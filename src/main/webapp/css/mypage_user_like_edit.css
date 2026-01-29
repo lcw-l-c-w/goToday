@@ -7,11 +7,11 @@ body {
 }
 
 .page-title {
-	margin-top:0px;
-    font-size: 28px;     /* 글자 크기 */
-    font-weight: 700;    /* 글자 두껍게 */
-    margin-bottom: 20px; /* 아래 여백 */
-    color: #111;
+    margin-top: 0px;
+    font-size: 28px;       /* 글자 크기 */
+    font-weight: 700;      /* 글자 두껍게 */
+    margin-bottom: 15px;   /* 아래 여백 */
+    color: #111;         /* 글자 색상 */
 }
 
 .form-wrapper {
