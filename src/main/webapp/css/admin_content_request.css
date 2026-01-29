@@ -1,0 +1,393 @@
+@charset "UTF-8";
+/* 1. 기본 초기화 및 폰트 */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #f3f5f9; /* 배경색 통일 */
+}
+
+body {
+	font-family: 'Pretendard', sans-serif;
+	background-color: #f3f5f9;
+	color: #333;
+}
+
+html {
+	/* 스크롤바 공간을 미리 계산해 화면 중앙을 유지합니다. */
+	scrollbar-gutter: stable;
+}
+
+.admin-container {
+	display: flex;
+	min-height: 100vh;
+}
+
+/* 이름과 아이콘을 가로로 배치 */
+.name-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between; /* 이름은 왼쪽, 아이콘은 오른쪽 끝 */
+	gap: 8px;
+	margin-top: 4px;
+}
+
+.home-icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	color: #666; /* 기본 색상 */
+	transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.home-icon-btn:hover {
+	color: #000; /* 마우스 올렸을 때 색상 */
+	transform: scale(1.1); /* 살짝 커지는 효과 */
+}
+
+.home-icon-btn .material-symbols-outlined {
+	font-size: 20px; /* 아이콘 크기 조절 */
+}
+
+/* 기존 admin-info 스타일 보정 (필요시) */
+.user-box {
+	padding: 15px; /* 사이드바 하단 여백 */
+}
+
+/* 2. 사이드바 (Sidebar) */
+.sidebar {
+	width: 260px;
+	background-color: #1a1f33;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	height: 100vh;
+}
+
+.sidebar-header {
+	padding: 40px 25px;
+}
+
+.logo {
+	font-size: 20px;
+	font-weight: 800;
+	color: #5d5dff;
+}
+
+.logo-sub {
+	font-size: 10px;
+	opacity: 0.6;
+	letter-spacing: 1px;
+	margin-top: 5px;
+}
+
+.sidebar-nav {
+	flex: 1;
+	padding: 0 15px;
+}
+
+.sidebar-nav ul {
+	list-style: none;
+}
+
+.sidebar-nav a {
+	display: flex;
+	align-items: center;
+	padding: 12px 15px;
+	color: #8a94ad;
+	text-decoration: none;
+	border-radius: 8px;
+	transition: 0.3s;
+	font-size: 15px;
+}
+
+.sidebar-nav li.active a {
+	background-color: #4d4dff;
+	color: white;
+}
+
+.sidebar-nav a:hover:not(.active) {
+	background-color: rgba(255, 255, 255, 0.05);
+	color: white;
+}
+
+.material-symbols-outlined {
+	margin-right: 12px;
+	font-size: 20px;
+}
+
+.sidebar-footer {
+	padding: 20px;
+}
+
+.user-box {
+	background: rgba(255, 255, 255, 0.05);
+	padding: 15px;
+	border-radius: 12px;
+}
+
+.user-role {
+	display: block;
+	font-size: 11px;
+	color: #8a94ad;
+	margin-bottom: 3px;
+}
+
+.user-name {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* 3. 메인 레이아웃 및 상단 헤더 */
+.main-content {
+	flex: 1;
+	margin-left: 260px;
+	padding: 40px 50px;
+}
+
+.content-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+}
+
+.title-group h2 {
+	font-size: 26px;
+	font-weight: 700;
+}
+
+.title-group p {
+	color: #888;
+	font-size: 14px;
+	margin-top: 5px;
+}
+
+.content-card {
+	height: 84vh;
+	background: white;
+	border-radius: 16px;
+	padding: 25px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.table-section {
+	flex: 1; /* 남는 모든 중간 공간을 차지해서 페이지네이션을 아래로 밉니다 */
+	overflow-y: auto; /* 데이터가 많아질 경우 이 안에서만 스크롤 발생 */
+	margin-bottom: 20px; /* 페이지네이션과의 간격 */
+}
+
+/* 4. 툴바 (검색 및 필터) */
+.toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 25px;
+}
+
+.search-box {
+	display: flex;
+	align-items: center;
+	background: #f5f6f8;
+	padding: 8px 15px;
+	border-radius: 10px;
+	width: 320px;
+}
+
+.search-box input {
+	border: none;
+	background: transparent;
+	outline: none;
+	margin-left: 10px;
+	width: 100%;
+	font-size: 14px;
+}
+
+.filter-tabs {
+	display: flex;
+	gap: 8px;
+}
+
+.filter-tabs button {
+	border: 1px solid #eee;
+	background: white;
+	padding: 8px 16px;
+	border-radius: 20px;
+	font-size: 13px;
+	color: #888;
+	cursor: pointer;
+}
+
+.filter-tabs button.active {
+	background: #1a1f33;
+	color: white;
+	border-color: #1a1f33;
+}
+
+/* 5. 테이블 (Grid Layout) */
+.table-header, .table-row {
+	display: grid;
+	/* 요청하신대로 전시기간을 왼쪽으로 당긴 비율 설정 */
+	grid-template-columns: 80px 1fr 180px 1fr 70px 100px;
+	padding: 18px 15px;
+	align-items: center;
+	gap: 12px;
+}
+
+.table-header {
+	border-bottom: 1px solid #eee;
+	color: #aaa;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.table-row {
+	border-bottom: 1px solid #f8f8f8;
+	font-size: 14px;
+}
+
+.table-row .title {
+	font-weight: 600;
+	color: #222;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.table-row .date, .table-row .location {
+	font-size: 13px;
+	color: #666;
+	line-height: 1.4;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.title-link {
+	color: inherit;
+	text-decoration: none;
+}
+
+.title-link:hover .title {
+	text-decoration: underline;
+}
+/* 6. 뱃지 (Status Badge) */
+.badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 65px;
+	padding: 4px 0;
+	border-radius: 20px;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.STATUS_REJECTED {
+	background: #fff1f0;
+	color: #ff4d4f;
+	border: 1px solid #ffccc7;
+}
+
+.STATUS_REQUESTED {
+	background: #fff8e6;
+	color: #ffa000;
+	border: 1px solid #ffeeba;
+}
+
+/* 7. 관리 버튼 (Action Buttons) */
+.actions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+}
+
+.btn-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 8px;
+	border: 1px solid #edf0f5;
+	background-color: white;
+	cursor: pointer;
+	transition: 0.2s;
+	font-size: 16px;
+	font-size: 20px;
+	line-height: 1;
+}
+/* 관리 버튼(.btn-icon) 내부의 아이콘만 타겟팅 */
+.btn-icon .material-symbols-outlined {
+	margin-right: 0; /* 글자가 없으므로 마진 제거 */
+	display: flex; /* 텍스트 베이스라인 영향 제거 */
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-icon:hover {
+	background-color: #f8f9fa;
+}
+
+.btn-stop {
+	color: #ffa000;
+}
+
+.btn-stop:hover {
+	background-color: #fff8e6;
+	border-color: #ffa000;
+}
+
+.btn-delete {
+	color: #ff4d4d;
+}
+
+.btn-delete:hover {
+	background-color: #fff5f5;
+	border-color: #ff4d4d;
+}
+
+/* 8. 페이지네이션 */
+.pagination {
+    margin-top: auto; /* flex:1에 의해 밀려나 바닥에 붙음 */
+    padding-top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: white; /* 스크롤 시 겹침 방지 */
+}
+
+.pagination button {
+	width: 35px;
+	height: 35px;
+	border: none;
+	background: transparent;
+	border-radius: 8px;
+	cursor: pointer;
+	color: #888;
+	font-weight: 600;
+}
+
+.pagination button.active {
+	background: #1a1f33;
+	color: white;
+}
+
+.pagination button.arrow {
+	font-size: 10px;
+	color: #ccc;
+}

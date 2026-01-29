@@ -22,4 +22,9 @@ public class UserVO {
     // 카카오 로그인   
     private String kakao_email; 
     private String kakao_nickname;
+    
+    private String naver_key;
+    
+    //추가 -> admin에 대한 여부
+    private int admin; // 0: admin이 아님 / 1: admin이 맞음 
 }

@@ -28,6 +28,25 @@ public class VendorController {
 	@Autowired
 	private VendorService vendorService;
 	
+	@GetMapping("/vendor/main")
+	public String adminMain(HttpSession session, Model model) {
+		UserVO login = (UserVO)session.getAttribute("loginSess");
+		 // 로그인 체크
+	    if (login == null) {
+	        model.addAttribute("cmd", "move");
+	        model.addAttribute("msg", "로그인이 필요합니다.");
+	        model.addAttribute("url", "login");
+	        return "common/return";
+	    }
+		if(login.getRole()==0) {
+			model.addAttribute("cmd", "move");
+			model.addAttribute("msg", "업체 전용 페이지입니다.");
+			model.addAttribute("url", "main");
+			return "common/return";
+		}
+		return "vendor/main";
+	}
+	
 	//content 관리 페이지
 	@GetMapping("/vendor/content_manage")
 	public String contentManage() {
@@ -41,6 +60,7 @@ public class VendorController {
 	public Map<String, Object> contentList(
 			@RequestParam(required = false) String keyword,
 			@RequestParam(required = false) String status,
+			@RequestParam(required = false) Integer page,
 			HttpSession session
 			){
 		UserVO login = (UserVO) session.getAttribute("loginSess");
@@ -50,9 +70,21 @@ public class VendorController {
 		if (keyword != null) keyword = keyword.trim();
 	    if (status != null && status.trim().isEmpty()) status = null;
 		
-		Map<String, Object> map = vendorService.getFilterList(login.getUser_id(), keyword, status);
+		Map<String, Object> map = vendorService.getFilterList(login.getUser_id(), keyword, status, page);
 		
 		return map;
+	}
+	
+	@GetMapping("/vendor/content_manage/all")
+	@ResponseBody
+	public Map<String, Object> getAllContent(HttpSession session) {
+	    UserVO login = (UserVO) session.getAttribute("loginSess");
+
+	    List<ContentVO> list = vendorService.getAllContentForFilter(login.getUser_id());
+
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("list", list);
+	    return map;
 	}
 
 	//content list 별도
@@ -69,7 +101,6 @@ public class VendorController {
 		
 		dto.setUser_id(login.getUser_id());
 		Map<String, Object> map = vendorService.findReservationByVendor(dto);
-		System.out.println("DTO = " + dto);
 		
 		return map;
 	}
@@ -116,32 +147,41 @@ public class VendorController {
 			@RequestParam(value="Time[]", required = false) List<String> timeList,
 			@RequestParam(value="total_ticket", required = false) Integer total_ticket
 			) {
-		HttpSession sess = request.getSession();
-		UserVO login = (UserVO)sess.getAttribute("loginSess");
-		if (login == null) {
-		    return "redirect:/member/login"; 
-		}
-		contentVo.setUser_id(login.getUser_id());
-		
-		contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
-		contentVo.setIs_active(true);
-		contentVo.setIs_delete(false);
-		int r = vendorService.createContent(contentVo, contentScheduleVO, file, request, timeList, total_ticket);
-		
-		if (contentScheduleVO != null && contentScheduleVO.getTotal_ticket() != null) {
-		    contentScheduleVO.setCurrent_ticket(contentScheduleVO.getTotal_ticket());
-		}
-		
-		if(r > 0) {
-			model.addAttribute("cmd", "move");
-			model.addAttribute("msg", "정상적으로 등록되었습니다.");
-			model.addAttribute("url", "content_manage");
-		}else {
+		try {
+			HttpSession sess = request.getSession();
+			UserVO login = (UserVO)sess.getAttribute("loginSess");
+			if (login == null) {
+				return "redirect:/member/login"; 
+			}
+			contentVo.setUser_id(login.getUser_id());
+			
+			contentVo.setContent_status(ContentEnum.STATUS_REQUESTED.name());
+			contentVo.setIs_active(true);
+			contentVo.setIs_delete(false);
+			int r = vendorService.createContent(contentVo, contentScheduleVO, file, request, timeList, total_ticket);
+			
+			if (contentScheduleVO != null && contentScheduleVO.getTotal_ticket() != null) {
+				contentScheduleVO.setCurrent_ticket(contentScheduleVO.getTotal_ticket());
+			}
+			
+			if(r > 0) {
+				model.addAttribute("cmd", "move");
+				model.addAttribute("msg", "정상적으로 등록되었습니다.");
+				model.addAttribute("url", "content_manage");
+			}else {
+				model.addAttribute("cmd", "back");
+				model.addAttribute("msg", "등록 오류, 다시 작성해주세요.");
+			}
+			return "common/return";
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "등록 오류, 다시 작성해주세요.");
+			
+			return "common/return";
 		}
-		
-		return "common/return";
 	}
 	//update
 	@PostMapping("/vendor/content_update")

@@ -1,26 +1,33 @@
 package kr.co.gotoday.content;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import kr.co.gotoday.user.UserMapper;
 import util.PageInfo;
+import util.TagVO;
 
 @Service
 public class ContentServiceImpl implements ContentService {
 
-	private static final int PAGE_SIZE = 3;
+	private static final int PAGE_SIZE = 8;
 	private static final int BLOCK_SIZE = 10;
 	// mapper를 만들고 돌아올것
 	@Autowired
 	private ContentMapper contentMapper;
+	@Autowired
+	private UserMapper userMapper;
+	
 
 	@Override
 	public List<MainContentViewDTO> getRandomContents(MainContentDTO mcd) {
@@ -36,13 +43,45 @@ public class ContentServiceImpl implements ContentService {
 	}
 
 	@Override
-	public List<MainContentViewDTO> getRecommandContents(MainContentDTO mcd) {
-		// TODO Auto-generated method stub
-		List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
+	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
+	    if (mcd != null && mcd.getUser_id() != null) {
+	        
+	        // 1. 무조건 DB에서 유저의 전체 태그 정보(이름+카테고리)를 가져옵니다.
+	        List<TagVO> tagAll = userMapper.getUserTags(mcd.getUser_id());
+	        
+	        List<String> location = new ArrayList<>();
+	        List<String> interest = new ArrayList<>();
+	        List<String> event = new ArrayList<>();
+	        List<String> allNames = new ArrayList<>();
+	        
+	        // 2. 카테고리별로 분류 작업 수행
+	        for (TagVO tag : tagAll) {
+	        	String category = tag.getCategory(); // TagVO 필드명 확인 (getCategory 또는 getTag_category)
+	            String name = tag.getTag_name();
+	            
+	            allNames.add(name); // 전체 이름 리스트 채우기
+	            
+	            if ("location".equals(category)) location.add(name);
+	            else if ("interest".equals(category)) interest.add(name);
+	            else if ("event".equals(category)) event.add(name);
+	        }
+	        
+	        // 3. DTO에 각 리스트 배달 (이제 null이 아님!)
+	        mcd.setLocationTags(location);
+	        mcd.setEventTags(event);
+	        mcd.setInterestTags(interest);
+	       
+	        // 4. (중요) 정책 필터를 위해 user_tag_name도 최신화
+	        mcd.setUser_tag_name(allNames);
+	    }
+	    
+	    // 5. 이제 데이터가 꽉 찬 DTO를 들고 쿼리 실행
+	    List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
 
-		return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());
+	    return list.stream()
+	               .map(vo -> applyViewPolicy(vo, mcd))
+	               .collect(Collectors.toList());
 	}
-
 	@Override
 	public ContentVO getDetailContents(int content_id, Integer user_id) {
 		// 상세페이지 보여주는것
@@ -51,50 +90,93 @@ public class ContentServiceImpl implements ContentService {
 		if (vo == null) {
 			return null;
 		}
+	
+		if("false".equals(vo.getReservation_type())) {
+			System.out.println("현장대기 실행됨");
+			vo.setContentReservation(0); //볼수없게함
+		}
+		else if ("true".equals(vo.getReservation_type())) {
+			System.out.println("사전 예매");
+			vo.setContentReservation(1);
+		}
+		return updateContentStatus(vo);
 
-		System.out.println("db 조회결과 vo=" + vo);
+	}
+	
+	//예외 : 티켓 관련 조회 ( 승인요청까지도 보여줘야함
+	@Override
+	public ContentVO getDetailContentsForTicket(int content_id, Integer user_id) {
+		// 상세페이지 보여주는것
+	
+		ContentVO vo = contentMapper.selectTicketDetail(content_id);
+		if (vo == null) {
+			return null;
+		}
+		return updateContentStatus(vo);
 
+	}
+	//시간 비교
+	
+	public ContentVO updateContentStatus(ContentVO vo) {
+		
+		LocalDate today = LocalDate.now();
+		
+	
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    LocalDate startDateTime = LocalDate.parse(vo.getStart_at().substring(0, 10));
+	    LocalDate endDateTime= LocalDate.parse(vo.getEnd_at().substring(0,10));
+	 // !start.isAfter(today) 는 (오늘 >= 시작일) 과 같습니다.
+	    if(!startDateTime.isAfter(today) && !endDateTime.isBefore(today)) {
+	    	//진행형이면
+	    	vo.setContent_status_current("STATUS_OPEN");
+	    }
+	    else if(startDateTime.isAfter(today)) {
+	    	//이후에 시작이면
+	    	vo.setContent_status_current("STATUS_SCHEDULED");
+	    }
+	    else if(endDateTime.isBefore(today)) {
+	    	//끝났으면
+	    	vo.setContent_status_current("STATUS_CLOSED");
+	    }
 		return vo;
 	}
-
-	// 핵심 메서드
+	
 	private MainContentViewDTO applyViewPolicy(ContentVO vo, MainContentDTO mcd) {
 	    MainContentViewDTO mcv = new MainContentViewDTO(vo);
 	    
-	    // 1. 비로그인 유저 처리 (mcd 자체가 null이거나 user_id가 null인 경우)
+	    // 1. 비로그인 유저 처리
 	    if (mcd == null || mcd.getUser_id() == null) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("로그인하시면 볼 수 있습니다!");
 	        mcv.setCtaUrl("/member/login");
 	        return mcv;
 	    }
-
-	    // 2. 회원인 경우: 관심사 리스트(user_tag_id)가 null이거나 비어있는지 체크
-	    // 수정 포인트: mcd.getUser_tag_id() == null 조건을 반드시 앞에 추가
-	    if (mcd.getUser_tag_id() == null || mcd.getUser_tag_id().isEmpty()) {
+	    // 2. 관심사 리스트 체크 (user_tag_name을 기준으로 변경)
+	    // 컨트롤러에서 이미 mcd.setUser_tag_name(likeTagName)을 해줬으므로 여기서 바로 체크 가능합니다.
+	    if (mcd.getUser_tag_name() == null || mcd.getUser_tag_name().isEmpty()) {
 	        mcv.setBlur(true);
 	        mcv.setCtaMessage("관심사 설정하시면 볼 수 있습니다!");
 	        mcv.setCtaUrl("/mypage/like_list");
 	        return mcv;
 	    }
+
 	    
-	    // 3. 정상인 경우
+	    // 3. 정상 (로그인 되어 있고, 관심사 리스트도 들어있는 경우)
 	    mcv.setBlur(false);
 	    return mcv;
 	}
-
 	// 날짜 조회
 	@Override
 	public List<String> getAvailableDatesByContent(Integer content_id) {
-		// TODO Auto-generated method stub
 
+		
 		return contentMapper.selectDateByID(content_id);
 	}
 
 	// 시간 조회
 	@Override
 	public List<ContentScheduleVO> getAvailableTimesByContent(Integer content_id, String scheduled_at) {
-		// TODO Auto-generated method stub
+		
 		return contentMapper.selectTimeByID(content_id, scheduled_at);
 	}
 
@@ -123,7 +205,7 @@ public class ContentServiceImpl implements ContentService {
 			// 2) D-day (시작일까지 남은 일수)
 			if (start != null) {
 				long diff = ChronoUnit.DAYS.between(today, start); // 오늘->시작일
-				dto.setDday((int) diff);
+				dto.setDday(diff > 0 ? (int) diff : null);  // 오픈예정만
 			} else {
 				dto.setDday(null);
 			}
@@ -165,6 +247,19 @@ public class ContentServiceImpl implements ContentService {
 	public PageInfo getSearchPageInfo(ContentSearchDTO dto) {
 		int count = contentMapper.countSearch(dto);
 		return PageInfo.of(count, dto.getPage(), PAGE_SIZE, BLOCK_SIZE);
+	}
+
+	@Override
+	public int selectIdByContentId(int content_id) {
+		// TODO Auto-generated method stub
+		return contentMapper.findVendorId(content_id);
+		
+	}
+
+	@Override
+	public List<String> getUserTagName(int user_id) {
+		// TODO Auto-generated method stub
+		return contentMapper.getTagName(user_id);
 	}
 
 

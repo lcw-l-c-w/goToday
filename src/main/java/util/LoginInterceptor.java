@@ -40,7 +40,7 @@ public class LoginInterceptor implements HandlerInterceptor{
 	                redirectUrl = "/index.do"; // 외부에서 유입된 경우 기본 페이지 설정
 	            }
 	        } else {
-	            redirectUrl = "/index.do"; // 이전 페이지 정보가 없는 경우
+	            redirectUrl = "/main"; // 이전 페이지 정보가 없는 경우
 	        }
 
 	        // URL 인코딩 (특수문자 처리)
@@ -51,7 +51,7 @@ public class LoginInterceptor implements HandlerInterceptor{
 
 	        out.print("<script>");
 	        out.print("alert('로그인 후 사용 가능합니다.');");
-	        out.print("location.href='" + contextPath + "/member/login?redirect=" + encodedUrl + "';");
+	        out.print("top.location.href='" + contextPath + "/member/login?redirect=" + encodedUrl + "';");
 	        out.print("</script>");
 
 	        out.close();
@@ -60,3 +60,9 @@ public class LoginInterceptor implements HandlerInterceptor{
 	    return true;
 	}
 }
+
+
+
+
+
+

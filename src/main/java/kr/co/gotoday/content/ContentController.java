@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.co.gotoday.contentLike.ContentLikeService;
+import kr.co.gotoday.review.ReviewService;
+import kr.co.gotoday.review.ReviewVO;
 import kr.co.gotoday.user.UserVO;
 
 @Controller
@@ -23,25 +25,43 @@ public class ContentController {
 	private ContentService contentService;
 	@Autowired
 	private ContentLikeService contentLikeService;
-
+	@Autowired
+	private ReviewService reviewService;
+	
 	//상세보기 
 	@GetMapping("/detail/{content_id}") // @pathVariable @RequestParam 햇갈려...
-	public String contentDetail(Model model, @PathVariable("content_id") int content_id, HttpSession session) {
-		System.out.println("▶ Controller 진입, content_id = " + content_id);
+	public String contentDetail(
+			Model model, 
+			@PathVariable("content_id") int content_id, 
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "latest") String sortType,
+			HttpSession session) {
+	
 		UserVO user = (UserVO) session.getAttribute("loginSess");
 
+		//기업회원이면 그냥 내보냅시다요 
+			
+		
 		Integer user_id = (user != null) ? user.getUser_id() : null;
 		//content 
 		ContentVO result = contentService.getDetailContents(content_id, user_id);
 		
-		if (user != null && result != null) {
+		if (user != null && result != null ) {
 	        // user도 있고, 컨텐츠도 있다면 
 	        int like = contentLikeService.CheckContentLike( content_id,user.getUser_id());
 	        result.setLiked(like); // VO에 결과 담기
+	       
 	    }
 		
 		
+		
 		model.addAttribute("content", result);
+		
+		//리뷰 탭에 내용 뜨게 하기 위해서 추가함-가빈
+		model.addAttribute("reviewList", reviewService.getReviewsByContentPaged(content_id, page, sortType));
+	    model.addAttribute("ratingSummary", reviewService.getRatingSummary(content_id));
+	    model.addAttribute("avgRatingByTimeZone", reviewService.getAvgRatingByTimeZone(content_id));
+		    
 		return "content/content_detail";
 	}
 
@@ -79,7 +99,20 @@ public class ContentController {
 		return "redirect:/reserve/quantity.do";
 	}
 	
+	//리뷰 더보기 버튼 누르면 해당 경로로 들어옴 -가빈
+	@GetMapping("/content/{contentId}/reviews")
+	public String loadMoreReviews(
+	        @PathVariable int contentId,
+	        @RequestParam int page,
+	        @RequestParam(defaultValue = "latest") String sortType,
+	        Model model) {
 
+	    List<ReviewVO> list = reviewService.getReviewsByContentPaged(contentId, page, sortType);
+
+	    model.addAttribute("reviewList", list);
+
+	    return "review/review_list_by_content";
+	}
 	
 	
 }

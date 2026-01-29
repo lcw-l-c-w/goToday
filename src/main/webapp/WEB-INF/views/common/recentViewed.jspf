@@ -1,0 +1,289 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<c:set var="uri" value="${pageContext.request.requestURI}" />
+<c:set var="hideFloatBtns"
+       value="${fn:contains(uri, '/member/login') or fn:contains(uri, '/member/join')}" />
+
+<c:if test="${not hideFloatBtns}">
+  <div class="float-btns">
+    <button type="button" class="float-btn float-top" id="btnTop" aria-label="맨 위로">↑</button>
+    <button type="button" class="float-btn float-recent" id="btnRecent" aria-label="최근 본 콘텐츠">🕘</button>
+  </div>
+
+  <div class="recent-modal-overlay" id="recentOverlay" aria-hidden="true">
+    <div class="recent-modal" role="dialog" aria-modal="true" aria-labelledby="recentTitle">
+      <div class="recent-modal-head">
+        <h2 id="recentTitle">최근 본 콘텐츠</h2>
+        <button type="button" class="recent-close" id="recentClose" aria-label="닫기">×</button>
+      </div>
+
+      <div class="recent-modal-actions">
+        <div class="recent-count"><span id="viewedCount">0</span>개</div>
+        <button type="button" class="recent-clear" id="viewedClear">전체삭제</button>
+      </div>
+
+      <ul class="viewed-list" id="viewedList"></ul>
+      <div class="recent-empty" id="viewedEmpty">최근 본 콘텐츠가 없습니다.</div>
+    </div>
+  </div>
+</c:if>
+
+<style>
+:root { --main-color: #4dc3ff; }
+
+.float-btns{
+  position: fixed; right: 18px; bottom: 32px; left: auto;
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 5000;
+}
+.float-btn{
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1px solid #e5e5e5; background: #fff;
+  cursor: pointer; font-size: 18px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.float-btn:hover{ border-color: #cfefff; transform: translateY(-1px); }
+.float-top.is-hidden{ display:none; }
+
+.recent-modal-overlay{
+  display:none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35); z-index: 6000;
+}
+.recent-modal-overlay.open{ display:block; }
+
+.recent-modal{
+  position: absolute; right: 20px; top: 20px; bottom: 20px;
+  width: 420px; max-width: calc(100vw - 40px);
+  background:#fff; border-radius: 18px;
+  padding: 18px 18px 16px;
+  overflow: hidden;
+  display:flex; flex-direction: column;
+}
+.recent-modal-head{
+  display:flex; align-items:center; justify-content: space-between;
+  padding-bottom: 10px; border-bottom: 1px solid #eee;
+}
+.recent-modal-head h2{ font-size: 18px; margin: 0; }
+
+.recent-close{
+  width: 34px; height: 34px; border-radius: 10px;
+  border: 1px solid #eee; background:#fff;
+  cursor:pointer; font-size: 22px; line-height: 1;
+}
+
+.recent-modal-actions{
+  display:flex; align-items:center; justify-content: space-between;
+  padding: 12px 0;
+}
+.recent-count{ font-size: 14px; }
+.recent-count span{ font-weight: 700; color: #1b7f4a; }
+
+.recent-clear{
+  border:none; background: transparent;
+  cursor:pointer; font-size: 12px; color:#666;
+}
+.recent-clear:hover{ color:#000; }
+
+.viewed-list{
+  margin: 0; padding: 0; list-style:none;
+  overflow-y:auto;
+  display:flex; flex-direction: column; gap: 10px;
+  flex: 1;
+}
+
+.viewed-item{
+  position: relative;
+  display:flex; gap: 12px;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 12px;
+}
+.viewed-thumb{
+  width: 74px; height: 74px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.viewed-info{
+  flex: 1; display:flex; flex-direction: column;
+  gap: 6px; min-width: 0;
+}
+.viewed-title{
+  font-size: 14px; font-weight: 600; color:#111;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow:hidden;
+}
+.viewed-sub{ font-size: 12px; color:#666; }
+
+.viewed-del{
+  position:absolute; top: 10px; right: 10px;
+  width: 28px; height: 28px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background:#fff; cursor:pointer; color:#888;
+}
+.viewed-del:hover{ color:#000; }
+
+.recent-empty{
+  display:none;
+  color:#888; font-size: 13px;
+  padding: 10px 0;
+}
+</style>
+
+<script>
+(function () {
+  const STORAGE_KEY = "gotoday_recent_viewed";
+  const MAX = 20;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function save(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+  function add(item) {
+    if (!item || !item.id) return;
+    let arr = load().filter(x => String(x.id) !== String(item.id));
+    arr.unshift({
+      id: String(item.id),
+      title: item.title || "",
+      image: item.image || "",
+      url: item.url || "",
+      location: item.location || "",
+      ts: Date.now()
+    });
+    if (arr.length > MAX) arr = arr.slice(0, MAX);
+    save(arr);
+  }
+
+  function remove(id) { save(load().filter(x => String(x.id) !== String(id))); }
+  function clearAll() { localStorage.removeItem(STORAGE_KEY); }
+
+  function render() {
+    const listEl = document.getElementById("viewedList");
+    const emptyEl = document.getElementById("viewedEmpty");
+    const countEl = document.getElementById("viewedCount");
+    if (!listEl || !emptyEl || !countEl) return;
+
+    const arr = load();
+    countEl.textContent = String(arr.length);
+
+    listEl.innerHTML = "";
+    if (arr.length === 0) {
+      emptyEl.style.display = "block";
+      return;
+    }
+    emptyEl.style.display = "none";
+
+    arr.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "viewed-item";
+
+      const img = document.createElement("img");
+      img.className = "viewed-thumb";
+      img.alt = item.title || "thumbnail";
+      img.loading = "lazy";
+      img.src = item.image || "";
+
+      const info = document.createElement("div");
+      info.className = "viewed-info";
+
+      const title = document.createElement("div");
+      title.className = "viewed-title";
+      title.textContent = item.title || "(제목 없음)";
+
+      const sub = document.createElement("div");
+      sub.className = "viewed-sub";
+      sub.textContent = item.location || "";
+
+      info.appendChild(title);
+      info.appendChild(sub);
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "viewed-del";
+      del.textContent = "×";
+      del.addEventListener("click", function (e) {
+        e.stopPropagation();
+        remove(item.id);
+        render();
+      });
+
+      li.addEventListener("click", function () {
+        if (item.url) location.href = item.url;
+      });
+
+      li.appendChild(img);
+      li.appendChild(info);
+      li.appendChild(del);
+      listEl.appendChild(li);
+    });
+  }
+
+  function initUI() {
+    const btnTop = document.getElementById("btnTop");
+    const btnRecent = document.getElementById("btnRecent");
+    if (!btnTop || !btnRecent) return;
+
+    function toggleTopBtn() {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      if (y < 120) btnTop.classList.add("is-hidden");
+      else btnTop.classList.remove("is-hidden");
+    }
+    toggleTopBtn();
+    window.addEventListener("scroll", toggleTopBtn);
+
+    btnTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    const overlay = document.getElementById("recentOverlay");
+    const closeBtn = document.getElementById("recentClose");
+    const clearBtn = document.getElementById("viewedClear");
+    if (!overlay || !closeBtn || !clearBtn) return;
+
+    btnRecent.addEventListener("click", function () {
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+      render();
+    });
+
+    function closeModal() {
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closeModal();
+    });
+
+    window.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay.classList.contains("open")) closeModal();
+    });
+
+    clearBtn.addEventListener("click", function () {
+      clearAll();
+      render();
+    });
+  }
+
+  window.GoTodayRecentViewed = { add, render, clearAll, remove };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initUI);
+  } else {
+    initUI();
+  }
+})();
+</script>

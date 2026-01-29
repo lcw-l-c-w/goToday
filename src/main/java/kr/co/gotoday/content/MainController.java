@@ -1,5 +1,7 @@
 package kr.co.gotoday.content;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +32,14 @@ public class MainController {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 		if (user != null) {
 			mcd.setUser_id(user.getUser_id());
-			mcd.setUser_tag_id(user.getUserTagList());
+			List<String> likeTagName= contentService.getUserTagName(user.getUser_id());
+			mcd.setUser_tag_name(likeTagName);
 		}
+		System.out.println("DTO 데이터 확인: " + mcd);
+		System.out.println("태그 리스트 사이즈: " + (mcd.getUser_tag_name() != null ? mcd.getUser_tag_name().size() : "null"));
 		// service 호출
 		model.addAttribute("random", contentService.getRandomContents(mcd));
-		model.addAttribute("recommand", contentService.getRecommandContents(mcd));
+		model.addAttribute("recommend", contentService.getRecommendContents(mcd));
 		model.addAttribute("popularList", contentService.getPopularContent(7, null));
 		model.addAttribute("upcomingList", contentService.getUpcomingContent(10, null));
 

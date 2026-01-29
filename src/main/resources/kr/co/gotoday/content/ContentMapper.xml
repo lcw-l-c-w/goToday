@@ -11,9 +11,9 @@
         c.start_at          AS start_at,
         c.end_at            AS end_at
     FROM content c
-    WHERE c.is_active = true
-      AND c.is_delete = false
-      AND c.content_status IN ('STATUS_OPEN', 'STATUS_SCHEDULED')
+    WHERE 
+	<include refid="USER_VISIBLE_CONTENT" />
+      AND c.end_at >= NOW()
       <if test="content_kind != null">
       	AND c.content_kind=#{content_kind}
       </if>	  
@@ -22,46 +22,82 @@
 	
 	</select>
 
-	<select id="findRecommendedContents" parameterType="kr.co.gotoday.content.MainContentDTO" resultType="kr.co.gotoday.content.ContentVO">
-	SELECT 
-		c. content_id 		AS content_id,
-		c. title 			AS title,
-		c. main_image_path 	AS main_image_path,
-		c. location 		AS location,
-		c.start_at			AS start_at,
-		c.end_at			AS end_at
-		FROM content c
-		WHERE c.is_active=true
-		AND	  c.is_delete=false
-		AND c.content_status = 'STATUS_OPEN' 
-		<if test="content_kind != null and content_kind != ''">
-            AND c.content_kind = #{content_kind}
-        </if>
-		 <if test="content_kind !=null and user_tag_id.size > 0">
-      	 AND c.content_id IN (
-    SELECT DISTINCT ct.content_id
-    FROM content_tag ct
-    WHERE ct.tag_id IN
-    <foreach collection="user_tag_id"
-             item="ut"
-             open="("
-             separator=","
-             close=")">
-      #{ut.tag_id}
-    </foreach>
-  )
-      </if>	 
-      	
-		LIMIT #{limit}	
-	
-	</select>
+<select id="findRecommendedContents"
+        parameterType="kr.co.gotoday.content.MainContentDTO"
+        resultType="kr.co.gotoday.content.ContentVO">
 
+SELECT *
+FROM (
+    SELECT
+        c.*,
+        (
+            <!-- event -->
+            <choose>
+                <when test="eventTags != null and eventTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="eventTags" item="t" separator=" OR ">
+                            c.content_kind LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 6 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+
+            +
+
+            <!-- location -->
+            <choose>
+                <when test="locationTags != null and locationTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="locationTags" item="t" separator=" OR ">
+                            c.location LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 3 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+
+            +
+
+            <!-- interest -->
+            <choose>
+                <when test="interestTags != null and interestTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="interestTags" item="t" separator=" OR ">
+                            c.category LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 1 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+        ) AS weight_score
+    FROM content c
+    <where>
+        <include refid="USER_VISIBLE_CONTENT" />
+        AND c.start_at <![CDATA[<=]]> NOW()
+        AND c.end_at <![CDATA[>=]]> NOW()
+    </where>
+) t
+
+ORDER BY t.weight_score DESC, t.start_at DESC
+LIMIT #{limit}
+
+</select>
+
+
+
+
+	<select id="getTagName" resultType="string">
+	SELECT t.tag_name 
+	FROM tag t JOIN user_tag ut 
+	ON t.tag_id = ut.tag_id 
+    WHERE ut.user_id = #{user_id}
+	</select>
 
 	<sql id="USER_VISIBLE_CONTENT">
 		c.is_delete = 0
 		AND c.is_active = 1
-		AND c.content_status IN
-		('STATUS_SCHEDULED','STATUS_OPEN','STATUS_CLOSED')
+		AND c.content_status = 'STATUS_APPROVAL'
 	</sql>
 
 
@@ -94,7 +130,7 @@
 		) l ON l.content_id = c.content_id
 		WHERE
 		<include refid="USER_VISIBLE_CONTENT" />
-		AND c.content_status IN ('STATUS_SCHEDULED','STATUS_OPEN')
+		AND c.end_at >= NOW()
 		<if test="kind != null and kind != ''">
 			AND c.content_kind = #{kind}
 		</if>
@@ -120,7 +156,7 @@
 		content c
 		WHERE
 		<include refid="USER_VISIBLE_CONTENT" />
-		AND c.content_status = 'STATUS_SCHEDULED'
+		AND c.start_at > NOW()
 		<if test="kind != null and kind != ''">
 			AND c.content_kind = #{kind}
 		</if>
@@ -139,7 +175,10 @@
 		c.content_kind AS content_kind,
 		c.location AS location,
 		c.start_at AS start_at,
-		c.end_at AS end_at
+		c.end_at AS end_at,
+		c.content_status AS content_status,
+		c.reservation_type AS reservation_type
+		
 
 		<!-- popular일 때만 like_cnt select -->
 		<if test="dto.sort == 'popular'">
@@ -180,9 +219,9 @@
 			<!-- ✅ 유저 노출 공통 조건 -->
 			<include refid="USER_VISIBLE_CONTENT" />
 
-			<!-- ✅ 종료 안보기: status로 판단 -->
+			<!-- ✅ 종료 안보기: end_at 비교로 판단 -->
 			<if test="dto.hideEnded != null and dto.hideEnded == true">
-				AND c.content_status != 'STATUS_CLOSED'
+				AND c.end_at >= NOW()
 			</if>
 			<!-- ✅ 무료만 보기 -->
 			<if test="dto.onlyFree != null and dto.onlyFree == true">
@@ -274,7 +313,7 @@
 			<include refid="USER_VISIBLE_CONTENT" />
 
 			<if test="dto.hideEnded != null and dto.hideEnded == true">
-				AND c.content_status != 'STATUS_CLOSED'
+				AND c.end_at >= NOW()
 			</if>
 
 			<if test="dto.q != null and dto.q != ''">
@@ -349,11 +388,15 @@ SELECT
     c.reservation_type AS reservation_type,
     c.category 			AS category,
     c.content_time 		AS 	content_time,
-    c.content_kind		AS content_kind
+    c.content_kind		AS content_kind,
+    c.x_url 			AS x_url,
+    c.instagram_url 	AS instagram_url,
+    c.reservation_type 	AS reservation_type
    
 FROM content c
-WHERE c.content_id = #{content_id};
-
+WHERE 
+	<include refid="USER_VISIBLE_CONTENT" />
+	AND c.content_id = #{content_id}
 	</select>
 	
 	<select id="selectDateByID" parameterType="int" resultType="string">
@@ -370,4 +413,34 @@ WHERE c.content_id = #{content_id};
 	AND scheduled_at= #{scheduled_at}
 	ORDER BY time_zone
 	</select>
+	
+		<select id="selectTicketDetail" resultType="kr.co.gotoday.content.ContentVO">
+SELECT
+    c.title            AS title,
+    c.content_id       AS content_id,
+    c.start_at         AS start_at,
+    c.end_at           AS end_at,
+    c.location         AS location,
+    c.adult_price      AS adult_price,
+    c.teen_price       AS teen_price,
+    c.child_price      AS child_price,
+    c.main_image_path  AS main_image_path,
+    c.reservation_type AS reservation_type,
+    c.category 			AS category,
+    c.content_kind		AS content_kind
+    
+FROM content c 
+WHERE 
+		c.content_id = #{content_id}
+	AND c.is_delete = 0
+	AND c.is_active = 1
+	AND c.content_status IN ( 'STATUS_APPROVAL','STATUS_REQUESTED')
+	</select>
+	
+	
+<select id="findVendorId" resultType="int">
+	SELECT user_id
+	FROM content
+	WHERE content_id=#{content_id}
+</select>
 </mapper>

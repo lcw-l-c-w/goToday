@@ -1,6 +1,8 @@
 package kr.co.gotoday.reservation;
 
 import java.io.BufferedReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -18,14 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.content.ContentVO;
-import kr.co.gotoday.payment.PaymentVO;
 import kr.co.gotoday.payment.TossInputDTO;
 import kr.co.gotoday.user.UserVO;
 
@@ -41,9 +44,46 @@ public class ReservationController {
 	private static final Logger log =
 	        LoggerFactory.getLogger(ReservationController.class);
 
-	@PostMapping("/reserve/schedule.do")
+	@PostMapping(
+			value = "/reserve/schedule.do",
+		    produces = "text/plain; charset=UTF-8")
 	@ResponseBody
-	public String selectSchedule(HttpSession session, ReservationDTO dto) {
+	public ResponseEntity<String> selectSchedule(HttpSession session, ReservationDTO dto) {
+		log.info("===== [selectSchedule] dto = {}", dto);
+		// 필수 값 검증
+		if (dto.getReserved_for_at() == null || dto.getReserved_for_at().isEmpty()
+				|| dto.getTime_zone() == null || dto.getTime_zone().isEmpty()
+				|| dto.getContent_id() == 0 || dto.getSchedule_id() == 0) {
+			return ResponseEntity.ok("날짜 및 시간 정보가 누락 되었습니다.");
+		}
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		LocalDateTime NOW = LocalDateTime.now();
+
+		String[] times = dto.getTime_zone().replace(" ", "").split("~");
+	    String startTimeStr = times[0];
+	    String endTimeStr   = times[1];
+	    
+	    LocalDateTime startTime = LocalDateTime.parse(
+	            dto.getReserved_for_at() + " " + startTimeStr, formatter);
+	    LocalDateTime endTime = LocalDateTime.parse(
+	            dto.getReserved_for_at() + " " + endTimeStr, formatter);
+		
+	    boolean isAllDayType =
+	            dto.getContent_time() != null &&
+	            endTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[1]) &&
+	            startTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[0]);
+		
+	    if (isAllDayType) {
+	    	if (NOW.isAfter(endTime)) {
+	            return ResponseEntity.ok("이미 운영 시간이 종료된 전시입니다.");
+	        }
+		} else {
+			if (NOW.isAfter(startTime) || NOW.isEqual(startTime)) {
+	            return ResponseEntity.ok("지난 회차는 선택하실 수 없습니다.");
+	        }
+		}
+
 		ReservationDTO reservation = new ReservationDTO();
 		reservation.setReserved_for_at(dto.getReserved_for_at());
 		reservation.setTime_zone(dto.getTime_zone());
@@ -51,26 +91,33 @@ public class ReservationController {
 		reservation.setSchedule_id(dto.getSchedule_id());
 
 		session.setAttribute("schedule", reservation);
-		return "ok";
+		return ResponseEntity.ok("OK");
 	}
 
 	@GetMapping("/reserve/quantity.do")
 	public String showQuantityForm(HttpSession session, Model model) {
-		 ReservationDTO dto = (ReservationDTO) session.getAttribute("schedule");
+		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
+		log.info("===== [showQuantityForm] reservation = {}", reservation);
 
-		 // [테스트용] 세션에 schedule이 없으면 임시 데이터 생성
-		 if (dto == null) {
+		if (reservation == null) {
 			 model.addAttribute("cmd", "back");
 			 model.addAttribute("msg", "예약정보가 누락되었습니다.");
 			 return "common/return";
-		 }
+		}
 		 
-		 model.addAttribute("reservationDTO", dto);
+		UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		if(userVO.getRole() != 0 || !userVO.getEmail().contains("@")) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "일반 사용자만 예약이 가능합니다.");
+			return "common/return";
+		}
 
-		 UserVO userVO = (UserVO) session.getAttribute("loginSess");
+		model.addAttribute("reservationDTO", reservation);
 		 
-		 ContentVO contentVO = contentService.getDetailContents(dto.getContent_id(), userVO.getUser_id());
-		 model.addAttribute("contentVO",contentVO);
+		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
+		ContentScheduleVO scheduleVO = reservationService.findCurrentTickets(reservation.getSchedule_id());
+		model.addAttribute("contentVO",contentVO);
+		model.addAttribute("scheduleVO", scheduleVO);
 
 		return "reserve_pay/reservation";
 	}
@@ -102,9 +149,17 @@ public class ReservationController {
 	@GetMapping("/reserve/payment.do")
 	public String showPaymentForm(HttpSession session, Model model){
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-		if (reservation == null) {
+		
+		if (reservation == null ) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "예약정보가 누락되었습니다.");
+			return "common/return";
+		}
+		int totalQty = reservation.getAdult_qty()+ reservation.getChild_qty() + reservation.getTeen_qty();
+		log.info("totalQty = {}", totalQty);
+		if(totalQty == 0) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "올바른 접근이 아닙니다.");
 			return "common/return";
 		}
 		//스케줄 관련 세션 정보를 예약 정보로 모델에 저장
@@ -115,6 +170,12 @@ public class ReservationController {
 		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
 		model.addAttribute("contentVo",contentVO);
 
+		if(userVO.getRole() != 0 || !userVO.getEmail().contains("@")) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "일반 사용자만 예약이 가능합니다.");
+			return "common/return";
+		}
+		
 		//기본적으로 세션에 있는 유저의 정보를 가져다가 수령인 란에 저장하기 위해 정보를 모델에 저장
 		UserVO userInfo = (UserVO)session.getAttribute("loginSess");
 		model.addAttribute("receiver_info", userInfo);
@@ -151,41 +212,48 @@ public class ReservationController {
 
 		try {
 			ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
+		
 			if (reservation == null) {
 				result.put("success", false);
 	            result.put("msg", "예약 정보가 없습니다.");
 				return ResponseEntity.badRequest().body(result);
 			}
 
-			// 서비스에서 DTO → VO 변환
-			reservationService.convertToVO(reservation, reservationVO);
-
 			// 예약자 설정
 			UserVO userVO = (UserVO) session.getAttribute("loginSess");
 			reservationVO.setUser_id(userVO.getUser_id());
+
+			// 서비스에서 DTO → VO 변환 : 이때 예약 상태 PENDING으로 변경,
+			reservationService.convertToVO(reservation, reservationVO);
+
+			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
+			session.setAttribute("pendingReservation", reservationVO);
+
 			
 			//0원일 때 서비스 분기
 			int total_price = reservation.getTotal_price();
 			if (total_price == 0) {
 				ReservationVO resultVO = reservationService.confirmAndCreateReservation(reservationVO, null, null, 0);
-				
+				result.put("success", true);
+				result.put("free", true);   // ⭐ 프론트 분기용
+				result.put("reservationCode", resultVO.getReservation_code());
+
 				// 세션 정리
 	            session.removeAttribute("schedule");
 	            session.removeAttribute("pendingReservation");
 	            session.removeAttribute("paymentDTO");
-
-	            result.put("success", true);
-	            result.put("free", true);   // ⭐ 프론트 분기용
-	            result.put("reservationCode", resultVO.getReservation_code());
+	            
+	            //success get 접근을 막기 위한 예약코드
+	            session.setAttribute("LAST_RESERVATION_CODE", resultVO.getReservation_code());
 
 	            return ResponseEntity.ok(result);
 			}
 
-			// Session에 임시예약 정보 저장 (결제 완료 후 사용)
-			session.setAttribute("pendingReservation", reservationVO);
 
 			TossInputDTO paymentDTO = (TossInputDTO) session.getAttribute("paymentDTO");
 
+			session.setAttribute("LAST_RESERVATION_CODE", reservationVO.getReservation_code());
+			
 			// 토스페이먼츠 결제 요청 정보
 			result.put("success", true);
 	        result.put("orderId", paymentDTO.getOrderId());
@@ -211,21 +279,38 @@ public class ReservationController {
 			@RequestParam(required=false) String paymentKey,
 			@RequestParam(required=false) String orderId,
 			@RequestParam(required=false) Integer amount,
-			@RequestParam(required=false) String reservation_code,
-			Model model) {
-
+			Model model,
+			HttpSession session) {
+		
+		String reservationCode = (String) session.getAttribute("LAST_RESERVATION_CODE");
+		
+		if(reservationCode == null) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "올바른 접근이 아닙니다.");
+			return "common/return";
+		}
 		// 토스에서 받은 파라미터를 모델에 전달 (JSP에서 confirm API 호출 시 사용)
 		model.addAttribute("paymentKey", paymentKey);
+		model.addAttribute("orderId", orderId);
 		model.addAttribute("amount", amount ==null ? 0 : amount);
-		model.addAttribute("reservation_code", reservation_code);
+		model.addAttribute("reservationCode", reservationCode);
 
 		return "reserve_pay/success";
 	}
 
 	//토스페이먼츠에서 결제 실패 콜백
 	@GetMapping("/reserve/fail.do")
-	public String paymentFail(@RequestParam String message, Model model) {
+	public String paymentFail(@RequestParam(required=false) String message, Model model, HttpSession sess) {
+		if(message == null) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "올바른 접근이 아닙니다.");
+			return "common/return";
+		}
 		model.addAttribute("msg", message);
+		
+		sess.removeAttribute("pendingReservation");
+		sess.removeAttribute("paymentDTO");
+	    
 		return "reserve_pay/fail";
 	}
 
@@ -278,11 +363,13 @@ public class ReservationController {
 			// 4. 예약 프로세스 
 			ReservationVO result = reservationService.confirmAndCreateReservation(
 					reservationVO, paymentKey, orderId, amount);
-
 			// 세션 정리
 			session.removeAttribute("schedule");
 			session.removeAttribute("pendingReservation");
 			session.removeAttribute("paymentDTO");
+			
+			//success get 접근을 막기 위한 예약코드
+            session.setAttribute("LAST_RESERVATION_CODE", result.getReservation_code());
 
 			response.put("success", true);
 			response.put("msg", "예약이 완료되었습니다.");
@@ -342,5 +429,38 @@ public class ReservationController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+	
+	@PostMapping("/ticket/{reservation_id}")
+    public ReservationVO onlineTicket(@PathVariable Integer reservation_id) {
+        return reservationService.findByReservationId(reservation_id);
+    }
+    @GetMapping("/ticket/{reservation_id}")
+    public String showTicket(@PathVariable("reservation_id") Integer reservation_id, HttpSession sess,Model model) {
+        UserVO userVO= (UserVO) sess.getAttribute("loginSess");
+        if(userVO== null || reservation_id==null) {
+        	model.addAttribute("msg","로그인이 필요합니다.");
+        	 model.addAttribute("cmd", "back");
+        	return "redirect:/member/login"; // null 반환 대신 로그인 페이지로 유도
+        }
+        ReservationVO reservationVO =reservationService.findByReservationId(reservation_id); 
+        if(reservationVO==null) {
+            model.addAttribute("msg","존재하지 않는 예약입니다");
+            return "common/return";
+        }
+        ContentVO contentVO = contentService.getDetailContentsForTicket(reservationVO.getContent_id(), userVO.getUser_id());
+        if(contentVO == null) {
+            // 콘텐츠 정보가 사라졌거나 가져올 수 없는 경우에 대한 처리
+        	System.out.println("???");
+            model.addAttribute("msg", "해당 콘텐츠 정보를 불러올 수 없습니다.");
+            return "common/return";
+        }
+        int totalQty= reservationVO.getChild_qty()+reservationVO.getTeen_qty()+reservationVO.getAdult_qty();
+        reservationVO.setTotalQty(totalQty);
+        reservationVO.setLocation(contentVO.getLocation());
+        reservationVO.setTitle(contentVO.getTitle());
+        reservationVO.setImgPath(contentVO.getMain_image_path());
+        model.addAttribute("reservation", reservationVO);
+        return "mypage/reserve_ticket";
+    }
 
 }

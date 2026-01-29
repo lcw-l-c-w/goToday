@@ -1,66 +1,57 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html>
-
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>1:1 문의 상세</title>
+<title>나의 Q&A 상세 | GoToday</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_reply_detail.css">
 </head>
 
 <body>
+<h1 class="page-title">나의 Q&A</h1>
+<div class="page-wrap">
+    <div class="page-header">
+        <button type="button" class="btn-back" onclick="history.back();" title="목록으로">
+            &lt;
+        </button>
+    </div>
 
-	<h2>1:1 문의</h2>
-	<hr>
+    <div class="detail-card">
+        <div class="question-title">
+            Q. ${reply.title}
+        </div>
+        <div class="meta-info">
+            <fmt:formatDate value="${reply.created_at}" pattern="yyyy.MM.dd"/> | ${userName}
+        </div>
+        <div class="content-area">${reply.body}</div>
+    </div>
 
-	<table border="0" width="100%" cellspacing="0" cellpadding="10">
-		<tr>
-			<td>
-				<h3>Q. 예약 취소 환불 규정이 궁금합니다.</h3> <font color="gray">2026.01.12
-					| 홍길동</font> <br>
-			<br>
+	<c:if test="${not empty answer}">
+	        <div class="detail-card" style="background-color: #f9f9f9;">
+	            <div class="answer-header" style="display: block; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+	                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+	                    <span class="answer-badge">답변 완료</span>
+	                    <span class="answer-title">관리자의 답변입니다.</span>
+	                </div>
+	                <div class="meta-info" style="margin-bottom: 0;">
+	                    답변일 : <fmt:formatDate value="${answer.created_at}" pattern="yyyy.MM.dd"/>
+	                </div>
+	            </div>
+	
+	            <div class="content-area">${answer.body}</div>
+	        </div>
+	    </c:if>
 
-				<p>
-					가나다라 마바사 아자차카 타파하...<br> 예약을 취소하고 싶은데 환불 규정이 어떻게 되나요?<br>
-					혹시 수수료가 발생하는지 궁금해서 문의드립니다.<br> 너무너무너무너무 궁금해요 알려주세요 ㅠㅠ
-				</p> <br>
-
-				<table border="1" width="200" height="200" cellspacing="0"
-					cellpadding="0">
-					<tr>
-						<td align="center" bgcolor="#eeeeee">사 진<br>(첨부파일)
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-
-	<br>
-	<br>
-
-	<table border="0" width="100%" cellspacing="0" cellpadding="10"
-		bgcolor="#f9f9f9">
-		<tr>
-			<td>
-				<h3>[답변]</h3>
-				<p>
-					안녕하세요, 고객님.<br> 문의하신 취소 환불 규정에 대해 답변드립니다.<br>
-					~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br>
-					~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br> 이용해 주셔서 감사합니다.
-				</p>
-			</td>
-		</tr>
-	</table>
-
-	<br>
-
-	<div align="right">
-		<a href="reply_list.html"><button>목록으로</button></a>
-		<button>수정</button>
-		<button>삭제</button>
-	</div>
-
+		<div class="bottom-actions">
+		    <a href="${pageContext.request.contextPath}/reply/view.do?reply_id=${reply.reply_id}" 
+		       target="_top" 
+		       class="btn-origin-view">
+		        원본 페이지로 이동
+		    </a>
+		</div>
+		    
+</div>
 </body>
-
 </html>

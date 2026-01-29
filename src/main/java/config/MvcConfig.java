@@ -25,7 +25,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import util.AdminInterceptor;
 import util.LoginInterceptor;
+import util.VendorInterceptor;
 
 @Configuration
 @MapperScan(annotationClass = Mapper.class, basePackages = "kr.co.gotoday")
@@ -50,7 +52,7 @@ public class MvcConfig implements WebMvcConfigurer{
     private String kakaoRestApiKey;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
-    
+	
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
@@ -86,6 +88,8 @@ public class MvcConfig implements WebMvcConfigurer{
 	    
 		return dataSource;
 	}
+
+	
 	// mybatis
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception{
@@ -118,7 +122,8 @@ public class MvcConfig implements WebMvcConfigurer{
 		PropertyPlaceholderConfigurer config = new PropertyPlaceholderConfigurer();
 		config.setLocations(
 				new ClassPathResource("db.properties"),
-				new ClassPathResource("api.properties")
+				new ClassPathResource("api.properties"),
+				new ClassPathResource("application.properties")
 			);
 		return config;
 	}
@@ -127,6 +132,10 @@ public class MvcConfig implements WebMvcConfigurer{
 	//로그인 인터셉터 설정
 	@Autowired
 	private LoginInterceptor loginInterceptor;
+	@Autowired
+	private VendorInterceptor vendorInterceptor;
+	@Autowired
+	private AdminInterceptor adminInterceptor;
 	
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(loginInterceptor)
@@ -135,9 +144,28 @@ public class MvcConfig implements WebMvcConfigurer{
 					"/payment/**",
 					"/admin/**",
 					"/vendor/**",
-					"/mypage/**"
+					"/mypage/**",
+					"/review/**"
 			);
+		registry.addInterceptor(vendorInterceptor)
+		.addPathPatterns(
+				"/vendor/**"
+		);
+		
+		 registry.addInterceptor(adminInterceptor)
+	        .addPathPatterns(
+	            "/admin/**"
+	        );
 			
+	}
+	
+	@Value("${upload.path}")
+	private String uploadPath;
+	
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    registry.addResourceHandler("/upload/**")
+	            .addResourceLocations("file:" + uploadPath);
 	}
 	
 }

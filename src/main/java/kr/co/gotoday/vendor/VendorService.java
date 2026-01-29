@@ -19,18 +19,16 @@ public interface VendorService {
 			HttpServletRequest request, List<String> timeList, Integer total_ticket);
 
 	//content 관리 리스트
-	Map<String, Object> getFilterList(int user_id, String keyword, String status);
+	Map<String, Object> getFilterList(int user_id, String keyword, String status, Integer page);
 
 	//수정요청 여부 판단 
 	ContentVO getContent(Integer content_id);
 	List<ContentScheduleVO> getContentSchedule(Integer content_id);
 	
-	//수정시 이전 스케줄 삭제
-	int deleteContentSchedule(Integer content_id);
-	
 	//예약 확인
 	Map<String, Object> findReservationByVendor(VendorReservationSearchDTO dto);
 	int updateReservationStatus(int reserve_id);
+	List<ContentVO> getAllContentForFilter(int userId);
 
 
 }

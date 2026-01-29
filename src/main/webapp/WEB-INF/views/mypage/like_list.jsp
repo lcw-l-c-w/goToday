@@ -1,79 +1,93 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
-
 <head>
 <meta charset="UTF-8">
-<title>찜관리</title>
+<title>찜 관리 | GoToday</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_like_list.css">
 </head>
-
 <body>
+<h1 class="page-title">찜 관리</h1>
+<div class="container">
+	<div class="list-wrapper">
+		<!-- 오늘 날짜 -->
+		<jsp:useBean id="now" class="java.util.Date" />
+		<fmt:parseNumber value="${now.time / (1000*60*60*24)}"
+		                 integerOnly="true"
+		                 var="nowDays" />
 
-	<h2>찜관리</h2>
-	<hr>
+		<c:choose>
+			<c:when test="${empty likeList}">
+				<div class="empty-box">찜한 내역이 없습니다.</div>
+			</c:when>
 
-	<table border="1" width="100%" cellspacing="0" cellpadding="15">
-		<tr>
-			<td colspan="2"><strong>12.03</strong></td>
-		</tr>
-		<tr valign="middle">
-			<td>
-				<h3>[D-3] &nbsp; 일정이름이름이름이름</h3>
-				<p>2025.12.03 16:00</p> <br>
-				<button
-					style="padding: 10px 20px; background-color: #ddd; border: 1px solid #999; cursor: pointer;">
-					예약하러가기</button>
-			</td>
+			<c:otherwise>
+				<c:forEach var="item" items="${likeList}">
+					<!-- 종료일 기준 D-day 계산 -->
+					<fmt:parseNumber value="${item.end_at.time / (1000*60*60*24)}"
+					                 integerOnly="true"
+					                 var="endDays" />
+					<c:set var="dDay" value="${endDays - nowDays}" />
 
-			<td width="120" align="center" bgcolor="#eeeeee"><br>포스터<br>
-			<br></td>
-		</tr>
-	</table>
+					<div class="like-item">
+						<div class="item-info">
+							<div class="title-line">
+								<c:choose>
+									<c:when test="${dDay == 0}">
+										<span class="badge dday">D-Day</span>
+									</c:when>
+									<c:when test="${dDay < 0}">
+										<span class="badge end">종료</span>
+									</c:when>
+									<c:otherwise>
+										<span class="badge">D-${dDay}</span>
+									</c:otherwise>
+								</c:choose>
 
-	<br>
-	<br>
-	<table border="1" width="100%" cellspacing="0" cellpadding="15">
-		<tr>
-			<td colspan="2"><strong>12.20</strong></td>
-		</tr>
-		<tr valign="middle">
-			<td>
-				<h3>[D-20] &nbsp; 일정이름이름이름이름</h3>
-				<p>2025.12.20 16:00</p> <br>
-				<button
-					style="padding: 10px 20px; background-color: #ddd; border: 1px solid #999; cursor: pointer;">
-					예약하러가기</button>
-			</td>
-			<td width="120" align="center" bgcolor="#eeeeee"><br>포스터<br>
-			<br></td>
-		</tr>
-	</table>
+								<a href="${pageContext.request.contextPath}/detail/${item.content_id}"
+								   class="title"
+								   target="_top">
+									${item.title}
+								</a>
+							</div>
 
-	<br>
-	<br>
-	<table border="1" width="100%" cellspacing="0" cellpadding="15">
-		<tr>
-			<td colspan="2"><strong>12.21</strong></td>
-		</tr>
-		<tr valign="middle">
-			<td>
-				<h3>[D-21] &nbsp; 일정이름이름이름이름</h3>
-				<p>2025.12.21 16:00</p> <br>
-				<button
-					style="padding: 10px 20px; background-color: #ddd; border: 1px solid #999; cursor: pointer;">
-					예약하러가기</button>
-			</td>
-			<td width="120" align="center" bgcolor="#eeeeee"><br>포스터<br>
-			<br></td>
-		</tr>
-	</table>
+							<div class="period">
+								<fmt:formatDate value="${item.start_at}" pattern="yyyy.MM.dd"/>
+								~
+								<fmt:formatDate value="${item.end_at}" pattern="yyyy.MM.dd"/>
+							</div>
 
-	<br>
-	<br>
+							<div class="btn-group">
+								<button type="button"
+								        class="reserve-btn"
+								        onclick="top.location.href='${pageContext.request.contextPath}/detail/${item.content_id}'">
+									예약하러 가기
+								</button>
+							</div>
+						</div>
 
-	<div align="center">&lt;&lt; 1, 2, 3, 4, 5 &gt;&gt;</div>
-
+						<div class="poster">
+							<c:choose>
+								<c:when test="${not empty item.main_image_path}">
+									<a href="${pageContext.request.contextPath}/detail/${item.content_id}" target="_top">
+										<img src="${pageContext.request.contextPath}${item.main_image_path}" alt="포스터">
+									</a>
+								</c:when>
+								<c:otherwise>
+									<div style="width:100px; height:140px; border-radius:12px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#aaa;">
+										No Image
+									</div>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+				</c:forEach>
+			</c:otherwise>
+		</c:choose>
+	</div>
+</div>
 </body>
-
 </html>

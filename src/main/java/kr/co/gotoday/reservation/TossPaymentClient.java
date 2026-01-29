@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,9 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 		return "Basic " + new String(encodedBytes);
 	}
 	
+	@Autowired 
+	ReservationMapper reservationMapper;
+	
 	//토스 API 공통 호출 메서드
 	private JSONObject callTossApi(String endpoint, JSONObject requestBody) {
 		HttpURLConnection connection = null;
@@ -44,6 +48,7 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 		Reader reader = null;
 
 		try {
+			log.info("디버깅 중: requestBody={}", requestBody);
 			// HTTP 연결 설정
 			URL url = new URL(apiUrl + endpoint);
 			connection = (HttpURLConnection) url.openConnection();
@@ -97,19 +102,32 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 		requestBody.put("amount", String.valueOf(amount));
 		requestBody.put("paymentKey", paymentKey);
 
+		log.info("[paymentKey 확인]: paymentKey={}", paymentKey);
 		// API 호출
 		JSONObject tossResponse = callTossApi("/confirm", requestBody);
 		
 		log.info("[토스 결제 승인 성공] paymentKey={}, orderId={}", paymentKey, orderId);
 
+		// 토스에서 넘긴 정보가 우리 서버 값과 같은지 마지막 최종 점검
+		String tossOrderId = (String) tossResponse.get("orderId");
+		if(!orderId.equals(tossOrderId)) {
+			log.error("[토스 반환 주문키 불일치] expected={}, actual={}", orderId, tossOrderId);
+			throw new RuntimeException("토스 반환된 orderId 불일치");
+		}
+		
+		Number tossAmount = (Number) tossResponse.get("totalAmount");
+		if(tossAmount.intValue() != amount) {
+			log.error("[토스 반환 가격 불일치] expected={}, actual={}", amount, tossAmount);
+			throw new RuntimeException("토스 반환된 amount 불일치");
+		}
+		
 		// PaymentVO 생성 및 반환
 		PaymentVO paymentVO = new PaymentVO();
 		paymentVO.setPayment_key((String) tossResponse.get("paymentKey"));
 		paymentVO.setOrder_key((String) tossResponse.get("orderId"));
 		paymentVO.setPayment_method((String) tossResponse.get("method"));
 		paymentVO.setPayment_status((String) tossResponse.get("status"));
-		Number totalAmount = (Number) tossResponse.get("totalAmount");
-		paymentVO.setAmount_price(totalAmount.intValue());
+		paymentVO.setAmount_price(tossAmount.intValue());
 		paymentVO.setRefund_status("NONE");
 
 		return paymentVO;
@@ -119,11 +137,25 @@ private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.clas
 	public void cancelPayment(String paymentKey, String cancelReason) {
 		// 요청 데이터 생성
 		JSONObject requestBody = new JSONObject();
+		requestBody.put("paymentKey", paymentKey);
 		requestBody.put("cancelReason", cancelReason);
 
 		// API 호출
 		callTossApi("/" + paymentKey + "/cancel", requestBody);
 		
-		log.info("[토스 결제 취소 성공] paymentKey={}, reason={}", paymentKey, cancelReason);
+		log.info("[토스 결제 취소 성공] orderId={}, reason={}", paymentKey, cancelReason);
+	}
+	
+	public void cancelPayment(String paymentKey, String cancelReason, String refundAccount) {
+		// 요청 데이터 생성
+		JSONObject requestBody = new JSONObject();
+		requestBody.put("paymentKey", paymentKey);
+		requestBody.put("cancelReason", cancelReason);
+		requestBody.put("refundAccount", refundAccount);
+
+		// API 호출
+		callTossApi("/" + paymentKey + "/cancel", requestBody);
+		
+		log.info("[토스 결제 취소 성공] orderId={}, reason={}", paymentKey, cancelReason);
 	}
 }

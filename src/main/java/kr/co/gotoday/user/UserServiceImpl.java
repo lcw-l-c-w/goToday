@@ -47,8 +47,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Long findTagIdByName(String tagName) {
-        return userMapper.findTagIdByName(tagName);
+    public Long findTagIdByNameAndCategory(String tagName, String category) {
+        return userMapper.findTagIdByNameAndCategory(tagName, category);
     }
 
     @Override
@@ -135,27 +135,60 @@ public class UserServiceImpl implements UserService{
     // 관심사 수정
     @Override
     @Transactional
-    public boolean updateUserTags(int userId, List<String> tagNames) {
-    	// 기존 태그 삭제
-        userMapper.deleteUserTags(userId);
-        // 새로운 태그 추가
-        for (String tagName : tagNames) {
-            Long tagId = userMapper.findTagIdByName(tagName);
-            // 태그가 존재하지 않는 경우 스킵
-            if (tagId == null) continue;
-            UserTagVO ut = new UserTagVO();
-            ut.setUser_id(userId);
-            ut.setTag_id(tagId.intValue());
-            userMapper.insertUserTag(ut);
-        }
-        return true;
-    }
+    public boolean updateUserTags(int userId,
+	            String event,
+	            List<String> locations,
+	            List<String> interests) {
+	
+	// 기존 태그 삭제
+	userMapper.deleteUserTags(userId);
+	
+	// event (radio)
+	if (event != null) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(event, "event");
+	if (tagId != null) {
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	// location (checkbox)
+	if (locations != null) {
+	for (String loc : locations) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(loc, "location");
+	if (tagId == null) continue;
+	
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	// interest (checkbox)
+	if (interests != null) {
+	for (String interest : interests) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(interest, "interest");
+	if (tagId == null) continue;
+	
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	return true;
+	}
     
-    //회원정보 수정
+    //회원정보 수정+회원 조회해서 사업자/ 개인/ admin 분기 
     @Override
     public UserVO getUserById(int userId) {
         return userMapper.getUserById(userId);
     }
+    
     //회원정보 수정
     @Override
     @Transactional
@@ -166,5 +199,106 @@ public class UserServiceImpl implements UserService{
         }
         int result = userMapper.updateUserInfo(vo);
         return result > 0;
+    }
+
+// --------------------------------------------------------------------- 네이버 로그인
+    
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.redirect-uri}")
+    private String naverRedirectUri;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
+    
+	@Override
+	public UserVO getNaverUserInfo(String accessToken) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + accessToken);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
+		
+		ResponseEntity<String> response = rt.exchange(
+				"https://openapi.naver.com/v1/nid/me",
+				 HttpMethod.GET,
+				 entity,
+				 String.class
+				 );
+		
+		if (!response.getStatusCode().is2xxSuccessful()) {
+		    return null;
+		}
+		
+		JSONObject json = new JSONObject(response.getBody());
+		JSONObject responseObj = json.getJSONObject("response");
+		
+		
+	    UserVO user = new UserVO();
+	    user.setLogin_type("N");
+	    user.setNaver_key(responseObj.optString("id", null));
+	    user.setEmail(responseObj.optString("email", null));
+	    user.setName(responseObj.optString("name", null));      // 동의 항목 따라 null 가능
+	    user.setBirthday(responseObj.optString("birthday", null));      // 동의 항목 따라 null 가능
+	    user.setGender(responseObj.optString("gender", null));      // 동의 항목 따라 null 가능
+		return user;
+	}
+
+
+	@Override
+	public boolean insertNaverUser(UserVO vo) {
+		return userMapper.insertNaverUser(vo) > 0 ? true : false ;
+	}
+
+
+	@Override
+	public String getNaverAccessToken(String code, String savedState) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", naverClientId);
+		params.add("client_secret", naverClientSecret);
+		params.add("redirect_uri", naverRedirectUri);
+		params.add("code", code);
+		params.add("state", savedState);
+		
+		
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+		
+		ResponseEntity<String> response = rt.exchange(
+				"https://nid.naver.com/oauth2.0/token",
+				HttpMethod.POST,
+				request,
+				String.class
+				);
+		JSONObject json = new JSONObject(response.getBody());
+		return json.getString("access_token");
+	}
+
+
+	@Override
+	public UserVO loginByNaverKey(String naver_key) {
+		return userMapper.loginByNaverKey(naver_key);
+	}
+    
+    // 아이디 비밀번호 찾기
+    @Override
+    public String findEmail(String name, String birthday, String phone_number) {
+        UserVO vo = userMapper.findEmail(name, birthday, phone_number);
+        return (vo != null) ? vo.getEmail() : null;
+    }
+
+    @Override
+    @Transactional
+    public String resetPassword(String email, String phone_number) {
+        UserVO vo = userMapper.findUserForPw(email, phone_number);
+        if (vo != null) {
+            // 8자리 임시 비밀번호 생성 (영문+숫자)
+            String tempPw = java.util.UUID.randomUUID().toString().substring(0, 8);
+            userMapper.updateTempPassword(vo.getUser_id(), tempPw);
+            return tempPw;
+        }
+        return null;
     }
 }

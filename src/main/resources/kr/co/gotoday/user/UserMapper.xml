@@ -43,8 +43,13 @@
 	</insert>
 
     <!-- 태그 이름으로 태그 id 찾기 -->
-    <select id="findTagIdByName" parameterType="String" resultType="long">
-        SELECT tag_id FROM tag WHERE tag_name = #{tagName}
+    <select id="findTagIdByNameAndCategory"
+            parameterType="map"
+            resultType="long">
+        SELECT tag_id
+        FROM tag
+        WHERE tag_name = #{tagName}
+          AND category = #{category}
     </select>
     
     <!-- 이메일 중복 체크 -->
@@ -69,6 +74,14 @@
 	    WHERE ut.user_id = #{userId}
 	</select>
 
+	<!--  관심사 가져오기  -->
+	<select id="getUserTags" resultType="util.TagVO">
+		SELECT 	t.category, t.tag_name
+		FROM user_tag u join tag t
+		ON u.tag_id=t.tag_id
+		WHERE user_id=#{user_id}
+	</select>
+	
 	<!-- 마이페이지 관심사 수정(사용자 태그 전체 삭제) -->
 	<delete id="deleteUserTags">
 	    DELETE FROM user_tag WHERE user_id = #{userId}
@@ -99,4 +112,30 @@
 	    </set>
 	    WHERE user_id = #{user_id}
 	</update>
+	<!-- 네이버 -->
+	<insert id="insertNaverUser" parameterType="kr.co.gotoday.user.UserVO" useGeneratedKeys="true" keyProperty="user_id">
+		INSERT INTO user(
+		email, name, registered_at, role, login_type, naver_key
+		) VALUES (#{email}, #{name} , NOW(), 0, 'N',  #{naver_key})
+	</insert>
+	<!-- 네이버 DB 중복체크  -->
+	<select id="loginByNaverKey" parameterType="string"  resultType="kr.co.gotoday.user.UserVO">
+		SELECT * FROM user WHERE naver_key = #{naver_key} AND login_type = 'N'
+	</select>
+	
+	<!-- 아이디, 비밀번호 찾기 -->
+	<select id="findEmail" resultType="kr.co.gotoday.user.UserVO">
+	    SELECT email FROM user 
+	    WHERE name = #{name} AND birthday = #{birthday} AND phone_number = #{phone_number}
+	</select>
+	
+	<select id="findUserForPw" resultType="kr.co.gotoday.user.UserVO">
+	    SELECT user_id, email FROM user 
+	    WHERE email = #{email} AND phone_number = #{phone_number}
+	</select>
+	
+	<update id="updateTempPassword">
+	    UPDATE user SET password = MD5(#{tempPw}) WHERE user_id = #{user_id}
+	</update>
+
 </mapper>

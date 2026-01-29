@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.gotoday.reply.ReplyMapper">
+	
+	<!-- 유저의 문의 -->
+	<insert id="create" parameterType="kr.co.gotoday.reply.ReplyVO">
+		INSERT INTO reply (
+			title, body, created_at, reply_status, writer, user_id
+		) VALUES (
+			#{title}, #{body}, NOW(), #{reply_status}, #{writer}, #{user_id}
+		)
+		<selectKey keyProperty="reply_id" order="AFTER" resultType="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<!-- 관리자 답글 -->
+	<insert id="adminCreate" parameterType="kr.co.gotoday.reply.ReplyVO">
+		INSERT INTO reply (
+			title, body, created_at, reply_status,
+			gno, writer, admin_id 
+		) VALUES (
+			#{title}, #{body}, NOW(), #{reply_status},
+			#{gno}, #{writer}, #{admin_id}
+		)
+	</insert>
+	
+	<!-- reply_status 수정 -->
+	<update id="updateGno" parameterType="int">
+		UPDATE reply SET gno=#{reply_id} WHERE reply_id = #{reply_id}
+	</update>
+	
+	<update id="update" parameterType="kr.co.gotoday.reply.ReplyVO">
+		UPDATE reply SET 
+			title=#{title}
+			, body=#{body}
+		 WHERE reply_id = #{reply_id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM reply  WHERE reply_id = #{reply_id}
+	</delete>
+	
+	<delete id="deleteAdmin" parameterType="int">
+		DELETE FROM reply  WHERE gno = #{reply_id}
+	</delete>
+	
+	<sql id="searchSql">
+		<where>
+			reply_status = 0
+			<if test="searchWord != null and searchWord != ''">
+				<if test="searchType == 'all'">
+					AND (title LIKE '%${searchWord}%' OR body LIKE '%${searchWord}%')
+				</if>
+				<if test="searchType != 'all'">
+					AND ${searchType} LIKE '%${searchWord}%'
+				</if>
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 목록 -->
+	<select id="list" parameterType="kr.co.gotoday.reply.ReplyVO" resultType="kr.co.gotoday.reply.ReplyVO">
+	    SELECT r.*,
+	           u.name AS writer_name,
+	           (
+		         SELECT COUNT(*)
+		         FROM reply a
+		         WHERE a.gno = r.reply_id
+		           AND a.reply_status = 1
+		       ) AS answer_count
+	    FROM reply r
+	    LEFT JOIN user u ON u.user_id = r.user_id
+	    <include refid="searchSql"/>
+	    ORDER BY r.reply_id DESC
+	    LIMIT #{startIdx}, 5
+	</select>
+
+	
+	<!-- 카운트 -->
+	<select id="count" parameterType="kr.co.gotoday.reply.ReplyVO" resultType="int">
+		SELECT COUNT(*) FROM reply
+		<include refid="searchSql"/>
+	</select>
+	
+	<!-- 상세 -->
+	<select id="detail" parameterType="kr.co.gotoday.reply.ReplyVO" resultType="kr.co.gotoday.reply.ReplyVO">
+		SELECT * FROM reply  WHERE reply_id = #{reply_id}
+	</select>
+	
+	<select id="getAdminReply" parameterType="int" resultType="kr.co.gotoday.reply.ReplyVO">
+		SELECT  
+		r.reply_id     AS reply_id,
+	    r.admin_id     AS admin_id,
+	    r.title        AS title,
+	    r.body         AS body,
+	    r.reply_status AS reply_status,
+	    r.created_at   AS created_at,
+	    r.gno          AS gno,
+	    r.user_id      AS user_id,
+	    r.writer       AS writer,
+	    u.name         AS writer_name
+	    FROM reply r
+	    LEFT JOIN user u
+	        ON r.user_id = u.user_id
+	    WHERE r.gno = #{reply_id}
+	      AND r.reply_status = 1
+	    LIMIT 1
+	</select>
+	
+</mapper>

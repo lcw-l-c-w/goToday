@@ -3,33 +3,34 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>완료 | GoToday</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<style>
-    <%@ include file="register.css" %>
-</style>
+<title>회원가입 완료 | GoToday</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/member_register.css">
 </head>
-
 <body>
-<jsp:include page="/WEB-INF/views/common/header.jsp" />
+    <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
-<div class="container">
-    <div class="tab-nav">
-        <div class="tab-item">정보 입력</div>
-        <div class="tab-item">관심사 입력</div>
-        <div class="tab-item active">가입 완료</div>
-    </div>
+    <div class="container">
+        <div class="tab-nav">
+            <div class="tab-item">정보 입력</div>
+            <div class="tab-item">관심사 입력</div>
+            <div class="tab-item active">가입 완료</div>
+        </div>
 
-    <div class="form-container" style="text-align:center;">
-        <h2>회원가입이 완료되었습니다</h2>
-        <p style="margin-top:20px;">GoToday에 오신 것을 환영합니다.</p>
+        <div class="form-container">
+            <div class="complete-box">
+                
+                <p class="complete-msg">
+                    <strong>${user.name}</strong> 님의<br>
+                    가입이 완료되었습니다~
+                </p>
 
-        <div class="bottom-buttons">
-            <a href="/gotoday/main" class="btn-outline">메인으로</a>
+                <div class="next-btn-container">
+                    <a href="/gotoday/member/login" class="next-btn">로그인하러 가기</a>
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
-
 </body>
 </html>

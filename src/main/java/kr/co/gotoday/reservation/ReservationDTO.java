@@ -11,6 +11,7 @@ public class ReservationDTO {
 	private int content_id; 
 	private String reserved_for_at;
 	private String time_zone;
+	private String content_time;
 	private int adult_qty;
 	private int child_qty;
 	private int teen_qty;

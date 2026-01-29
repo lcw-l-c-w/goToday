@@ -1,0 +1,150 @@
+@charset "UTF-8";
+/* 페이지 기본 */
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: transparent;  /* 배경 투명 */
+    margin: 0;  /* 브라우저 기본 여백 제거 */
+    padding: 0;  /* 브라우저 기본 패딩 제거 */
+    color: #333;   /* 기본 글자색 진한 회색 */
+}
+
+.page-title {
+    font-size: 28px;     /* 글자 크기 */
+    font-weight: 700;    /* 글자 두껍게 */
+    margin-bottom: 0px; /* 아래 여백 */
+    color: #111;         /* 글자 색상 */
+}
+
+.top-area {
+	max-width: 900px;
+	margin: 0 auto 10px auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.btn-back {
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: 0.2s;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+	color: #333;
+	font-weight: 700;
+	font-size: 18px;
+	line-height: 1;
+	padding-right: 2px;
+	margin-left: auto;
+}
+
+.btn-back:hover {
+	background-color: #eee;
+	transform: scale(1.1);
+}
+
+.reservation-wrapper {
+	width: 100%;
+	max-width: 700px;
+	background: #fff;
+	padding: 40px;
+	border-radius: 20px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.header-section {
+	display: flex;
+	justify-content: space-between;
+	gap: 40px;
+	padding-bottom: 30px;
+	border-bottom: 1px solid #eee;
+}
+
+.info-summary {
+	flex: 1;
+}
+
+.content-title {
+	font-size: 24px;
+	font-weight: 700;
+	color: #333;
+	margin-bottom: 20px;
+}
+
+.summary-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.summary-table th {
+	text-align: left;
+	padding: 10px 0;
+	color: #888;
+	font-weight: 500;
+	width: 100px;
+	font-size: 15px;
+}
+
+.summary-table td {
+	padding: 10px 0;
+	font-weight: 600;
+	font-size: 15px;
+	color: #333;
+}
+
+.poster-wrapper {
+	width: 220px;
+}
+
+.poster {
+	width: 100%;
+	border-radius: 12px;
+	box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+	object-fit: cover;
+}
+
+.section-title {
+	font-size: 18px;
+	font-weight: 700;
+	margin-top: 40px;
+	margin-bottom: 20px;
+	color: #111;
+}
+
+.data-table {
+	width: 100%;
+	border-collapse: collapse;
+	border-top: 1px solid #ddd;
+}
+
+/* ▼▼▼ 여기가 문제였습니다. 색상 코드를 직접 넣었습니다 ▼▼▼ */
+.data-table th {
+	background-color: #4dc3ff; /* 파란색 직접 지정 */
+	color: #fff;               /* 흰색 글씨 */
+	text-align: left;
+	padding: 12px 20px;
+	width: 180px;
+	border-bottom: 1px solid #eee;
+	font-size: 14px;
+}
+/* ▲▲▲ 수정 완료 ▲▲▲ */
+
+.data-table td {
+	padding: 12px 20px;
+	border-bottom: 1px solid #eee;
+	font-size: 14px;
+}
+
+.notice-box {
+	background-color: #f9f9f9;
+	padding: 20px;
+	border-radius: 12px;
+	font-size: 14px;
+	color: #666;
+	line-height: 1.6;
+}

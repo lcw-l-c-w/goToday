@@ -3,6 +3,7 @@ package kr.co.gotoday.reservation;
 import java.util.List;
 import java.util.Map;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentVO;
 
@@ -12,6 +13,8 @@ public interface ReservationService {
 	ReservationVO findByReservationId(int reservation_id);
 
 	ReservationVO convertToVO(ReservationDTO dto, ReservationVO vo);
+	
+	ContentScheduleVO findCurrentTickets(int schedule_id);
 
 	//예약 프로세스
 	ReservationVO confirmAndCreateReservation(ReservationVO reservationVO, String paymentKey, String orderId, int amount);
@@ -29,7 +32,7 @@ public interface ReservationService {
 	
 	int updateReservationStatusById(int reservation_id);
 	
-	List<ReservationListDTO> findReservationListByUserId(int user_id);
+	List<ReservationListDTO> findReservationListByUserId(int user_id, String filter);
 	
 	ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id);
 }

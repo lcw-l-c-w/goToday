@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
 import kr.co.gotoday.payment.PaymentMapper;
 import kr.co.gotoday.payment.PaymentVO;
@@ -75,26 +76,41 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 	
 	@Override
+	public ContentScheduleVO findCurrentTickets(int schedule_id) {
+		return reservationMapper.findCurrentTickets(schedule_id);
+	}
+	
+	@Override
 	public ReservationVO confirmAndCreateReservation(ReservationVO reservationVO, String paymentKey, String orderId, int amount) {
 		PaymentVO paymentVO = null;
 		boolean ticketSucceed = false; 
 		try {
+			//confirm 중복 호출로 인한 결제 내역 중복 저장 방지
+			PaymentVO exist = reservationMapper.findByPaymentKey(paymentKey);
+			if (exist != null) {
+			    log.warn("[DUPLICATE_CONFIRM] paymentKey={}, orderId={}", paymentKey, orderId);
+
+			    ReservationVO existReservation =
+			        reservationMapper.findByReservationId(exist.getReservation_id());
+
+			    return existReservation;
+			}
+			
 			// 잔여 확인 후 티켓 선차감 (중복 결제 방지)
 			trySubCurrentTicket(reservationVO);
 			ticketSucceed = true;
 			
 			// 유, 무료에 의해 분기됨
 			if (amount == 0) {
-	            // 🔥 무료 결제 로직
+	            //무료 결제 로직
 	            paymentVO = new PaymentVO();
 	            paymentVO.setOrder_key("FREE_" + UUID.randomUUID());
 	            paymentVO.setAmount_price(0);
 	            paymentVO.setPayment_method("FREE");
-	            paymentVO.setPayment_status("DONE");
 	            paymentVO.setRefund_status("NONE");
 	            
 	        } else {
-	            // 🔥 유료 결제 로직
+	            //유료 결제 로직
 	            paymentVO = tossPaymentClient.confirmPayment(
 	                paymentKey, orderId, amount
 	            );
@@ -125,12 +141,13 @@ public class ReservationServiceImpl implements ReservationService{
 			return savedReservation;
 			
 		} catch (Exception e) {
-			if (paymentVO != null) {
+			//토스 결제 이후 에러가 발생하여 예약은 안 된 경우, 
+			if (paymentVO != null && paymentVO.getAmount_price()!=0) {
 				try {
 					//결제 승인 후 DB저장 실패 로그
 					log.error("[예약결제 DB저장 실패]",e);
 					// 토스 결제 취소
-					tossPaymentClient.cancelPayment(paymentKey, "DB 저장 실패로 인한 취소");
+					tossPaymentClient.cancelPayment(orderId, "DB 저장 실패로 인한 토스 결제 취소");
 				} catch (Exception cancelException) {
 					log.error("[토스 결제 취소 실패] paymentKey={}, orderId={}", 
 							paymentKey,
@@ -154,6 +171,7 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 	
 	@Override
+	@Transactional
 	public int trySubCurrentTicket(ReservationVO reservationVO) throws Exception {
 		
 		int total_qty = reservationVO.getAdult_qty()
@@ -172,13 +190,15 @@ public class ReservationServiceImpl implements ReservationService{
 		            reservationVO.getSchedule_id(),
 		            total_qty
 					);
-			throw new Exception("잔여 티켓 수량이 부족합니다.");
+			throw new Exception("티켓이 모두 소진되어 결제가 진행되지 않았습니다.\r\n"
+					+ "결제 금액은 청구되지 않습니다.");
 		}
 		
 		return result;
 	}
 	
 	@Override
+	@Transactional
 	public int tryAddCurrentTicket(ReservationVO reservationVO) throws Exception {
 	    int total_qty = reservationVO.getAdult_qty()
 	            + reservationVO.getTeen_qty()
@@ -207,12 +227,12 @@ public class ReservationServiceImpl implements ReservationService{
 	public ReservationVO createReservationWithPaymentent(ReservationVO reservationVO, PaymentVO paymentVO) throws Exception {
 		//예약 상태를 완료로 변경
 		reservationVO.setReservation_status("DONE");
-		
 		// 예약 정보 저장
 		int reservationResult = reservationMapper.createReservation(reservationVO);
 		if(reservationResult <= 0 ) {
 			throw new Exception("에약 정보 저장에 실패했습니다.");
 		}
+		
 		// 결제 정보 저장 
 		paymentVO.setReservation_id(reservationVO.getReservation_id());
 		int paymentResult = paymentMapper.createPayment(paymentVO);//			
@@ -267,9 +287,12 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 
 	@Override
-	public List<ReservationListDTO> findReservationListByUserId(int user_id) {
-		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(user_id);
+	public List<ReservationListDTO> findReservationListByUserId(int user_id, String filter) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("user_id", user_id);
+		map.put("filter", filter);
 		
+		List<ReservationListDTO> listDTO = reservationMapper.findReservationListByUserId(map);
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		
 		for(ReservationListDTO dto : listDTO) {
@@ -308,9 +331,13 @@ public class ReservationServiceImpl implements ReservationService{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("reservation_id", reservation_id);
 		map.put("user_id", user_id);
-		
+
 		ReservationDetailDTO dto = reservationMapper.findReservationDetailById(map);
-		
+
+		if (dto == null) {
+			throw new RuntimeException("예약 정보를 찾을 수 없습니다. reservation_id=" + reservation_id);
+		}
+
     	String birth = dto.getReceiver_birth();
     	if (birth != null && birth.length() >= 10) {
     	    birth = birth.substring(0, 10); //yyyy-MM-dd
