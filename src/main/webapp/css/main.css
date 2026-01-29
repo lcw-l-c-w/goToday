@@ -128,6 +128,30 @@ a { text-decoration: none; color: inherit; }
   transition: none;
 }
 
+.recommend-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border: 1px solid #eee;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 110;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.recommend-btn:hover { background: #f8f8f8; color: var(--main-color); }
+
+/* ✅ 여기 수정: 음수 -> 안쪽으로 */
+.rec-prev { left: 8px; }
+.rec-next { right: 8px; }
 
 .recommend-view::-webkit-scrollbar{ height: 0; }
 .recommend-view{ scrollbar-width: none; }
@@ -210,4 +234,5 @@ a { text-decoration: none; color: inherit; }
 .upcoming-container .rec-prev { left: -60px; }
 .upcoming-container .rec-next { right: -60px; }
 
-
+/* (선택) 버튼이 카드 이미지 정중앙쯤 오게 높이 조절 */
+.upcoming-container .recommend-btn { top: 180px; }  /* 카드 이미지가 280px라 대충 중간 */
