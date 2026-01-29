@@ -22,13 +22,15 @@
             <c:otherwise>
                 <c:forEach var="r" items="${reviewList}">
                     <div class="review-item">
-                        <div class="review-info">
-                            <div class="review-date">
-                                <fmt:formatDate value="${r.created_at}" pattern="yyyy.MM.dd"/>
+                        <div class="review-left">
+                            <div class="review-header">
+                                <span class="review-date"><fmt:formatDate value="${r.created_at}" pattern="yyyy.MM.dd"/> 작성</span>
+                                <span class="visit-info">| 방문일: ${r.visited_at}<c:if test="${not empty r.visited_time_zone}"> (${r.visited_time_zone})</c:if></span>
                             </div>
-
                             <div class="title-line">
-                                <span class="title">${r.title}</span>
+                                <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
+                                    <span class="title">${r.title}</span>
+                                </a>
                                 <span class="star-rating">
                                     <c:forEach begin="1" end="5" var="i">
                                         <c:choose>
@@ -38,36 +40,16 @@
                                     </c:forEach>
                                 </span>
                             </div>
-
                             <div class="review-content">${r.content}</div>
-
-                            <c:if test="${not empty r.image_new}">
-                                <div class="review-image">
-                                    <img src="/upload/${r.image_new}" alt="리뷰 이미지">
-                                </div>
-                            </c:if>
-
-                            <div class="visit-info">
-                                방문일: ${r.visited_at}
-                                <c:if test="${not empty r.visited_time_zone}">
-                                    (${r.visited_time_zone})
-                                </c:if>
-                            </div>
-
-                            <div class="btn-group">
-                                <button class="edit-btn" data-reservation-id="${r.reservation_id}">
-                                    수정
-                                </button>
-                                <button class="delete-btn" data-review-id="${r.review_id}">
-                                    삭제
-                                </button>
-                            </div>
                         </div>
-
-                        <div class="poster">
-                            <a href="${pageContext.request.contextPath}/detail/${r.content_id}" target="_top">
-                                <img src="<c:url value='${r.main_image_path}'/>" alt="포스터">
-                            </a>
+                        <c:if test="${not empty r.image_new}">
+                            <div class="review-image">
+                                <img src="${pageContext.request.contextPath}/upload/${r.image_new}" alt="리뷰 이미지"/>
+                            </div>
+                        </c:if>
+                        <div class="btn-group">
+                            <button class="edit-btn" data-reservation-id="${r.reservation_id}">수정</button>
+                            <button class="delete-btn" data-review-id="${r.review_id}">삭제</button>
                         </div>
                     </div>
                 </c:forEach>

@@ -20,8 +20,9 @@
     .page-title { 
         font-size: 28px; 
         font-weight: 700; 
-        margin-bottom: 30px; 
+        margin-bottom: 15px; 
         color: #111;
+        margin-top: 0px;
     }
     
     /* ===== 리스트 컨테이너 ===== */

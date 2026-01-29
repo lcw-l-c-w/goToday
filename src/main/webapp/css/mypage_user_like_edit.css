@@ -15,9 +15,10 @@ body {
 
 /* 페이지 제목 */
 .page-title {
+    margin-top: 0px;
     font-size: 28px;       /* 글자 크기 */
     font-weight: 700;      /* 글자 두껍게 */
-    margin-bottom: 30px;   /* 아래 여백 */
+    margin-bottom: 15px;   /* 아래 여백 */
     color: #111;         /* 글자 색상 */
 }
 
