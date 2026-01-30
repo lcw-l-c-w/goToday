@@ -24,7 +24,7 @@
 }
 
     body {
-        background-color: var(--page-bg);
+        background-color: white;
         font-family: inherit;
         margin: 0;
         padding: 0;
@@ -73,7 +73,7 @@
     /* 2. 티켓 전체 레이아웃 */
     .ticket-wrapper {
         width: 360px;
-        filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));
+        filter: drop-shadow(0 15px 15px rgba(0,0,0,0.1));
         margin-bottom: 60px;
     }
 
@@ -164,7 +164,7 @@
     .ticket-footer {
         background: var(--ticket-bg);
         border-radius: 0 0 20px 20px;
-        padding: 25px;
+        padding: 5px 25px 25px;
         text-align: center;
         margin-top: -1px;
     }

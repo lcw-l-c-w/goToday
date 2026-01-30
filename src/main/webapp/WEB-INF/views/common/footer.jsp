@@ -7,6 +7,7 @@
         padding: 50px 0; 
         color: #666;
         font-family: 'Pretendard', sans-serif;
+        padding-top: 20px;
     }
 
     .footer-container {
