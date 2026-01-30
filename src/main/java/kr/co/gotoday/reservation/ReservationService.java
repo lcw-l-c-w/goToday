@@ -33,6 +33,8 @@ public interface ReservationService {
 	int updateReservationStatusById(int reservation_id);
 	
 	List<ReservationListDTO> findReservationListByUserId(int user_id, String filter);
-	
+
+	Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page);
+
 	ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id);
 }

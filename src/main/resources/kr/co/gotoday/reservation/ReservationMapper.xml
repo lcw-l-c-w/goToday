@@ -160,9 +160,36 @@
 		WHERE order_key = #{order_key}
 	</select>
 	
+	<!-- 예약 목록 COUNT -->
+	<select id="countReservationByUserId" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM reservation r
+		JOIN content c ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		WHERE r.user_id = #{user_id}
+		<choose>
+			<when test="filter == 'CANCELED'">
+				AND r.reservation_status = 'CANCELED'
+			</when>
+			<when test="filter == 'UPCOMING'">
+				AND r.reserved_for_at >= CURDATE()
+				AND r.reservation_status = 'DONE'
+			</when>
+			<when test="filter == 'VISITED'">
+				AND (DATE(r.reserved_for_at) &lt; CURDATE() 
+          			OR DATE(r.reserved_for_at) = CURDATE())
+	            AND r.reservation_status = 'VISITED'
+			</when>
+			<when test="filter == 'END'">
+				AND r.reserved_for_at &lt; CURDATE()
+			</when>
+			<otherwise></otherwise>
+		</choose>
+	</select>
+
 	<select id="findReservationListByUserId" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationListDTO">
-		SELECT 
-			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
+		SELECT
+			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type,
 			c.content_id, c.title, c.main_image_path,
 			p.payment_status, p.order_key AS order_id, p.payment_method,
 			CASE WHEN r2.review_id IS NOT NULL THEN 1 ELSE 0 END as review_exists
@@ -171,23 +198,38 @@
 		JOIN payment p ON r.reservation_id = p.reservation_id
 		LEFT JOIN review r2 ON r.reservation_id = r2.reservation_id
 		WHERE r.user_id = #{user_id}
-		   <choose>
+	   <choose>
 	        <when test="filter == 'CANCELED'">
 	            AND r.reservation_status = 'CANCELED'
 	        </when>
-
+	
 	        <when test="filter == 'UPCOMING'">
-	            AND r.reserved_for_at >= NOW()
+	            AND DATE(r.reserved_for_at) >= CURDATE()
 	            AND r.reservation_status = 'DONE'
 	        </when>
 	
 	    	<when test="filter == 'END'">
-	            AND r.reserved_for_at &lt; NOW()
+	            AND DATE(r.reserved_for_at) &lt; CURDATE()
 	        </when>
-
+	        
+          	<when test="filter == 'VISITED'">
+          		AND (DATE(r.reserved_for_at) &lt; CURDATE() 
+          			OR DATE(r.reserved_for_at) = CURDATE())
+	            AND r.reservation_status = 'VISITED'
+	        </when>
+	        
 	        <otherwise></otherwise>
 	    </choose>
-		ORDER BY r.reserved_for_at, r.time_zone
+		ORDER BY 
+			CASE 
+	        WHEN r.reserved_for_at >= CURDATE() THEN 0 
+	        ELSE 1 
+	    END,
+	    ABS(DATEDIFF(r.reserved_for_at, CURDATE())),
+	    r.time_zone
+		<if test="pageSize != null and offset != null">
+			LIMIT #{pageSize} OFFSET #{offset}
+		</if>
 	</select>
 	
 	<select id="findReservationDetailById" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationDetailDTO">
@@ -214,7 +256,7 @@
 		SET reservation_status = 'VISITED'
 		WHERE r.reservation_id = #{reservation_id}
 			AND payment_status = 'DONE' 
-			AND reserved_for_at >= NOW()
+			AND reserved_for_at >= CURDATE()
 			AND ( reservation_status NOT IN ('CANCELED','PENDING')
 				OR reservation_status IS NULL );
 	</update>

@@ -14,5 +14,8 @@ public interface ReviewService {
     List<ReviewVO> getReviewsByContentPaged(int content_id, int page, String sortType );
     Map<String, Object> getRatingSummary(int content_id);
     Map<String, Double> getAvgRatingByTimeZone(int content_id);
+    
+    List<ReviewVO> findReviewsByUserIdPaged(int user_id, int page, int limit);
+    int countReviewsByUserId(int user_id);
 	
 }

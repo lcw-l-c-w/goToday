@@ -1,6 +1,7 @@
 package kr.co.gotoday.mypage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,9 +87,17 @@ public class MypageController {
             HttpSession session,
             @RequestParam(required = false) String event,
             @RequestParam(required = false) String[] location,
-            @RequestParam(required = false) String[] interest) {
+            @RequestParam(required = false) String[] interest,
+            UserVO vo, Model model) {
 
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/member/login");
+            return "common/return";
+        }
+        
         int userId = loginUser.getUser_id();
 
         // 배열 → List 변환
@@ -176,21 +185,23 @@ public class MypageController {
     // 예약 관리
     @GetMapping("/mypage/reservation")
     public String showReservationList(
-    		@RequestParam(required = false, defaultValue = "ALL") String filter, 
-    		HttpSession sess, 
+    		@RequestParam(required = false, defaultValue = "ALL") String filter,
+    		@RequestParam(required = false, defaultValue = "1") Integer page,
+    		HttpSession sess,
     		Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-    	
+
     	if (userVO == null) {
             model.addAttribute("cmd", "back");
             model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
             return "common/return";
         }
-    	
-    	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id(), filter);
-    	model.addAttribute("reservationList", reservationList);
+
+    	Map<String, Object> result = reservationService.findReservationListByUserId(userVO.getUser_id(), filter, page);
+    	model.addAttribute("reservationList", result.get("list"));
+    	model.addAttribute("pageInfo", result.get("pageInfo"));
     	model.addAttribute("currentFilter", filter);
-    	
+
     	return "mypage/reserve_list";
     }
     // 예약 관리
@@ -289,18 +300,66 @@ public class MypageController {
         return "mypage/reply_detail";
     }
     
-	@GetMapping("/mypage/myreviews.do")
-	public String showUserReviewList(HttpSession sess, Model model) {
-		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
-		if(userVO == null) {
-			model.addAttribute("cmd","back");
-			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
-			return "common/return";
-		}
-		List<ReviewVO> reviewList = reviewService.findReviewsByUserId(userVO.getUser_id());
-		model.addAttribute("reviewList", reviewList);
-		return "mypage/review_list";
-	}
+//	@GetMapping("/mypage/myreviews.do")
+//	public String showUserReviewList(HttpSession sess, Model model) {
+//		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+//		if(userVO == null) {
+//			model.addAttribute("cmd","back");
+//			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+//			return "common/return";
+//		}
+//		List<ReviewVO> reviewList = reviewService.findReviewsByUserId(userVO.getUser_id());
+//		model.addAttribute("reviewList", reviewList);
+//		return "mypage/review_list";
+//	}
+    
+    @GetMapping("/mypage/myreviews.do")
+    public String showUserReviewList(
+            HttpSession sess, 
+            Model model,
+            @RequestParam(value = "page", defaultValue = "1") int page) {
+        
+        UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+        if(userVO == null) {
+            model.addAttribute("cmd","back");
+            model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+            return "common/return";
+        }
+
+        // --- 페이징 로직 시작 ---
+        int limit = 4;      // 한 페이지에 보여줄 글 개수
+        int pageBlock = 5;  // 하단에 보여줄 페이지 번호 개수 (1,2,3,4,5)
+
+        // 1. 전체 게시물 수 조회
+        int totalCount = reviewService.countReviewsByUserId(userVO.getUser_id());
+
+        // 2. 총 페이지 수 계산
+        int totalPage = (int) Math.ceil((double) totalCount / limit);
+        
+        // 페이지 번호 예외 처리
+        if (page < 1) page = 1;
+        if (page > totalPage && totalPage > 0) page = totalPage;
+
+        // 3. 현재 페이지에 해당하는 데이터 조회
+        List<ReviewVO> reviewList = reviewService.findReviewsByUserIdPaged(userVO.getUser_id(), page, limit);
+
+        // 4. 페이지 네비게이션 계산 (시작번호, 끝번호)
+        int startPage = ((page - 1) / pageBlock) * pageBlock + 1;
+        int endPage = startPage + pageBlock - 1;
+        if (endPage > totalPage) endPage = totalPage;
+
+        // 5. 뷰로 데이터 전달
+        model.addAttribute("reviewList", reviewList);
+        
+        Map<String, Object> paging = new HashMap<>();
+        paging.put("page", page);
+        paging.put("totalPage", totalPage);
+        paging.put("startPage", startPage);
+        paging.put("endPage", endPage);
+        model.addAttribute("paging", paging); // 페이징 정보 맵 전달
+
+        return "mypage/review_list";
+    }
 	
 /*	
     // 문의사항 목록(채원)

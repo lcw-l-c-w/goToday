@@ -60,7 +60,7 @@
             </c:if>
 
             <div class="recommend-container">
-                <button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
+               
                 <div class="recommend-view">
                     <%-- 조건에 따라 blur-container 클래스 동적 부여 --%>
                     <div id="recList" class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <button class="recommend-btn rec-next" id="recNext">&gt;</button>
+                
             </div>
         </section>
 
