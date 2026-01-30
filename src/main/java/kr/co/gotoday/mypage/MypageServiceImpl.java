@@ -18,8 +18,8 @@ public class MypageServiceImpl implements MypageService {
     private final ReplyMapper replyMapper;
     
     @Override
-    public List<MypageDTO> getMyLikeList(Integer user_id) {
-        return mypageMapper.selectMyLikeList(user_id);
+    public List<MypageDTO> getMyLikeList(Integer user_id,int offset, int pageSize) {
+        return mypageMapper.selectMyLikeList(user_id, offset,  pageSize);
     }
    
 
@@ -94,6 +94,12 @@ public class MypageServiceImpl implements MypageService {
     public MypageDTO getInquiryAnswer(int creply_id) {
         return mypageMapper.selectInquiryAnswer(creply_id);
     }
+
+
+	@Override
+	public int getLikeCount(int user_id) {
+		return mypageMapper.countLike(user_id);
+	}
 
     
     

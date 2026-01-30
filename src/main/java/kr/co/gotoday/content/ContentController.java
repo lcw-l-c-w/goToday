@@ -48,7 +48,7 @@ public class ContentController {
 		
 		if (user != null && result != null ) {
 	        // user도 있고, 컨텐츠도 있다면 
-	        int like = contentLikeService.CheckContentLike( content_id,user.getUser_id());
+	        int like = contentLikeService.checkContentLike( content_id,user.getUser_id());
 	        result.setLiked(like); // VO에 결과 담기
 	       
 	    }
