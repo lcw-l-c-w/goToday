@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>GoToday Main</title>
-    <!-- ✅ main 전용 CSS -->
+    <!--  main 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/css/main.css'/>">
  
 </head>
@@ -186,56 +186,42 @@
             startTimer(); // 최초 시작
         }
 
-        // 2. 추천 컨텐츠 슬라이드 로직
-        const recList = document.getElementById('recList');
-        const recCards = recList ? recList.querySelectorAll('.content-card') : [];
-        let recPosition = 0;
-        const cardWidth = 210 + 20; 
-        const recView = document.querySelector('.recommend-view');
-        const containerWidth = recView ? recView.offsetWidth : 0;
-        const visibleCount = Math.floor(containerWidth / cardWidth);
+     // --- 2. 오픈 예정 콘텐츠 슬라이드 (수정본) ---
+        const upView = document.getElementById('upView');
+        const upPrev = document.getElementById('upPrev');
+        const upNext = document.getElementById('upNext');
+        const upFirstCard = document.querySelector('#upList .content-card');
 
-        if (recCards.length > visibleCount) {
-            document.getElementById('recPrev').onclick = () => {
-                recPosition = Math.min(recPosition + cardWidth, 0);
-                recList.style.transform = `translateX(\${recPosition}px)`;
+        if (upView && upPrev && upNext && upFirstCard) {
+            // gap 값을 가져오되, 실패할 경우 기본값 15를 사용
+            const upListStyle = getComputedStyle(document.getElementById('upList'));
+            const gapValue = parseFloat(upListStyle.gap || upListStyle.columnGap);
+            const upGap = isNaN(gapValue) ? 15 : gapValue; 
+            
+            // 이동할 한 칸의 거리 계산
+            const upStep = upFirstCard.offsetWidth + upGap;
+
+            // 다음 버튼 클릭
+            upNext.onclick = () => {
+                upView.scrollBy({ left: upStep, behavior: 'smooth' });
             };
-            document.getElementById('recNext').onclick = () => {
-                const maxScroll = -(cardWidth * recCards.length - containerWidth + 10);
-                recPosition = Math.max(recPosition - cardWidth, maxScroll);
-                recList.style.transform = `translateX(\${recPosition}px)`;
+
+            // 이전 버튼 클릭
+            upPrev.onclick = () => {
+                upView.scrollBy({ left: -upStep, behavior: 'smooth' });
             };
-        } else {
-            if(document.getElementById('recPrev')) document.getElementById('recPrev').style.display = 'none';
-            if(document.getElementById('recNext')) document.getElementById('recNext').style.display = 'none';
-        }
 
-
-
-                 // 3. 오픈 예정 컨텐츠: 버튼으로 1개씩 이동
-            const upView = document.getElementById('upView');
-            const upPrev = document.getElementById('upPrev');
-            const upNext = document.getElementById('upNext');
-            const upFirstCard = document.querySelector('#upList .content-card');
-
-            if (upView && upPrev && upNext && upFirstCard) {
-              const upListStyle = getComputedStyle(document.getElementById('upList'));
-              const upGap = parseFloat(upListStyle.gap || upListStyle.columnGap || 0);
-              const upStep = upFirstCard.offsetWidth + upGap;
-
-              upPrev.onclick = () => upView.scrollBy({ left: -upStep, behavior: 'smooth' });
-              upNext.onclick = () => upView.scrollBy({ left: upStep, behavior: 'smooth' });
-
-              // 카드가 5개 이하이면 버튼 숨김(원하면)
-              const upCards = document.querySelectorAll('#upList .content-card');
-              if (upCards.length <= 5) {
+            // 데이터가 화면(보통 5개)보다 적으면 버튼을 숨기되, 테스트를 위해 숫자를 확인하세요.
+            const upCards = document.querySelectorAll('#upList .content-card');
+            if (upCards.length > 5) {
+                upPrev.style.display = 'flex';
+                upNext.style.display = 'flex';
+            } else {
+                // 항목이 적을 때는 버튼 숨김
                 upPrev.style.display = 'none';
                 upNext.style.display = 'none';
-              }
-            } else {
-              if (upPrev) upPrev.style.display = 'none';
-              if (upNext) upNext.style.display = 'none';
             }
+        }
 
     });
     </script>

@@ -19,25 +19,39 @@
         --bg-light: #fcfcfc;
     }
 
-    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: var(--text-dark); }
+    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: var(--text-dark);}
 
-    .dynamic-list-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+    .dynamic-list-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; min-height: 700px; 
+    display: flex;
+    flex-direction: column;}
 
+
+.empty-msg {
+    text-align: center;
+    /* ⭐ 테이블이 비어있을 때 이 TD가 남은 공간을 다 차지하게 합니다. */
+    height: 400px; 
+    color: var(--text-light);
+    background: var(--bg-light);
+    vertical-align: middle !important; /* 글자를 정중앙에 */
+}
     /* 헤더 영역 */
     .list-info-header { 
-        display: flex; justify-content: flex-end; /* 버튼만 우측 정렬 */
+        display: flex; justify-content: flex-end; 
         padding-bottom: 15px; margin-bottom: 0;
+         min-height: 100px; align-items: flex-start; /* ⭐⭐⭐ 이거 하나 */
     }
 
     .btn-write {
         padding: 10px 22px; background: var(--text-dark); color: #fff;
         border-radius: 6px; font-weight: 600; font-size: 14px;
-        transition: 0.3s; border: none; cursor: pointer;
+        transition: 0.3s; border: none; cursor: pointer; 
+         margin-top: auto;
+}
     }
     .btn-write:hover { background: #555; }
 
     /* 테이블 스타일 */
-    .custom-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text-dark); }
+    .custom-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text-dark); background:white;}
     
     .custom-table th { 
         background-color: #fcfcfc; padding: 16px 10px; text-align: center; 
@@ -86,15 +100,36 @@
     
     /* 호버 효과 */
     .custom-table tbody tr:hover { background-color: #f9fdff; }
+    
+    .pagination button{
+  border:1px solid #ddd;
+  background:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:13px;
+}
+.pagination button[disabled]{
+  background:#f5f5f5;
+  cursor:default;
+  color:#999;
+}
+    
+    .empty-space {
+    height: 100px;   /* 원하는 만큼 */
+}
 </style>
 </head>
 <body>
     <div class="wrap">
         <div class="dynamic-list-container">
             <div class="list-info-header">
+          
+            <c:if test="${loginSess.role==0}">
                 <button type="button" class="btn-write" onclick="goWriteForm()" >문의하기</button>
-            </div>
-
+            
+			</c:if>
+			</div>
             <table class="custom-table">
                 <colgroup>
                     <col style="width: 110px;"> <col style="width: auto;">  <col style="width: 150px;"> <col style="width: 150px;"> </colgroup>
@@ -108,8 +143,8 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty list}">
-                            <c:forEach var="item" items="${list}">
+                        <c:when test="${not empty inquiryList}">
+                            <c:forEach var="item" items="${inquiryList}">
                                 <tr>
                                     <td>
                                      <c:if test="${item.nested==0}">
@@ -185,6 +220,49 @@
                     </c:choose>
                 </tbody>
             </table>
+            
+            <%-- 페이지네이션: inquiryPageInfo 라는 이름으로 내려온다고 가정 --%>
+<c:if test="${not empty inquiryPageInfo and inquiryPageInfo.totalPage > 1}">
+  <div class="pagination" style="display:flex;justify-content:center;gap:8px;padding:18px 0 0;">
+    
+    <c:if test="${inquiryPageInfo.prev}">
+      <c:url var="prevUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${inquiryPageInfo.startPage - 1}"/>
+      </c:url>
+<button type="button" class="inquiry-page" data-page="${inquiryPageInfo.startPage - 1}">이전</button>
+    </c:if>
+
+    <c:forEach var="p" begin="${inquiryPageInfo.startPage}" end="${inquiryPageInfo.endPage}">
+      <c:url var="pUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${p}"/>
+      </c:url>
+
+      <c:choose>
+        <c:when test="${p == inquiryPageInfo.page}">
+          <button type="button" disabled>${p}</button>
+        </c:when>
+        <c:otherwise>
+  <button type="button"
+          class="inquiry-page"
+          data-page="${p}">
+    ${p}
+  </button>        </c:otherwise>
+      </c:choose>
+    </c:forEach>
+
+    <c:if test="${inquiryPageInfo.next}">
+      <c:url var="nextUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${inquiryPageInfo.endPage + 1}"/>
+      </c:url>
+<button type="button" class="inquiry-page" data-page="${inquiryPageInfo.endPage + 1}">다음</button>
+    </c:if>
+
+  </div>
+</c:if>
+            
         </div>
     </div>
 
@@ -199,7 +277,7 @@
     	var content_id= $("#content_id").val();
     	if(!content_id) {
             // 부모창에 id="content_id"가 없을 경우를 대비한 2차 시도
-            content_id = "${list[0].content_id}"; 
+            content_id = "${inquiryList[0].content_id}"; 
         }
 
         if(!content_id) {

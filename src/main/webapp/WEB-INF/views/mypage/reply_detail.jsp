@@ -8,7 +8,6 @@
 <title>나의 Q&A 상세 | GoToday</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_reply_detail.css">
 </head>
-
 <body>
 <h1 class="page-title">나의 Q&A</h1>
 <div class="page-wrap">

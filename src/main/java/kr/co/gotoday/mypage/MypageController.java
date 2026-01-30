@@ -24,6 +24,7 @@ import kr.co.gotoday.review.ReviewVO;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import util.PageInfo;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -72,7 +73,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
@@ -128,7 +129,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
@@ -217,22 +218,35 @@ public class MypageController {
     }
     
     // 좋아요 목록
-    
     @GetMapping("/mypage/like_list")
-    public String myLikeList(HttpSession session, Model model) {
+    public String myLikeList(@RequestParam(value = "page", required = false) Integer page,HttpSession session, Model model) {
 
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
 
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
-        List<MypageDTO> likeList =
-                mypageService.getMyLikeList(loginUser.getUser_id());
+        //페이징 처리 
+        int pageSize=3;
+        int blockSize=5;
+       
+        // db에서 전체 좋아요 개수만 가져와야함
+        int totalCount=mypageService.getLikeCount(loginUser.getUser_id());
+        
 
+        PageInfo pi = PageInfo.of(totalCount, page, pageSize, blockSize);
+        int offset= PageInfo.offset(page, pageSize);
+
+        //전체 좋아요 가져옴(limit 사용해야함)_
+        List<MypageDTO> likeList =
+        		mypageService.getMyLikeList(loginUser.getUser_id(), offset,  pageSize);
+        model.addAttribute("pi", pi); // JSP에서 사용할 페이징 정보
+        
+        
         model.addAttribute("likeList", likeList);
 
         return "mypage/like_list";
@@ -252,7 +266,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -275,7 +289,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
@@ -370,7 +384,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -397,7 +411,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -420,7 +434,7 @@ public class MypageController {
 	    if (loginUser == null) {
 	        model.addAttribute("msg", "로그인이 필요합니다.");
 	        model.addAttribute("cmd", "move");
-	        model.addAttribute("url", "/gotoday/member/login");
+	        model.addAttribute("url", "/member/login");
 	        return "common/return";
 	    }
 
