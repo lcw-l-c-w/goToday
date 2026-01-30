@@ -172,7 +172,7 @@
 				AND r.reservation_status = 'CANCELED'
 			</when>
 			<when test="filter == 'UPCOMING'">
-				AND r.reserved_for_at >= CURDATE()
+				AND DATE(r.reserved_for_at) >= CURDATE()
 				AND r.reservation_status = 'DONE'
 			</when>
 			<when test="filter == 'VISITED'">
