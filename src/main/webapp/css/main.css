@@ -23,6 +23,18 @@ a { text-decoration: none; color: inherit; }
   background: #000;
 }
 
+.ad-wrap {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+}
+
+.ad {
+    width: 100%;
+    display: block;
+    padding : 60px 0;
+    cursor: pointer;
+}
+
 #slideList {
   display: flex !important;
   flex-wrap: nowrap !important;

@@ -105,6 +105,10 @@
                 </c:if>
             </div>
         </section>
+        
+        <div class="ad-wrap" onclick="location.href='${pageContext.request.contextPath}/detail/20'">
+		    <img class="ad" src="${pageContext.request.contextPath}/img/전지적독자시점.png">
+		</div>
 
 <section class="upcoming-section" style="padding-bottom: 100px;">
   <h2 class="section-title">오픈 예정 콘텐츠</h2>
