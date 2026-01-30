@@ -172,9 +172,8 @@ a {
 	position: relative;
 	width: 100%;
 	margin-bottom: 80px;
-	min-height: 450px;
 	border-radius: 25px;
-	padding: 40px 0;
+	padding: 0px;
 }
 
 .recommend-container {
@@ -193,7 +192,7 @@ a {
 	display: flex;
 	gap: 15px;
 	transition: transform 0.5s ease;
-	padding: 10px 0;
+	padding: 0px;
 	list-style: none;
 }
 
@@ -310,8 +309,7 @@ a {
 	display: grid;
 	grid-template-columns: 1.3fr 2fr;
 	gap: 15px;
-	height: 550px;
-	margin-bottom: 80px;
+	height: 600px;
 }
 
 .hot-main {
