@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import util.PageInfo;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,11 +34,21 @@ public class ContentReplyController {
 
 	// 1. 조회 (컨텐츠 내 전체 조회 )
 	@GetMapping("/detail/tab/inquiry")
-	public String getQuestion(@RequestParam("content_id") int content_id, Model model) {
+	public String getQuestion(@RequestParam("content_id") int content_id,
+			@RequestParam(defaultValue="1") int inquiryPage,
+			Model model) {
 		// 불러오자 @
-		List<ContentReplyVO> replyVO = contentReplyService.showQAALL(content_id);
-		model.addAttribute("list", replyVO);
-		return "/content_reply/content_question";
+	    int count = contentReplyService.countQuestion(content_id);
+	    PageInfo pageInfo = PageInfo.of(count, inquiryPage, 8, 5);
+	    int offset = PageInfo.offset(inquiryPage, 8);
+
+	    List<ContentReplyVO> list = contentReplyService.selectQuestionPage(content_id, offset, 8);
+
+	    model.addAttribute("inquiryList", list);
+	    model.addAttribute("inquiryPageInfo", pageInfo);
+	    model.addAttribute("content_id", content_id);
+
+	    return "content_reply/content_question";
 	}
 
 	// 작성폼으로 이동

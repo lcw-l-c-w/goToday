@@ -44,7 +44,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -73,7 +73,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
@@ -129,7 +129,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
@@ -226,12 +226,12 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
         //페이징 처리 
-        int pageSize=4;
+        int pageSize=3;
         int blockSize=5;
        
         // db에서 전체 좋아요 개수만 가져와야함
@@ -266,7 +266,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -289,7 +289,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
 
@@ -384,7 +384,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -411,7 +411,7 @@ public class MypageController {
         if (loginUser == null) {
             model.addAttribute("msg", "로그인이 필요합니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/login");
+            model.addAttribute("url", "/member/login");
             return "common/return";
         }
         
@@ -434,7 +434,7 @@ public class MypageController {
 	    if (loginUser == null) {
 	        model.addAttribute("msg", "로그인이 필요합니다.");
 	        model.addAttribute("cmd", "move");
-	        model.addAttribute("url", "/gotoday/member/login");
+	        model.addAttribute("url", "/member/login");
 	        return "common/return";
 	    }
 

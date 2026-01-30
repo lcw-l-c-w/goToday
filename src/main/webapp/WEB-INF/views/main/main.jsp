@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>GoToday Main</title>
-    <!-- ✅ main 전용 CSS -->
+    <!--  main 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/css/main.css'/>">
  
 </head>

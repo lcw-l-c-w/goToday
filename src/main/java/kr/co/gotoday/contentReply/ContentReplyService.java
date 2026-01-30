@@ -35,6 +35,17 @@ public interface ContentReplyService {
 	//게시판 수정시에 사용할 조회해오기 
 	ContentReplyVO getReplyForUser(int creply_id,int user_id);
 	
+	// 문의 페이징 조회 (질문 + 답글 묶어서 반환)
+	List<ContentReplyVO> selectQuestionPage(int content_id, int offset, int limit);
+
+	// 질문 개수 조회 (nested=0만 count)
+	int countQuestion(int content_id);
+
+	// 답글 조회 (gno 목록으로 IN)
+	List<ContentReplyVO> selectAnswersByGno(List<Integer> gno);
+
+
+	
 	//상태 조회
 	int showStatus(int gno);
 }
