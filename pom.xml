@@ -250,6 +250,7 @@
 	
 	</dependencies>
     <build>
+     <finalName>gotoday</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-eclipse-plugin</artifactId>
