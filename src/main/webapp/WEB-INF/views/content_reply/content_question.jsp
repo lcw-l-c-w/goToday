@@ -19,10 +19,21 @@
         --bg-light: #fcfcfc;
     }
 
-    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: var(--text-dark); }
+    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: var(--text-dark);}
 
-    .dynamic-list-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+    .dynamic-list-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; min-height: 700px; 
+    display: flex;
+    flex-direction: column;}
 
+
+.empty-msg {
+    text-align: center;
+    /* ⭐ 테이블이 비어있을 때 이 TD가 남은 공간을 다 차지하게 합니다. */
+    height: 400px; 
+    color: var(--text-light);
+    background: var(--bg-light);
+    vertical-align: middle !important; /* 글자를 정중앙에 */
+}
     /* 헤더 영역 */
     .list-info-header { 
         display: flex; justify-content: flex-end; 
@@ -40,7 +51,7 @@
     .btn-write:hover { background: #555; }
 
     /* 테이블 스타일 */
-    .custom-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text-dark); }
+    .custom-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text-dark); background:white;}
     
     .custom-table th { 
         background-color: #fcfcfc; padding: 16px 10px; text-align: center; 
