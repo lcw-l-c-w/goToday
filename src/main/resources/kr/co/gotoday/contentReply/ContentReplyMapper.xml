@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.gotoday.contentReply.ContentReplyMapper">
+
+<insert id="insertContentQA" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
+	INSERT INTO content_reply (
+		title,
+		body,
+		writer,
+		user_id,
+		created_at,
+		content_id,
+		file_path, 
+		gno,
+		ono,
+		nested,
+		secret,
+		reply_status,
+		vendor_id
+	)
+	VALUES(
+		#{title},
+		#{body},
+		#{writer},
+		#{user_id},
+		NOW(),
+		#{content_id},
+		#{file_path},
+		#{gno},
+		#{ono},
+		#{nested},
+		#{secret},
+		0,
+		#{vendor_id}
+	)
+	<selectKey keyProperty="creply_id" order="AFTER" resultType="int">
+
+		SELECT LAST_INSERT_ID()
+
+	</selectKey>
+</insert>
+
+<!--  gno 업데이트 해줘야함 (바로 이어서 ) -->
+<update id="updateGno" parameterType="int">
+    UPDATE content_reply 
+    SET gno = #{creply_id} 
+    WHERE creply_id = #{creply_id}
+</update>
+
+<!-- 벤더 계정인 경우에만 댓글을 달 수 있다(서비스단에서 처리).벤더는 TITLE이 없습니다.   -->
+<insert id="insertVendorQA" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
+	INSERT INTO content_reply(
+		body,
+		writer,
+		user_id,
+		created_at,
+		content_id,
+		file_path,
+		gno,
+		ono,
+		nested,
+		reply_status
+	) 
+	VALUES(
+		#{body},
+		#{writer},
+		#{user_id},
+		NOW(),
+		#{content_id},
+		#{file_path},
+		#{gno},
+		#{ono} + 1,
+		#{nested} + 1,
+		1
+	)
+</insert>
+
+<!-- 답변을 수정하는 경우  -->
+<update id="updateReply" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
+	UPDATE content_reply
+	<set> 
+		secret=#{secret},
+		title=#{title},
+		body=#{body},
+		update_at=NOW(),
+		<if test="file_path != null">
+		file_path=#{file_path},
+		</if>
+		reply_status=#{reply_status}
+	</set>
+	WHERE content_id= #{content_id}
+		AND user_id=#{user_id} 
+		AND creply_id=#{creply_id}
+		
+</update>
+
+
+<!-- 갯수 세기  (원게시물인 경우 -> 타이틀이 있지만, 답글은 타이틀이 없음)-->
+<select id="count" parameterType="int" resultType="int">
+	SELECT COUNT(*) 
+	FROM content_reply
+	WHERE content_id=#{content_id} 
+		AND ono=0
+</select>
+
+<!--  상세보기 gno같은 경우 selectGNO로 서비스단에서 사용하기 -->
+<select id="showDetail" parameterType="int">
+	SELECT *
+	FROM content_reply
+	WHERE gno = (SELECT gno FROM content_reply WHERE creply_id = #{creply_id})
+    ORDER BY nested ASC, ono ASC
+</select>
+
+<!-- 유저별 게시물 조회 -->
+<select id="selectQAByID" parameterType="int">
+	SELECT *
+	FROM content_reply
+	WHERE user_id=#{user_id}
+</select>
+
+<!--  전체 게시물 조회  -->
+<select id="selectAllQA" parameterType="int">
+	SELECT *
+	FROM content_reply
+	WHERE content_id = #{content_id}
+        ORDER BY gno DESC, ono ASC
+</select>
+
+<!--  유저가 삭제하면 서비스단에서 벤더꺼도 삭제하기 //벤더가 삭제하면 서비스단에서 답변상태 update해주기  -->
+<delete id="deleteReply" parameterType="kr.co.gotoday.contentReply.ContentReplyVO">
+	DELETE 
+	FROM content_reply
+	WHERE creply_id=#{creply_id}
+		AND user_id=#{user_id}
+		
+</delete>
+
+<!--  벤더가 삭제한 경우 reply_status 업데이트 해주기/ 댓글달면 바꿔주기  -->
+<update id="updateReplyStatus">
+    UPDATE content_reply
+    SET reply_status = #{reply_status}
+    WHERE gno = #{gno}
+    AND ono=0
+</update>
+
+<!--  유저가 삭제했을 경우에 벤더꺼가 있으면 벤더 삭제  -->
+<select id="countVendorReplyByGno" parameterType="int" resultType="int">
+    SELECT COUNT(*)
+    FROM content_reply
+    WHERE gno = #{gno}
+      AND ono > 0
+</select>
+
+<select id="selectGno" parameterType="int">
+	SELECT gno 
+	FROM content_reply 
+	WHERE creply_id = #{creply_id}
+</select>
+<delete id="deleteVendorReplyByGno" parameterType="int">
+	DELETE	
+	FROM content_reply
+	WHERE gno=#{gno} 
+	AND ono>0
+</delete>
+
+<select id="showQADetail" parameterType="int" resultType="kr.co.gotoday.contentReply.ContentReplyVO">
+SELECT *
+FROM content_reply
+WHERE creply_id=#{creply_id} AND user_id=#{user_id}
+</select>
+
+<select id="countQuestion" resultType="int">
+  SELECT COUNT(*)
+  FROM content_reply
+  WHERE content_id = #{content_id}
+    AND nested = 0
+</select>
+
+<select id="selectQuestionPage"
+        resultType="kr.co.gotoday.contentReply.ContentReplyVO">
+  SELECT *
+  FROM content_reply
+  WHERE content_id = #{content_id}
+    AND nested = 0
+  ORDER BY gno DESC, ono ASC
+  LIMIT #{offset}, #{limit}
+</select>
+
+<select id="selectAnswersByGno"
+        resultType="kr.co.gotoday.contentReply.ContentReplyVO">
+  SELECT *
+  FROM content_reply
+  WHERE nested = 1
+    AND gno IN
+    <foreach collection="gno" item="x" open="(" separator="," close=")">
+      #{x}
+    </foreach>
+  ORDER BY gno DESC, ono ASC
+</select>
+
+
+
+</mapper>

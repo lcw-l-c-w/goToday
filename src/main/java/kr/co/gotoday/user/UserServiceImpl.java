@@ -1,5 +1,304 @@
 package kr.co.gotoday.user;
 
-public class UserServiceImpl implements UserService{
+import java.util.List;
 
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class UserServiceImpl implements UserService{
+	
+	@Autowired
+	private UserMapper userMapper;
+
+    @Override
+    public UserVO login(UserVO vo) {
+        try {
+            return userMapper.login(vo); // MyBatis/Mapper 호출
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // 에러 발생 시 null 반환
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public boolean registerUserInfo(UserVO vo) {
+    	return userMapper.register(vo) > 0 ? true : false;
+    }
+    
+    @Override
+    @Transactional
+    public boolean registerUserTags(List<UserTagVO> tagList) {
+        if (tagList == null || tagList.isEmpty()) return true;
+        userMapper.createUserTagsBatch(tagList);
+        return true;
+    }
+
+    @Override
+    public Long findTagIdByNameAndCategory(String tagName, String category) {
+        return userMapper.findTagIdByNameAndCategory(tagName, category);
+    }
+
+    @Override
+    public int emailCheck(String email) {
+        return userMapper.emailCheck(email);
+    }
+    
+    // 카카오 로그인 서비스
+    @Value("${kakao.rest-api-key}")
+    private String kakaoRestApiKey;
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+
+    @Override
+    public String getKakaoAccessToken(String code) {
+        RestTemplate rt = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", kakaoRestApiKey);
+        params.add("redirect_uri", kakaoRedirectUri);
+        params.add("code", code);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = rt.exchange(
+                "https://kauth.kakao.com/oauth/token",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        JSONObject json = new JSONObject(response.getBody());
+        return json.getString("access_token");
+    }
+
+    @Override
+    public UserVO getKakaoUserInfo(String accessToken) {
+        RestTemplate rt = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        JSONObject json = new JSONObject(response.getBody());
+        JSONObject kakaoAccount = json.getJSONObject("kakao_account");
+        JSONObject profile = kakaoAccount.getJSONObject("profile");
+
+        UserVO user = new UserVO();
+        user.setKakao_nickname(profile.getString("nickname"));
+        user.setKakao_email(kakaoAccount.optString("email"));
+        return user;
+    }
+    
+    @Override
+    @Transactional
+    public boolean insertKakaoUser(UserVO vo) {
+        return userMapper.insertKakaoUser(vo) > 0 ? true : false;
+    }
+    
+    @Override
+    public UserVO loginByEmail(String email) {
+    	return userMapper.loginByEmail(email);
+    }
+    
+    @Override
+    public UserVO adminLogin(UserVO vo) {
+        return userMapper.adminLogin(vo);
+    }
+    
+    // 관심사 수정
+    @Override
+    public List<String> getUserTagNames(int userId) {
+        return userMapper.getUserTagNames(userId);
+    }
+    // 관심사 수정
+    @Override
+    @Transactional
+    public boolean updateUserTags(int userId,
+	            String event,
+	            List<String> locations,
+	            List<String> interests) {
+	
+	// 기존 태그 삭제
+	userMapper.deleteUserTags(userId);
+	
+	// event (radio)
+	if (event != null) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(event, "event");
+	if (tagId != null) {
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	// location (checkbox)
+	if (locations != null) {
+	for (String loc : locations) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(loc, "location");
+	if (tagId == null) continue;
+	
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	// interest (checkbox)
+	if (interests != null) {
+	for (String interest : interests) {
+	Long tagId = userMapper.findTagIdByNameAndCategory(interest, "interest");
+	if (tagId == null) continue;
+	
+	UserTagVO ut = new UserTagVO();
+	ut.setUser_id(userId);
+	ut.setTag_id(tagId.intValue());
+	userMapper.insertUserTag(ut);
+	}
+	}
+	
+	return true;
+	}
+    
+    //회원정보 수정+회원 조회해서 사업자/ 개인/ admin 분기 
+    @Override
+    public UserVO getUserById(int userId) {
+        return userMapper.getUserById(userId);
+    }
+    
+    //회원정보 수정
+    @Override
+    @Transactional
+    public boolean updateUserInfo(UserVO vo) {
+    	// 패스워드 입력 안 하면 null로 두기 → XML에서 처리
+        if (vo.getPassword() != null && vo.getPassword().isEmpty()) {
+            vo.setPassword(null);
+        }
+        int result = userMapper.updateUserInfo(vo);
+        return result > 0;
+    }
+
+// --------------------------------------------------------------------- 네이버 로그인
+    
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.redirect-uri}")
+    private String naverRedirectUri;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
+    
+	@Override
+	public UserVO getNaverUserInfo(String accessToken) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + accessToken);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
+		
+		ResponseEntity<String> response = rt.exchange(
+				"https://openapi.naver.com/v1/nid/me",
+				 HttpMethod.GET,
+				 entity,
+				 String.class
+				 );
+		
+		if (!response.getStatusCode().is2xxSuccessful()) {
+		    return null;
+		}
+		
+		JSONObject json = new JSONObject(response.getBody());
+		JSONObject responseObj = json.getJSONObject("response");
+		
+		
+	    UserVO user = new UserVO();
+	    user.setLogin_type("N");
+	    user.setNaver_key(responseObj.optString("id", null));
+	    user.setEmail(responseObj.optString("email", null));
+	    user.setName(responseObj.optString("name", null));      // 동의 항목 따라 null 가능
+	    user.setBirthday(responseObj.optString("birthday", null));      // 동의 항목 따라 null 가능
+	    user.setGender(responseObj.optString("gender", null));      // 동의 항목 따라 null 가능
+		return user;
+	}
+
+
+	@Override
+	public boolean insertNaverUser(UserVO vo) {
+		return userMapper.insertNaverUser(vo) > 0 ? true : false ;
+	}
+
+
+	@Override
+	public String getNaverAccessToken(String code, String savedState) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", naverClientId);
+		params.add("client_secret", naverClientSecret);
+		params.add("redirect_uri", naverRedirectUri);
+		params.add("code", code);
+		params.add("state", savedState);
+		
+		
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+		
+		ResponseEntity<String> response = rt.exchange(
+				"https://nid.naver.com/oauth2.0/token",
+				HttpMethod.POST,
+				request,
+				String.class
+				);
+		JSONObject json = new JSONObject(response.getBody());
+		return json.getString("access_token");
+	}
+
+
+	@Override
+	public UserVO loginByNaverKey(String naver_key) {
+		return userMapper.loginByNaverKey(naver_key);
+	}
+    
+    // 아이디 비밀번호 찾기
+    @Override
+    public String findEmail(String name, String birthday, String phone_number) {
+        UserVO vo = userMapper.findEmail(name, birthday, phone_number);
+        return (vo != null) ? vo.getEmail() : null;
+    }
+
+    @Override
+    @Transactional
+    public String resetPassword(String email, String phone_number) {
+        UserVO vo = userMapper.findUserForPw(email, phone_number);
+        if (vo != null) {
+            // 8자리 임시 비밀번호 생성 (영문+숫자)
+            String tempPw = java.util.UUID.randomUUID().toString().substring(0, 8);
+            userMapper.updateTempPassword(vo.getUser_id(), tempPw);
+            return tempPw;
+        }
+        return null;
+    }
 }

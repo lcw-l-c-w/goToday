@@ -4,87 +4,132 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>회원가입-관심사입력</title>
+<title>관심사 입력 | GoToday</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/member_register.css">
+<script>
+function goSave() {
+	$("#frm").submit();
+}
+</script>
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
+
 <div class="container">
-    <div class="step-container">
-        <span class="step">정보입력</span>
-        <span class="step active">관심사 입력</span>
-        <span class="step">가입완료</span>
-    </div>
+	<div class="tab-nav">
+		<div class="tab-item">정보 입력</div>
+		<div class="tab-item active">관심사 입력</div>
+		<div class="tab-item">가입 완료</div>
+	</div>
 
-    <form action="/registerUser" method="POST">
-        <section class="interest-section">
-            <h3 class="section-title">전시 or 팝업</h3>
-            <div class="tag-group">
-                <input type="radio" name="content_status" id="type_exhibit" value="EXHIBIT" class="tag-item">
-                <label for="type_exhibit" class="tag-label">전시</label>
-
-                <input type="radio" name="content_status" id="type_popup" value="POPUP" class="tag-item">
-                <label for="type_popup" class="tag-label">팝업</label>
-            </div>
-        </section>
-
-        <section class="interest-section">
-            <h3 class="section-title">사람들이 많이가는 핫 플레이스!</h3>
-            <div class="tag-group">
-                <input type="checkbox" name="location" value="성수" id="loc_성수" class="tag-item">
-                <label for="loc_성수" class="tag-label">성수</label>
-
-                <input type="checkbox" name="location" value="홍대" id="loc_홍대" class="tag-item">
-                <label for="loc_홍대" class="tag-label">홍대</label>
-
-                <input type="checkbox" name="location" value="여의도" id="loc_여의도" class="tag-item">
-                <label for="loc_여의도" class="tag-label">여의도</label>
-
-                <input type="checkbox" name="location" value="강남" id="loc_강남" class="tag-item">
-                <label for="loc_강남" class="tag-label">강남</label>
-
-                <input type="checkbox" name="location" value="혜화" id="loc_혜화" class="tag-item">
-                <label for="loc_혜화" class="tag-label">혜화</label>
-
-                <input type="checkbox" name="location" value="한남" id="loc_한남" class="tag-item">
-                <label for="loc_한남" class="tag-label">한남</label>
-            </div>
-        </section>
-
-        <section class="interest-section">
-            <h3 class="section-title">관심있는 분야</h3>
-            <div class="tag-group">
-                <input type="checkbox" name="category" value="식품" id="cat_식품" class="tag-item">
-                <label for="cat_식품" class="tag-label">식품</label>
-
-                <input type="checkbox" name="category" value="캐릭터" id="cat_캐릭터" class="tag-item">
-                <label for="cat_캐릭터" class="tag-label">캐릭터</label>
-
-                <input type="checkbox" name="category" value="화장품" id="cat_화장품" class="tag-item">
-                <label for="cat_화장품" class="tag-label">화장품</label>
-
-                <input type="checkbox" name="category" value="미디어" id="cat_미디어" class="tag-item">
-                <label for="cat_미디어" class="tag-label">미디어</label>
-
-                <input type="checkbox" name="category" value="미술" id="cat_미술" class="tag-item">
-                <label for="cat_미술" class="tag-label">미술</label>
-
-                <input type="checkbox" name="category" value="패션" id="cat_패션" class="tag-item">
-                <label for="cat_패션" class="tag-label">패션</label>
-
-                <input type="checkbox" name="category" value="디지털/테크" id="cat_디지털/테크" class="tag-item">
-                <label for="cat_디지털/테크" class="tag-label">디지털/테크</label>
-
-                <input type="checkbox" name="category" value="키즈/반려동물" id="cat_키즈/반려동물" class="tag-item">
-                <label for="cat_키즈/반려동물" class="tag-label">키즈/반려동물</label>
-
-                <input type="checkbox" name="category" value="etc" id="cat_etc" class="tag-item">
-                <label for="cat_etc" class="tag-label">etc</label>
-            </div>
-        </section>
-
-        <div class="footer">
-            <button type="submit" class="next-btn">다음단계</button>
-        </div> 
-    </form>
+	<div class="form-container">
+		<form id="frm" action="${pageContext.request.contextPath}/member/register2" method="POST">
+			
+			<div class="interest-section">
+				<h3>전시 or 팝업</h3>
+				<div class="event-grid">
+					<label>
+						<input type="radio" name="event" id="exhibition" value="exhibition">
+						<span class="tag-label">전시</span>
+					</label>
+					<label>
+						<input type="radio" name="event" id="popup" value="popup">
+						<span class="tag-label">팝업</span>
+					</label>
+				</div>
+			</div>
+			
+			<div class="interest-section">
+				<h3>사람들이 많이가는 핫 플레이스</h3>
+				<div class="location-grid">
+					<label>
+						<input type="checkbox" name="location" id="seongsu" value="성수">
+						<span class="tag-label">성수</span>
+					</label>
+					<label>
+						<input type="checkbox" name="location" id="hongdae" value="홍대">
+						<span class="tag-label">홍대</span>
+					</label>
+					<label>
+						<input type="checkbox" name="location" id="yeouido" value="여의도">
+						<span class="tag-label">여의도</span>
+					</label>
+					<label>
+						<input type="checkbox" name="location" id="gangnam" value="강남">
+						<span class="tag-label">강남</span>
+					</label>
+					<label>
+						<input type="checkbox" name="location" id="hyehwa" value="혜화">
+						<span class="tag-label">혜화</span>
+					</label>
+					<label>
+						<input type="checkbox" name="location" id="hannam" value="한남">
+						<span class="tag-label">한남</span>
+					</label>
+					<label>
+						<input type="checkbox" name="location" id="ect" value="ect">
+						<span class="tag-label">etc</span>
+					</label>
+				</div>
+			</div>
+							
+			<div class="interest-section">
+				<h3>관심있는 분야</h3>
+				<div class="interest-grid">
+					<div class="interest-row">
+						<label>
+							<input type="checkbox" name="interest" id="food" value="식품">
+							<span class="tag-label">식품</span>
+						</label>
+						<label>
+							<input type="checkbox" name="interest" id="character" value="캐릭터">
+							<span class="tag-label">캐릭터</span>
+						</label>
+						<label>
+							<input type="checkbox" name="interest" id="cosmetics" value="화장품">
+							<span class="tag-label">화장품</span>
+						</label>
+						<label>
+							<input type="checkbox" name="interest" id="media" value="미디어">
+							<span class="tag-label">미디어</span>
+						</label>
+					</div>
+					
+					<div class="interest-row">
+						<label>
+							<input type="checkbox" name="interest" id="art" value="미술">
+							<span class="tag-label">미술</span>
+						</label>
+						<label>
+							<input type="checkbox" name="interest" id="fashion" value="패션">
+							<span class="tag-label">패션</span>
+						</label>
+						<label>
+							<input type="checkbox" name="interest" id="digitaltech" value="디지털/테크">
+							<span class="tag-label">디지털/테크</span>
+						</label>
+					</div>
+					
+					<div class="interest-row">
+						<label>
+							<input type="checkbox" name="interest" id="kidspets" value="키즈/반려동물">
+							<span class="tag-label">반려동물</span>
+						</label>
+						<label>
+							<input type="checkbox" name="interest" id="etc" value="etc">
+							<span class="tag-label">etc</span>
+						</label>
+					</div>
+				</div>
+			</div>
+			<br>
+			<div class="next-btn-container">
+				<a href="javascript:;" class="next-btn" onclick="goSave();">다음단계</a>
+			</div>
+		</form>
+	</div>
 </div>
 </body>
 </html>

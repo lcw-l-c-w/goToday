@@ -1,5 +1,10 @@
 package kr.co.gotoday.payment;
 
-public class PaymentMapper {
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface PaymentMapper {
+
+	int createPayment(PaymentVO paymentVO);
 
 }

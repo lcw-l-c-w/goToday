@@ -3,8 +3,8 @@ package config;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,14 +19,19 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import util.AdminInterceptor;
+import util.LoginInterceptor;
+import util.VendorInterceptor;
+
 @Configuration
-@MapperScan(basePackages = {"kr.co.gotoday"}, annotationClass = Mapper.class)
-@ComponentScan(basePackages = {"kr.co.gotoday"})
+@MapperScan(annotationClass = Mapper.class, basePackages = "kr.co.gotoday")
+@ComponentScan(basePackages = {"kr.co.gotoday", "util"})
 @EnableWebMvc
 @EnableTransactionManagement
 public class MvcConfig implements WebMvcConfigurer{
@@ -40,8 +44,15 @@ public class MvcConfig implements WebMvcConfigurer{
 	private String username;
 	@Value("${db.password}")
 	private String password;
-	
+	//사진 관련 
 
+
+    // Kakao
+    @Value("${kakao.rest-api-key}")
+    private String kakaoRestApiKey;
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+	
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
@@ -52,19 +63,33 @@ public class MvcConfig implements WebMvcConfigurer{
 		registry.jsp("/WEB-INF/views/", ".jsp");
 	}
 	
+	// 1. 상단에 변수 추가
+	@Value("${spring.datasource.hikari.maximum-pool-size}")
+	private int maxPoolSize;
+
+	@Value("${spring.datasource.hikari.minimum-idle}")
+	private int minIdle;
+	
 	// hikaricp
 	@Bean
 	@Primary
 	public HikariDataSource dataSource() {
 		HikariDataSource dataSource = new HikariDataSource();
-//		dataSource.setDriverClassName("org.mariadb.jdbc.Driver");
 		dataSource.setDriverClassName(driver);
-//		dataSource.setJdbcUrl("jdbc:mariadb://localhost:3306/study");
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);
+		
+		// 이 코드들을 추가해야 프로퍼티 설정이 적용
+	    dataSource.setMaximumPoolSize(maxPoolSize); // 3으로 설정됨
+	    dataSource.setMinimumIdle(minIdle);         // 1로 설정됨
+	    dataSource.setIdleTimeout(10000);           // 10초
+	    dataSource.setMaxLifetime(30000);           // 30초v
+	    
 		return dataSource;
 	}
+
+	
 	// mybatis
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception{
@@ -91,14 +116,57 @@ public class MvcConfig implements WebMvcConfigurer{
 	}
 	
 
-	//DB property 처占쏙옙 
+	//DB property, API properties 등록
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer config = new PropertyPlaceholderConfigurer();
-		config.setLocation(new ClassPathResource("db.properties"));
+		config.setLocations(
+				new ClassPathResource("db.properties"),
+				new ClassPathResource("api.properties"),
+				new ClassPathResource("application.properties")
+			);
 		return config;
 	}
 	
+
+	//로그인 인터셉터 설정
+	@Autowired
+	private LoginInterceptor loginInterceptor;
+	@Autowired
+	private VendorInterceptor vendorInterceptor;
+	@Autowired
+	private AdminInterceptor adminInterceptor;
+	
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(loginInterceptor)
+			.addPathPatterns(
+					"/reserve/**",
+					"/payment/**",
+					"/admin/**",
+					"/vendor/**",
+					"/mypage/**",
+					"/review/**"
+			);
+		registry.addInterceptor(vendorInterceptor)
+		.addPathPatterns(
+				"/vendor/**"
+		);
+		
+		 registry.addInterceptor(adminInterceptor)
+	        .addPathPatterns(
+	            "/admin/**"
+	        );
+			
+	}
+	
+	@Value("${upload.path}")
+	private String uploadPath;
+	
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    registry.addResourceHandler("/upload/**")
+	            .addResourceLocations("file:" + uploadPath);
+	}
 	
 }
 

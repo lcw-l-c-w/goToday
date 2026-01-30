@@ -1,307 +1,481 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>콘텐츠 상세</title>
-  <style>
-    .poster, .posterDetail { 
-      width: 300px;
+<meta charset="UTF-8" />
+<title>GoToday | ${content.title}</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/content_detail.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script
+	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+
+<script>
+$(function() {
+      //탭전환
+      $(".tab-item").click(function() {
+      	// 클릭한 탭의 순서 (0, 1, 2)
+      	const index = $(this).index(); 
+      	//탭 이름 
+      	const tabCategory=$(this).data("type");
+      	const content_id=$("#content_id").val();
+      	
+          //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
+      	$(".tab-item").removeClass("active");
+          $(this).addClass("active");
+          
+          // 패널 표시 전환 -> 모든패널을 숨기고 클릭한 순서에 맞는거만 보여줌 
+          $(".tab-panel").removeClass("active").hide();
+          const currentPanel = $(".tab-panel").eq(index);
+          currentPanel.addClass("active").show();
+          
+          if(tabCategory !== "detail") {   
+          //패널 가시성 조절
+          
+          $.ajax({
+          	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
+          	type:"GET", //목록 조회는 get
+          	data:{
+          		content_id:content_id
+          	},
+          	success:function(data){
+          		 currentPanel.html(data);
+          	}
+          	
+          	
+          })
+          }
+
+    
+      });
+      
+  	//이전페이지로 이동한 것처럼 
+  	const urlParams = new URLSearchParams(window.location.search);
+      const tabName = urlParams.get('tab');
+
+      if (tabName === 'inquiry') {
+          // 탭 메뉴 중에서 inquiry 타입을 찾아서 클릭 시뮬레이션
+          $(".tab-item[data-type='inquiry']").trigger("click");
+          
+          $('html, body').animate({
+              scrollTop: $(".tab-wrapper").offset().top - 100
+          }, 300);
+      }
+      let selectedDate = null;
+      let selectedTime = null;
+      let scheduleId = null;
+
+      if("${content.content_id}"=='' ) {
+      	$(".container").hide();
+      	setTimeout(function() {
+              alert("해당 콘텐츠를 찾을 수 없습니다.");
+          }, 10);
+          return;
+      }
+        const isReservable= "${content.contentReservation}" === "1" ? 1:0;
+        if(isReservable==0) {$(".btn-reserve").prop("disabled", true)
+     							 			  .addClass("is-disabled")
+    							    $("#btn-reservation-detail").html("이 컨텐츠는 현장 대기만 가능하므로, 예매가 불가합니다.");
+        }
+        else{
+      	  $("#btn-reservation-detail").hide();
+  }
+        
+    // 달력 로드
+    const calendarEl = document.getElementById('calendar');
+    if (calendarEl) {
+    	
+    	// 1. JSP 변수에서 시작일과 종료일 가져오기 (문자열 자르기 포함)
+        const startDate = "${content.start_at}".substring(0, 10);
+        const endDate = "${content.end_at}".substring(0, 10);
+        const today = new Date().toISOString().slice(0,10);
+     // 2. 종료일 포함(inclusive)을 위해 하루 더하기
+        // JS의 Date 객체는 현재 지역 시간을 기준으로 하므로 시간 오차를 방지하기 위해 
+        // 단순 날짜 더하기 로직을 사용합니다.
+        let endDateObj = new Date(endDate);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        
+        
+     // yyyy-mm-dd 형식으로 변환
+        let finalEndDate = endDateObj.toISOString().substring(0, 10);
+     
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            timeZone: 'local',     // 한국시간기준으로 바꿔주는것
+            height: 'auto',
+            headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+      
+         // 3. 전시 기간 배경색 입히기 (핑크색)
+            events: [
+                {
+                    start: startDate,
+                    end: finalEndDate,
+                    display: 'background',
+                    backgroundColor: '#ffe3ee', // 연한 핑크색
+                    allDay: true
+                }
+            ],
+            dateClick: function(info) {
+            	// 모든 날짜 클릭 가능
+                $(".fc-daygrid-day").css("background", ""); // 이전 선택 초기화
+                $(info.dayEl).css("background", "rgba(77, 195, 255, 0.3)"); // 클릭한 날짜 강조
+               const todayDate= new Date();
+               todayDate.setHours(0, 0, 0, 0);  
+                if(info.date<todayDate){
+            		alert("지난 날짜는 불가합니다. 다른 날짜를 선택해주세요.");
+            		return;
+            	}
+                
+                selectedDate = info.dateStr;
+                fetchTimes(selectedDate);
+            }
+        });
+        calendar.render();
     }
-  </style>
+
+    // 시간 조회
+    function fetchTimes(date) {
+        $.ajax({
+            url: "${pageContext.request.contextPath}/schedule/time",
+            data: { content_id: $("#content_id").val(), scheduled_at: date },
+            success: function(res) {
+                let html = `<span class="time-title">\${date} 시간 선택</span>`;
+                if(!res || res.length === 0) {
+                    html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
+                } else {
+                    res.forEach(sch => {
+                    	const isSoldOut = sch.current_ticket === 0;
+                        const disabledAttr = isSoldOut ? 'disabled' : '';
+                        const soldOutClass = isSoldOut ? 'sold-out' : '';
+                        const ticketText = isSoldOut ? '매진' : `\${sch.current_ticket}석`;
+                        
+                    	
+                        html += `
+                            <label class="time-option \${soldOutClass}">
+                                <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}" data-time="\${sch.time_zone}">
+                                <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
+                                <span style="font-size:12px; \${isSoldOut ? 'color:#e74c3c; font-weight:bold;' : ''}">\${ticketText}</span>
+                            </label>`;
+                    });
+                }
+                $(".reservation_timezone").html(html);
+                selectedTime = null;
+                scheduleId = null;
+                
+                $(".time-option.sold-out").on("click", function(e) {
+                    e.preventDefault();
+                    alert("해당 시간대는 매진되었습니다.");
+                    return false;
+                });
+            }
+        });
+    }
+
+    $(document).on("change", "input[name='sch_radio']", function() {
+        selectedTime = $(this).data("time");
+        scheduleId = $(this).data("id");
+    });
+    
+
+ 
+	
+    //추가-의선 캘박 
+    $(".btn-save-cal").click(function() {
+        // 1. 변수에 값이 있는지 확인
+        if(!selectedDate) {
+            alert("관람하실 날짜를 먼저 선택해주세요.");
+            return;
+        }
+
+        const contentId = $("#content_id").val();
+        
+        // 2. 캘린더 패키지로 데이터 전송 (AJAX)
+        $.ajax({
+            url: "${pageContext.request.contextPath}/calendar/add", 
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                "contentId": contentId,
+                "date": selectedDate,  // 변수에 저장된 날짜 (예: 2026-01-20)
+                "time": selectedTime   
+            }),
+            success: function(res) {
+                if (res.success) {
+                    alert("📅 " + res.msg); // "나의 캘린더에 저장되었습니다!"
+                } else {
+                    alert(res.msg); // "로그인이 필요합니다." 
+                    if (res.msg.includes("로그인")) {
+                        location.href = "${pageContext.request.contextPath}/member/login";
+                    }
+                }
+            },
+            error: function() {
+                alert("서버 통신 중 오류가 발생했습니다.");
+            }
+        });
+    });
+    
+    // 예매하기
+    $(".btn-reserve").click(function() {
+        if(!selectedDate || !selectedTime || !scheduleId) {
+            alert("날짜와 시간을 선택해주세요.");
+            return;
+        }
+    
+        $.post("${pageContext.request.contextPath}/reserve/schedule.do", {
+            content_id: $("#content_id").val(),
+            reserved_for_at: selectedDate,
+            time_zone: selectedTime,
+            schedule_id: scheduleId,
+            content_time: "${content.content_time}"        
+        	}).done(function(res){
+        	if (res === "OK") {
+	       		location.href = "${pageContext.request.contextPath}/reserve/quantity.do";
+            } else {
+                alert(res);
+            }
+        }).fail(function(){
+        	const msg = res.responseText;
+            alert(msg || "예약 요청 중 오류가 발생했습니다.");
+        });
+    });
+
+    // 좋아요 토글 - 깨짐 방지를 위해 코드로 변경
+    $("#likeBtn").click(function() {
+    	const userRole = "${loginSess.role}"; 
+        
+        if (userRole === "1") {
+            alert("관리자 계정은 '좋아요' 기능을 이용할 수 없습니다.");
+            return; // AJAX 실행 방지
+        }
+    	const heart = $(this).find(".heart-icon");
+        const count = $(this).find(".like-count-num");
+        const content_id = heart.data("content-id");
+       
+        $.ajax({
+            url: "${pageContext.request.contextPath}/heart",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify({ content_id: content_id }),
+            success: function(res) {
+                if (!res) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    location.href = "${pageContext.request.contextPath}/member/login";
+                    return;
+                }
+                // JavaScript에서도 코드로 변경
+                if (res.liked == 1) {
+                    heart.html("&#x1F499;"); // 파란 하트
+                    $("#likeBtn").addClass("active-liked");
+                } else {
+                    heart.html("&#x1F90D;"); // 흰 하트
+                    $("#likeBtn").removeClass("active-liked");
+                }
+                count.text(res.count_num);
+            },
+            error: function() {  }
+        });
+    });
+    //트위터 클릭시 해당 프로필로 이동 . 근데 만약 트위터 주소가 없으면 버튼 블락 처리해야하지 않을까? 클릭을 못하도록 . 
+    	if("${content.x_url}"=="")$("#x").hide();
+    	if("${content.instagram_url}"=="") $("#ig").hide();
+    	$("#x").click(function(){
+    		window.location.href= "${content.x_url}";
+    	})
+    	$("#ig").click(function(){
+    		window.location.href= "${content.instagram_url}";
+    	})
+    	
+
+  // url 공유 -> web share API
+$("#link").click(async function() { // async 사용 해야하는 이유
+    const shareData = {
+        title: "GoToday ! " + "${content.title}", 
+        text: "멋진 전시/팝업 정보를 확인해보세요!", 
+        url: window.location.href 
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = window.location.href;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("주소가 복사되었습니다.");
+        }
+    } catch(err) {
+        console.log("공유하기 에러 발생:", err);
+    }
+});
+    	
+    	
+    	
+    //예약 처리 여부 -> 만약 상태가 종료이면 reservation-div를 hidden처리
+   $(document).ready(function() {
+    // 1. data-status 값을 가져옴
+    const contentStatus = $("#confirmStatus").data("status");
+    
+    
+    if(contentStatus === "STATUS_CLOSED" || contentStatus === "종료") {
+    	$(".reservation-div").html(`
+    	        <div style="background: #f8f9fa; padding: 40px; text-align: center; border-radius: 10px; border: 1px dashed #ccc;">
+    	            <p style="font-size: 18px; font-weight: bold; color: #999;">🔒 관람이 종료된 콘텐츠입니다.</p>
+    	            <p style="font-size: 14px; color: #bbb; margin-top: 10px;">다음에 더 좋은 전시로 찾아뵙겠습니다.</p>
+    	        </div>
+    	    `);
+    }
+});
+    
+
+});
+
+    //  상세 페이지 들어갔을 때 최근본페이지 기능에 넣으려고 만든 부분
+	document.addEventListener("DOMContentLoaded", function () {
+  		if (window.GoTodayRecentViewed) {
+    		GoTodayRecentViewed.add({
+      		id: "${content.content_id}",
+      		title: "${content.title}",
+            image: "<c:url value='${content.main_image_path}'/>",
+      		url: "${pageContext.request.contextPath}/detail/${content.content_id}",
+      		location: "${content.location}"
+    		});
+  		}
+	});
+
+
+</script>
 </head>
 <body>
-
-<div class="page-wrapper">
-  <div class="content-container">
-    <section class="top-area">
-      <div class="content-info">
-        <span>컨텐츠 &gt; 팝업</span>
-        <a href="#" class="tag">#미디어</a>
-        <h1>팝업 제목 : 치이카와 베이비 팝업</h1>
-        <p class="period">2026.01.01 ~ 2026.03.02</p>
-        <a href = "#" class="search-location">
-          <p class="location">홍대 어딘가</p>
-        </a>
-      </div>
-
-      <!-- 공유 버튼 그룹 -->
-      <div class="share-group">
-        <button class="share-btn" aria-label="인스타그램 링크">
-          <img src="icon-share.svg" alt="링크">
-        </button>
-        <button class="share-btn" aria-label="엑스 링크">
-          <img src="icon-share.svg" alt="링크">
-        </button>
-        <button class="share-btn" aria-label="공유">
-          <img src="icon-share.svg" alt="공유">
-        </button>
-
-        <ul class="share-list">
-          <li>
-            <a href="#" class="share-item instagram">
-              <img src="icon-instagram.svg" alt="카카오톡 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item instagram">
-              <img src="icon-instagram.svg" alt="인스타그램 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item facebook">
-              <img src="icon-facebook.svg" alt="엑스 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item link">
-              <img src="icon-link.svg" alt="URL">
-            </a>
-          </li>
-        </ul>
-        
-      </div>
-
-    </section>
-    <!-- 좌측 영역 -->
-    <section class="left-area">
-      <div>
-        <img src="poster.jpg" alt="포스터" class="poster" />
-      </div>
-      <button class="like-btn" aria-label="좋아요">
-        <img src="icon-heart.svg" alt="좋아요">
-        <span class="like-count">123</span>
-      </button>
-    </section>
-
-    <!-- 우측 영역 -->
-    <section class="right-area">
-      <div class="info-box">
-        <p>소개</p>
-        <span>어쩌고 저쩌고 간략하게 소개하는 란</span>
-      </div>
-      
-      <div class="price-box">
-        <p>관람료</p>
-        <ul>
-          <li>성인 17,000원</li>
-          <li>청소년 17,000원</li>
-        </ul>
-      </div>
-
-      <div class="operating-hours">
-        <p>운영시간</p>
-        <span>10 : 00 ~ 18 : 00</span>
-      </div>
-
-      <div class="receive-method">
-        <p>수령방법</p>
-        <span>사전예매</span>
-      </div>
+	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 
 
-      <!-- 예약 영역 -->
-      <div class="reservation-box">
+	<div class="container">
+		<div class="breadcrumb">
+			콘텐츠 > ${content.contentKindName} > <span>#${content.category}</span>
+		</div>
 
-        <!-- 날짜 선택 -->
-        <label>날짜 선택</label>
-        <input type="date" id="dateInput" />
+		<div class="content-title-area">
+			<div>
+				<h1>${content.title}</h1>
+				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at.substring(0,10)}
+					~ ${content.end_at.substring(0,10)}  |  ${content.location} 📍</p>
+			</div>
+			<div class="sns-group">
+				<img src="https://cdn-icons-png.flaticon.com/512/5968/5968958.png"
+					alt="X" style="width: 22px; margin-left: 10px;" id="x"> <img
+					src="https://cdn-icons-png.flaticon.com/512/1384/1384031.png"
+					alt="IG" style="width: 22px; margin-left: 10px;" id="ig"> <img
+					src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png"
+					alt="Link" style="width: 22px; margin-left: 10px;"id="link">
+			</div>
+		</div>
 
-        <!-- 시간대 선택 -->
-        <div id="timeSlotArea" class="hidden">
-          <label>시간대</label>
-          <select>
-            <option value="1">
-              10 : 00 ~ 12 : 00
-            </option>
-            <option value="2">
-              12 : 00 ~ 14 : 00
-            </option>
-            <option value="3">
-              14 : 00 ~ 16 : 00
-            </option>
-          </select>
-          <ul id="timeSlotList"></ul>
-        </div>
+		<div class="main-box">
+			<section class="poster-side">
+				<img class="poster-img"
+					src="${pageContext.request.contextPath}${content.main_image_path}"
+					alt="포스터">
+					<c:if test="${loginSess.role==0}">
+				<button type="button"
+					class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}"
+					id="likeBtn">
+					<span class="heart-icon" data-content-id="${content.content_id}">
+						<c:choose>
+							<c:when test="${content.liked == 1}">&#x1F499;</c:when>
+							<c:otherwise>&#x1F90D;</c:otherwise>
+						</c:choose>
+					</span> <span class="like-count-num">${content.like_count}</span>
+				</button>
+				</c:if>
+				<c:if test="${loginSess.role==1}">
+				<button type="button" class="poster-like-btn" style="cursor: default; opacity: 0.8;">
+                <span class="heart-icon">
+                    <c:choose>
+                        <c:when test="${content.liked == 1}">&#x1F499;</c:when>
+                        <c:otherwise>&#x1F90D;</c:otherwise>
+                    </c:choose>
+                </span> 
+                <span class="like-count-num">${content.like_count}</span>
+            </button>
+				</c:if>
+			</section>
 
-        <button class="reserve-btn">예매하기</button>
-        <button class="calendar-btn">캘린더에 저장하기</button>
-      </div>
-    </section>
+			<section class="info-side">
+				<table class="info-table">
+					<tr>
+						<th>소개</th>
+						<td>${content.description}</td>
+					</tr>
+					<tr>
+						<th>관람료</th>
+						<td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원</td>
+					</tr>
+					<tr>
+						<th>운영시간</th>
+						<td>${content.content_time}</td>
+					</tr>
+					<tr>
+						<th>수령방법</th>
+						<td>${content.reservationTypeLabel}</td>
+					</tr>
+					<tr>
+						<th>상태</th>
+						<td id="confirmStatus" data-status="${content.contentStatusCurrent}">${content.contentStatusCurrent}</td>
+					</tr>
+				</table>
+				<div class="reservation-div">
+				<div class="reserve-section">
+					<div id="calendar"></div>
+					<div class="time-selector">
+						<div class="reservation_timezone">
+							<span class="time-title">시간대 선택</span>
+							<p style="font-size: 12px; color: #999; margin-top: 20px;">먼저
+								달력에서 날짜를 선택해주세요.</p>
+						</div>
+					</div>
+				</div>
 
-    <!-- 탭 영역 -->
-    <div class="tab-wrapper">
+				<div class="action-btns">
+					<input type="hidden" id="content_id" value="${content.content_id}">
+					<button class="btn-reserve">예매하기</button>
+					<button class="btn-save-cal">캘린더 저장</button>
+				</div>
+				</div>
+				<div id="btn-reservation-detail">
+				
+				</div>
+			</section>
+		</div>
 
-      <!-- 탭 메뉴 -->
-      <ul class="tab-menu">
-        <li class="tab-item active">상세정보</li>
-        <li class="tab-item">리뷰</li>
-      </ul>
+		<div class="tab-wrapper">
+			<ul class="tab-menu">
+				<li class="tab-item active" data-type="detail">상세정보</li>
+				<li class="tab-item" data-type="review">리뷰</li>
+				<li class="tab-item" data-type="inquiry">문의사항</li>
+			</ul>
 
-      <!-- 탭 콘텐츠 -->
-      <div class="tab-content">
-
-        <!-- 상세정보 -->
-        <section class="tab-panel active">
-          <h2>상세 정보</h2>
-          <p>
-            해당 전시는 어쩌고 저쩌고 설명이 들어갑니다.<br />
-            전시 소개, 유의사항, 관람 정보 등을 보여줍니다.
-          </p>
-          <img src="detail.jpg" alt="포스터" class="posterDetail" />
-        </section>
-
-        <!-- 리뷰 탭 전체 -->
-        <section class="review-section">
-
-          <!-- 리뷰 요약 영역 -->
-          <div class="review-summary">
-
-            <!-- 좌측: 전체 별점 분포 -->
-            <div class="rating-summary-left">
-              <h3>별점 분포</h3>
-
-              <div class="average-score">
-                <span class="score">4.7</span>
-                <span class="stars">★★★★★</span>
-                <span class="count">(총 34개 리뷰)</span>
-              </div>
-
-              <!-- 별점별 막대(개수 숫자로 보여주고 바 형식으로 시각화) -->
-              <ul class="rating-bars">
-                <li>
-                  <span class="label">5점</span>
-                  <div class="bar">
-                    <div class="fill" style="width: 80%;"></div>
-                  </div>
-                  <span class="value">24</span>
-                </li>
-                <li>
-                  <span class="label">4점</span>
-                  <div class="bar">
-                    <div class="fill" style="width: 60%;"></div>
-                  </div>
-                  <span class="value">7</span>
-                </li>
-                <li>
-                  <span class="label">3점</span>
-                  <div class="bar">
-                    <div class="fill" style="width: 20%;"></div>
-                  </div>
-                  <span class="value">3</span>
-                </li>
-                <li>
-                  <span class="label">2점</span>
-                  <div class="bar">
-                    <div class="fill"></div>
-                  </div>
-                  <span class="value">0</span>
-                </li>
-                <li>
-                  <span class="label">1점</span>
-                  <div class="bar">
-                    <div class="fill"></div>
-                  </div>
-                  <span class="value">0</span>
-                </li>
-              </ul>
-            </div>
-
-            <!-- 우측: 시간대별 평균 -->
-            <div class="rating-summary-right">
-              <h3>방문 시간대별 평점</h3>
-
-              <ul class="time-rating-list">
-                <li>
-                  <span class="time">10:00 ~ 12:00</span>
-                  <span class="stars">★★★★★</span>
-                  <span class="score">5.0</span>
-                </li>
-                <li>
-                  <span class="time">12:00 ~ 14:00</span>
-                  <span class="stars">★★★★☆</span>
-                  <span class="score">4.0</span>
-                </li>
-                <li>
-                  <span class="time">14:00 ~ 16:00</span>
-                  <span class="stars">★★★★★</span>
-                  <span class="score">5.0</span>
-                </li>
-              </ul>
-            </div>
-
-          </div>
-
-          <!-- 리뷰 리스트 헤더 -->
-          <div class="review-list-header">
-            <h3>리뷰 목록 (총개수)</h3>
-
-            <!-- 정렬 버튼 -->
-            <select class="review-sort">
-              <option value="latest">최신순</option>
-              <option value="high">별점 높은순</option>
-              <option value="low">별점 낮은순</option>
-            </select>
-          </div>
-
-          <!-- 리뷰 리스트 : 더보기 누르면 추가 -->
-          <ul class="review-list">
-            
-            
-            <!-- 리뷰 아이템 -->
-            <li class="review-item">
-              <div class="review-header">
-                <span class="user">김*</span>
-                <span class="stars">★★★★★</span>
-                <span class="date">2026.01.13</span>
-              </div>
-              
-              <div class="review-meta">
-                <span class="time-slot">10:00 ~ 12:00</span>
-              </div>
-              
-              <p class="review-content">
-                오전 시간대 방문했는데 사람도 적당하고 좋았습니다.
-                작품 설명도 자세해서 이해하기 좋았어요.
-              </p>
-              
-              <div class="review-images">
-                <img src="review1.jpg" alt="리뷰 이미지" />
-              </div>
-            </li>
-            
-            <!-- 리뷰 아이템 -->
-            <li class="review-item">
-              <div class="review-header">
-                <span class="user">박*</span>
-                <span class="stars">★★★★☆</span>
-                <span class="date">2026.01.12</span>
-              </div>
-              
-              <div class="review-meta">
-                <span class="time-slot">12:00 ~ 14:00</span>
-              </div>
-              
-              <p class="review-content">
-                전시는 재밌었는데 점심시간이라 사람이 조금 많았어요.
-              </p>
-            </li>
-            
-            <!-- 페이징 / 더보기 -->
-            <div class="review-pagination">
-              <button class="load-more">리뷰 더보기</button>
-            </div>
-            
-          </ul>
-
-        </section>
-
-      </div>
-    </div>
-    
-  </div>
-</div>
-
+			<div class="tab-content">
+				<section class="tab-panel active">
+					<div class="detail-content">${content.detail_description}</div>
+					<img
+						src="${pageContext.request.contextPath}${content.main_image_path}"
+						class="detail-img">
+				</section>
+				<section class="tab-panel">
+					<jsp:include page="/WEB-INF/views/review/review_list_by_content.jsp" />
+				</section>
+				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

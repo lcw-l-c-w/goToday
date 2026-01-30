@@ -1,0 +1,114 @@
+@charset "UTF-8";
+
+/* 1. 기본 레이아웃 및 외부 스크롤 차단 */
+html, body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    height: 100%;
+    overflow: hidden; /* ★ 브라우저 전체 스크롤 방지 */
+}
+
+/* 2. 고정 헤더 영역 */
+.fixed-header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 20px 10px 20px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+/* 3. 전체 컨테이너 (높이 고정형) */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    /* ★ 버튼 위치를 사이드바 끝에 고정하기 위한 핵심 높이 */
+    /* 사이드바 메뉴 길이에 맞춰 650px~750px 사이로 조절하세요 */
+    height: 700px; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* 4. 리스트와 페이징을 담는 래퍼 */
+.list-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 20px;
+    /* 내부 스크롤은 없애고 영역만 확보 */
+}
+
+/* 5. 아이템들이 담기는 영역 */
+.items-container {
+    flex: 1; /* 남는 공간을 모두 차지하여 페이징을 아래로 밀어냄 */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-top: 10px;
+}
+
+/* [사용자님의 기존 아이템 디자인 유지 - 건드리지 않음] */
+.like-item {
+    background: #ffffff; border-radius: 16px; padding: 18px 22px;
+    display: flex; justify-content: space-between; gap: 20px;
+    border: 3px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.like-item:hover { transform: translateY(-4px); box-shadow: 0 8px 22px rgba(0,0,0,0.05); }
+.item-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.title-line { display: flex; align-items: center; gap: 8px; }
+.badge { padding: 4px 10px; border-radius: 14px; font-size: 12px; font-weight: 700; background: #e1f5fe; color: #03a9f4; }
+.badge.dday { background: #fff9c4; color: #f57f17; }
+.badge.end { background: #f5f5f5; color: #666; }
+.title { font-size: 17px; font-weight: 700; color: #333; text-decoration: none; }
+.period { font-size: 13px; color: #555; }
+.btn-group { display: flex; gap: 8px; margin-top: auto; }
+.reserve-btn {
+    background: white; border: 1px solid #4dc3ff; color: #4dc3ff;
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s ease;
+}
+.reserve-btn:hover { background: #4dc3ff; color: white; }
+.poster img { width: 100px; height: 140px; border-radius: 12px; object-fit: cover; }
+.empty-box { text-align: center; padding: 100px 0; background: #fff; border-radius: 20px; color: #666; font-size: 16px; }
+
+/* 6. 페이징 버튼 영역 (위치 고정) */
+.pagination {
+    flex-shrink: 0;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+}
+
+.page-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.page-btn.active {
+    background-color: #333;
+    color: #fff;
+    border-color: #333;
+    font-weight: bold;
+}

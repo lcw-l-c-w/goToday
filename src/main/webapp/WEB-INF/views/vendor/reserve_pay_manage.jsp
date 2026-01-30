@@ -1,136 +1,381 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<link
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+	rel="stylesheet" />
+<link rel="stylesheet" href="${ctx}/css/reserve_pay_manage.css">
 
-<!-- ================= 예약/결제 관리 페이지 ================= -->
-<div class="admin-layout">
+<main class="main-content">
+	<div class="page-header">
+		<div class="page-title">
+			<h2>예약 및 결제 관리</h2>
+			<p>실시간 예약 현황을 확인하고 관리하세요.</p>
+		</div>
+	</div>
 
-  <!-- 사이드바 -->
-  <aside class="sidebar">
-  <!-- 생략 -->
-  </aside>
+	<section class="filter-bar">
+		<input type="text" class="searchInput" id="searchInput" placeholder="예약번호, 수령인 검색" /> 
+			<select id="contentFilter">
+				<option value="">모든 콘텐츠</option>
+			</select> 
+			<input type="date" id="dateFilter" />
+		<select id="statusFilter">
+			<option value="">전체 예약상태</option>
+			<option value="DONE">예약 확정</option>
+			<option value="CANCELLED">예약 취소</option>
+			<option value="PENDING">예약 보류</option>
+			<option value="VISITED">이용 완료</option>
+		</select>
+	</section>
 
-  <!-- 메인 -->
-  <main class="main-content">
+	<section class="table-wrap">
+		<div class="table-scroll-area"> <table class="user-table">
+			<thead>
+				<tr>
+					<th>예약번호</th>
+					<th>콘텐츠명</th>
+					<th>수령인</th>
+					<th>방문일시</th>
+					<th>인원</th>
+					<th>예약상태</th>
+					<th>결제상태</th>
+					<th>관리</th>
+				</tr>
+			</thead>
+			<tbody id="reserveList">
+			</tbody>
+		</table>
+	</section>
+</main>
 
-    <!-- 페이지 타이틀 -->
-    <header class="page-header">
-      <h2>예약 및 결제 관리</h2>
-      <button class="btn-outline">엑셀 다운로드</button>
-    </header>
-
-    <!-- 검색 / 필터 -->
-    <section class="filter-bar">
-      <input type="text" placeholder="예약번호, 예약자명 검색" />
-      <select><option>모든 콘텐츠</option></select>
-      <input type="date" />
-      <select><option>모든 결제수단</option></select>
-      <select><option>전체 예약상태</option></select>
-    </section>
-
-    <!-- 예약 리스트 -->
-    <section class="table-wrap">
-      <table class="reservation-table">
-        <thead>
-          <tr>
-            <th>예약번호</th>
-            <th>콘텐츠명</th>
-            <th>예약자</th>
-            <th>방문일시</th>
-            <th>인원</th>
-            <th>예약 상태</th>
-            <th>결제 상태</th>
-            <th>관리</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>R20240501-001</td>
-            <td>반 고흐 몰입형 전시</td>
-            <td>김*수</td>
-            <td>2026-01-12<br>10:00 ~ 12:00</td>
-            <td>2명</td>
-            <td><span class="badge success">예약 확정</span></td>
-            <td><span class="badge paid">결제 완료</span></td>
-            <td>
-              <!-- 클릭 시 상세 모달 오픈 -->
-              <button class="btn-sm">상세보기</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-  </main>
+<div class="modal-overlay" id="userModal">
+	<div class="modal">
+		<header class="modal-header">
+			<h3>
+				예약 상세 정보 <span id="modalReserveId"></span>
+			</h3>
+			<button
+				style="border: none; background: none; font-size: 20px; cursor: pointer; color: #999;"
+				onclick="closeModal()">✕</button>
+		</header>
+		<div class="modal-body" id="modalBody"></div>
+		<footer class="modal-footer">
+			<span style="font-size: 12px; color: #bbb; font-weight: 500;">ADMIN
+				ACTION</span>
+			<div class="footer-btns">
+				<button class="btn-action" id="btnAction">
+					<span class="material-symbols-outlined"
+						style="margin: 0; font-size: 18px;">check_circle</span> 이용 완료 처리
+				</button>
+				<button class="btn-close" onclick="closeModal()">닫기</button>
+			</div>
+		</footer>
+	</div>
 </div>
 
-<!-- ================= 예약 상세 모달 ================= -->
-<div class="modal-overlay">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-  <div class="modal reservation-detail">
+<script>
+const ctx = '${pageContext.request.contextPath}';
 
-    <!-- 헤더 -->
-    <header class="modal-header">
-      <h3>예약 상세 내역 <span>#R20240501-001</span></h3>
-      <button class="btn-close">✕</button>
-    </header>
+function confirmLogout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+        return true; 
+    } else {
+        return false;
+    }
+}
 
-    <!-- 본문 -->
-    <div class="modal-body">
+const RESERVE_MAP = {
+    'DONE': { text: '예약 확정', className: 'res-confirm' },
+    'CANCELED': { text: '예약 취소', className: 'res-cancel' },
+    'PENDING': { text: '예약 보류', className: 'res-pending' },
+    'VISITED': { text: '이용 완료', className: 'res-visited' }
+};
 
-      <!-- 예약 정보 -->
-      <section class="detail-section">
-        <h4>예약 정보</h4>
-        <ul class="info-grid">
-          <li><strong>콘텐츠명</strong> 반 고흐 몰입형 전시</li>
-          <li><strong>방문일</strong> 2026-01-12</li>
-          <li><strong>시간대</strong> 10:00 ~ 12:00</li>
-          <li><strong>예약 인원</strong> 2명</li>
-          <li><strong>예약 상태</strong> <span class="badge success">예약 확정</span></li>
-          <li><strong>이용 상태</strong> <span class="badge info">이용 전</span></li>
-        </ul>
-      </section>
+const PAY_MAP = {
+    'DONE': { text: '결제 완료', className: 'pay-complete' },
+    'WAITING_FOR_DEPOSIT': { text: '입금 대기', className: 'pay-waiting' },
+    'FAILED': { text: '결제 실패', className: 'pay-failed' },
+    'REFUNDED': { text: '환불 처리', className: 'pay-refund' },
+    'CANCELED' : { text: '결제 취소', className: 'pay-cancel'}
+};
 
-      <!-- 결제 정보 -->
-      <section class="detail-section">
-        <h4>결제 정보</h4>
-        <ul class="info-grid">
-          <li><strong>결제 수단</strong> 카드</li>
-          <li><strong>결제 상태</strong> <span class="badge paid">결제 완료</span></li>
-          <li><strong>결제 금액</strong> <strong class="price">₩44,000</strong></li>
-          <li><strong>결제 일시</strong> 2024-05-01 09:30:12</li>
-        </ul>
-      </section>
+function loadContentFilter() {
+	$.ajax({
+		url : ctx + '/vendor/content_manage/all',
+		type : 'get',
+		success : function(res) {
+			const $select = $('#contentFilter');
+			
+			if ($select.data('select2')) {
+                $select.select2('destroy');
+            }
+			
+			$select.empty();
+			$select.append('<option value="">모든 콘텐츠</option>');
+			
+			if(!res.list || res.list.length === 0) return;
+			
+			res.list.forEach(item => {
+				$select.append(
+						`<option value="\${item.content_id}">
+							\${item.title}
+						</option>`
+						);
+			});
+			
+			$select.select2({
+                placeholder: "콘텐츠 선택",
+                allowClear: true,
+                width: '100%'
+            }).on('change', function() {
+                loadReserveList();
+            });
+		},
+		error: function() {
+			console.log('콘텐츠 목록 로드 실패')
+		}
+	})
+}
 
-      <!-- 수령인 정보 -->
-      <section class="detail-section">
-        <h4>수령인 정보</h4>
-        <ul class="info-grid">
-          <li><strong>이름</strong> 김*수</li>
-          <li><strong>생년월일</strong> 2000.05.12</li>
-          <li><strong>이메일</strong> kim***@gmail.com</li>
-          <li><strong>연락처</strong> 010-3671-4401</li>
-        </ul>
-      </section>
+$(function () {
+	loadContentFilter();
+    loadReserveList();
+    
+	$('#contentFilter, #statusFilter, #dateFilter').on('change', function() {
+	    loadReserveList();
+	});
+});
 
-    </div>
+$('#searchInput').on('keypress', function(e) {
+    if (e.key === 'Enter') {
+        loadReserveList();
+    }
+});
 
-    <!-- 하단 액션 -->
-    <footer class="modal-footer">
-      <!-- 관리자 액션 (상태에 따라 노출) -->
-      <button class="btn-primary">이용 완료 처리</button>
-      <button class="btn-secondary">닫기</button>
-    </footer>
+function loadReserveList() {
+    const $list = $('#reserveList');
+    $list.html('<tr><td colspan="8" class="loading">데이터를 불러오는 중입니다...</td></tr>');
 
-  </div>
-</div>
+    const data = {};
+
+    const keyword = $('#searchInput').val();
+    const contentId = $('#contentFilter').val();
+    const status = $('#statusFilter').val();
+    const date = $('#dateFilter').val();
+    
+    if (keyword) data.keyword = keyword;
+    if (contentId) data.content_id = contentId;
+    if (status) data.reservation_status = status;
+    if (date) data.reserved_for_at = date;
+    
+    $.ajax({
+        url: ctx + '/vendor/reserve_pay_manage/list',
+        type: 'get',
+        data: data,
+        success: function(res) {
+        	console.log('res =', res);
+            console.log('res.list =', res.list);
+            console.log('Array?', Array.isArray(res.list));
+            console.log('length =', res.list?.length);
+
+            reserveCache = res.list;
+            renderList(res.list);
+        },
+        error: function() {
+            $list.html('<tr><td colspan="8" class="empty">데이터 로드 실패</td></tr>');
+        }
+    });
+}
+
+function formatPhone(phone) {
+    if (!phone) return 'null';
+    if (phone==='') return 'null';
+    
+    phone = phone.replace(/\D/g,'');
+    
+    if(phone.length === 11){
+    	return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+    }
+    if(phone.length === 10){
+    	return phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+    }
+    
+    return phone; // yyyy-MM-dd
+}
+
+function renderList(list) {
+    const $list = $('#reserveList');
+    $list.empty();
+
+    if (!list || list.length === 0) {
+        $list.append('<tr><td colspan="8" class="empty">예약 내역이 없습니다.</td></tr>');
+        return;
+    }
+    
+    list.forEach(item => {
+    	console.log('renderList item =', item);
+    	// 데이터가 없을 경우를 대비한 기본값 처리
+        const resKey = item.reserve_status || '';
+        const payKey = item.pay_status || '';
+        const resInfo = RESERVE_MAP[item.reserve_status] || { text: item.reserve_status, className: '' };
+        const payInfo = PAY_MAP[item.pay_status] || { text: item.pay_status, className: '' };
+        const isVisited = item.reserve_status === 'VISITED';
+        const rowStyle = isVisited ? 'style="background-color: #fafafa; color: #bbb;"' : '';
+        
+        const html = `
+        	<tr>
+        	    <td>\${item.reservation_code}</td>
+        	    <td style="font-weight:600;">\${item.content_title}</td>
+        	    <td>\${item.receiver_name}<br>
+        	    <small style="color:#888;">\${formatPhone(item.receiver_phone)}</small>
+        	    </td>
+        	    <td>\${item.visit_date}<br><small>\${item.visit_time}</small></td>
+        	    <td>\${item.person_count}명</td>
+        	    <td><span class="badge \${resInfo.className}">\${resInfo.text}</span></td>
+        	    <td><span class="badge \${payInfo.className}">\${payInfo.text}</span></td>
+        	    <td>
+        	    <button class="btn-sm" onclick="openModal('\${item.reserve_id}')">
+	                \${isVisited ? '기록 보기' : '상세보기'}
+	            </button>
+        	    </td>
+        	</tr>
+        	`;
+
+
+        $list.append(html);
+    });
+}
+
+function openModal(id) {
+    const data = reserveCache.find(item => item.reserve_id == id);
+    if (!data) return;
+
+    $('#modalReserveId').text('#' + data.reserve_id);
+
+    const resInfo = RESERVE_MAP[data.reserve_status] || { text: data.reserve_status, className: '' };
+    
+    const modalHtml = `
+        <div class="modal-content-wrapper">
+            <section class="detail-group">
+                <div class="group-title icon-blue">
+                    <span class="material-symbols-outlined">calendar_month</span>예약 정보
+                </div>
+                <div class="info-card">
+                    <div class="info-item">
+                        <label>콘텐츠명</label>
+                        <div class="val-bold">\${data.content_title}</div>
+                    </div>
+                    <div class="info-row-grid">
+                        <div class="info-item">
+                            <label>방문일</label>
+                            <div class="val">\${data.visit_date}</div>
+                        </div>
+                        <div class="info-item">
+                            <label>시간대</label>
+                            <div class="val"><span class="material-symbols-outlined" style="font-size:16px;">schedule</span> \${data.visit_time}</div>
+                        </div>
+                    </div>
+                    <div class="info-row-grid">
+                        <div class="info-item">
+                            <label>예약 인원</label>
+                            <div class="val"><span class="material-symbols-outlined" style="font-size:16px;">group</span> \${data.person_count}명</div>
+                        </div>
+                        <div class="info-item">
+                            <label>예약 상태</label>
+                            <div><span class="badge \${resInfo.className}">\${resInfo.text}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="detail-group">
+                <div class="group-title icon-green">
+                    <span class="material-symbols-outlined">payments</span>결제 정보
+                </div>
+                <div class="info-card">
+                    <div class="info-row-grid">
+                        <div class="info-item">
+                            <label>결제 수단</label>
+                            <div class="val">\${data.payment_method}</div>
+                        </div>
+                        <div class="info-item">
+                            <label>결제 금액</label>
+                            <div class="val-price">₩\${Number(data.amount_price || 0).toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="detail-group" style="margin-bottom:0;">
+                <div class="group-title icon-purple">
+                    <span class="material-symbols-outlined">person</span>예약자 정보
+                </div>
+                <div class="info-card">
+                    <div class="info-row-grid">
+                        <div class="info-item">
+                            <label>예약자명</label>
+                            <div class="val">\${data.receiver_name}</div>
+                        </div>
+                        <div class="info-item">
+                            <label>연락처</label>
+                            <div class="val">\${formatPhone(data.receiver_phone)}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    `;
+
+    $('#modalBody').html(modalHtml);
+    
+	 // 하단 버튼 제어 및 이벤트 바인딩
+    const $actionBtn = $('#btnAction');
+    
+    if (data.reserve_status === 'VISITED') {
+        $actionBtn.prop('disabled', true)
+                  .css({'background': '#ccc', 'cursor': 'not-allowed'})
+                  .html('<span class="material-symbols-outlined" style="margin:0;">task_alt</span> 처리 완료');
+        $actionBtn.off('click'); // 이벤트 해제
+    } else {
+        $actionBtn.prop('disabled', false)
+                  .css({'background': '#4d4dff', 'cursor': 'pointer'})
+                  .html('<span class="material-symbols-outlined" style="margin:0;">check_circle</span> 이용 완료 처리');
+        
+        // 기존 이벤트 제거 후 새로 등록
+        $actionBtn.off('click').on('click', function() {
+            if (!confirm('해당 예약을 [이용 완료] 상태로 변경하시겠습니까?')) return;
+
+            $.ajax({
+                url: ctx + '/vendor/reserve_pay_manage/update_status',
+                type: 'post',
+                data: { reserve_id: data.reserve_id, status: 'VISITED' },
+                success: function(res) {
+                    if (res.success) {
+                        alert('이용 완료 처리가 정상적으로 완료되었습니다.');
+                        closeModal();
+                        loadReserveList();
+                    } else {
+                        alert('처리에 실패했습니다: ' + (res.message || '오류 발생'));
+                    }
+                },
+                error: function() { alert('서버 통신 중 오류가 발생했습니다.'); }
+            });
+        });
+    }
+
+    $('#userModal').addClass('active');
+}
+
+function closeModal() {
+    $('#userModal').removeClass('active');
+}
+</script>
 
 </body>
 </html>

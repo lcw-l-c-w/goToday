@@ -1,107 +1,233 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>전시 관리</title>
-</head>
-<body>
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<link
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/admin_content_manage.css">
 
-<div class="admin-layout">
-  <!-- ================= 메인 ================= -->
-  <main class="admin-content">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
 
-    <!-- 탭 -->
-    <div class="tab-menu">
-      <button class="active">전시 관리</button>
-      <button>사용자 관리</button>
-      <button>문의 사항</button>
-    </div>
+<header class="content-header">
+	<div class="title-group">
+		<h2>전시 관리</h2>
+		<p>등록된 게시글의 상태를 확인하고 관리하세요.</p>
+	</div>
+</header>
 
-    <!-- 타이틀 -->
-    <h2 class="page-title">전시 관리</h2>
+<div class="content-card">
+	<div class="toolbar">
+		<div class="search-box">
+			<span class="material-symbols-outlined">search</span> <input
+				type="text" class="searchInput" id="searchInput"
+				placeholder="전시회 명, 유저 아이디로 검색..." />
+		</div>
+		<div class="filter-tabs">
+			<button class="filter-btn active" data-status="">전체</button>
+			<button class="filter-btn" data-status="1">활성화</button>
+			<button class="filter-btn" data-status="0">비활성화</button>
+		</div>
+	</div>
 
-    <!-- 검색-->
-    <div class="toolbar">
-      <input type="text" placeholder="전시명 검색" />
-    </div>
+	<section class="table-section">
+		<div class="table-header">
+			<span>상태</span> <span>전시명</span> <span>전시기간</span> <span>장소</span> <span>작성자</span>
+			<span class="text-right">관리</span>
+		</div>
 
-    <!-- ================= 전시 리스트 ================= -->
-    <section class="table-wrap">
+		<ul class="table-body" id="contentList">
+			<li class="loading">데이터를 불러오는 중입니다...</li>
+		</ul>
 
-      <!-- 헤더 -->
-      <div class="table-header">
-        <span>상태</span>
-        <span>전시명</span>
-        <span>전시기간</span>
-        <span>장소</span>
-        <span>가격</span>
-        <span>관리</span>
-      </div>
-
-      <!-- 바디 -->
-      <ul class="table-body">
-
-        <!-- item -->
-        <li class="table-row">
-          <span><span class="badge active">활성</span></span>
-          <span>모던 아트 익스피리언스 2026</span>
-          <span>2026.01.15 ~ 2026.03.30</span>
-          <span>서울 시립미술관 본관 2층</span>
-          <span>15,000원</span>
-          <span class="actions">
-            <button title="승인">✅</button>
-            <button title="거절">❌</button>
-            <button title="비활성화">⛔</button>
-            <button title="삭제">🗑</button>
-          </span>
-        </li>
-
-        <!-- item (비활성화 예시) -->
-        <li class="table-row">
-          <span><span class="badge inactive">비활성</span></span>
-          <span>모던 아트 익스피리언스 2026</span>
-          <span>2026.01.15 ~ 2026.03.30</span>
-          <span>서울 시립미술관 본관 2층</span>
-          <span>15,000원</span>
-          <span class="actions">
-            <button title="승인">✅</button>
-            <button title="거절">❌</button>
-            <button title="비활성화">⛔</button>
-            <button title="삭제">🗑</button>
-          </span>
-        </li>
-
-        <!-- item (승인 대기) -->
-        <li class="table-row">
-          <span><span class="badge pending">승인 대기</span></span>
-          <span>미디어 아트: 빛과 공간</span>
-          <span>2026.02.01 ~ 2026.04.01</span>
-          <span>DDP 전시관</span>
-          <span>18,000원</span>
-          <span class="actions">
-            <button title="승인">✅</button>
-            <button title="거절">❌</button>
-            <button title="비활성화">⛔</button>
-            <button title="삭제">🗑</button>
-          </span>
-        </li>
-
-      </ul>
-
-    </section>
-    <!-- ================= 전시 리스트 END ================= -->
-
-    <!-- 페이지네이션 -->
-    <div class="pagination">
-      <button>1</button>
-      <button class="active">2</button>
-      <button>3</button>
-    </div>
-
-  </main>
+	</section>
+	<div class="pagination">
+		<button class="arrow">◀</button>
+		<button>1</button>
+		<button class="active">2</button>
+		<button>3</button>
+		<button class="arrow">▶</button>
+	</div>
 </div>
+<script>
+const ctx = '${pageContext.request.contextPath}';
 
-</body>
+function confirmLogout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+        return true; 
+    } else {
+        return false;
+    }
+}
+
+const ACTIVATE_MAP = {
+		  1:  { text: '활성화', className: 'active' },
+		  0: { text: '비활성화', className: 'inactive' }
+		};
+
+$(function () {
+	loadContentList();
+})	
+
+let currentPage = 1;
+
+function loadContentList(page = 1) {
+	currentPage = page;
+	
+    const keyword = $('#searchInput').val();
+    let status = $('.filter-btn.active').data('status');
+    
+    const searchData = { 
+    		keyword : keyword,
+    		page : page
+    	};
+    
+    if (status !== "" && status !== undefined) {
+        searchData.is_active = status;
+    }
+
+    $.ajax({
+        url: ctx + '/admin/content_manage/list',
+        type: 'get',
+        data: searchData,
+        success(res) {
+            renderList(res.list);
+            if(res.pageInfo) {
+            renderPagination(res.pageInfo);
+            }else{
+            	console.error('pafeInfo 없음', res);
+            	$('.pagination').empty();
+            }
+        },
+        error() {
+            alert('목록을 불러오지 못했습니다.');
+        }
+    });
+}
+
+//필터 클릭 시
+$('.filter-btn').on('click', function() {
+	$('.filter-btn').removeClass('active');
+	$(this).addClass('active');
+	loadContentList(1);
+});
+
+//검색 서치 시
+$('#searchInput').on('keyup', function(e){
+	if(e.key ==='Enter'){
+		loadContentList(1);
+	}
+});
+
+$(document).on('click', '.btn-act', function () {
+    const contentId = $(this).data('id');
+
+    $.ajax({
+        url: ctx + '/admin/content_manage/act',
+        type: 'get',
+        data: { content_id: contentId },
+        success() {
+            loadContentList(); 
+        },
+        error() {
+            alert('상태 변경 실패');
+        }
+    });
+});
+
+$(document).on('click', '.btn-delete', function () {
+    const contentId = $(this).data('id');
+    
+    if (!confirm('삭제하시겠습니까?')) {
+        return; 
+    }
+
+    $.ajax({
+        url: ctx + '/admin/content_manage/delete',
+        type: 'get',
+        data: { content_id: contentId },
+        success() {
+            loadContentList();
+        },
+        error() {
+            alert('삭제 실패');
+        }
+    });
+});
+
+function renderPagination(p){
+	const $pagination = $('.pagination');
+	$pagination.empty();
+	
+	if(p.prev){
+		$pagination.append(
+				'<button class="arrow" onclick="loadContentList(' +(p.startPage -1)+ ')">◀</button>'
+				);
+	}
+	
+	for(let i=p.startPage; i<=p.endPage; i++){
+		const activeClass = (i === p.page) ? 'active' : '';
+		$pagination.append(
+				 '<button class="' + activeClass + '" onclick="loadContentList(' + i + ')">' + i + '</button>'
+		);
+	}
+	if(p.next) {
+		$pagination.append(
+				'<button class="arrow" onclick="loadContentList('+(p.endPage +1) + ')">▶</button>'
+				);
+	}
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    return dateStr.split(' ')[0]; // yyyy-MM-dd
+}
+
+function renderList(list) {
+    const $list = $('#contentList');
+    $list.empty();
+
+    if (list.length === 0) {
+        $list.append('<div class="empty" style="padding:40px; text-align:center; color:#999;">검색 결과가 없습니다.</div>');
+        return;
+    }
+
+    list.forEach(item => {
+    	
+    	const isActive = (item.is_active === true || item.is_active === 1 || item.is_active === "1");
+        const statusVal = isActive ? 1 : 0;
+        const activateInfo = ACTIVATE_MAP[statusVal] || { text: '알수없음', className: 'inactive' };
+
+        const actIcon = isActive ? 'visibility' : 'visibility_off';
+        const actTitle = isActive ? '비활성화 하기' : '활성화 하기';
+        
+        $list.append(
+        		'<li class="table-row">' +
+	                '<div><span class="badge ' + activateInfo.className + '">' + activateInfo.text + '</span></div>' + 
+	                '<a href="' + ctx + '/detail/' + item.content_id + '" class="title-link">' +
+		                '<span class="title" style="font-weight:600;">' + item.title + '</span>' +
+		            '</a>' +
+	                '<span class="date" style="color:#666;">' + formatDate(item.start_at) + ' ~ ' + formatDate(item.end_at) + '</span>' +
+	                '<span class="location" style="color:#666;">' + item.location + '</span>' +
+	                '<span class="user_id">' + item.user_id + '</span>' +
+	                '<div class="actions">' +
+	                    '<button class="btn-icon btn-act" data-id="' + item.content_id + '" title="' + actTitle + '">' +
+	                        '<span class="material-symbols-outlined" style="font-size:18px;">' + actIcon + '</span>' +
+	                    '</button>' +
+	                    '<button class="btn-icon btn-delete" data-id="' + item.content_id + '" title="삭제">' +
+	                        '<span class="material-symbols-outlined" style="font-size:18px;">delete</span>' +
+	                    '</button>' +
+	                '</div>' +
+            '</li>'
+        );
+    });
+}
+</script>
 </html>
+
+
+
+
+
+

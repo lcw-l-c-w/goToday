@@ -1,0 +1,238 @@
+@charset "UTF-8";
+
+/* =========================
+   1. 기본 스타일
+========================= */
+:root { --main-color: #4dc3ff; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Pretendard', sans-serif; overflow-x: hidden; background-color: #fff; }
+a { text-decoration: none; color: inherit; }
+
+/* =========================
+   2. 메인 배너
+========================= */
+.main-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.main-banner {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  margin: 20px 0 60px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #000;
+}
+
+#slideList {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  width: auto;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.banner-card {
+  flex: 0 0 100% !important;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
+.banner-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.banner-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 60px 40px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: white;
+}
+
+.banner-info h3 { font-size: 32px; margin-bottom: 10px; }
+
+.banner-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.3);
+  border: none;
+  color: black;
+  font-size: 24px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 100;
+  transition: 0.3s;
+}
+
+.btn-prev { left: 20px;  }
+.btn-next { right: 20px; }
+
+/* =========================
+   3. 추천 컨텐츠
+========================= */
+.recommend-section { position: relative; width: 100%; margin-bottom: 60px; }
+
+/* ✅ 여기 수정: padding 0 10px -> 0 (5개 딱 맞게) */
+.recommend-container { position: relative; width: 100%; padding: 0; }
+
+.recommend-view{
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+}
+
+.content-list.horizontal{
+  display: flex;
+  gap: 15px;
+  padding: 0px;
+  list-style: none;
+}
+
+.content-card{
+  flex: 0 0 200px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.content-card:hover { transform: translateY(-5px); }
+
+.card-img-wrap{
+  width: 100%;
+  height: 280px;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+}
+
+.card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+#recList{
+  width: max-content;
+  transform: none !important;
+  transition: none;
+}
+
+.recommend-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border: 1px solid #eee;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 110;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.recommend-btn:hover { background: #f8f8f8; color: var(--main-color); }
+
+/* ✅ 여기 수정: 음수 -> 안쪽으로 */
+.rec-prev { left: 8px; }
+.rec-next { right: 8px; }
+
+.recommend-view::-webkit-scrollbar{ height: 0; }
+.recommend-view{ scrollbar-width: none; }
+
+/* 블러 및 CTA */
+.blur-container { filter: blur(8px); pointer-events: none; user-select: none; }
+
+.cta-overlay{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px 60px;
+  border-radius: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 480px;
+}
+
+.cta-overlay h3 { font-size: 24px; font-weight: bold; margin-bottom: 15px; color: #111; }
+.cta-overlay p { font-size: 16px; color: #666; margin-bottom: 25px; line-height: 1.6; }
+.cta-btn { display: inline-block; background-color: var(--main-color); color: white; padding: 14px 35px; border-radius: 12px; font-weight: bold; }
+
+/* =========================
+   4. 기타 스타일
+========================= */
+.section-title { font-size: 24px; font-weight: bold; margin: 60px 0 30px; text-align: center; }
+
+.hot-grid-container { display: grid; grid-template-columns: 1.3fr 2fr; gap: 15px; height: 565px; }
+.hot-main { border-radius: 18px; overflow: hidden; position: relative; cursor: pointer; }
+.hot-main img { width: 100%; height: 100%; object-fit: cover; }
+
+.hot-sub-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.sub-card { border-radius: 12px; overflow: hidden; cursor: pointer; }
+.sub-card img { width: 100%; height: 100%; object-fit: cover; }
+
+/* 오픈 예정: 버튼 슬라이더 */
+/* ✅ 여기 수정: padding 0 10px -> 0 */
+.upcoming-container{
+  position: relative;
+  width: 100%;
+  padding: 0;
+}
+
+.upcoming-view{
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+}
+
+.upcoming-view::-webkit-scrollbar{ height: 0; }
+.upcoming-view{ scrollbar-width: none; }
+
+.d-day-badge{
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #00d2ff;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* 오픈예정 버튼만 바깥 여백으로 빼기 */
+.upcoming-container{ overflow: visible; } /* 혹시 잘림 방지 */
+
+/* 왼/오 버튼을 바깥으로 */
+.upcoming-container .rec-prev { left: -60px; }
+.upcoming-container .rec-next { right: -60px; }
+
+/* (선택) 버튼이 카드 이미지 정중앙쯤 오게 높이 조절 */
+.upcoming-container .recommend-btn { top: 180px; }  /* 카드 이미지가 280px라 대충 중간 */

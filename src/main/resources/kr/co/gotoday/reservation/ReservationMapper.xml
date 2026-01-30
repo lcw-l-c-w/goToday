@@ -1,5 +1,283 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.gotoday.content.ContentMapper">
+<mapper namespace="kr.co.gotoday.reservation.ReservationMapper">
 
+	<insert id="createReservation" parameterType="kr.co.gotoday.reservation.ReservationVO">
+		INSERT INTO reservation(
+			reservation_code, reserved_for_at, time_zone, reservation_status, 
+			total_price, adult_qty, child_qty, teen_qty, 
+			user_id, content_id, reservation_type, 
+			receiver_name, receiver_birth, receiver_phone, reserve_visit, receive_type, 
+			created_at, schedule_id
+		) VALUES (
+			#{reservation_code}, #{reserved_for_at}, #{time_zone}, #{reservation_status}, 
+			#{total_price}, #{adult_qty}, #{child_qty}, #{teen_qty}, 
+			#{user_id}, #{content_id}, #{reservation_type}, 
+			#{receiver_name}, #{receiver_birth}, #{receiver_phone}, #{reserve_visit}, #{receive_type}, 
+			NOW(), #{schedule_id}
+		)
+		
+		<selectKey keyProperty="reservation_id" order="AFTER" resultType="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<insert id = "createScheduleByReservation" parameterType="kr.co.gotoday.user.CalendarVO" >
+		INSERT INTO calendar(
+			selected_at, type, content_id, user_id, reservation_id
+		) VALUES(
+			#{selected_at}, #{type}, #{content_id}, #{user_id}, #{reservation_id}
+		)
+	</insert>
+
+	<select id="findByReservationId" parameterType="int"  resultType="kr.co.gotoday.reservation.ReservationVO">
+	    SELECT * FROM reservation 
+	    WHERE reservation_id = #{reservation_id}
+	</select>
+	
+	<select id="findByPaymentKey" parameterType="String"  resultType="kr.co.gotoday.payment.PaymentVO">
+	    SELECT * FROM payment 
+	    WHERE payment_key = #{payment_key}
+	</select>
+	
+	<select id="findReservationByVendor"
+	    parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
+	    resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
+	
+	    SELECT
+		    r.reservation_id AS reserve_id,
+		    r.reservation_code AS reservation_code,
+		    r.reserved_for_at AS visit_date,
+		    r.time_zone AS visit_time,
+		    (r.adult_qty + r.child_qty + r.teen_qty) AS person_count,
+		    r.reservation_status AS reserve_status,
+		    p.payment_status AS pay_status,
+		    r.receiver_name,
+		    r.receiver_phone,
+		    c.title AS content_title,
+		    p.amount_price AS amount_price,
+		    p.payment_method AS payment_method
+	    FROM content c
+	    JOIN reservation r ON r.content_id = c.content_id
+	    LEFT JOIN payment p ON r.reservation_id = p.reservation_id
+	
+	    <where>
+	        c.user_id = #{user_id}
+	
+	        <!-- 검색어 -->
+	        <if test="keyword != null and keyword != ''">
+			    AND (
+			        CAST(r.reservation_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+			        OR r.receiver_name LIKE CONCAT('%', #{keyword}, '%')
+			    )
+			</if>
+	
+	
+	        <!-- 콘텐츠 -->
+	        <if test="content_id != null">
+	            AND c.content_id = #{content_id}
+	        </if>
+	
+	        <!-- 예약 상태 -->
+	        <if test="reservation_status != null and reservation_status != ''">
+	            AND r.reservation_status = #{reservation_status}
+	        </if>
+	
+	        <!-- 결제 상태 -->
+	        <if test="payment_status != null and payment_status != ''">
+	            AND p.payment_status = #{payment_status}
+	        </if>
+	
+	        <!-- 결제 수단 -->
+	        <if test="payment_method != null and payment_method != ''">
+	            AND p.payment_method = #{payment_method}
+	        </if>
+	
+	        <!-- 방문 날짜 -->
+	        <if test="reserved_for_at != null and reserved_for_at != ''">
+	            AND r.reserved_for_at = #{reserved_for_at}
+	        </if>
+	    </where>
+    	ORDER BY r.reserved_for_at DESC
+	</select>
+
+	
+	<select id="countReservationByVendor"
+        parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
+        resultType="int">
+        
+	    SELECT COUNT(*)
+	    FROM content c
+	    JOIN reservation r ON r.content_id = c.content_id
+	    LEFT JOIN payment p ON r.reservation_id = p.reservation_id
+	
+	    <where>
+	        c.user_id = #{userId}
+	
+	        <if test="contentId != null">
+	            AND c.content_id = #{contentId}
+	        </if>
+	
+	        <if test="keyword != null and keyword != ''">
+	            AND (
+	                r.reservation_code LIKE CONCAT('%', #{keyword}, '%')
+	                OR c.title LIKE CONCAT('%', #{keyword}, '%')
+	            )
+	        </if>
+	
+	        <if test="reservationStatus != null and reservationStatus != ''">
+	            AND r.reservation_status = #{reservationStatus}
+	        </if>
+	
+	        <if test="paymentStatus != null and paymentStatus != ''">
+	            AND p.payment_status = #{paymentStatus}
+	        </if>
+	
+	        <if test="paymentMethod != null and paymentMethod != ''">
+	            AND p.payment_method = #{paymentMethod}
+	        </if>
+	
+	        <if test="startDate != null and endDate != null">
+	            AND r.reserved_for_at BETWEEN #{startDate} AND #{endDate}
+	        </if>
+	    </where>
+	
+	</select>
+	
+	
+	<select id="findByOrderId" parameterType="string" resultType="kr.co.gotoday.payment.PaymentVO">
+		SELECT 
+			payment_id,
+			reservation_id,
+			payment_key,
+			order_key,
+			payment_method,
+			payment_status,
+			amount_price,
+			refund_status,
+			paid_at
+		FROM payment
+		WHERE order_key = #{order_key}
+	</select>
+	
+	<!-- 예약 목록 COUNT -->
+	<select id="countReservationByUserId" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM reservation r
+		JOIN content c ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		WHERE r.user_id = #{user_id}
+		<choose>
+			<when test="filter == 'CANCELED'">
+				AND r.reservation_status = 'CANCELED'
+			</when>
+			<when test="filter == 'UPCOMING'">
+				AND r.reserved_for_at >= CURDATE()
+				AND r.reservation_status = 'DONE'
+			</when>
+			<when test="filter == 'VISITED'">
+				AND (DATE(r.reserved_for_at) &lt; CURDATE() 
+          			OR DATE(r.reserved_for_at) = CURDATE())
+	            AND r.reservation_status = 'VISITED'
+			</when>
+			<when test="filter == 'END'">
+				AND r.reserved_for_at &lt; CURDATE()
+			</when>
+			<otherwise></otherwise>
+		</choose>
+	</select>
+
+	<select id="findReservationListByUserId" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationListDTO">
+		SELECT
+			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type,
+			c.content_id, c.title, c.main_image_path,
+			p.payment_status, p.order_key AS order_id, p.payment_method,
+			CASE WHEN r2.review_id IS NOT NULL THEN 1 ELSE 0 END as review_exists
+		FROM reservation r
+		JOIN content c ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		LEFT JOIN review r2 ON r.reservation_id = r2.reservation_id
+		WHERE r.user_id = #{user_id}
+	   <choose>
+	        <when test="filter == 'CANCELED'">
+	            AND r.reservation_status = 'CANCELED'
+	        </when>
+	
+	        <when test="filter == 'UPCOMING'">
+	            AND DATE(r.reserved_for_at) >= CURDATE()
+	            AND r.reservation_status = 'DONE'
+	        </when>
+	
+	    	<when test="filter == 'END'">
+	            AND DATE(r.reserved_for_at) &lt; CURDATE()
+	        </when>
+	        
+          	<when test="filter == 'VISITED'">
+          		AND (DATE(r.reserved_for_at) &lt; CURDATE() 
+          			OR DATE(r.reserved_for_at) = CURDATE())
+	            AND r.reservation_status = 'VISITED'
+	        </when>
+	        
+	        <otherwise></otherwise>
+	    </choose>
+		ORDER BY 
+			CASE 
+	        WHEN r.reserved_for_at >= CURDATE() THEN 0 
+	        ELSE 1 
+	    END,
+	    ABS(DATEDIFF(r.reserved_for_at, CURDATE())),
+	    r.time_zone
+		<if test="pageSize != null and offset != null">
+			LIMIT #{pageSize} OFFSET #{offset}
+		</if>
+	</select>
+	
+	<select id="findReservationDetailById" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationDetailDTO">
+		SELECT 
+			r.reservation_id, r.reservation_status, r.reserved_for_at, r.time_zone, r.reservation_code, r.receive_type, 
+			r.receiver_name, r.receiver_birth, r.receiver_phone, r.adult_qty, r.child_qty, r.teen_qty,
+			c.content_id, c.title, c.main_image_path, c.location,
+			p.paid_at, p.payment_status, p.payment_method, p.amount_price,p.cancel_amount
+		FROM content c 
+		JOIN reservation r ON r.content_id = c.content_id
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		WHERE r.user_id = #{user_id}
+			AND r.reservation_id = #{reservation_id}
+	</select>
+	
+	<select id="findCurrentTickets" parameterType="int" resultType="kr.co.gotoday.content.ContentScheduleVO" >
+		SELECT * FROM content_schedule
+		WHERE schedule_id = #{schedule_id}
+	</select>
+	
+	<update id="updateReservationStatusById" parameterType="int">
+		UPDATE reservation r
+		JOIN payment p ON r.reservation_id = p.reservation_id
+		SET reservation_status = 'VISITED'
+		WHERE r.reservation_id = #{reservation_id}
+			AND payment_status = 'DONE' 
+			AND reserved_for_at >= CURDATE()
+			AND ( reservation_status NOT IN ('CANCELED','PENDING')
+				OR reservation_status IS NULL );
+	</update>
+	
+	<update id="subCurrentTicket" parameterType="map">
+		UPDATE content_schedule
+		SET current_ticket = current_ticket - #{total_qty}
+		WHERE schedule_id = #{schedule_id} 
+			AND current_ticket >= #{total_qty} 
+	</update>
+	
+	<update id="addCurrentTicket" parameterType="map">
+	    UPDATE content_schedule
+	    SET current_ticket = LEAST(current_ticket + #{total_qty}, total_ticket)
+	    WHERE schedule_id = #{schedule_id}
+	</update>
+	
+	<update id="updatePaymentStatus" parameterType="map">
+		UPDATE payment
+		SET payment_status = #{payment_status}
+		WHERE order_key = #{order_key}
+	</update>
+	
 </mapper>

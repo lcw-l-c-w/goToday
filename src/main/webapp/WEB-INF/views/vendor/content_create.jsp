@@ -1,378 +1,63 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title><c:choose><c:when test="${isEdit}">전시 수정</c:when><c:otherwise>새 전시 등록</c:otherwise></c:choose></title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <title>
+  	<c:choose>
+  		<c:when test="${isEdit}">전시 수정</c:when>
+  		<c:otherwise>새 전시 등록</c:otherwise>
+  	</c:choose>
+  </title>
+<link rel="stylesheet" href="${ctx}/css/vendor_content_create.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/gotoday/smarteditor/js/HuskyEZCreator.js"></script>
+<script>
+//네이버 스마트 에디터
+var oEditors = [];
+$(function() {
+    nhn.husky.EZCreator.createInIFrame({
+        oAppRef: oEditors,
+        elPlaceHolder: "detail_description",
+        sSkinURI: "/gotoday/smarteditor/SmartEditor2Skin.html",    
+        htParams : {
+            bUseToolbar : true,                // 툴바 사용 여부 (true:사용/ false:사용하지 않음)
+            bUseVerticalResizer : true,        // 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
+            bUseModeChanger : true,            // 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음)
+            fOnBeforeUnload : function(){
+            }
+        }, //boolean
+        fOnAppLoad : function(){
+        	
+        },
+        fCreator: "createSEditor2"
+    });
+})
 
-    body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
-    }
+const isEdit = ${isEdit};
 
-    .page-wrapper {
-      min-height: 100vh;
-      padding: 40px 20px;
-    }
-
-    .content-container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .content-form {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-      padding: 40px;
-    }
-
-    /* 뒤로가기 버튼 */
-    .back-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #666;
-      padding: 8px 12px;
-      border-radius: 8px;
-      transition: background-color 0.2s;
-    }
-
-    .back-btn:hover {
-      background-color: #f0f0f0;
-    }
-
-    /* 헤더 */
-    .form-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .form-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #222;
-    }
-
-    .form-header .reject-notice {
-      color: #e74c3c;
-      font-size: 14px;
-      margin-top: 12px;
-      padding: 10px 16px;
-      background-color: #fdf2f2;
-      border-radius: 6px;
-      display: inline-block;
-    }
-
-    /* 섹션 공통 */
-    section {
-      margin-bottom: 40px;
-    }
-
-    section h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 12px;
-    }
-
-    section hr {
-      border: none;
-      border-top: 2px solid #4a90d9;
-      margin-bottom: 24px;
-    }
-
-    /* 폼 그룹 */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #555;
-      margin-bottom: 8px;
-    }
-
-    .form-group input[type="text"],
-    .form-group input[type="number"],
-    .form-group input[type="date"],
-    .form-group textarea {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: #4a90d9;
-      box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
-    }
-
-    .form-group input::placeholder,
-    .form-group textarea::placeholder {
-      color: #aaa;
-    }
-
-    /* 라디오 버튼 스타일 */
-    .radio-group {
-      display: flex;
-      gap: 24px;
-      margin-top: 8px;
-    }
-
-    .radio-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .radio-item input[type="radio"] {
-      width: 18px;
-      height: 18px;
-      accent-color: #4a90d9;
-      cursor: pointer;
-    }
-
-    .radio-item span {
-      font-size: 14px;
-      color: #555;
-    }
-
-    /* 날짜 범위 */
-    .date-range {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .date-range p {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .date-range input[type="date"] {
-      padding: 10px 14px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    /* 링크 입력 */
-    .link-inputs {
-      margin-bottom: 16px;
-    }
-
-    .link-inputs input {
-      background-color: #fafafa;
-    }
-
-    /* 포스터 업로드 */
-    .poster-upload-header {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .upload-btn {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #4a90d9;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .upload-btn:hover {
-      background-color: #3a7bc8;
-    }
-
-    #posterInput {
-      display: none;
-    }
-
-    .poster-preview {
-      border: 2px dashed #ddd;
-      border-radius: 12px;
-      padding: 40px;
-      text-align: center;
-      background-color: #fafafa;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .poster-placeholder {
-      color: #999;
-      font-size: 14px;
-    }
-
-    .poster-placeholder img {
-      max-width: 100%;
-      max-height: 300px;
-      margin-top: 16px;
-      border-radius: 8px;
-      display: none;
-    }
-
-    .poster-placeholder img.show {
-      display: block;
-    }
-
-    /* 상세 정보 */
-    .detail-info-section textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    @media (max-width: 600px) {
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .form-row .form-group > div {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .form-row .form-group > div span {
-      min-width: 50px;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .form-row .form-group > div input {
-      flex: 1;
-      padding: 10px 14px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .form-row .form-group > div label {
-      display: inline;
-      margin-bottom: 0;
-      margin-right: 8px;
-    }
-
-    /* 에디터 영역 */
-    .editor-placeholder {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 40px;
-      background-color: #fafafa;
-      text-align: center;
-      color: #999;
-      min-height: 300px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* 하단 버튼 */
-    .form-footer {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 40px;
-      padding-top: 32px;
-      border-top: 1px solid #eee;
-    }
-
-    .cancel-btn,
-    .submit-btn {
-      padding: 14px 40px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .cancel-btn {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      color: #666;
-    }
-
-    .cancel-btn:hover {
-      background-color: #f5f5f5;
-      border-color: #ccc;
-    }
-
-    .submit-btn {
-      background-color: #4a90d9;
-      border: none;
-      color: #fff;
-    }
-
-    .submit-btn:hover {
-      background-color: #3a7bc8;
-    }
-
-    /* 입력 필드 에러 상태 */
-    .form-group input.error,
-    .form-group textarea.error {
-      border-color: #e74c3c;
-    }
-
-    .error-message {
-      color: #e74c3c;
-      font-size: 12px;
-      margin-top: 4px;
-    }
-  </style>
+</script>
 </head>
 <body>
 
 <div class="page-wrapper">
   <div class="content-container">
 
-    <form class="content-form" method="post" action="<c:choose><c:when test='${isEdit}'>update</c:when><c:otherwise>create</c:otherwise></c:choose>">
+    <form class="content-form" method="post" id="frm" 
+    	action="${pageContext.request.contextPath}/vendor/${isEdit ? 'content_update' : 'content_create'}" enctype="multipart/form-data">
 
-    <!-- 수정 모드일 때 content_id 전달 -->
     <c:if test="${isEdit}">
-        <input type="hidden" name="content_id" value="${content.content_id}">
-    </c:if>
+	    <input type="hidden" name="content_id" value="${contentVO.content_id}">
+	</c:if>
+
 
     <!-- 상단 -->
     <button type="button" class="back-btn">←</button>
     <header class="form-header">
         <h1><c:choose><c:when test="${isEdit}">전시 수정</c:when><c:otherwise>새 전시 등록</c:otherwise></c:choose></h1>
-        <c:if test="${isEdit}">
-            <p class="reject-notice">* 거절된 콘텐츠입니다. 내용을 수정하여 다시 제출해주세요.</p>
-        </c:if>
     </header>
 
     <!-- 기본 정보 -->
@@ -380,68 +65,199 @@
         <h2>기본 정보</h2>
         <hr>
 
-        <div class="form-group">
-            <label>전시명</label>
-            <input type="text" name="title" placeholder="전시명을 입력하세요" value="${content.title}">
-        </div>
-
-        <div class="form-group">
-            <label>장소</label>
-            <input type="text" name="location" placeholder="전시 장소를 입력하세요" value="${content.location}">
-        </div>
-
-        <div class="form-group">
-            <label>수령방법</label>
+		<div class="form-group">
+            <label>종류 *</label>
             <div class="radio-group">
                 <label class="radio-item">
-                    <input type="radio" name="reservation_type" value="onsite" <c:if test="${content.reservation_type eq 'onsite'}">checked</c:if>>
-                    <span>현장수령</span>
+                    <input type="radio" name="content_kind" value="popup" required <c:if test="${contentVO.content_kind eq 'popup'}">checked</c:if>>
+                    <span>팝업스토어</span>
                 </label>
                 <label class="radio-item">
-                    <input type="radio" name="reservation_type" value="advance" <c:if test="${content.reservation_type eq 'advance'}">checked</c:if>>
-                    <span>사전예매</span>
+                    <input type="radio" name="content_kind" value="exhibition" required <c:if test="${contentVO.content_kind eq 'exhibition'}">checked</c:if>>
+                    <span>전시</span>
                 </label>
             </div>
         </div>
+        <div class="form-row">
+			<div class="form-group">
+	            <label>카테고리 *</label>
+	            <div class="radio-group">
+	                 <select name="category" required>
+				        <option value="">카테고리를 선택하세요</option>
+				        <option value="식품"
+				            <c:if test="${contentVO.category eq '식품'}">selected</c:if>>
+				            식품
+				        </option>
+				        <option value="캐릭터"
+				            <c:if test="${contentVO.category eq '캐릭터'}">selected</c:if>>
+				            캐릭터
+				        </option>
+				        <option value="화장품"
+				            <c:if test="${contentVO.category eq '화장품'}">selected</c:if>>
+				            화장품
+				        </option>
+				        <option value="미디어"
+				            <c:if test="${contentVO.category eq '미디어'}">selected</c:if>>
+				            미디어
+				        </option>
+				        <option value="미술"
+				            <c:if test="${contentVO.category eq '미술'}">selected</c:if>>
+				            미술
+				        </option>
+				        <option value="패션"
+				            <c:if test="${contentVO.category eq '패션'}">selected</c:if>>
+				            패션
+				        </option>
+				        <option value="디지털/테크"
+				            <c:if test="${contentVO.category eq '디지털/테크'}">selected</c:if>>
+				            디지털/테크
+				        </option>
+				        <option value="키즈/반려동물"
+				            <c:if test="${contentVO.category eq '키즈/반려동물'}">selected</c:if>>
+				            키즈/반려동물
+				        </option>
+				        <option value="etc"
+				            <c:if test="${contentVO.category eq 'etc'}">selected</c:if>>
+				            기타 (etc)
+				        </option>
+				    </select>
+	            </div>
+	        </div>
+			<div class="form-group">
+	            <label>장소 태그 *</label>
+	            <div class="radio-group">
+	                 <select name="place_tag" required>
+				        <option value="">장소 태그를 선택하세요</option>
+				        <option value="성수"
+				            <c:if test="${contentVO.place_tag eq '성수'}">selected</c:if>>
+				            성수
+				        </option>
+				        <option value="홍대"
+				            <c:if test="${contentVO.place_tag eq '홍대'}">selected</c:if>>
+				            홍대
+				        </option>
+				        <option value="여의도"
+				            <c:if test="${contentVO.place_tag eq '여의도'}">selected</c:if>>
+				            여의도
+				        </option>
+				        <option value="강남"
+				            <c:if test="${contentVO.place_tag eq '강남'}">selected</c:if>>
+				            강남
+				        </option>
+				        <option value="혜화"
+				            <c:if test="${contentVO.place_tag eq '혜화'}">selected</c:if>>
+				            혜화
+				        </option>
+				        <option value="한남"
+				            <c:if test="${contentVO.place_tag eq '한남'}">selected</c:if>>
+				            한남
+				        </option>
+				        <option value="etc"
+				            <c:if test="${contentVO.place_tag eq 'etc'}">selected</c:if>>
+				            기타 (etc)
+				        </option>
+				    </select>
+	            </div>
+	        </div>
+        </div>
         <div class="form-group">
-            <label>전시 기간</label>
-            <div class="date-range">
-            <p>시작일</p>
-            <input type="date" name="start_at" value="${startDate}">
-            <p>~</p>
-            <p>종료일</p>
-            <input type="date" name="end_at" value="${endDate}">
-            </div>
+            <label>전시명 *</label>
+            <input type="text" name="title" placeholder="전시명을 입력하세요" value="<c:out value='${contentVO.title}'/>" required >
         </div>
 
+        <div class="form-group">
+            <label>장소 *</label>
+            <input type="text" name="location" placeholder="형식 : 도로명 주소 , 상호명 ( , 필수)" value="${contentVO.location}" required>
+        </div>
+
+        <div class="form-group">
+            <label>수령방법 *</label>
+            <div class="radio-group">
+                <label class="radio-item">
+                    <input type="radio" name="reservation_type" value="true" required <c:if test="${contentVO.reservation_type eq 'true'}">checked</c:if>>
+                    <span>예매 필수</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="reservation_type" value="false" <c:if test="${contentVO.reservation_type eq 'false'}">checked</c:if>>
+                    <span>현장 대기</span>
+                </label>
+            </div>
+        </div>
+       	<div class="form-group">
+            <label>전시 기간 *</label>
+            <div class="date-range">
+	            <p>시작일</p>
+	            <input type="date" name="start_at" value="${contentVO.start_at}" required>
+	            <p>~</p>
+	            <p>종료일</p>
+	            <input type="date" name="end_at" value="${contentVO.end_at}" required>
+            </div>
+        </div>
+        <div class="form-row"  id= "schedule-visual" style="<c:if test='${empty scheduleList}'>display:none</c:if>">
+	        <div class="form-group">
+	            <div class="schedule-section">
+					<label>전시 시간대 등록</label>
+					<button type="button" id="addScheduleBtn">+ 시간대 추가</button>
+				</div>
+			</div>
+			<div class="form-group">	
+	            <div id="scheduleList">
+	            	<c:choose>
+	            		<c:when test="${not empty scheduleList}">
+	            			<c:forEach var="sch" items="${scheduleList}">
+				       			<div class="schedule-item">
+								    <input type="text" name="Time[]" value="${sch.time_zone}" required>
+								    <button type="button" class="remove-btn">삭제</button>
+								</div>
+							</c:forEach>
+						</c:when>
+						<c:otherwise>
+				       		<div class="schedule-item">
+							    <input type="text" name="Time[]" placeholder="시간대 (예 : 10:00 ~ 11:00)">
+							    <button type="button" class="remove-btn">삭제</button>
+							</div>
+						</c:otherwise>
+	            	</c:choose>
+    			</div>
+	        </div>
+	        <div class="form-group">
+	        	<label>시간당 티켓 수</label>
+	        	<input type="number" name="total_ticket" value="<c:out value='${not empty scheduleList ? scheduleList[0].total_ticket :""}'/>" min="0">
+	        </div>
+		</div>
         <div class="form-group">
             <label>판매자 인스타그램 주소</label>
             <div class="link-inputs">
-                <input type="text" name="instagram_url" placeholder="INSTAGRAM URL" value="${content.instagram_url}">
+                <input type="text" name="instagram_url" placeholder="INSTAGRAM URL" value="${contentVO.instagram_url}">
             </div>
             <label>판매자 엑스 주소</label>
             <div class="link-inputs">
-                <input type="text" name="x_url" placeholder="X URL" value="${content.x_url}">
+                <input type="text" name="x_url" placeholder="X URL" value="${contentVO.x_url}">
             </div>
         </div>
     </section>
 
     <!--  대표 포스터 -->
     <section class="form-section">
-    <h2>대표 포스터</h2>
+    <h2>대표 포스터 *</h2>
     <hr>
 
     <!-- 업로드 버튼 -->
     <div class="poster-upload-header">
-        <label for="posterInput" class="upload-btn">이미지 추가</label>
-        <input type="file" id="posterInput" accept="image/*">
+        <c:if test="${empty contentVO.main_image_path}">
+	        <label for="posterInput" class="upload-btn">이미지 추가</label>
+		</c:if>
+        <input type="file" name="main_image_file" id="posterInput" accept="image/*">
     </div>
 
     <!-- 포스터 미리보기 영역 -->
     <div class="poster-preview">
         <div class="poster-placeholder">
             <span id="posterText">대표 포스터를 업로드하세요</span>
-            <img id="posterPreviewImg" src="" alt="포스터 미리보기">
+            <img id="posterPreviewImg"
+			     src="<c:out value='${pageContext.request.contextPath}${contentVO.main_image_path}'/>"
+			     alt="포스터 미리보기"
+			     class="<c:if test='${not empty contentVO.main_image_path}'>show</c:if>">
         </div>
     </div>
     </section>
@@ -453,49 +269,41 @@
 
     <div class="form-group">
         <label>전시 소개</label><br>
-        <textarea name="description" placeholder="전시에 대한 간단한 소개를 입력하세요">${content.description}</textarea>
+        <textarea name="description" placeholder="전시에 대한 간단한 소개를 입력하세요">${contentVO.description}</textarea>
     </div>
 
     <div class="form-row">
         <div class="form-group">
-            <label>관람료</label>
+            <label>관람료 *</label>
             <div>
-                <span>성인</span><input type="number" name="adult_price" placeholder="0" value="${content.adult_price}">원
+                <span>성인</span><input type="number" name="adult_price" placeholder="0" value="${contentVO.adult_price}" required>원
             </div>
             <div>
-                <span>청소년</span><input type="number" name="teen_price" placeholder="0" value="${content.teen_price}">원
+                <span>청소년</span><input type="number" name="teen_price" placeholder="0" value="${contentVO.teen_price}" required>원
             </div>
             <div>
-                <span>유아</span><input type="number" name="child_price" placeholder="0" value="${content.child_price}">원
+                <span>유아</span><input type="number" name="child_price" placeholder="0" value="${contentVO.child_price}" required>원
             </div>
         </div>
 
         <div class="form-group">
             <div>
-                <span>월~목</span>
+            <br><br><br><br>
                 <label>운영 시간</label>
-                <input type="text" name="content_time_weekday" placeholder="00:00 ~ 00:00" value="${content.content_time}">
-            </div>
-            <div>
-                <span>금~일</span>
-                <label>운영 시간</label>
-                <input type="text" name="content_time_weekend" placeholder="00:00 ~ 00:00" value="${content.content_time}">
+                <input type="text" name="content_time" placeholder="00:00 ~ 00:00" value="${contentVO.content_time}">
             </div>
         </div>
     </div>
     </section>
 
-    
 
     <!-- 상세 소개 (에디터) -->
     <section class="form-section">
-    <h2>상세 소개 (에디터)</h2>
-    <hr>
-
-    <!-- 네이버 에디터 placeholder -->
-    <div class="editor-placeholder">
-        네이버 스마트 에디터 영역 -> 수업내용 reply -> edit.jsp 참고
-    </div>
+	    <h2>상세 소개</h2>
+	    <hr>
+	
+	    <!-- 네이버 에디터 placeholder -->
+	    <textarea name="detail_description" id="detail_description" style="width:100%;">${contentVO.detail_description }</textarea>
     </section>
 
     <!-- 하단 버튼 -->
@@ -514,8 +322,58 @@
   </div>
 </div>
 
+<c:if test="${not empty contentVO.main_image_path}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const posterText = document.getElementById("posterText");
+            const posterImg  = document.getElementById("posterPreviewImg");
+
+            if (posterText) posterText.style.display = "none";
+            if (posterImg) posterImg.classList.add("show");
+            
+            if (isEdit) {
+                // 시간대 input 수정 불가
+                document.querySelectorAll('#scheduleList input[name="Time[]"]').forEach(input => {
+                    input.readOnly = true;
+                    input.classList.add('readonly');
+                });
+
+                // 시간대 추가 버튼 비활성화
+                const addBtn = document.getElementById("addScheduleBtn");
+                if (addBtn) {
+                    addBtn.disabled = true;
+                    addBtn.style.opacity = "0.5";
+                    addBtn.style.cursor = "not-allowed";
+                }
+
+                // 시간대 삭제 버튼 비활성화
+                document.querySelectorAll('#scheduleList .remove-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.5";
+                    btn.style.cursor = "not-allowed";
+                });
+
+                // 시간당 티켓 수 수정 불가
+                const totalTicketInput = document.querySelector('input[name="total_ticket"]');
+                if (totalTicketInput) {
+                    totalTicketInput.readOnly = true;
+                    totalTicketInput.classList.add('readonly');
+                }
+            }
+
+        });
+    </script>
+</c:if>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+	
+	//수정 모드 + 시간대 전시면 내용 불러옴
+	const hasSchedule = ${not empty scheduleList};
+	if(hasSchedule) {
+		document.getElementById("schedule-visual").style.display = "block";
+	}
+	
     // 뒤로가기 버튼
     const backBtn = document.querySelector('.back-btn');
     if (backBtn) {
@@ -535,6 +393,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    //상시 버튼에 따라 숨기기
+    document.querySelectorAll('input[name="reservation_type"]').forEach(radio => {
+        radio.addEventListener("change", () => {
+            document.getElementById("schedule-visual").style.display =
+                radio.value === "true" ? "block" : "none";
+        });
+    });
+
+    //5개 이상 시 버튼 비활성화
+    function updateAddButtonState() {
+        const btn = document.getElementById("addScheduleBtn");
+        const count = document.getElementById("scheduleList").children.length;
+
+        btn.disabled = count >= 5;
+    }
+    
+    // 스케줄 추가 버튼
+    document.getElementById("addScheduleBtn").addEventListener("click", function () {
+        const scheduleList = document.getElementById("scheduleList");
+        const item = document.createElement("div");
+        item.className = "schedule-item";
+
+        item.innerHTML = `
+            <input type="text" name="Time[]" placeholder="시간대 (예 : 10:00 ~ 11:00)" required>
+            <button type="button" class="remove-btn">삭제</button>
+        `;
+
+        scheduleList.appendChild(item);
+        updateAddButtonState();
+    });
+
+    /* 삭제 버튼 (이벤트 위임) */
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-btn")) {
+            e.target.closest(".schedule-item").remove();
+            updateAddButtonState();
+        }
+    });
 
     // 포스터 이미지 업로드 미리보기
     const posterInput = document.getElementById('posterInput');
@@ -600,8 +496,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 필수 필드 검사
             const title = form.querySelector('input[placeholder="전시명을 입력하세요"]');
-            const location = form.querySelector('input[placeholder="전시 장소를 입력하세요"]');
-            const receiveMethod = form.querySelector('input[name="receive-method"]:checked');
+            const location = form.querySelector('input[name="location"]');
+            const receiveMethod = form.querySelector('input[name="reservation_type"]:checked');
 
             let isValid = true;
             let errorMessages = [];
@@ -641,7 +537,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 유효성 검사 통과 시 폼 제출
             if (confirm('전시를 등록하시겠습니까?')) {
-                form.submit();
+            	oEditors.getById["detail_description"].exec("UPDATE_CONTENTS_FIELD", []);
+            	 const reservation = document.querySelector('input[name="reservation_type"]:checked').value;
+
+            	    if (reservation === 'false') {
+            	        document.querySelector('input[name="total_ticket"]')?.remove();
+            	        document.querySelectorAll('input[name="Time[]"]').forEach(e => e.remove());
+            	    }
+            	document.getElementById("frm").submit();
             }
         });
     }
@@ -655,6 +558,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
 });
 </script>
 

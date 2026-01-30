@@ -2,4 +2,130 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.gotoday.vendor.VendorMapper">
 
+	<insert id="createContent" parameterType="kr.co.gotoday.content.ContentVO" 
+				useGeneratedKeys="true" keyProperty="content_id">
+		INSERT INTO content (
+			user_id, content_kind, category, location, title, description, reservation_type,
+			start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
+			is_active, is_delete, content_time, instagram_url, x_url, content_status, place_tag
+		) VALUES (
+			#{user_id}, #{content_kind}, #{category}, #{location}, #{title}, #{description}, #{reservation_type},
+			#{start_at}, #{end_at}, #{adult_price}, #{teen_price}, #{child_price}, #{main_image_path}, #{detail_description},
+			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}, #{place_tag}
+		)
+	</insert>
+	
+	<insert id="createSchedule" parameterType="kr.co.gotoday.content.ContentScheduleVO">
+		INSERT INTO content_schedule (
+			schedule_id, scheduled_at, time_zone, total_ticket, current_ticket, content_id 
+		) VALUES (
+			#{schedule_id}, #{scheduled_at}, #{time_zone}, #{total_ticket}, #{current_ticket}, #{content_id}
+		)
+	</insert>
+	
+	<select id="selectContentList" parameterType="map" resultType="kr.co.gotoday.content.ContentVO">
+    SELECT
+	        content_id, user_id, content_kind, category, location, title, description, reservation_type,
+	        start_at, end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
+	        is_active, is_delete, content_time, instagram_url, x_url, place_tag,
+	        CASE
+	            WHEN content_status = 'STATUS_REQUESTED' THEN 'STATUS_REQUESTED'
+	            WHEN content_status = 'STATUS_REJECTED' THEN 'STATUS_REJECTED'
+	            WHEN content_status = 'STATUS_APPROVAL' AND <![CDATA[NOW() < start_at]]> THEN 'STATUS_SCHEDULED'
+	            WHEN content_status = 'STATUS_APPROVAL' AND <![CDATA[NOW() BETWEEN start_at AND end_at]]> THEN 'STATUS_OPEN'
+	            WHEN content_status = 'STATUS_APPROVAL' AND <![CDATA[NOW() > end_at]]> THEN 'STATUS_CLOSED'
+	        END AS content_status
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0 AND is_active = 1
+	    <if test="keyword != null and keyword != ''">
+	        AND title LIKE CONCAT('%', #{keyword}, '%')
+	    </if>
+	    <if test="status != null and status != ''">
+	        AND (
+	            (content_status IN ('STATUS_REQUESTED','STATUS_REJECTED') AND content_status = #{status})
+	            OR
+	            (content_status = 'STATUS_APPROVAL' AND
+	                CASE
+	                    WHEN <![CDATA[NOW() < start_at]]> THEN 'STATUS_SCHEDULED'
+	                    WHEN <![CDATA[NOW() BETWEEN start_at AND end_at]]> THEN 'STATUS_OPEN'
+	                    WHEN <![CDATA[NOW() > end_at]]> THEN 'STATUS_CLOSED'
+	                END = #{status}
+	            )
+	        )
+	    </if>	
+	    ORDER BY content_id DESC
+	    LIMIT #{offset}, #{pageSize}
+	</select>
+	
+	<select id="selectContentListCount" parameterType="map" resultType="int">
+    SELECT COUNT(*)
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0 AND is_active = 1
+	    <if test="keyword != null and keyword != ''">
+	        AND title LIKE CONCAT('%', #{keyword}, '%')
+	    </if>
+	    <if test="status != null and status != ''">
+	        AND (
+	            (content_status IN ('STATUS_REQUESTED','STATUS_REJECTED') AND content_status = #{status})
+	            OR
+	            (content_status = 'STATUS_APPROVAL' AND
+	                CASE
+	                    WHEN <![CDATA[NOW() < start_at]]> THEN 'STATUS_SCHEDULED'
+	                    WHEN <![CDATA[NOW() BETWEEN start_at AND end_at]]> THEN 'STATUS_OPEN'
+	                    WHEN <![CDATA[NOW() > end_at]]> THEN 'STATUS_CLOSED'
+	                END = #{status}
+	            )
+	        )
+	    </if>	
+	    ORDER BY content_id DESC
+	</select>
+	
+	<select id="selectAllContentForFilter" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
+	    SELECT content_id, title
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0
+	      AND is_active = 1
+	    ORDER BY content_id DESC
+	</select>
+	
+	<select id="selectContentOne" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
+		SELECT content_id, user_id, content_kind, category, location, title, description, reservation_type,
+			DATE(start_at) AS start_at, DATE(end_at) AS end_at, adult_price, teen_price, child_price, main_image_path, detail_description,
+			is_active, is_delete, content_time, instagram_url, x_url, content_status, place_tag
+		FROM content WHERE content_id = #{content_id}
+	</select>
+	
+	<select id="selectContentScheduleList" parameterType="int" resultType="kr.co.gotoday.content.ContentScheduleVO">
+		SELECT * FROM content_schedule WHERE content_id = #{content_id}
+	</select>
+
+	<update id="updateContent" parameterType="kr.co.gotoday.content.ContentVO">
+		UPDATE content
+		<set>
+			title = #{title},
+	        location = #{location},
+	        category = #{category},
+	        place_tag = #{place_tag},
+	        reservation_type = #{reservation_type},
+	        start_at = #{start_at},
+	        end_at = #{end_at},
+	        description = #{description},
+	        adult_price = #{adult_price},
+	        teen_price = #{teen_price},
+	        child_price = #{child_price},
+	        detail_description = #{detail_description},
+	        content_time = #{content_time},
+	        instagram_url = #{instagram_url},
+	        x_url = #{x_url},
+	        content_status = #{content_status},
+	        is_active = #{is_active},
+	        is_delete = #{is_delete},
+	        place_tag = #{place_tag}
+		WHERE content_id = #{content_id}	
+		</set> 
+	</update>
+
 </mapper>
