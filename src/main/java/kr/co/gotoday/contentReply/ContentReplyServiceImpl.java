@@ -1,19 +1,13 @@
 package kr.co.gotoday.contentReply;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import kr.co.gotoday.user.UserMapper;
 import kr.co.gotoday.user.UserVO;
@@ -45,7 +39,6 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	//답변해줌 (vendor)
 	@Override
 	public int vendorCreate(ContentReplyVO vo) {
-		// TODO Auto-generated method stub
 		//벤더가 insert
 		return contentReplyMapper.insertVendorQA(vo);
 	}
@@ -53,7 +46,6 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	//업데이트
 	@Override
 	public int updateQA(ContentReplyVO vo) {
-		// TODO Auto-generated method stub
 		return contentReplyMapper.updateReply(vo);
 		
 	}
@@ -64,7 +56,6 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	@Override
 	public int deleteQA(ContentReplyVO vo) {
 		List<ContentReplyVO> detailList = contentReplyMapper.showDetail(vo.getCreply_id());
-		// TODO Auto-generated method stub
 		if (detailList == null || detailList.isEmpty()) {
 	        return 0; // 이미 삭제된 글이거나 존재하지 않는 경우
 	    }
@@ -97,27 +88,23 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	//게시물 유저별 보여주기 
 	@Override
 	public List<ContentReplyVO> showQAByID(int user_id) {
-		// TODO Auto-generated method stub
 		return contentReplyMapper.selectQAByID(user_id);
 	}
 
 	//게시물 전체 보여주기 
 	@Override
 	public List<ContentReplyVO> showQAALL(int content_id) {
-		// TODO Auto-generated method stub
 		return contentReplyMapper.selectAllQA(content_id);
 	}
 	
 	//게시물 갯수 보여주기 
 	@Override
 	public int CountQA(int content_id) {
-		// TODO Auto-generated method stub
 		return CountQA(content_id);
 	}
 
 	@Override
 	public List<ContentReplyVO> showDetailByID(int creply_id) {
-		// TODO Auto-generated method stub
 		return contentReplyMapper.showDetail(creply_id);
 	}
 
@@ -129,13 +116,63 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 
 	@Override
 	public int updateStatus(int gno) {
-		// TODO Auto-generated method stub
 		
 		return contentReplyMapper.updateReplyStatus(gno, 1);
 	}
 
 
+  
+	@Override
+	public List<ContentReplyVO> selectQuestionPage(int content_id, int offset, int limit) {
+
+	    // 1) 질문 목록 조회 (nested=0)
+	    List<ContentReplyVO> questions =
+	        contentReplyMapper.selectQuestionPage(content_id, offset, limit);
+
+	    if (questions.isEmpty()) return questions;
+
+	    // 2) 질문들의 gno 수집 (리스트 이름도 gno로)
+	    List<Integer> gno = questions.stream()
+	        .map(ContentReplyVO::getGno)
+	        .distinct()
+	        .collect(Collectors.toList());
+
+	    // 3) 답글들 조회 (nested=1 AND gno IN (...))
+	    List<ContentReplyVO> answers =
+	        contentReplyMapper.selectAnswersByGno(gno);
+
+	    // 4) gno 기준으로 답글 그룹핑 (질문 1개당 답글 여러 개)
+	    Map<Integer, List<ContentReplyVO>> answerMap =
+	        answers.stream().collect(Collectors.groupingBy(ContentReplyVO::getGno));
+
+	    // 5) 질문에 답글 리스트 세팅
+	    for (ContentReplyVO q : questions) {
+	        q.setAnswers(answerMap.getOrDefault(q.getGno(), Collections.emptyList()));
+	    }
+
+	    return questions;
+	}
+
+	@Override
+	public int countQuestion(int content_id) {
+	    return contentReplyMapper.countQuestion(content_id);
+	}
+
+	@Override
+	public List<ContentReplyVO> selectAnswersByGno(List<Integer> gno) {
+	    if (gno == null || gno.isEmpty()) return Collections.emptyList();
+	    return contentReplyMapper.selectAnswersByGno(gno);
+	}
+
+	
+	
+	
+	
+	
+}
+
+
 	
 
 	
-}
+

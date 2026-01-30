@@ -86,6 +86,21 @@
     
     /* 호버 효과 */
     .custom-table tbody tr:hover { background-color: #f9fdff; }
+    
+    .pagination button{
+  border:1px solid #ddd;
+  background:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:13px;
+}
+.pagination button[disabled]{
+  background:#f5f5f5;
+  cursor:default;
+  color:#999;
+}
+    
 </style>
 </head>
 <body>
@@ -108,8 +123,8 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty list}">
-                            <c:forEach var="item" items="${list}">
+                        <c:when test="${not empty inquiryList}">
+                            <c:forEach var="item" items="${inquiryList}">
                                 <tr>
                                     <td>
                                      <c:if test="${item.nested==0}">
@@ -185,6 +200,49 @@
                     </c:choose>
                 </tbody>
             </table>
+            
+            <%-- 페이지네이션: inquiryPageInfo 라는 이름으로 내려온다고 가정 --%>
+<c:if test="${not empty inquiryPageInfo and inquiryPageInfo.totalPage > 1}">
+  <div class="pagination" style="display:flex;justify-content:center;gap:8px;padding:18px 0 0;">
+    
+    <c:if test="${inquiryPageInfo.prev}">
+      <c:url var="prevUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${inquiryPageInfo.startPage - 1}"/>
+      </c:url>
+<button type="button" class="inquiry-page" data-page="${inquiryPageInfo.startPage - 1}">이전</button>
+    </c:if>
+
+    <c:forEach var="p" begin="${inquiryPageInfo.startPage}" end="${inquiryPageInfo.endPage}">
+      <c:url var="pUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${p}"/>
+      </c:url>
+
+      <c:choose>
+        <c:when test="${p == inquiryPageInfo.page}">
+          <button type="button" disabled>${p}</button>
+        </c:when>
+        <c:otherwise>
+  <button type="button"
+          class="inquiry-page"
+          data-page="${p}">
+    ${p}
+  </button>        </c:otherwise>
+      </c:choose>
+    </c:forEach>
+
+    <c:if test="${inquiryPageInfo.next}">
+      <c:url var="nextUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${inquiryPageInfo.endPage + 1}"/>
+      </c:url>
+<button type="button" class="inquiry-page" data-page="${inquiryPageInfo.endPage + 1}">다음</button>
+    </c:if>
+
+  </div>
+</c:if>
+            
         </div>
     </div>
 
@@ -199,7 +257,7 @@
     	var content_id= $("#content_id").val();
     	if(!content_id) {
             // 부모창에 id="content_id"가 없을 경우를 대비한 2차 시도
-            content_id = "${list[0].content_id}"; 
+            content_id = "${inquiryList[0].content_id}"; 
         }
 
         if(!content_id) {

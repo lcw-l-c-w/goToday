@@ -25,7 +25,6 @@ public class ContentServiceImpl implements ContentService {
 
 	@Override
 	public List<MainContentViewDTO> getRandomContents(MainContentDTO mcd) {
-		// TODO Auto-generated method stub
 		// service가 정책 메서드를 호출하지 않고 viewDTO를 반환하면 안됨 .
 		// Mapper는 contentVO 반환
 		// Service에서 viewDTO 변환
@@ -38,7 +37,6 @@ public class ContentServiceImpl implements ContentService {
 
 	@Override
 	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
-		// TODO Auto-generated method stub
 		List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
 		//System.out.println("리스트 출력"+list);
 		return list.stream().map(vo -> applyViewPolicy(vo, mcd)).collect(Collectors.toList());

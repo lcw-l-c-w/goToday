@@ -35,12 +35,14 @@ public class ContentController {
 			@PathVariable("content_id") int content_id, 
 			@RequestParam(defaultValue = "1") int page,
 			@RequestParam(defaultValue = "latest") String sortType,
+			@RequestParam(required = false) String tab,
+
 			HttpSession session) {
 	
 		UserVO user = (UserVO) session.getAttribute("loginSess");
 
 		//기업회원이면 그냥 내보냅시다요 
-			
+		
 		
 		Integer user_id = (user != null) ? user.getUser_id() : null;
 		//content 
@@ -52,6 +54,8 @@ public class ContentController {
 	        result.setLiked(like); // VO에 결과 담기
 	       
 	    }
+		
+		
 		
 		
 		

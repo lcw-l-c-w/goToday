@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>GoToday - Exhibition</title>
-<!-- ✅ exhibition 전용 CSS -->
+<!--  exhibition 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/css/exhibition.css'/>">
 </head>
 <body>

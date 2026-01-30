@@ -6,7 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>POPUP</title>
-<!-- ✅ popup 전용 CSS -->
+<!--  popup 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/css/popup.css'/>">
 </head>
 <body>
