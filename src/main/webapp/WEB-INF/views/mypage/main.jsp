@@ -11,6 +11,7 @@
 body { f
 	ont-family: 'Pretendard', sans-serif; 
 	background-color: #ffffff;
+	 /* overflow: hidden; */
 }
 
 .container {
