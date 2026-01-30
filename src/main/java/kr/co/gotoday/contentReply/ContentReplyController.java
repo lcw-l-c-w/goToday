@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContentReplyController {
 
+	@Value("${upload.path}")
+	private String uploadPath;
 	// 주입
 	private final ContentReplyService contentReplyService;
 	private final ContentService contentService;
@@ -87,7 +90,7 @@ public class ContentReplyController {
 		if (file != null && !file.isEmpty()) {
 			try {
 				// 1. 저장할 절대 경로 설정 (webapp/resources/upload/inquiry/)
-				String uploadPath = request.getServletContext().getRealPath("/resources/upload/inquiry/");
+				 uploadPath += "/inquiry/";
 				File folder = new File(uploadPath);
 				if (!folder.exists())
 					folder.mkdirs(); // 폴더가 없으면 생성
