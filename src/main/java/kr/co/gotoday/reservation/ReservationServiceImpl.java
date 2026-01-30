@@ -330,7 +330,7 @@ public class ReservationServiceImpl implements ReservationService{
 
 	@Override
 	public Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page) {
-		final int PAGE_SIZE = 5;
+		final int PAGE_SIZE = 10;
 		final int BLOCK_SIZE = 5;
 
 		Map<String, Object> param = new HashMap<>();
