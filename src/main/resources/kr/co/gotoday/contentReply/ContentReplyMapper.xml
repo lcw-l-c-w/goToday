@@ -168,4 +168,36 @@ SELECT *
 FROM content_reply
 WHERE creply_id=#{creply_id} AND user_id=#{user_id}
 </select>
+
+<select id="countQuestion" resultType="int">
+  SELECT COUNT(*)
+  FROM content_reply
+  WHERE content_id = #{content_id}
+    AND nested = 0
+</select>
+
+<select id="selectQuestionPage"
+        resultType="kr.co.gotoday.contentReply.ContentReplyVO">
+  SELECT *
+  FROM content_reply
+  WHERE content_id = #{content_id}
+    AND nested = 0
+  ORDER BY gno DESC, ono ASC
+  LIMIT #{offset}, #{limit}
+</select>
+
+<select id="selectAnswersByGno"
+        resultType="kr.co.gotoday.contentReply.ContentReplyVO">
+  SELECT *
+  FROM content_reply
+  WHERE nested = 1
+    AND gno IN
+    <foreach collection="gno" item="x" open="(" separator="," close=")">
+      #{x}
+    </foreach>
+  ORDER BY gno DESC, ono ASC
+</select>
+
+
+
 </mapper>
