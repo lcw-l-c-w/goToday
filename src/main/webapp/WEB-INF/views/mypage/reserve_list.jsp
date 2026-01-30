@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html id="top">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>예약 관리 | GoToday</title>
@@ -10,38 +10,34 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-<h1 class="page-title">예약 관리</h1>
-<div class="container">
-	<div class="page-header">
-	    <div class="filter-bar">
-	        <a class="filter-btn ticket-btn ${currentFilter eq 'ALL' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservation?filter=ALL">
-	            전체
-	        </a>
-	
-	        <a class="filter-btn ticket-btn ${currentFilter eq 'UPCOMING' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservation?filter=UPCOMING">
-	            이용 예정
-	        </a>
-	
-	        <a class="filter-btn ticket-btn ${currentFilter eq 'VISITED' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservation?filter=VISITED">
-	            이용 완료
-	        </a>
-
-	        <a class="filter-btn ticket-btn ${currentFilter eq 'END' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservation?filter=END">
-	            종료된 내역
-	        </a>
-	
-	        <a class="filter-btn ticket-btn ${currentFilter eq 'CANCELED' ? 'active' : ''}"
-	           href="${pageContext.request.contextPath}/mypage/reservation?filter=CANCELED">
-	            예약 취소
-	        </a>
-	        
-	    </div>
+<!-- 고정 헤더 영역 -->
+<div class="fixed-header">
+	<h1 class="page-title">예약 관리</h1>
+	<div class="filter-bar">
+		<a class="filter-btn ticket-btn ${currentFilter eq 'ALL' ? 'active' : ''}"
+		   href="${pageContext.request.contextPath}/mypage/reservation?filter=ALL">
+			전체
+		</a>
+		<a class="filter-btn ticket-btn ${currentFilter eq 'UPCOMING' ? 'active' : ''}"
+		   href="${pageContext.request.contextPath}/mypage/reservation?filter=UPCOMING">
+			이용 예정
+		</a>
+		<a class="filter-btn ticket-btn ${currentFilter eq 'VISITED' ? 'active' : ''}"
+		   href="${pageContext.request.contextPath}/mypage/reservation?filter=VISITED">
+			이용 완료
+		</a>
+		<a class="filter-btn ticket-btn ${currentFilter eq 'END' ? 'active' : ''}"
+		   href="${pageContext.request.contextPath}/mypage/reservation?filter=END">
+			종료된 내역
+		</a>
+		<a class="filter-btn ticket-btn ${currentFilter eq 'CANCELED' ? 'active' : ''}"
+		   href="${pageContext.request.contextPath}/mypage/reservation?filter=CANCELED">
+			예약 취소
+		</a>
 	</div>
+</div>
 
+<div class="container">
 	<div class="list-wrapper">
 		<c:choose>
 			<c:when test="${empty reservationList}">
@@ -145,13 +141,17 @@
 		</c:choose>
 	</div>
 
-	<!-- 페이징 -->
+	</div>
+</div>
+
+<!-- 고정 푸터 영역 (페이징) -->
+<div class="fixed-footer">
 	<c:if test="${pageInfo.totalPage > 1}">
 		<div class="pagination">
 			<%-- 이전 블록 --%>
 			<c:choose>
 				<c:when test="${pageInfo.prev}">
-					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}#top" class="prev">&laquo;</a>
+					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}" class="prev">&laquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="prev disabled">&laquo;</span>
@@ -165,7 +165,7 @@
 						<span class="active">${i}</span>
 					</c:when>
 					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}#top">${i}</a>
+						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}">${i}</a>
 					</c:otherwise>
 				</c:choose>
 			</c:forEach>
@@ -173,7 +173,7 @@
 			<%-- 다음 블록 --%>
 			<c:choose>
 				<c:when test="${pageInfo.next}">
-					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}#top" class="next">&raquo;</a>
+					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}" class="next">&raquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="next disabled">&raquo;</span>
@@ -266,9 +266,18 @@
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/review/write.js"></script>
 <script>
+	// 브라우저 스크롤 복원 비활성화
+	if (history.scrollRestoration) {
+		history.scrollRestoration = 'manual';
+	}
+	// 부모 창 스크롤 초기화
+	if (window.parent) {
+		window.parent.scrollTo(0, 0);
+	}
+
 	$(function() {
-		// 페이지 로드 시 맨 위로 스크롤
-		window.scrollTo(0, 0);
+		// 컨테이너 스크롤 위치 초기화
+		$(".container").scrollTop(0);
 
 		$(".info-btn").click(
 				function() {
@@ -305,24 +314,294 @@
 		let currentOrderId = null;
 		let currentPaymentMethod = null;
 		let currentPaymentStatus = null;
+		let cancelOverlay = null;
 
-		const $cancelModal = $("#cancelModal");
-		const $refundSection = $("#refundAccountSection");
-		const $bankSelect = $("#refundBankSelect");
-		const $bankManual = $("#refundBankManual");
+		// 부모 창에 모달 열기
+		function openCancelModal() {
+			const parentDoc = window.parent.document;
+			const parentBody = parentDoc.body;
 
-		// 은행 입력 방식 토글
-		$("input[name='bankInputType']").change(function() {
-			if ($(this).val() === "select") {
-				$bankSelect.show();
-				$bankManual.hide().val("");
-			} else {
-				$bankSelect.hide().val("");
-				$bankManual.show();
+			// 기존 오버레이가 있으면 제거
+			const existingOverlay = parentDoc.getElementById('cancelModalOverlay');
+			if (existingOverlay) {
+				existingOverlay.remove();
 			}
-		});
 
-		// 모달 열기
+			// 오버레이 생성
+			cancelOverlay = parentDoc.createElement('div');
+			cancelOverlay.id = 'cancelModalOverlay';
+			cancelOverlay.style.cssText = `
+				display: flex;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				background: rgba(0, 0, 0, 0.7);
+				z-index: 99999;
+				justify-content: center;
+				align-items: center;
+			`;
+
+			// 모달 컨텐츠 복사
+			const original = document.getElementById('cancelModal');
+			const modalClone = original.querySelector('.cancel-modal').cloneNode(true);
+
+			cancelOverlay.appendChild(modalClone);
+			parentBody.appendChild(cancelOverlay);
+
+			// 스타일 추가
+			addCancelModalStyles(parentDoc);
+
+			// 폼 초기화
+			const reasonInput = cancelOverlay.querySelector('#cancelReason');
+			const refundSection = cancelOverlay.querySelector('#refundAccountSection');
+			const bankSelect = cancelOverlay.querySelector('#refundBankSelect');
+			const bankManual = cancelOverlay.querySelector('#refundBankManual');
+
+			reasonInput.value = "단순 변심";
+			cancelOverlay.querySelector('#refundAccountNumber').value = "";
+			cancelOverlay.querySelector('#refundHolderName').value = "";
+			bankSelect.value = "";
+			bankManual.value = "";
+
+			// 은행 선택 라디오 초기화
+			const selectRadio = cancelOverlay.querySelector("input[name='bankInputType'][value='select']");
+			selectRadio.checked = true;
+			bankSelect.style.display = "block";
+			bankManual.style.display = "none";
+
+			// 가상계좌 섹션 표시 여부
+			if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
+				refundSection.style.display = "block";
+			} else {
+				refundSection.style.display = "none";
+			}
+
+			// 이벤트 바인딩
+			bindCancelModalEvents(cancelOverlay);
+		}
+
+		// 모달 닫기
+		function closeCancelModal() {
+			if (cancelOverlay) {
+				cancelOverlay.remove();
+				cancelOverlay = null;
+			}
+		}
+
+		// 스타일 추가
+		function addCancelModalStyles(parentDoc) {
+			if (parentDoc.getElementById('cancelModalStyles')) return;
+
+			const style = parentDoc.createElement('style');
+			style.id = 'cancelModalStyles';
+			style.textContent = `
+				#cancelModalOverlay .cancel-modal {
+					background: #fff;
+					border-radius: 12px;
+					width: 90%;
+					max-width: 420px;
+					box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+					overflow: hidden;
+					font-family: 'Pretendard', sans-serif;
+				}
+				#cancelModalOverlay .cancel-modal-header {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					padding: 18px 20px;
+					border-bottom: 1px solid #eee;
+				}
+				#cancelModalOverlay .cancel-modal-header h3 {
+					margin: 0;
+					font-size: 18px;
+					font-weight: 600;
+				}
+				#cancelModalOverlay .cancel-modal-close {
+					background: none;
+					border: none;
+					font-size: 24px;
+					cursor: pointer;
+					color: #999;
+					padding: 0;
+					line-height: 1;
+				}
+				#cancelModalOverlay .cancel-modal-body {
+					padding: 20px;
+				}
+				#cancelModalOverlay .cancel-form-group {
+					margin-bottom: 16px;
+				}
+				#cancelModalOverlay .cancel-form-group label {
+					display: block;
+					margin-bottom: 6px;
+					font-size: 14px;
+					font-weight: 500;
+					color: #333;
+				}
+				#cancelModalOverlay .cancel-form-group input[type="text"],
+				#cancelModalOverlay .cancel-form-group select {
+					width: 100%;
+					padding: 10px 12px;
+					border: 1px solid #ddd;
+					border-radius: 6px;
+					font-size: 14px;
+					box-sizing: border-box;
+				}
+				#cancelModalOverlay .bank-input-toggle {
+					display: flex;
+					gap: 16px;
+					margin-bottom: 10px;
+				}
+				#cancelModalOverlay .radio-label {
+					display: flex;
+					align-items: center;
+					gap: 6px;
+					font-size: 14px;
+					cursor: pointer;
+				}
+				#cancelModalOverlay .cancel-modal-footer {
+					display: flex;
+					justify-content: flex-end;
+					gap: 10px;
+					padding: 16px 20px;
+					border-top: 1px solid #eee;
+					background: #f9f9f9;
+				}
+				#cancelModalOverlay .cancel-modal-btn {
+					padding: 10px 20px;
+					border: none;
+					border-radius: 6px;
+					font-size: 14px;
+					font-weight: 500;
+					cursor: pointer;
+				}
+				#cancelModalOverlay .cancel-modal-btn-secondary {
+					background: #e9e9e9;
+					color: #333;
+				}
+				#cancelModalOverlay .cancel-modal-btn-primary {
+					background: #dc3545;
+					color: #fff;
+				}
+			`;
+			parentDoc.head.appendChild(style);
+		}
+
+		// 이벤트 바인딩
+		function bindCancelModalEvents(overlay) {
+			const closeBtn = overlay.querySelector('.cancel-modal-close');
+			const cancelBtn = overlay.querySelector('#cancelModalClose');
+			const confirmBtn = overlay.querySelector('#cancelModalConfirm');
+			const bankRadios = overlay.querySelectorAll("input[name='bankInputType']");
+			const bankSelect = overlay.querySelector('#refundBankSelect');
+			const bankManual = overlay.querySelector('#refundBankManual');
+
+			// 닫기 버튼
+			closeBtn.addEventListener('click', closeCancelModal);
+			cancelBtn.addEventListener('click', closeCancelModal);
+
+			// 오버레이 클릭 시 닫기
+			overlay.addEventListener('click', function(e) {
+				if (e.target === overlay) {
+					closeCancelModal();
+				}
+			});
+
+			// 은행 입력 방식 토글
+			bankRadios.forEach(function(radio) {
+				radio.addEventListener('change', function() {
+					if (this.value === "select") {
+						bankSelect.style.display = "block";
+						bankManual.style.display = "none";
+						bankManual.value = "";
+					} else {
+						bankSelect.style.display = "none";
+						bankSelect.value = "";
+						bankManual.style.display = "block";
+					}
+				});
+			});
+
+			// 예약 취소 확인 버튼
+			confirmBtn.addEventListener('click', function() {
+				const reason = overlay.querySelector("#cancelReason").value.trim();
+				if (!reason) {
+					alert("취소 사유를 입력해주세요.");
+					return;
+				}
+
+				let accountNumber = null;
+				let bank = null;
+				let holderName = null;
+
+				if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
+					accountNumber = overlay.querySelector("#refundAccountNumber").value.trim();
+					holderName = overlay.querySelector("#refundHolderName").value.trim();
+					const bankInputType = overlay.querySelector("input[name='bankInputType']:checked").value;
+					if (bankInputType === "select") {
+						bank = bankSelect.value;
+					} else {
+						bank = bankManual.value.trim();
+					}
+					if (!accountNumber || !bank || !holderName) {
+						alert("환불 계좌 정보를 모두 입력해주세요.");
+						return;
+					}
+				}
+
+				if (!confirm("정말 예약을 취소하시겠습니까?")) return;
+
+				closeCancelModal();
+
+				if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
+					$.ajax({
+						url: "${pageContext.request.contextPath}/payment/account/refund.do",
+						type: "POST",
+						contentType: "application/json",
+						data: JSON.stringify({
+							orderId: currentOrderId,
+							reason: reason,
+							accountNumber: accountNumber,
+							bank: bank,
+							holderName: holderName
+						}),
+						success: function (res) {
+							if (res.success) {
+								alert(res.msg);
+								location.reload();
+							} else {
+								alert(res.msg);
+							}
+						},
+						error: function () {
+							alert("시스템 오류가 발생했습니다. 관리자에게 문의하세요.");
+						}
+					});
+				} else {
+					$.ajax({
+						url: "${pageContext.request.contextPath}/payment/cancel.do",
+						type: "POST",
+						contentType: "application/json",
+						data: JSON.stringify({ orderId: currentOrderId, reason: reason}),
+						success: function (res) {
+							if (res.success) {
+								alert(res.msg);
+								location.reload();
+							} else {
+								alert(res.msg);
+							}
+						},
+						error: function () {
+							alert("시스템 오류가 발생했습니다. 관리자에게 문의하세요.");
+						}
+					});
+				}
+			});
+		}
+
+		// 모달 열기 버튼 클릭
 		$(".cancel-btn").click(function () {
 			currentOrderId = $(this).data("order-id");
 			if (!currentOrderId) {
@@ -333,120 +612,7 @@
 			currentPaymentMethod = $(this).data("payment-method");
 			currentPaymentStatus = $(this).data("payment-status");
 
-			// 폼 초기화
-			$("#cancelReason").val("단순 변심");
-			$("#refundAccountNumber").val("");
-			$("#refundHolderName").val("");
-			$bankSelect.val("");
-			$bankManual.val("");
-			$("input[name='bankInputType'][value='select']").prop("checked", true).trigger("change");
-
-			// 가상계좌 + 결제완료 상태면 환불계좌 섹션 표시
-			if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
-				$refundSection.show();
-			} else {
-				$refundSection.hide();
-			}
-
-			$cancelModal.addClass("show");
-		});
-
-		// 모달 닫기
-		$(".cancel-modal-close, #cancelModalClose").click(function() {
-			$cancelModal.removeClass("show");
-		});
-
-		// 모달 외부 클릭 시 닫기
-		$cancelModal.click(function(e) {
-			if ($(e.target).hasClass("cancel-modal-overlay")) {
-				$cancelModal.removeClass("show");
-			}
-		});
-
-		// 예약 취소 확인
-		$("#cancelModalConfirm").click(function() {
-			const reason = $("#cancelReason").val().trim();
-			if (!reason) {
-				alert("취소 사유를 입력해주세요.");
-				return;
-			}
-
-			let accountNumber = null;
-			let bank = null;
-			let holderName = null;
-
-			// 가상계좌 + 결제완료 상태면 환불계좌 정보 필수
-			if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
-				accountNumber = $("#refundAccountNumber").val().trim();
-				holderName = $("#refundHolderName").val().trim();
-
-				// 은행명: select 또는 직접입력
-				const bankInputType = $("input[name='bankInputType']:checked").val();
-				if (bankInputType === "select") {
-					bank = $bankSelect.val();
-				} else {
-					bank = $bankManual.val().trim();
-				}
-
-				if (!accountNumber || !bank || !holderName) {
-					alert("환불 계좌 정보를 모두 입력해주세요.");
-					return;
-				}
-			}
-
-			if (!confirm("정말 예약을 취소하시겠습니까?")) return;
-
-			$cancelModal.removeClass("show");
-
-			if (currentPaymentMethod === "가상계좌" && currentPaymentStatus === "DONE") {
-				$.ajax({
-				    url: "${pageContext.request.contextPath}/payment/account/refund.do",
-				    type: "POST",
-				    contentType: "application/json",
-				    data: JSON.stringify({
-				    	orderId: currentOrderId,
-				    	reason: reason,
-				    	accountNumber: accountNumber,
-				    	bank: bank,
-				    	holderName: holderName
-				    }),
-				    success: function (res) {
-				        if (res.success) {
-				            alert(res.msg);
-				            location.reload();
-				        } else {
-				            alert(res.msg);
-				        }
-				    },
-				    error: function () {
-				        alert("시스템 오류가 발생했습니다. 관리자에게 문의하세요.");
-				    }
-				});
-
-			} else {
-				$.ajax({
-				    url: "${pageContext.request.contextPath}/payment/cancel.do",
-				    type: "POST",
-				    contentType: "application/json",
-				    data: JSON.stringify({ orderId: currentOrderId, reason: reason}),
-				    success: function (res) {
-				        // 성공 여부에 따라 분기 처리
-				        if (res.success) {
-				            // 진짜 취소 성공 시
-				            alert(res.msg); // "결제가 정상적으로 취소되었습니다."
-				            location.reload();
-				        } else {
-				            // 로직상 실패 (당일 취소 불가, 이미 취소됨 등)
-				            // 서버에서 보낸 e.getMessage()가 res.msg에 들어있음
-				            alert(res.msg); // "관람일 당일 및 지난 일정은 취소/환불이 불가합니다." 출력됨
-				        }
-				    },
-				    error: function () {
-				        // 이건 진짜 네트워크 에러나 404, 서버 다운일 때만 뜸
-				        alert("시스템 오류가 발생했습니다. 관리자에게 문의하세요.");
-				    }
-				});
-			}
+			openCancelModal();
 		});
 	});
 </script>
