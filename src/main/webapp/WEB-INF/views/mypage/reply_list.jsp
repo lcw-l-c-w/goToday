@@ -67,25 +67,26 @@ function getComment(page) {
 				</c:choose>
 			</tbody>
 		</table>
-
-		<div class="pagenate clear">
-			<ul class='paging'>
-				<%-- 이전 페이지 버튼 (<<) --%>
-				<c:if test="${vo.page > 1}">
-					<li><a href="javascript:getComment(${vo.page - 1})">&lt;&lt;</a></li>
-				</c:if>
-				<%-- 페이지 번호 목록 --%>
-				<c:forEach var="p" begin="${map.startPage}" end="${map.endPage}">
-					<li>
-						<a href="javascript:getComment(${p});" 
-						   <c:if test="${vo.page == p}">class='current'</c:if>>${p}</a>
-					</li>
-				</c:forEach>
-				<%-- 다음 페이지 버튼 (>>) --%>
-				<c:if test="${vo.page < map.totalPage}">
-					<li><a href="javascript:getComment(${vo.page + 1})">&gt;&gt;</a></li>
-				</c:if>
-			</ul>
+		<div class="fixed-footer">
+			<div class="pagenate clear">
+				<ul class='paging'>
+					<%-- 이전 페이지 버튼 (<<) --%>
+					<c:if test="${vo.page > 1}">
+						<li><a href="javascript:getComment(${vo.page - 1})">&lt;&lt;</a></li>
+					</c:if>
+					<%-- 페이지 번호 목록 --%>
+					<c:forEach var="p" begin="${map.startPage}" end="${map.endPage}">
+						<li>
+							<a href="javascript:getComment(${p});" 
+							   <c:if test="${vo.page == p}">class='current'</c:if>>${p}</a>
+						</li>
+					</c:forEach>
+					<%-- 다음 페이지 버튼 (>>) --%>
+					<c:if test="${vo.page < map.totalPage}">
+						<li><a href="javascript:getComment(${vo.page + 1})">&gt;&gt;</a></li>
+					</c:if>
+				</ul>
+			</div>
 		</div>
 	</div>
 </body>
