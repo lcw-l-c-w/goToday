@@ -10,8 +10,10 @@ import kr.co.gotoday.reply.ReplyVO;
 @Mapper
 public interface MypageMapper {
 	// 내가 좋아요 누른 콘텐츠 목록
-    List<MypageDTO> selectMyLikeList(@Param("user_id") Integer user_id);
+    List<MypageDTO> selectMyLikeList(@Param("user_id") Integer user_id,@Param("offset") int offset, @Param("pageSize") int pageSize);
  
+    //내가 좋아요 누른 콘텐츠 갯수 반환
+    int countLike(@Param("user_id") Integer user_id);
     // 내 Q&A 문의 목록
     List<ReplyVO> selectMyReplyList(ReplyVO vo);
     int countMyReplyList(@Param("user_id") int user_id);
@@ -28,4 +30,6 @@ public interface MypageMapper {
     List<MypageDTO> selectInquiryDetail(int creplyId);
     // 1:1 문의사항 답변
     MypageDTO selectInquiryAnswer(@Param("creply_id") int creply_id);
+    
+    
 }

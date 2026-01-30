@@ -41,7 +41,7 @@ public class ContentLikeServiceImpl implements ContentLikeService{
 		return vo;
 	}
 	@Override
-	public int CheckContentLike(Integer content_id, Integer user_id) {
+	public int checkContentLike(Integer content_id, Integer user_id) {
 		// TODO Auto-generated method stub
 		return contentLikeMapper.checkHeartExists(content_id, user_id);
 	}
