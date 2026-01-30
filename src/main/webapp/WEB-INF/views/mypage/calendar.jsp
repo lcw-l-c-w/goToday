@@ -44,7 +44,7 @@ body {
 #event-container {
 	padding: 20px;
 	border-left: 1px solid #ddd;
-	height: 100%;
+	height: 61vh;
 }
 
 .event-item {

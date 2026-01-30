@@ -9,92 +9,18 @@
     <title>GoToday | 문의사항</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<style>
-    :root {
-        --main-color: #4dc3ff;
-        --text-dark: #333;
-        --text-gray: #666;
-        --text-light: #999;
-        --border-color: #eee;
-        --bg-light: #fcfcfc;
-    }
-
-    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; color: var(--text-dark); }
-
-    .dynamic-list-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
-
-    /* 헤더 영역 */
-    .list-info-header { 
-        display: flex; justify-content: flex-end; /* 버튼만 우측 정렬 */
-        padding-bottom: 15px; margin-bottom: 0;
-    }
-
-    .btn-write {
-        padding: 10px 22px; background: var(--text-dark); color: #fff;
-        border-radius: 6px; font-weight: 600; font-size: 14px;
-        transition: 0.3s; border: none; cursor: pointer;
-    }
-    .btn-write:hover { background: #555; }
-
-    /* 테이블 스타일 */
-    .custom-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text-dark); }
-    
-    .custom-table th { 
-        background-color: #fcfcfc; padding: 16px 10px; text-align: center; 
-        color: #444; font-weight: 600; font-size: 14px; border-bottom: 1px solid #ddd;
-    }
-    
-    .custom-table td { 
-        padding: 18px 10px; text-align: center; border-bottom: 1px solid var(--border-color);
-        font-size: 15px; color: #555; vertical-align: middle;
-    }
-
-    /* 제목 영역 특화 */
-    .text-left { text-align: left !important; padding-left: 20px !important; }
-    .title-wrapper { display: flex; align-items: center; gap: 8px; }
-    .title-link { 
-        color: var(--text-dark); text-decoration: none; font-weight: 500; 
-        cursor: pointer; transition: color 0.2s;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .title-link:hover { color: var(--main-color); }
-
-    /* 답변 아이콘 & 비밀글 아이콘 */
-    .reply-icon { color: var(--text-light); font-size: 13px; font-weight: 400; }
-    .secret-icon { font-size: 12px; color: #ffb800; }
-
-    /* 배지(상태) 스타일 */
-    .badge {
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 70px; height: 26px; border-radius: 4px; font-size: 11px; font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .badge-waiting { background: #f5f5f5; color: #999; border: 1px solid #e0e0e0; }
-    .badge-done { background: #eaf7ff; color: #2b7fc2; border: 1px solid #cde9ff; }
-
-    /* 담당자 텍스트 스타일 */
-    .vendor-label { 
-        background: #f0f0f0; color: #777; padding: 2px 6px; 
-        border-radius: 3px; font-size: 12px; font-weight: 500; 
-    }
-
-    /* 빈 목록 */
-    .empty-msg { 
-        text-align: center; padding: 80px 0 !important; color: var(--text-light); 
-        background: var(--bg-light);
-    }
-    
-    /* 호버 효과 */
-    .custom-table tbody tr:hover { background-color: #f9fdff; }
-</style>
-</head>
+	<link rel="stylesheet" href="<c:url value='/css/inquiry_list.css'/>"> 
+	</head>
 <body>
     <div class="wrap">
         <div class="dynamic-list-container">
             <div class="list-info-header">
+          
+            <c:if test="${loginSess.role==0}">
                 <button type="button" class="btn-write" onclick="goWriteForm()" >문의하기</button>
-            </div>
-
+            
+			</c:if>
+			</div>
             <table class="custom-table">
                 <colgroup>
                     <col style="width: 110px;"> <col style="width: auto;">  <col style="width: 150px;"> <col style="width: 150px;"> </colgroup>
@@ -108,8 +34,8 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty list}">
-                            <c:forEach var="item" items="${list}">
+                        <c:when test="${not empty inquiryList}">
+                            <c:forEach var="item" items="${inquiryList}">
                                 <tr>
                                     <td>
                                      <c:if test="${item.nested==0}">
@@ -185,6 +111,49 @@
                     </c:choose>
                 </tbody>
             </table>
+            
+            <%-- 페이지네이션: inquiryPageInfo 라는 이름으로 내려온다고 가정 --%>
+<c:if test="${not empty inquiryPageInfo and inquiryPageInfo.totalPage > 1}">
+  <div class="pagination" style="display:flex;justify-content:center;gap:8px;padding:18px 0 0;">
+    
+    <c:if test="${inquiryPageInfo.prev}">
+      <c:url var="prevUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${inquiryPageInfo.startPage - 1}"/>
+      </c:url>
+<button type="button" class="inquiry-page" data-page="${inquiryPageInfo.startPage - 1}">이전</button>
+    </c:if>
+
+    <c:forEach var="p" begin="${inquiryPageInfo.startPage}" end="${inquiryPageInfo.endPage}">
+      <c:url var="pUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${p}"/>
+      </c:url>
+
+      <c:choose>
+        <c:when test="${p == inquiryPageInfo.page}">
+          <button type="button" disabled>${p}</button>
+        </c:when>
+        <c:otherwise>
+  <button type="button"
+          class="inquiry-page"
+          data-page="${p}">
+    ${p}
+  </button>        </c:otherwise>
+      </c:choose>
+    </c:forEach>
+
+    <c:if test="${inquiryPageInfo.next}">
+      <c:url var="nextUrl" value="/detail/${content_id}">
+        <c:param name="tab" value="inquiry"/>
+        <c:param name="inquiryPage" value="${inquiryPageInfo.endPage + 1}"/>
+      </c:url>
+<button type="button" class="inquiry-page" data-page="${inquiryPageInfo.endPage + 1}">다음</button>
+    </c:if>
+
+  </div>
+</c:if>
+            
         </div>
     </div>
 
@@ -199,7 +168,7 @@
     	var content_id= $("#content_id").val();
     	if(!content_id) {
             // 부모창에 id="content_id"가 없을 경우를 대비한 2차 시도
-            content_id = "${list[0].content_id}"; 
+            content_id = "${inquiryList[0].content_id}"; 
         }
 
         if(!content_id) {

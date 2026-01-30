@@ -20,6 +20,8 @@ node_modules/
 
 /src/main/resources/db.properties
 /src/main/resources/api.properties
+/src/main/resources/application.properties
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=eclipse

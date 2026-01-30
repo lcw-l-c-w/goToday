@@ -8,13 +8,13 @@
 <meta charset="UTF-8">
 <title>Search</title>
 
-<!-- ✅ search 전용 CSS -->
+<!--  search 전용 CSS -->
 <link rel="stylesheet" href="<c:url value='/css/search.css'/>">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body>
 
-<!-- ✅ 공통 네비바 -->
+<!--  공통 네비바 -->
 	<%@ include file="/WEB-INF/views/common/header.jsp" %>
 	<%@ include file="/WEB-INF/views/common/recentViewed.jspf" %>
 	
@@ -139,7 +139,7 @@
        				href="${pageContext.request.contextPath}/detail/${item.content_id}">
               		<img class="poster-img" src="<c:url value='${item.main_image_path}'/>" alt="poster">
 
-              <!-- ✅ 오픈예정 D-day: dday > 0 일 때만 -->
+              <!-- 오픈예정 D-day: dday > 0 일 때만 -->
               <c:if test="${item.dday != null && item.dday > 0}">
                 <span class="dday">D-${item.dday}</span>
               </c:if>
@@ -211,7 +211,7 @@
   const clearBtn = document.getElementById("clearQBtn");
   const qInput = form.querySelector("input[name='q']");
 
-  // ✅ 새 검색(조건 적용/검색)하면 1페이지부터
+  // 새 검색(조건 적용/검색)하면 1페이지부터
   form.addEventListener("submit", function () {
     if (form.dataset.goPage === "1") return; // 페이지네이션 이동이면 유지
     page.value = "1";

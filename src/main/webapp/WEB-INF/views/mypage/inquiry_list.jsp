@@ -66,23 +66,24 @@
                 </c:choose>
             </tbody>
         </table>
-
-		<div class="pagenate clear">
-		    <ul class='paging'>
-		        <c:if test="${dto.page > 1}">
-		            <li><a href="javascript:getComment(${dto.page - 1})">&lt;&lt;</a></li>
-		        </c:if>
-		        <c:forEach var="p" begin="1" end="${totalPage == 0 ? 1 : totalPage}">
-		            <li>
-		                <a href="javascript:getComment(${p});" 
-		                   <c:if test="${dto.page == p}">class='current'</c:if>>${p}</a>
-		            </li>
-		        </c:forEach>
-		
-		        <c:if test="${dto.page < totalPage}">
-		            <li><a href="javascript:getComment(${dto.page + 1})">&gt;&gt;</a></li>
-		        </c:if>
-		    </ul>
+		<div class="fixed-footer">
+			<div class="pagenate clear">
+			    <ul class='paging'>
+			        <c:if test="${dto.page > 1}">
+			            <li><a href="javascript:getComment(${dto.page - 1})">&lt;&lt;</a></li>
+			        </c:if>
+			        <c:forEach var="p" begin="1" end="${totalPage == 0 ? 1 : totalPage}">
+			            <li>
+			                <a href="javascript:getComment(${p});" 
+			                   <c:if test="${dto.page == p}">class='current'</c:if>>${p}</a>
+			            </li>
+			        </c:forEach>
+			
+			        <c:if test="${dto.page < totalPage}">
+			            <li><a href="javascript:getComment(${dto.page + 1})">&gt;&gt;</a></li>
+			        </c:if>
+			    </ul>
+			</div>
 		</div>
     </div>
 </body>

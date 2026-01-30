@@ -1,0 +1,64 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 코드 체크아웃
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    # JDK 11 설정
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    
+    # Maven 빌드
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+    
+    # Docker Hub 로그인
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    
+    # Docker 이미지 빌드 & 푸시
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/gotoday:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
+    
+    # EC2 배포
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
+          docker stop gotoday || true
+          docker rm gotoday || true
+          
+          docker run -d \
+            --name gotoday \
+            -p 8080:8080 \
+            -v /home/ubuntu/gotoday-data:/app/upload \
+            -v /home/ubuntu/gotoday-config/application.properties:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties:ro \
+            -v /home/ubuntu/gotoday-config/db.properties:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/db.properties:ro \
+            -v /home/ubuntu/gotoday-config/api.properties:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/api.properties:ro \
+            ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
+
+          sleep 10 
+
+          docker cp /home/ubuntu/gotoday-config/application.properties gotoday:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
+          docker cp /home/ubuntu/gotoday-config/db.properties gotoday:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
+          docker cp /home/ubuntu/gotoday-config/api.properties gotoday:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
+
+          docker restart gotoday
