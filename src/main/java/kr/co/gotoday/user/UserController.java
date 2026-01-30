@@ -148,7 +148,7 @@ public class UserController {
         if (user == null) {
             model.addAttribute("msg", "잘못된 접근입니다.");
             model.addAttribute("cmd", "move");
-            model.addAttribute("url", "/gotoday/member/register1");
+            model.addAttribute("url", "/member/register1");
             return "common/return";
         }
 

@@ -30,4 +30,8 @@ public class ContentReplyVO { // 테이블 :content_reply
 	
 	//언니
 	private int answer_count;
+	
+	private List<ContentReplyVO> answers;
+
+
 }
