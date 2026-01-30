@@ -6,277 +6,11 @@
 <head>
 <meta charset="UTF-8" />
 <title>GoToday | ${content.title}</title>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/content_detail.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
-<style>
-/* 1. 기본 스타일 정의 */
-:root { 
-	--main-color: #4dc3ff; 
-	--border-color: #eee; 
-	--text-gray: #666;
-}
-
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-
-body {
-	font-family: 'Pretendard', sans-serif;
-	color: #333;
-	background-color: #fff;
-	overflow-x: hidden;
-	line-height: 1.5;
-}
-
-a {
-	text-decoration: none;
-	color: inherit;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-/* 3. 레이아웃 및 본문 */
-.container {
-	max-width: 1100px;
-	margin: 40px auto;
-	padding: 0 20px;
-}
-
-.content-title-area {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
-	border-bottom: 2px solid #333;
-	padding-bottom: 15px;
-	margin-bottom: 30px;
-}
-
-.content-title-area h1 {
-	margin: 0;
-	font-size: 28px;
-	letter-spacing: -1px;
-}
-
-.sns-group {
-	display: flex;
-	gap: 10px;
-}
-
-.sns-group img {
-	width: 22px;
-	cursor: pointer;
-	opacity: 0.7;
-	transition: 0.2s;
-}
-
-.main-box {
-	display: flex;
-	gap: 50px;
-	align-items: flex-start;
-	margin-bottom: 60px;
-}
-
-/* 4. 포스터 사이드 */
-.poster-side {
-	flex: 0 0 350px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.poster-img {
-	width: 100%;
-	height: 480px;
-	object-fit: cover;
-	border-radius: 8px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.poster-like-btn {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-top: 15px;
-	padding: 8px 25px;
-	background: #fff;
-	border: 1.5px solid #eee;
-	border-radius: 50px;
-	cursor: pointer;
-	transition: all 0.3s;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.poster-like-btn:hover {
-	transform: translateY(-2px);
-	border-color: var(- -main-color);
-}
-
-.poster-like-btn.active-liked {
-	background: #f0faff;
-	border-color: var(- -main-color);
-}
-
-/* 5. 정보 및 예매 섹션 */
-.info-side {
-	flex: 1;
-}
-
-.info-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-bottom: 30px;
-}
-
-.info-table th {
-	text-align: left;
-	width: 100px;
-	padding: 12px 0;
-	color: #333;
-	border-bottom: 1px solid #f5f5f5;
-}
-
-.info-table td {
-	padding: 12px 0;
-	font-size: 15px;
-	color: #555;
-	border-bottom: 1px solid #f5f5f5;
-}
-
-.reserve-section {
-	display: flex;
-	gap: 20px;
-	border-top: 1px solid var(- -border-color);
-	padding-top: 30px;
-}
-
-#calendar {
-	flex: 1.2;
-	border: 1px solid var(- -border-color);
-	border-radius: 10px;
-	padding: 10px;
-	font-size: 12px;
-}
-
-.time-selector {
-	flex: 1;
-	border: 1px solid var(- -border-color);
-	border-radius: 10px;
-	padding: 15px;
-	background: #fafafa;
-}
-
-.time-option {
-	display: flex;
-	align-items: center;
-	padding: 10px;
-	background: #fff;
-	border: 1px solid var(- -border-color);
-	border-radius: 6px;
-	margin-bottom: 8px;
-	cursor: pointer;
-}
-
-.action-btns {
-	display: flex;
-	gap: 10px;
-	margin-top: 25px;
-}
-
-.btn-reserve {
-	flex: 2;
-	background-color: var(--main-color);
-	color: #fff;
-	border: none;
-	padding: 16px;
-	border-radius: 6px;
-	font-weight: bold;
-	cursor: pointer;
-	font-size: 16px;
-	transition: background 0.2s;
-}
-
-.btn-reserve:hover {
-	background-color: #37b0f0;
-}
-
-.btn-save-cal {
-	flex: 1;
-	background: #f8f9fa;
-	border: 1px solid #ddd;
-	padding: 16px;
-	border-radius: 6px;
-	cursor: pointer;
-}
-.btn-reserve.is-disabled,
-.btn-reserve:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* 6. 탭 메뉴 */
-.tab-wrapper {
-	margin-top: 50px;
-}
-
-.tab-menu {
-	display: flex;
-	list-style: none;
-	border-bottom: 2px solid var(- -border-color);
-	margin-bottom: 30px;
-}
-
-.tab-item {
-	flex: 1;
-	padding: 18px 0;
-	cursor: pointer;
-	font-weight: bold;
-	color: #999;
-	text-align: center;
-}
-
-.tab-item.active {
-	color: #333;
-	border-bottom: 3px solid var(- -main-color);
-}
-
-.tab-panel {
-	display: none;
-	padding: 20px 0;
-}
-
-.tab-panel.active {
-	display: block;
-}
-
-.detail-img {
-width: 100%;           /* 1. 상자 너비에 딱 맞게! */
-    max-width: 600px;      /* 2. 너무 커지는 건 방지 (원하는 숫자로 조절해!) */
-    height: auto;          /* 3. 높이는 비율에 맞게 알아서! */
-    display: block;        /* 4. 덩어리로 만들어서 */
-    margin: 20px auto;     /* 5. 가운데로 모으기! */
-    border-radius: 8px;
-    object-fit: contain;   /* 6. 이미지가 잘리지 않고 상자 안에 다 보이게! */
-}
-#btn-reservation-detail {
-  margin-top: 12px;
-  padding: 14px 16px;
-  background: #eaf7ff;        /* 하늘색 배경 */
-  color: #2b7fc2;             /* 진한 하늘색 글자 */
-  border: 1px solid #bfe6ff;  /* 테두리 */
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-}
-</style>
 
 <script>
 $(function() {
@@ -287,9 +21,7 @@ $(function() {
       	//탭 이름 
       	const tabCategory=$(this).data("type");
       	const content_id=$("#content_id").val();
-      	const urlParams = new URLSearchParams(window.location.search);
-      	const inquiryPage = urlParams.get("inquiryPage") || 1;
-
+      	
           //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
       	$(".tab-item").removeClass("active");
           $(this).addClass("active");
@@ -306,8 +38,7 @@ $(function() {
           	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
           	type:"GET", //목록 조회는 get
           	data:{
-          		content_id:content_id,
-          	    inquiryPage: inquiryPage
+          		content_id:content_id
           	},
           	success:function(data){
           		 currentPanel.html(data);
@@ -319,28 +50,6 @@ $(function() {
 
     
       });
-      
-   //  문의사항 페이지네이션(AJAX) - 탭 내부에서 동작
-      $(document).on("click", ".inquiry-page", function(e){
-        e.preventDefault();
-
-        const page = $(this).data("page");
-        const content_id = $("#content_id").val();
-
-        $.ajax({
-          url: "${pageContext.request.contextPath}/detail/tab/inquiry",
-          type: "GET",
-          data: { content_id: content_id, inquiryPage: page },
-          success: function(html){
-            // inquiry 탭 패널(3번째)만 갱신
-            $(".tab-panel").eq(2).html(html);
-
-            // 주소만 바꾸기(새로고침 없음)
-            history.replaceState(null, "", `?tab=inquiry&inquiryPage=${page}`);
-          }
-        });
-      });
-
       
   	//이전페이지로 이동한 것처럼 
   	const urlParams = new URLSearchParams(window.location.search);
@@ -764,9 +473,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 				<section class="tab-panel">
 					<jsp:include page="/WEB-INF/views/review/review_list_by_content.jsp" />
 				</section>
-<section class="tab-panel" id="panel-inquiry">
-  <div class="loading" style="padding:20px 0; color:#999;">불러오는 중...</div>
-</section>
+				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
 			</div>
 		</div>
 	</div>
