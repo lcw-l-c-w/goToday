@@ -116,6 +116,13 @@ html, body {
     color: #333;
     text-decoration: none;
     font-size: 14px;
+    transition: all 0.2s;
+}
+
+.page-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+    cursor: pointer;        /* 선택 */
 }
 
 .page-btn.active {
