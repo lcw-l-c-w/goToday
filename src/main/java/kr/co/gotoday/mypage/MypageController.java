@@ -231,7 +231,7 @@ public class MypageController {
         }
 
         //페이징 처리 
-        int pageSize=4;
+        int pageSize=3;
         int blockSize=5;
        
         // db에서 전체 좋아요 개수만 가져와야함
