@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+:root {
+    --main-color: #4dc3ff;
+    --dark-gray: #333;
+    --light-gray: #f9f9f9;
+    --border-color: #eee;
+}
+
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #fff;
+    color: var(--dark-gray);
+    margin: 0; 
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+/* 헤더 디자인 */
+.page-header {
+    border-bottom: 2px solid var(--dark-gray);
+    padding-bottom: 15px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+/* 폼 레이아웃 */
+.edit-form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.edit-form-table th {
+    width: 120px;
+    text-align: left;
+    padding: 20px 10px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border-color);
+    color: #666;
+}
+
+.edit-form-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 입력 필드 스타일 */
+input[type="text"] {
+    width: 100%;
+    height: 45px;
+    padding: 0 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline-color: var(--main-color);
+}
+
+/* 파일 업로드 영역 */
+.file-upload-wrapper {
+    background: var(--light-gray);
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px dashed #ccc;
+}
+
+.existing-file {
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 하단 버튼 영역 */
+.btn-area {
+    margin-top: 40px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-save {
+    background-color: var(--dark-gray);
+    color: white;
+    padding: 14px 40px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-save:hover {
+    background-color: #555;
+}
+
+.btn-cancel {
+    background-color: #fff;
+    color: #666;
+    padding: 14px 40px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    border: 1px solid var(--border-color);
+    transition: 0.3s;
+    display: inline-block; /* a 태그일 경우 대비 */
+}
+
+.btn-cancel:hover {
+    background-color: var(--light-gray);
+}
