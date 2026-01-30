@@ -18,8 +18,8 @@ public class MypageServiceImpl implements MypageService {
     private final ReplyMapper replyMapper;
     
     @Override
-    public List<MypageDTO> getMyLikeList(Integer user_id) {
-        return mypageMapper.selectMyLikeList(user_id);
+    public List<MypageDTO> getMyLikeList(Integer user_id,int offset, int pageSize) {
+        return mypageMapper.selectMyLikeList(user_id, offset,  pageSize);
     }
    
 
@@ -64,5 +64,43 @@ public class MypageServiceImpl implements MypageService {
     public ReplyVO getReplyAnswer(int reply_id) {
         return mypageMapper.selectReplyAnswer(reply_id);
     }
+    
+    // 1:1 문의사항 
+    @Override
+    public Map<String, Object> getMyInquiryList(MypageDTO dto) {
+
+        int count = mypageMapper.countMyInquiryList(dto);
+
+        int startIdx = (dto.getPage() - 1) * 5;
+        dto.setStartIdx(startIdx);
+
+        List<MypageDTO> list = mypageMapper.selectMyInquiryList(dto);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("count", count);
+        map.put("list", list);
+
+        return map;
+    }
+    
+    // 1:1 문의사항 detail 내용
+    @Override
+    public List<MypageDTO> getInquiryDetail(int creplyId) {
+        return mypageMapper.selectInquiryDetail(creplyId); 
+    }
+
+    // 1:1 문의사항 detail 답변
+    @Override
+    public MypageDTO getInquiryAnswer(int creply_id) {
+        return mypageMapper.selectInquiryAnswer(creply_id);
+    }
+
+
+	@Override
+	public int getLikeCount(int user_id) {
+		return mypageMapper.countLike(user_id);
+	}
+
+    
     
 }

@@ -1,6 +1,7 @@
 package kr.co.gotoday.mypage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import kr.co.gotoday.review.ReviewVO;
 import kr.co.gotoday.user.UserService;
 import kr.co.gotoday.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import util.PageInfo;
 
 @Controller
 @RequiredArgsConstructor
@@ -86,9 +88,17 @@ public class MypageController {
             HttpSession session,
             @RequestParam(required = false) String event,
             @RequestParam(required = false) String[] location,
-            @RequestParam(required = false) String[] interest) {
+            @RequestParam(required = false) String[] interest,
+            UserVO vo, Model model) {
 
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/member/login");
+            return "common/return";
+        }
+        
         int userId = loginUser.getUser_id();
 
         // 배열 → List 변환
@@ -176,21 +186,23 @@ public class MypageController {
     // 예약 관리
     @GetMapping("/mypage/reservation")
     public String showReservationList(
-    		@RequestParam(required = false, defaultValue = "ALL") String filter, 
-    		HttpSession sess, 
+    		@RequestParam(required = false, defaultValue = "ALL") String filter,
+    		@RequestParam(required = false, defaultValue = "1") Integer page,
+    		HttpSession sess,
     		Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
-    	
+
     	if (userVO == null) {
             model.addAttribute("cmd", "back");
             model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
             return "common/return";
         }
-    	
-    	List<ReservationListDTO> reservationList = reservationService.findReservationListByUserId(userVO.getUser_id(), filter);
-    	model.addAttribute("reservationList", reservationList);
+
+    	Map<String, Object> result = reservationService.findReservationListByUserId(userVO.getUser_id(), filter, page);
+    	model.addAttribute("reservationList", result.get("list"));
+    	model.addAttribute("pageInfo", result.get("pageInfo"));
     	model.addAttribute("currentFilter", filter);
-    	
+
     	return "mypage/reserve_list";
     }
     // 예약 관리
@@ -206,9 +218,8 @@ public class MypageController {
     }
     
     // 좋아요 목록
-    
     @GetMapping("/mypage/like_list")
-    public String myLikeList(HttpSession session, Model model) {
+    public String myLikeList(@RequestParam(value = "page", required = false) Integer page,HttpSession session, Model model) {
 
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
 
@@ -219,9 +230,23 @@ public class MypageController {
             return "common/return";
         }
 
-        List<MypageDTO> likeList =
-                mypageService.getMyLikeList(loginUser.getUser_id());
+        //페이징 처리 
+        int pageSize=4;
+        int blockSize=5;
+       
+        // db에서 전체 좋아요 개수만 가져와야함
+        int totalCount=mypageService.getLikeCount(loginUser.getUser_id());
+        
 
+        PageInfo pi = PageInfo.of(totalCount, page, pageSize, blockSize);
+        int offset= PageInfo.offset(page, pageSize);
+
+        //전체 좋아요 가져옴(limit 사용해야함)_
+        List<MypageDTO> likeList =
+        		mypageService.getMyLikeList(loginUser.getUser_id(), offset,  pageSize);
+        model.addAttribute("pi", pi); // JSP에서 사용할 페이징 정보
+        
+        
         model.addAttribute("likeList", likeList);
 
         return "mypage/like_list";
@@ -289,20 +314,69 @@ public class MypageController {
         return "mypage/reply_detail";
     }
     
-	@GetMapping("/mypage/myreviews.do")
-	public String showUserReviewList(HttpSession sess, Model model) {
-		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
-		if(userVO == null) {
-			model.addAttribute("cmd","back");
-			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
-			return "common/return";
-		}
-		List<ReviewVO> reviewList = reviewService.findReviewsByUserId(userVO.getUser_id());
-		model.addAttribute("reviewList", reviewList);
-		return "mypage/review_list";
-	}
+//	@GetMapping("/mypage/myreviews.do")
+//	public String showUserReviewList(HttpSession sess, Model model) {
+//		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+//		if(userVO == null) {
+//			model.addAttribute("cmd","back");
+//			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+//			return "common/return";
+//		}
+//		List<ReviewVO> reviewList = reviewService.findReviewsByUserId(userVO.getUser_id());
+//		model.addAttribute("reviewList", reviewList);
+//		return "mypage/review_list";
+//	}
+    
+    @GetMapping("/mypage/myreviews.do")
+    public String showUserReviewList(
+            HttpSession sess, 
+            Model model,
+            @RequestParam(value = "page", defaultValue = "1") int page) {
+        
+        UserVO userVO = (UserVO) sess.getAttribute("loginSess");
+        if(userVO == null) {
+            model.addAttribute("cmd","back");
+            model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+            return "common/return";
+        }
+
+        // --- 페이징 로직 시작 ---
+        int limit = 4;      // 한 페이지에 보여줄 글 개수
+        int pageBlock = 5;  // 하단에 보여줄 페이지 번호 개수 (1,2,3,4,5)
+
+        // 1. 전체 게시물 수 조회
+        int totalCount = reviewService.countReviewsByUserId(userVO.getUser_id());
+
+        // 2. 총 페이지 수 계산
+        int totalPage = (int) Math.ceil((double) totalCount / limit);
+        
+        // 페이지 번호 예외 처리
+        if (page < 1) page = 1;
+        if (page > totalPage && totalPage > 0) page = totalPage;
+
+        // 3. 현재 페이지에 해당하는 데이터 조회
+        List<ReviewVO> reviewList = reviewService.findReviewsByUserIdPaged(userVO.getUser_id(), page, limit);
+
+        // 4. 페이지 네비게이션 계산 (시작번호, 끝번호)
+        int startPage = ((page - 1) / pageBlock) * pageBlock + 1;
+        int endPage = startPage + pageBlock - 1;
+        if (endPage > totalPage) endPage = totalPage;
+
+        // 5. 뷰로 데이터 전달
+        model.addAttribute("reviewList", reviewList);
+        
+        Map<String, Object> paging = new HashMap<>();
+        paging.put("page", page);
+        paging.put("totalPage", totalPage);
+        paging.put("startPage", startPage);
+        paging.put("endPage", endPage);
+        model.addAttribute("paging", paging); // 페이징 정보 맵 전달
+
+        return "mypage/review_list";
+    }
 	
-    // 문의사항 목록
+/*	
+    // 문의사항 목록(채원)
     @GetMapping("/mypage/inquiry_list")
     public String myInquiryList(HttpSession session, Model model, ReplyVO vo) {
         UserVO loginUser = (UserVO) session.getAttribute("loginSess");
@@ -326,4 +400,52 @@ public class MypageController {
         
         return "mypage/inquiry_list";
     }
+*/
+    
+    // 1:1 문의사항
+	@GetMapping("/mypage/inquiry_list")
+	public String myInquiryList(HttpSession session, Model model, MypageDTO dto) {
+
+	    UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+	    
+        if (loginUser == null) {
+            model.addAttribute("msg", "로그인이 필요합니다.");
+            model.addAttribute("cmd", "move");
+            model.addAttribute("url", "/gotoday/member/login");
+            return "common/return";
+        }
+        
+        
+	    dto.setUser_id(loginUser.getUser_id());
+
+	    Map<String, Object> map = mypageService.getMyInquiryList(dto);
+
+	    model.addAttribute("map", map);
+	    model.addAttribute("dto", dto);
+
+	    return "mypage/inquiry_list";
+	}
+	
+	// 1:1 문의사항 상세보기
+	@GetMapping("/mypage/inquiry_detail")
+	public String inquiryDetail(@RequestParam("creply_id") int creplyId, Model model, HttpSession session) {
+
+	    UserVO loginUser = (UserVO) session.getAttribute("loginSess");
+	    if (loginUser == null) {
+	        model.addAttribute("msg", "로그인이 필요합니다.");
+	        model.addAttribute("cmd", "move");
+	        model.addAttribute("url", "/gotoday/member/login");
+	        return "common/return";
+	    }
+
+	    // 문의 + 답변 내용 조회
+	    List<MypageDTO> detailList = mypageService.getInquiryDetail(creplyId);
+	    
+	    model.addAttribute("detailList", detailList);
+	    model.addAttribute("userName", loginUser.getName());
+	    
+	    return "mypage/inquiry_detail";
+	}
+
+
 }

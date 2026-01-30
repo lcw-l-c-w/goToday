@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib prefix="c"
 uri="http://java.sun.com/jsp/jstl/core"%>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
 <style>
     :root {
@@ -111,15 +112,32 @@ uri="http://java.sun.com/jsp/jstl/core"%>
         font-size: 16px;
         line-height: 1;
     }
+    
+    .search-btn .material-symbols-outlined {
+	    font-size: 23px; /* 아이콘 크기 */
+	    font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24;
+	}
 
     .user-icon {
-        font-size: 22px;
-        cursor: pointer;
-        transition: color 0.2s;
+        font-size: 30px;
+       display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    background: none;
+	    border: none;
+	    color: #333; /* 아이콘 색상 (원하는 색으로 변경 가능) */
+	    cursor: pointer;
+	    padding: 8px;
+	    transition: color 0.2s;
     }
     .user-icon:hover {
         color: var(--main-color);
     }
+    
+    .user-icon .material-symbols-outlined {
+	    font-size: 32px; /* 아이콘 크기 */
+	    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+	}
 
     .search-wrap {
         position: relative;
@@ -248,7 +266,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
                             class="search-btn"
                             aria-label="search"
                         >
-                            🔍
+                            <span class="material-symbols-outlined">search</span>
                         </button>
                     </div>
                 </form>
@@ -271,7 +289,24 @@ uri="http://java.sun.com/jsp/jstl/core"%>
                 </div>
             </div>
 
-            <span class="user-icon" id="myPageBtn">👤</span>
+            <span class="user-icon" id="myPageBtn">
+            	<c:choose>
+				    <c:when test="${empty loginSess}">
+				        <span class="material-symbols-outlined">login</span>
+				    </c:when>
+				    <c:otherwise>
+				    	<c:choose>
+						    <c:when test="${not empty loginSess and loginSess.role == 0}">
+						        <span class="material-symbols-outlined">person</span>
+						    </c:when>
+						    <c:otherwise>
+						        <span class="material-symbols-outlined">passkey</span>
+						    </c:otherwise>
+						</c:choose>
+				    </c:otherwise>
+				</c:choose>
+            	
+            </span>
         </div>
     </div>
 </header>

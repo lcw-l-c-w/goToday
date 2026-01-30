@@ -1,6 +1,4 @@
 @charset "UTF-8";
-
-/* 디자인 토큰 */
 :root {
     --color-bg-primary: #f5f5f5;
     --color-bg-white: #ffffff;
@@ -24,7 +22,6 @@ body {
     min-height: 100vh;
 }
 
-/* 전체 중앙 정렬 */
 .container {
     min-height: 100vh;
     display: flex;
@@ -32,7 +29,6 @@ body {
     justify-content: center;
 }
 
-/* 로그인 카드 */
 .login-card {
     background: var(--color-bg-white);
     width: 100%;
@@ -42,7 +38,6 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* 제목 */
 .login-title {
     font-size: 26px;
     font-weight: 700;
@@ -51,7 +46,6 @@ body {
     color: var(--color-text-primary);
 }
 
-/* 폼 그룹 */
 .form-group {
     margin-bottom: 24px;
 }
@@ -72,7 +66,6 @@ body {
     outline: none;
 }
 
-/* 체크박스 */
 .checkbox-group {
     display: flex;
     align-items: center;
@@ -82,7 +75,6 @@ body {
     margin-bottom: 24px;
 }
 
-/* 로그인 버튼 */
 .btn-login {
     width: 100%;
     padding: 12px;

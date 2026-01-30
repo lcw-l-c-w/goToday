@@ -2,183 +2,13 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<style>
-.review-summary-box {
-    display: flex;
-    align-items: center; /* 세로 중앙 정렬 */
-    gap: 40px;
-    margin: 20px 0;
-    padding: 20px;
-    background: #fcfcfc; /* 배경을 살짝 넣어 구분감 주기 */
-    border-radius: 8px;
-}
-
-.summary-left {
-    width: 120px; /* 너비 축소 */
-    text-align: center;
-    border-right: 1px solid #eee; /* 중간 구분선 추가 */
-    padding-right: 20px;
-}
-
-.avg-score {
-    font-size: 28px; /* 36px -> 28px로 축소 */
-    font-weight: 800;
-    color: #333;
-}
-
-.avg-score .max {
-    font-size: 14px;
-    color: #bbb;
-}
-
-.total-count {
-    font-size: 13px;
-    color: #888;
-    margin-top: 4px;
-}
-
-/* 중간 막대바 영역 */
-.summary-middle {
-    flex: 1.5; /* 막대바 영역 비중 확대 */
-}
-
-.rating-row {
-    display: flex;
-    align-items: center;
-	gap: 10px;
-    margin: 4px 0;
-}
-
-.star-label {
-    width: 70px;
-    font-size: 14px;
-    color: #ffc107;
-    white-space: nowrap;
-}
-
-.bar-bg {
-    flex: 1; 
-    height: 10px;
-    background: #f0f0f0;
-    border-radius: 5px;
-    overflow: hidden;
-    position: relative;
-}
-
-.bar-fill {
-	height: 100%;
-    background: #4dc3ff;
-    border-radius: 5px;
-    transition: width 0.3s ease
-}
-
-.cnt-label {
-	width: 35px;
-    font-size: 12px;
-    color: #888;
-    text-align: right;
-}
-
-.summary-right {
-    flex: 1;
-    padding-left: 20px;
-    border-left: 1px solid #eee;
-}
-
-.time-title {
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.time-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-}
-
-.review-divider {
-    margin: 25px 0;
-    border: none;
-    border-top: 1px solid #eee;
-}
-
-/* 리뷰 아이템 */
-.review-item {
-    border-bottom: 1px solid #eee;
-    padding: 20px 0;
-}
-
-.review-header {
-    display: flex;
-    justify-content: space-between;
-}
-
-.review-user-name {
-    font-weight: 700;
-}
-
-.review-timezone {
-    font-size: 13px;
-    color: #888;
-}
-
-.review-rating .star {
-    color: #ddd;
-}
-
-.review-rating .star.filled {
-    color: #ffc107;
-}
-
-.review-body {
-    margin: 10px 0;
-}
-
-.review-images img {
-    max-width: 120px;
-    border-radius: 6px;
-    margin-top: 8px;
-}
-
-.review-footer {
-    font-size: 12px;
-    color: #888;
-}
-
-.load-more-btn {
-    display: block;
-    margin: 30px auto;
-    padding: 10px 24px;
-    border: 1px solid #333;
-    background: #fff;
-    border-radius: 20px;
-    cursor: pointer;
-}
-.sort-btn {
-  padding: 6px 14px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.sort-btn.active {
-  background: #333;
-  color: #fff;
-  border-color: #333;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/review/review_list_by_content.css">
 <c:choose>
  <c:when test="${ratingSummary.totalReviews == 0}">
      <div class="review-summary-box" style="justify-content: center;">
          <div style="text-align:center; padding: 30px 0; width:100%;">
              <div style="font-size:18px; font-weight:700; margin-bottom:8px;">
-        			아직 등록된 리뷰가 없습니다.
-             </div>
-             <div style="font-size:14px; color:#888;">
-                	이 콘텐츠의 첫 번째 리뷰를 남겨보세요 😊
+        			집계된 점수가 없습니다.
              </div>
          </div>
      </div>
@@ -265,7 +95,10 @@
 	<c:choose>
         <c:when test="${empty reviewList}">
             <div class="no-review-list"style="text-align:center; padding: 40px 0; color:#888;">
-             	 아직 작성된 리뷰가 없습니다.
+             	아직 작성된 리뷰가 없습니다.
+        	  	<div style="font-size:14px; color:#888;">
+                	이 콘텐츠의 첫 번째 리뷰를 남겨보세요 😊
+             	</div>
             </div>
         </c:when>
 	    <c:otherwise>
@@ -289,7 +122,7 @@
 		
 		                <c:if test="${not empty r.image_new}">
 		                    <div class="review-images">
-		                        <img src="${pageContext.request.contextPath}/uploads/${r.image_new}">
+		                        <img src="${pageContext.request.contextPath}/upload/${r.image_new}">
 		                    </div>
 		                </c:if>
 		            </div>

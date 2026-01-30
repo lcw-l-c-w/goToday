@@ -24,7 +24,6 @@ import kr.co.gotoday.user.UserVO;
 
 @Controller
 public class VendorController {
-	
 	@Autowired
 	private VendorService vendorService;
 	
@@ -74,6 +73,18 @@ public class VendorController {
 		
 		return map;
 	}
+	
+	@GetMapping("/vendor/content_manage/all")
+	@ResponseBody
+	public Map<String, Object> getAllContent(HttpSession session) {
+	    UserVO login = (UserVO) session.getAttribute("loginSess");
+
+	    List<ContentVO> list = vendorService.getAllContentForFilter(login.getUser_id());
+
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("list", list);
+	    return map;
+	}
 
 	//content list 별도
 	@GetMapping("/vendor/reserve_pay_manage/list")
@@ -120,7 +131,6 @@ public class VendorController {
 		} else {
 			model.addAttribute("isEdit", false);
 		}
-		
 		return "vendor/content_create";
 	}
 	
@@ -206,7 +216,6 @@ public class VendorController {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "등록 오류, 다시 작성해주세요.");
 		}
-		
 		return "common/return";
 	}
 	

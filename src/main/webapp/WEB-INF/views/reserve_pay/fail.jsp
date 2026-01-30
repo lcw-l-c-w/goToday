@@ -4,87 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <title>결제 실패 | GoToday</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Pretendard', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #222;
-    }
-
-    .payment-wrapper {
-      width: 100%;
-      max-width: 420px;
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 36px 32px 32px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      text-align: center;
-    }
-
-    .logo {
-      margin-bottom: 18px;
-    }
-
-    .logo img {
-      height: 100px;
-      object-fit: contain;
-    }
-
-    .title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .title.error { color: #e74c3c; }
-
-    .message {
-      font-size: 15px;
-      color: #555;
-      line-height: 1.6;
-      margin-bottom: 14px;
-      word-break: keep-all;
-    }
-
-    .error-code {
-      font-size: 13px;
-      color: #999;
-      margin-bottom: 24px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 10px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 12px 0;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: #2c7be5;
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: #e9ecef;
-      color: #333;
-    }
-  </style>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reserve_pay/fail.css">
 </head>
 
 <body>
@@ -93,7 +13,7 @@
 
   <!-- 로고 -->
   <div class="logo">
-    <img src="${pageContext.request.contextPath}/uploads/logo/logo.png" alt="GoToday">
+    <img src="${pageContext.request.contextPath}/upload/logo/logo.png" alt="GoToday">
   </div>
 
   <!-- 타이틀 -->

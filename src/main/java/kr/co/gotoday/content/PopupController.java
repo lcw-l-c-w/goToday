@@ -1,5 +1,7 @@
 package kr.co.gotoday.content;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +29,12 @@ public class PopupController {
 		mcd.setContent_kind("popup");
 
 		// 로그인 정보 처리 (웹 책임)
+		
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 		if (user != null) {
 			mcd.setUser_id(user.getUser_id());
-			mcd.setUser_tag_id(user.getUserTagList());
+			List<String> likeTagName= contentService.getUserTagName(user.getUser_id());
+			mcd.setUser_tag_name(likeTagName);
 		}
 		// service 호출
 		model.addAttribute("random", contentService.getRandomContents(mcd));

@@ -25,14 +25,17 @@
 
     /* 헤더 영역 */
     .list-info-header { 
-        display: flex; justify-content: flex-end; /* 버튼만 우측 정렬 */
+        display: flex; justify-content: flex-end; 
         padding-bottom: 15px; margin-bottom: 0;
+         min-height: 100px; align-items: flex-start; /* ⭐⭐⭐ 이거 하나 */
     }
 
     .btn-write {
         padding: 10px 22px; background: var(--text-dark); color: #fff;
         border-radius: 6px; font-weight: 600; font-size: 14px;
-        transition: 0.3s; border: none; cursor: pointer;
+        transition: 0.3s; border: none; cursor: pointer; 
+         margin-top: auto;
+}
     }
     .btn-write:hover { background: #555; }
 
@@ -101,15 +104,21 @@
   color:#999;
 }
     
+    .empty-space {
+    height: 100px;   /* 원하는 만큼 */
+}
 </style>
 </head>
 <body>
     <div class="wrap">
         <div class="dynamic-list-container">
             <div class="list-info-header">
+          
+            <c:if test="${loginSess.role==0}">
                 <button type="button" class="btn-write" onclick="goWriteForm()" >문의하기</button>
-            </div>
-
+            
+			</c:if>
+			</div>
             <table class="custom-table">
                 <colgroup>
                     <col style="width: 110px;"> <col style="width: auto;">  <col style="width: 150px;"> <col style="width: 150px;"> </colgroup>

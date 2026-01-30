@@ -14,6 +14,7 @@
 			#{is_active}, #{is_delete}, #{content_time}, #{instagram_url}, #{x_url}, #{content_status}, #{place_tag}
 		)
 	</insert>
+	
 	<insert id="createSchedule" parameterType="kr.co.gotoday.content.ContentScheduleVO">
 		INSERT INTO content_schedule (
 			schedule_id, scheduled_at, time_zone, total_ticket, current_ticket, content_id 
@@ -78,6 +79,15 @@
 	            )
 	        )
 	    </if>	
+	    ORDER BY content_id DESC
+	</select>
+	
+	<select id="selectAllContentForFilter" parameterType="int" resultType="kr.co.gotoday.content.ContentVO">
+	    SELECT content_id, title
+	    FROM content
+	    WHERE user_id = #{user_id}
+	      AND is_delete = 0
+	      AND is_active = 1
 	    ORDER BY content_id DESC
 	</select>
 	

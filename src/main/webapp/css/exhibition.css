@@ -1,6 +1,5 @@
 @charset "UTF-8";
-
-     /* 1. 공통 기본 스타일 */
+/* 1. 공통 기본 스타일 */
 :root { 
 	--main-color: #4dc3ff;
 }
@@ -173,15 +172,14 @@ a {
 	position: relative;
 	width: 100%;
 	margin-bottom: 80px;
-	min-height: 450px;
 	border-radius: 25px;
-	padding: 40px 0;
+	padding: 0px;
 }
 
 .recommend-container {
 	position: relative;
 	width: 100%;
-	padding: 0 30px;
+	padding: 0 ;
 }
 
 .recommend-view {
@@ -194,7 +192,7 @@ a {
 	display: flex;
 	gap: 15px;
 	transition: transform 0.5s ease;
-	padding: 10px 0;
+	padding: 0px;
 	list-style: none;
 }
 
@@ -311,8 +309,7 @@ a {
 	display: grid;
 	grid-template-columns: 1.3fr 2fr;
 	gap: 15px;
-	height: 550px;
-	margin-bottom: 80px;
+	height: 600px;
 }
 
 .hot-main {
@@ -347,24 +344,6 @@ a {
 	object-fit: cover;
 }
 
-/* 오픈 예정: 버튼 슬라이더 */
-/* ✅ 여기 수정: padding 0 10px -> 0 */
-.upcoming-container{
-  position: relative;
-  width: 100%;
-  padding: 0;
-}
-
-.upcoming-view{
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-}
-
-.upcoming-view::-webkit-scrollbar{ height: 0; }
-.upcoming-view{ scrollbar-width: none; }
-
 .d-day {
 	position: absolute;
 	top: 12px;
@@ -375,14 +354,31 @@ a {
 	border-radius: 8px;
 	font-weight: bold;
 	font-size: 12px;
-}   
+}
 
-/* 오픈예정 버튼만 바깥 여백으로 빼기 */
-.upcoming-container{ overflow: visible; } /* 혹시 잘림 방지 */
 
-/* 왼/오 버튼을 바깥으로 */
+/* 오픈 예정: 버튼 슬라이더 (popup 전용) */
+.upcoming-container{
+  position: relative;
+  width: 100%;
+  padding: 0;          /* 잘림 방지 */
+  overflow: visible;   /* 버튼 바깥 배치 시 필요 */
+}
+
+.upcoming-view{
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+}
+
+/* 스크롤바 숨김 */
+.upcoming-view::-webkit-scrollbar{ height: 0; }
+.upcoming-view{ scrollbar-width: none; }
+
+/* (선택) 버튼을 카드 밖으로 빼고 싶으면 */
 .upcoming-container .rec-prev { left: -60px; }
 .upcoming-container .rec-next { right: -60px; }
 
-/* (선택) 버튼이 카드 이미지 정중앙쯤 오게 높이 조절 */
-.upcoming-container .recommend-btn { top: 180px; }  /* 카드 이미지가 280px라 대충 중간 */
+/* 버튼이 이미지 중앙쯤 오게 */
+.upcoming-container .recommend-btn { top: 180px; }

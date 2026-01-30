@@ -22,6 +22,7 @@ public interface ReservationMapper {
 	PaymentVO findByPaymentKey(String payment_key);
 	int updatePaymentStatus(Map<String, Object> map);
 	int updateReservationStatusById(int reservation_id);
+	int countReservationByUserId(Map<String, Object> map);
 	List<ReservationListDTO> findReservationListByUserId(Map<String, Object> map);
 	ReservationDetailDTO findReservationDetailById(Map<String, Object> map);
 	ContentScheduleVO findCurrentTickets(int schedule_id);

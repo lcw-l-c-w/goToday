@@ -106,7 +106,7 @@ public class ReservationController {
 		}
 		 
 		UserVO userVO = (UserVO) session.getAttribute("loginSess");
-		if(userVO.getRole() != 0) {
+		if(userVO.getRole() != 0 || !userVO.getEmail().contains("@")) {
 			model.addAttribute("cmd", "back");
 			model.addAttribute("msg", "일반 사용자만 예약이 가능합니다.");
 			return "common/return";
@@ -170,6 +170,12 @@ public class ReservationController {
 		ContentVO contentVO = contentService.getDetailContents(reservation.getContent_id(), userVO.getUser_id());
 		model.addAttribute("contentVo",contentVO);
 
+		if(userVO.getRole() != 0 || !userVO.getEmail().contains("@")) {
+			model.addAttribute("cmd", "back");
+			model.addAttribute("msg", "일반 사용자만 예약이 가능합니다.");
+			return "common/return";
+		}
+		
 		//기본적으로 세션에 있는 유저의 정보를 가져다가 수령인 란에 저장하기 위해 정보를 모델에 저장
 		UserVO userInfo = (UserVO)session.getAttribute("loginSess");
 		model.addAttribute("receiver_info", userInfo);

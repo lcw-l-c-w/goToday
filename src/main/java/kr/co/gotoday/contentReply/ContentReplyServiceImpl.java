@@ -120,6 +120,12 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 		return contentReplyMapper.updateReplyStatus(gno, 1);
 	}
 
+	@Override
+	public int showStatus(int gno) {
+		// TODO Auto-generated method stub
+		return contentReplyMapper.countVendorReplyByGno(gno);
+	}
+
 
   
 	@Override

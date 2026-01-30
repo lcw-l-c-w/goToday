@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,11 +23,12 @@ import util.PageInfo;
 
 @Service
 public class VendorServiceImpl implements VendorService {
-
 	@Autowired
 	private VendorMapper vendorMapper;
 	@Autowired
 	private ReservationMapper reservationMapper;
+	@Value("${upload.path}")
+	private String uploadPath;
 
 	@Override
 	public int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, MultipartFile file,
@@ -35,10 +37,9 @@ public class VendorServiceImpl implements VendorService {
 		if (contentScheduleVO == null) {
 			contentScheduleVO = new ContentScheduleVO();
 		}
-
 		// 파일 명명
 		if (file != null && !file.isEmpty()) {
-			String uploadDir = request.getServletContext().getRealPath("/upload/poster");
+			String uploadDir = uploadPath + "/poster";
 			String org = file.getOriginalFilename();
 			String ext = org.substring(org.lastIndexOf("."));
 			String filename = UUID.randomUUID().toString() + ext;
@@ -86,6 +87,11 @@ public class VendorServiceImpl implements VendorService {
 			}
 		}
 		return r;
+	}
+	
+	@Override
+	public List<ContentVO> getAllContentForFilter(int userId) {
+	    return vendorMapper.selectAllContentForFilter(userId);
 	}
 
 	@Override
@@ -141,7 +147,6 @@ public class VendorServiceImpl implements VendorService {
 			// 최초 1개만 저장
 			uniqueMap.putIfAbsent(time, vo);
 		}
-
 		return List.copyOf(uniqueMap.values());
 	}
 
@@ -159,7 +164,6 @@ public class VendorServiceImpl implements VendorService {
 				contentVo.setMain_image_path(origin.getMain_image_path());
 			}
 		}
-
 		int r = vendorMapper.updateContent(contentVo);
 
 		if (r <= 0)
@@ -169,8 +173,7 @@ public class VendorServiceImpl implements VendorService {
 	}
 
 	@Override
-	public int updateReservationStatus(int reservation_id) { // 여기에 int가 중복되진 않았나요?
+	public int updateReservationStatus(int reservation_id) { 
 		return reservationMapper.updateReservationStatusById(reservation_id);
 	}
-
 }

@@ -14,9 +14,9 @@ import kr.co.gotoday.user.UserVO;
 
 @Controller
 public class ReplyVendorController {
-
 	@Autowired
 	private ReplyVendorService service;
+	
 	
 	@GetMapping("/replyVendor/index")
 	public String index(Model model, ReplyVendorVO vo, HttpSession sess, RedirectAttributes ra) {
@@ -128,7 +128,6 @@ public class ReplyVendorController {
 				model.addAttribute("msg", "등록 오류");
 			}
 		}
-		
 		return "common/return";
 	}
 	

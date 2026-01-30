@@ -16,10 +16,12 @@
 	</div>
 
 	<section class="filter-bar">
-		<input type="text" class="searchInput" id="searchInput"
-			placeholder="예약번호, 수령인 검색" /> <select id="contentFilter"><option
-				value="">모든 콘텐츠</option></select> <input type="date" id="dateFilter" /> <select
-			id="statusFilter">
+		<input type="text" class="searchInput" id="searchInput" placeholder="예약번호, 수령인 검색" /> 
+			<select id="contentFilter">
+				<option value="">모든 콘텐츠</option>
+			</select> 
+			<input type="date" id="dateFilter" />
+		<select id="statusFilter">
 			<option value="">전체 예약상태</option>
 			<option value="DONE">예약 확정</option>
 			<option value="CANCELLED">예약 취소</option>
@@ -74,6 +76,9 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 <script>
 const ctx = '${pageContext.request.contextPath}';
 
@@ -85,7 +90,6 @@ function confirmLogout() {
     }
 }
 
-//1. 상태 맵핑
 const RESERVE_MAP = {
     'DONE': { text: '예약 확정', className: 'res-confirm' },
     'CANCELED': { text: '예약 취소', className: 'res-cancel' },
@@ -103,10 +107,14 @@ const PAY_MAP = {
 
 function loadContentFilter() {
 	$.ajax({
-		url : ctx + '/vendor/content_manage/list',
+		url : ctx + '/vendor/content_manage/all',
 		type : 'get',
 		success : function(res) {
 			const $select = $('#contentFilter');
+			
+			if ($select.data('select2')) {
+                $select.select2('destroy');
+            }
 			
 			$select.empty();
 			$select.append('<option value="">모든 콘텐츠</option>');
@@ -120,6 +128,14 @@ function loadContentFilter() {
 						</option>`
 						);
 			});
+			
+			$select.select2({
+                placeholder: "콘텐츠 선택",
+                allowClear: true,
+                width: '100%'
+            }).on('change', function() {
+                loadReserveList();
+            });
 		},
 		error: function() {
 			console.log('콘텐츠 목록 로드 실패')
@@ -159,7 +175,7 @@ function loadReserveList() {
     if (date) data.reserved_for_at = date;
     
     $.ajax({
-        url: ctx + '/vendor/reserve_pay_manage/list', // 실제 컨트롤러 URL에 맞게 수정
+        url: ctx + '/vendor/reserve_pay_manage/list',
         type: 'get',
         data: data,
         success: function(res) {
@@ -204,7 +220,7 @@ function renderList(list) {
     
     list.forEach(item => {
     	console.log('renderList item =', item);
-    	// 데이터가 없을 경우를 대비한 기본값 처리 (Optional Chaining 방식)
+    	// 데이터가 없을 경우를 대비한 기본값 처리
         const resKey = item.reserve_status || '';
         const payKey = item.pay_status || '';
         const resInfo = RESERVE_MAP[item.reserve_status] || { text: item.reserve_status, className: '' };
@@ -318,7 +334,7 @@ function openModal(id) {
 
     $('#modalBody').html(modalHtml);
     
-	 // 하단 버튼(btnAction) 제어 및 이벤트 바인딩
+	 // 하단 버튼 제어 및 이벤트 바인딩
     const $actionBtn = $('#btnAction');
     
     if (data.reserve_status === 'VISITED') {

@@ -9,19 +9,14 @@
 <head>
 <meta charset="utf-8">
 <title>Q&A</title>
-<META name="viewport"
-	content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<META name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<script
-	src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 <link rel="stylesheet" href="${ctx}/css/reset.css" />
 <link rel="stylesheet" href="${ctx}/css/contents.css" />
-<script>
-	
-</script>
+
 </head>
 <body>
 	<c:if test="${isIframe != 'true'}">
@@ -95,9 +90,10 @@
 							<div class="pagenate clear">
 								<ul class='paging'>
 									<c:if test="${map.isPrev }">
-										<li><a
-											href="index?page=${map.startPage-1 }&searchType=${replyVO.searchType}&searchWord=${replyVO.searchWord}&isIframe=${isIframe}">
-												<< </a></li>
+										<li>
+											<a href="index?page=${map.startPage-1 }&searchType=${replyVO.searchType}&searchWord=${replyVO.searchWord}&isIframe=${isIframe}">
+													<< </a>
+										</li>
 									</c:if>
 									<c:forEach var="p" begin="${map.startPage}"
 										end="${map.endPage}">

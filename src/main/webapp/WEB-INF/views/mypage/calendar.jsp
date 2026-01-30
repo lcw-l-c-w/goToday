@@ -16,9 +16,9 @@
 
 <style>
 body {
-	margin: 0;
-	padding: 20px;
+	margin: 0px;
 	font-family: 'Malgun Gothic', sans-serif;
+	
 }
 
 /* 캘린더 스타일 미세 조정 */
@@ -26,8 +26,18 @@ body {
 	max-width: 100%;
 }
 
+.fc .fc-daygrid-day-top {
+    flex-direction: row; /* 기존 column(위아래)에서 row(좌우)로 변경 */
+    justify-content: flex-start; /* 요소를 왼쪽으로 정렬 */
+    padding: 2px; /* 여백 조정 */
+}
+
 .fc-toolbar-title {
 	font-size: 20px !important;
+}
+
+.fc-scroller fc-scroller-liquid-absolute{
+	
 }
 
 /* 오른쪽 리스트 스타일 */

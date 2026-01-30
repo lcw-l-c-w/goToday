@@ -46,5 +46,7 @@ public interface ContentReplyService {
 
 
 	
+	//상태 조회
+	int showStatus(int gno);
 }
 

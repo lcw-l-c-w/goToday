@@ -19,8 +19,14 @@
         JOIN content c
           ON cl.content_id = c.content_id
         WHERE cl.user_id = #{user_id}
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
-
+    <!--  내가 좋아요 누른 컨텐ㅊ 갯수 반환 -->
+	<select id="countLike" parameterType="int">
+		SELECT count(*)
+		FROM content_like
+		WHERE user_id=#{user_id}
+	</select>
 	<!-- 내 Q&A 목록 조회 -->
 	<select id="selectMyReplyList" parameterType="kr.co.gotoday.reply.ReplyVO" resultType="kr.co.gotoday.reply.ReplyVO">
 	    SELECT r.*,
@@ -55,6 +61,42 @@
 	    SELECT * FROM reply 
 	    WHERE gno = #{reply_id} AND reply_status = 1
 	    ORDER BY reply_id DESC LIMIT 1
+	</select>
+	
+	<!-- 내1:1 문의사항 목록 조회 -->
+	<select id="selectMyInquiryList"
+	        parameterType="kr.co.gotoday.mypage.MypageDTO"
+	        resultType="kr.co.gotoday.mypage.MypageDTO">
+		SELECT 
+	        a.creply_id,
+	        a.title,
+	        a.created_at,
+	        a.content_id,
+	        (SELECT COUNT(*) FROM content_reply b WHERE b.gno = a.creply_id AND b.nested = 1) as answer_count
+	    FROM content_reply a
+	    WHERE a.user_id = #{user_id} 
+	      AND a.nested = 0  ORDER BY a.creply_id DESC
+	    LIMIT #{startIdx}, 5
+	</select>
+
+	<!-- 내1:1 문의사항 답변 개수 -->
+	<select id="countMyInquiryList" resultType="int">
+	    SELECT COUNT(*)
+	    FROM content_reply
+	    WHERE user_id = #{user_id}
+	      AND nested = 0
+	</select>
+	
+	<!-- 내1:1 문의사항 detail 내용 -->
+	<select id="selectInquiryDetail" parameterType="int" resultType="kr.co.gotoday.mypage.MypageDTO">
+		SELECT * FROM content_reply 
+	    WHERE gno = #{creply_id}  ORDER BY nested ASC, creply_id ASC
+	</select>
+	<!-- 내1:1 문의사항 detail 답변 -->
+	<select id="selectInquiryAnswer" parameterType="int" resultType="kr.co.gotoday.mypage.MypageDTO">
+		SELECT * FROM content_reply 
+	    WHERE gno = #{creply_id} AND nested = 1
+	    ORDER BY creply_id DESC LIMIT 1
 	</select>
 	
 </mapper>

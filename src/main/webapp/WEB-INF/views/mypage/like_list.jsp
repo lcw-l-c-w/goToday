@@ -10,7 +10,11 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_like_list.css">
 </head>
 <body>
-<h1 class="page-title">찜 관리</h1>
+<!-- 고정 헤더 영역 -->
+<div class="fixed-header">
+	<h1 class="page-title">찜 관리</h1>
+</div>
+
 <div class="container">
 	<div class="list-wrapper">
 		<!-- 오늘 날짜 -->
@@ -18,7 +22,7 @@
 		<fmt:parseNumber value="${now.time / (1000*60*60*24)}"
 		                 integerOnly="true"
 		                 var="nowDays" />
-
+	<div class="items-container">
 		<c:choose>
 			<c:when test="${empty likeList}">
 				<div class="empty-box">찜한 내역이 없습니다.</div>
@@ -87,6 +91,22 @@
 				</c:forEach>
 			</c:otherwise>
 		</c:choose>
+		</div>
+		<c:if test="${pi.totalPage > 0}">
+        <div class="pagination">
+            <c:if test="${pi.startPage > 1}">
+                <a href="?page=${pi.startPage - 1}" class="page-btn prev">&lt;</a>
+            </c:if>
+
+            <c:forEach begin="${pi.startPage}" end="${pi.endPage}" var="p">
+                <a href="?page=${p}" class="page-btn ${p == pi.page ? 'active' : ''}">${p}</a>
+            </c:forEach>
+
+            <c:if test="${pi.endPage < pi.totalPage}">
+                <a href="?page=${pi.endPage + 1}" class="page-btn next">&gt;</a>
+            </c:if>
+        </div>
+    </c:if>
 	</div>
 </div>
 </body>

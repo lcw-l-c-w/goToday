@@ -43,7 +43,7 @@
 
 			<%-- 2. 추천 리스트가 비어있는지 확인 --%>
 			<%-- 기존의 recommand[0].blur 조건이 까다로워서 오작동할 확률이 높으므로 단순화합니다 --%>
-			<c:set var="isTagEmpty" value="${empty recommend}" />
+			<c:set var="isTagEmpty" value="${ not empty recommend and recommend[0].blur}" />
 
 			<%-- 3. 블러 처리 여부 결정: 로그인을 안 했거나, 추천 데이터가 아예 없을 때 --%>
 			<c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
@@ -63,7 +63,7 @@
 							<p>
 								관심사를 설정하면 당신만을 위한<br>특별한 맞춤 전시를 추천해드려요!
 							</p>
-							<a href="${pageContext.request.contextPath}/mypage/interest"
+							<a href="${pageContext.request.contextPath}/mypage/user_like_edit"
 								class="cta-btn">관심사 설정하기</a>
 						</c:when>
 					</c:choose>
@@ -71,7 +71,7 @@
 			</c:if>
 
 			<div class="recommend-container">
-				<button class="recommend-btn rec-prev" id="recPrev">&lt;</button>
+				
 				<div class="recommend-view">
 					<div id="recList"
 						class="content-list horizontal ${isBlur ? 'blur-container' : ''}">
@@ -92,7 +92,6 @@
 						</c:if>
 					</div>
 				</div>
-				<button class="recommend-btn rec-next" id="recNext">&gt;</button>
 			</div>
 		</section>
 
@@ -148,7 +147,7 @@
 </section>
 
 	</main>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 	<script>
         window.addEventListener("load", function() {
             // --- 1. 입체 캐러셀 배너 로직 ---
@@ -190,46 +189,41 @@
                 }, 5000);
             }
 
-            // --- 2. 추천 콘텐츠 슬라이더 로직 ---
-            const recList = document.getElementById('recList');
-            const recCards = recList ? recList.querySelectorAll('.content-card') : [];
-            let recPosition = 0;
-            const cardWidth = 210 + 20; 
-            const view = document.querySelector('.recommend-view');
-            if (recCards.length > 0 && view) {
-                const containerWidth = view.offsetWidth;
-                const visibleCount = Math.floor(containerWidth / cardWidth);
-                document.getElementById('recPrev').onclick = () => { recPosition = Math.min(recPosition + cardWidth, 0); recList.style.transform = `translateX(${recPosition}px)`; };
-                document.getElementById('recNext').onclick = () => { recPosition = Math.max(recPosition - cardWidth, -(cardWidth * recCards.length - containerWidth + 10)); recList.style.transform = `translateX(${recPosition}px)`; };
-                if (recCards.length <= visibleCount) {
-                    document.getElementById('recPrev').style.display = 'none';
-                    document.getElementById('recNext').style.display = 'none';
-                }
-            }
-
-            // 3. 오픈 예정 컨텐츠: 버튼으로 1개씩 이동
+         // --- 2. 오픈 예정 콘텐츠 슬라이드 (수정본) ---
             const upView = document.getElementById('upView');
             const upPrev = document.getElementById('upPrev');
             const upNext = document.getElementById('upNext');
             const upFirstCard = document.querySelector('#upList .content-card');
 
             if (upView && upPrev && upNext && upFirstCard) {
-              const upListStyle = getComputedStyle(document.getElementById('upList'));
-              const upGap = parseFloat(upListStyle.gap || upListStyle.columnGap || 0);
-              const upStep = upFirstCard.offsetWidth + upGap;
+                // gap 값을 가져오되, 실패할 경우 기본값 15를 사용
+                const upListStyle = getComputedStyle(document.getElementById('upList'));
+                const gapValue = parseFloat(upListStyle.gap || upListStyle.columnGap);
+                const upGap = isNaN(gapValue) ? 15 : gapValue; 
+                
+                // 이동할 한 칸의 거리 계산
+                const upStep = upFirstCard.offsetWidth + upGap;
 
-              upPrev.onclick = () => upView.scrollBy({ left: -upStep, behavior: 'smooth' });
-              upNext.onclick = () => upView.scrollBy({ left: upStep, behavior: 'smooth' });
+                // 다음 버튼 클릭
+                upNext.onclick = () => {
+                    upView.scrollBy({ left: upStep, behavior: 'smooth' });
+                };
 
-              // 카드가 5개 이하이면 버튼 숨김(원하면)
-              const upCards = document.querySelectorAll('#upList .content-card');
-              if (upCards.length <= 5) {
-                upPrev.style.display = 'none';
-                upNext.style.display = 'none';
-              }
-            } else {
-              if (upPrev) upPrev.style.display = 'none';
-              if (upNext) upNext.style.display = 'none';
+                // 이전 버튼 클릭
+                upPrev.onclick = () => {
+                    upView.scrollBy({ left: -upStep, behavior: 'smooth' });
+                };
+
+                // 데이터가 화면(보통 5개)보다 적으면 버튼을 숨기되, 테스트를 위해 숫자를 확인하세요.
+                const upCards = document.querySelectorAll('#upList .content-card');
+                if (upCards.length > 5) {
+                    upPrev.style.display = 'flex';
+                    upNext.style.display = 'flex';
+                } else {
+                    // 항목이 적을 때는 버튼 숨김
+                    upPrev.style.display = 'none';
+                    upNext.style.display = 'none';
+                }
             }
     
         });

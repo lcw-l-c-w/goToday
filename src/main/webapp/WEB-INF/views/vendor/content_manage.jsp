@@ -38,7 +38,7 @@
 	<section class="content-list">
 		<div class="list-header">
 			<span class="col-info">전시 정보</span> <span class="col-period">기간</span>
-			<span class="col-status">상태</span> <span class="col-manage">관리</span>
+			<span class="col-status">상태</span> <span class="col-manage">문의</span><span class="col-manage">관리</span>
 		</div>
 		<div class="contentList" id="contentList">
 			<div class="loading">데이터를 불러오는 중입니다...</div>
@@ -76,7 +76,7 @@ const STATUS_MAP = {
 
 
 $(function () {
-    loadContentList(); // 최초 전체 목록
+    loadContentList(); 
 });
 
 let currentPage = 1;
@@ -186,6 +186,12 @@ function renderList(list) {
                     '</span>' +
                 '</div>' +
 
+                '<div class="col-manage">' +
+                    '<a href="' + ctx + '/detail/tab/inquiry?content_id=' + item.content_id + '">' +
+                        '문의관리' +
+                    '</a>' +
+                '</div>' +
+                
                 '<div class="col-manage">' +
                     '<a href="' + ctx + '/vendor/content_create?content_id=' + item.content_id + '">' +
                         '관리하기' +

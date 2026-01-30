@@ -75,17 +75,14 @@ let currentPage = 1;
 function loadContentList(page = 1) {
 	
     const keyword = $('#searchInput').val();
-    // active 클래스가 붙은 버튼의 data-status를 가져옴
     let status = $('.filter-btn.active').data('status');
     
-    // 데이터 전송 객체 구성
     const searchData = {
         keyword: keyword,
         content_status: status,
         page : page
     };
     
-    // status가 빈 문자열("")이 아닐 때만 파라미터에 추가 (전체 선택 시 제외)
     if (status !== "" && status !== undefined) {
         searchData.content_status = status;
     }
@@ -138,7 +135,7 @@ $(document).on('click', '.btn-delete', function () {
     const contentId = $(this).data('id');
     
     if (!confirm('삭제하시겠습니까?')) {
-        return; // 취소 누르면 아무것도 안 함
+        return; 
     }
 
     $.ajax({
@@ -146,7 +143,7 @@ $(document).on('click', '.btn-delete', function () {
         type: 'get',
         data: { content_id: contentId },
         success() {
-            loadContentList(); // 다시 로드
+            loadContentList(); 
         },
         error() {
             alert('삭제 실패');
