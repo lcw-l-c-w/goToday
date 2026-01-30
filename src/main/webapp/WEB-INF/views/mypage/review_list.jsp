@@ -9,43 +9,13 @@
 <title>나의 리뷰 | GoToday</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_review_list.css">
-<style>
-    /* 페이징 버튼 스타일 추가 */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin-top: 40px;
-        margin-bottom: 20px;
-        gap: 5px;
-    }
-    .page-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 32px;
-        height: 32px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #fff;
-        color: #555;
-        text-decoration: none;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-    .page-btn:hover {
-        background-color: #f0f0f0;
-        border-color: #ccc;
-    }
-    .page-btn.active {
-        background-color: #333; /* 원하시는 포인트 컬러로 변경 가능 */
-        color: #fff;
-        border-color: #333;
-        font-weight: bold;
-    }
-</style>
 </head>
 <body>
-<h1 class="page-title">나의 리뷰</h1>
+<!-- 고정 헤더 영역 -->
+<div class="fixed-header">
+	<h1 class="page-title">나의 리뷰</h1>
+</div>
+
 <div class="container">
     <div class="list-wrapper">
         <c:choose>
@@ -90,7 +60,10 @@
             </c:otherwise>
         </c:choose>
     </div>
+</div>
 
+<!-- 고정 푸터 영역 (페이징) -->
+<div class="fixed-footer">
     <c:if test="${paging.totalPage > 0}">
         <div class="pagination">
             <c:if test="${paging.startPage > 1}">
@@ -106,7 +79,7 @@
             </c:if>
         </div>
     </c:if>
-    </div>
+</div>
 
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 <script>
@@ -115,7 +88,19 @@
 <script src="${pageContext.request.contextPath}/resources/js/review/write.js"></script>
 
 <script>
+// 브라우저 스크롤 복원 비활성화
+if (history.scrollRestoration) {
+    history.scrollRestoration = 'manual';
+}
+// 부모 창 스크롤 초기화
+if (window.parent) {
+    window.parent.scrollTo(0, 0);
+}
+
 $(function() {
+    // 컨테이너 스크롤 위치 초기화
+    $(".container").scrollTop(0);
+
     // 수정 버튼 클릭
     $(".edit-btn").click(function() {
         const resId = $(this).data("reservation-id");

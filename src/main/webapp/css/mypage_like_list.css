@@ -1,25 +1,52 @@
 @charset "UTF-8";
-/* 페이지 기본 */
-body {
+
+html, body {
     font-family: 'Pretendard', sans-serif;
-    background-color: transparent;  /* 배경 투명 */
-    margin: 0;  /* 브라우저 기본 여백 제거 */
-    padding: 0;  /* 브라우저 기본 패딩 제거 */
-    color: #333;   /* 기본 글자색 진한 회색 */
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 고정 헤더 영역 */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    z-index: 100;
+    padding: 15px 20px 20px 20px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 /* 페이지 제목 */
 .page-title {
-    font-size: 28px;     /* 글자 크기 */
-    font-weight: 700;    /* 글자 두껍게 */
-    color: #111;         /* 글자 색상 */
-    margin-top: 0px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
 }
 
-/*컨테이너 */
+/* 페이지 전체 컨테이너 (스크롤 영역) */
 .container {
-    max-width: 900px;     /* 최대 900px */
-    margin: 20px auto;    /* 위/아래 20px, 좌우 가운데 정렬 */
+    max-width: 900px;
+    margin: 0 auto;
+    position: absolute;
+    top: 70px;
+    bottom: 250px;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    padding: 0 20px;
+}
+
+/* 스크롤 리스트 영역 */
+.list-wrapper {
+    padding-bottom: 10px;
 }
 
 

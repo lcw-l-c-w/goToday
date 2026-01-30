@@ -289,7 +289,24 @@ uri="http://java.sun.com/jsp/jstl/core"%>
                 </div>
             </div>
 
-            <span class="user-icon" id="myPageBtn"><span class="material-symbols-outlined">person</span></span>
+            <span class="user-icon" id="myPageBtn">
+            	<c:choose>
+				    <c:when test="${empty loginSess}">
+				        <span class="material-symbols-outlined">login</span>
+				    </c:when>
+				    <c:otherwise>
+				    	<c:choose>
+						    <c:when test="${not empty loginSess and loginSess.role == 0}">
+						        <span class="material-symbols-outlined">person</span>
+						    </c:when>
+						    <c:otherwise>
+						        <span class="material-symbols-outlined">passkey</span>
+						    </c:otherwise>
+						</c:choose>
+				    </c:otherwise>
+				</c:choose>
+            	
+            </span>
         </div>
     </div>
 </header>

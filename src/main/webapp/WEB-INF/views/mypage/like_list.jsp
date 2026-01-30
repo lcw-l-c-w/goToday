@@ -10,7 +10,11 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_like_list.css">
 </head>
 <body>
-<h1 class="page-title">찜 관리</h1>
+<!-- 고정 헤더 영역 -->
+<div class="fixed-header">
+	<h1 class="page-title">찜 관리</h1>
+</div>
+
 <div class="container">
 	<div class="list-wrapper">
 		<!-- 오늘 날짜 -->
