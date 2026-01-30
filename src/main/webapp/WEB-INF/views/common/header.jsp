@@ -30,7 +30,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
         z-index: 1000;
     }
     .nav-container {
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
         display: flex;
         align-items: center;

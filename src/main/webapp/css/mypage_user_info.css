@@ -15,6 +15,7 @@ body {
 	font-weight: 700;
 	margin-bottom: 30px;
 	color: #111;
+	padding-left:20px;
 	margin-top: 0px;
 }
 
@@ -24,7 +25,9 @@ body {
 	padding: 40px;
 	box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 	width: 100%;
-	max-width: 700px;
+	max-width: 720px;
+	min-height: 560px;
+	margin: 0px 20px;
 }
 
 .form-row {
@@ -85,10 +88,12 @@ body {
 	cursor: pointer;
 	font-weight: 700;
 	border-radius: 12px;
-	padding: 15px;
+	padding: 12px;
 	width: 100%;
-	max-width: 300px;
+	max-width: 220px;
 	margin-top: 20px;
+	font-size: 16px;
+	margin-bottom: 5px;
 }
 
 .btn-submit:hover {
