@@ -80,8 +80,8 @@
             </div>
         </section>
 
-        <h2 class="section-title">HOT 콘텐츠</h2>
         <section>
+        	<h2 class="section-title">HOT 콘텐츠</h2>
             <div class="hot-grid-container">
                 <c:if test="${not empty popularList}">
                     <div class="hot-main" onclick="location.href='${pageContext.request.contextPath}/detail/${popularList[0].content_id}'">
@@ -99,8 +99,9 @@
                     </div>
                 </c:if>
             </div>
-<h2 class="section-title">오픈 예정 콘텐츠</h2>
+		</section>
 <section class="upcoming-section" style="padding-bottom: 100px;">
+<h2 class="section-title">오픈 예정 콘텐츠</h2>
   <div class="upcoming-container">
     <button class="recommend-btn rec-prev" id="upPrev">&lt;</button>
 
