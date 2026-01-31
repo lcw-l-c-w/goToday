@@ -60,9 +60,12 @@ public class ReservationController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 		LocalDateTime NOW = LocalDateTime.now();
 
-		String[] times = dto.getTime_zone().replace(" ", "").split("~");
+		String[] times = dto.getTime_zone().replace(" ", "").split("[~-]");
 	    String startTimeStr = times[0];
-	    String endTimeStr   = times[1];
+	    String endTimeStr   = "";
+	    if (times.length > 1 && !times[1].isBlank()) {
+	        endTimeStr = times[1];
+	    }
 	    
 	    LocalDateTime startTime = LocalDateTime.parse(
 	            dto.getReserved_for_at() + " " + startTimeStr, formatter);
@@ -71,8 +74,8 @@ public class ReservationController {
 		
 	    boolean isAllDayType =
 	            dto.getContent_time() != null &&
-	            endTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[1]) &&
-	            startTimeStr.equals(dto.getContent_time().replace(" ", "").split("~")[0]);
+	            endTimeStr.equals(dto.getContent_time().replace(" ", "").split("[~-]")[1]) &&
+	            startTimeStr.equals(dto.getContent_time().replace(" ", "").split("[~-]")[0]);
 		
 	    if (isAllDayType) {
 	    	if (NOW.isAfter(endTime)) {

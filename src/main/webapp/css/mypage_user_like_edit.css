@@ -1,4 +1,8 @@
 @charset "UTF-8";
+:root {
+	--main-color: #4dc3ff;
+}
+
 body {
 	font-family: 'Pretendard', sans-serif;
 	margin: 0;
@@ -134,8 +138,9 @@ input:checked + .btn-option {
 	font-size: 16px;
 	cursor: pointer;
 	margin-bottom: 5px;
+	transition: all 0.3s ease;
 }
 
 .btn-submit:hover {
-	background: #000;
+	background: var(--main-color);
 }
