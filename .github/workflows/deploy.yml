@@ -44,13 +44,9 @@ jobs:
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
           docker stop gotoday 2>/dev/null || true
-          docker rm gotoday 2>/dev/null || tru
+          docker rm gotoday 2>/dev/null || true
           
-          docker run -d \
-            --name gotoday \
-            -p 8080:8080 \
-            -v /home/ubuntu/gotoday-data:/app/upload \      
-            ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
+          docker run -d --name gotoday -p 8080:8080 -v /home/ubuntu/gotoday-data:/app/upload ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
 
           echo "container 시작되는 지점. war 압축 해제 대기 (30초 -> 10초는 죽음)"
           sleep 30 
@@ -63,4 +59,7 @@ jobs:
           echo "컨테이너 재시작"
           docker restart gotoday
 
-          echo "배포 success"
+          echo "배포 success. 5초 대기 후 log 출력"
+          sleep 5
+          docker logs --tail 50 gotoday
+
