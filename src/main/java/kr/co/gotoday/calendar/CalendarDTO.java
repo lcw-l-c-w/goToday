@@ -10,4 +10,5 @@ public class CalendarDTO {
     
     
     private int reservation_id;
+    private int content_id;
 }

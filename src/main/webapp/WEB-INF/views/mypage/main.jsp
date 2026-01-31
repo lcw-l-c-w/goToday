@@ -8,8 +8,8 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body { f
-	ont-family: 'Pretendard', sans-serif; 
+body { 
+	font-family: 'Pretendard', sans-serif; 
 	background-color: #ffffff;
 	overflow: hidden;
 }
