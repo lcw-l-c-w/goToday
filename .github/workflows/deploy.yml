@@ -40,7 +40,7 @@ jobs:
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
-        key: ${{ secrets.EC2_SSH_KEY }}
+        key: ${{ secrets.EC2_SSH_KEY }}   #개인 .pem 
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
           docker stop gotoday || true
@@ -49,16 +49,18 @@ jobs:
           docker run -d \
             --name gotoday \
             -p 8080:8080 \
-            -v /home/ubuntu/gotoday-data:/app/upload \
-            -v /home/ubuntu/gotoday-config/application.properties:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties:ro \
-            -v /home/ubuntu/gotoday-config/db.properties:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/db.properties:ro \
-            -v /home/ubuntu/gotoday-config/api.properties:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/api.properties:ro \
+            -v /home/ubuntu/gotoday-data:/app/upload \      
             ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
 
+          echo "war 압축 해제 대기 (10초)"
           sleep 10 
 
+          echo "설정 파일 복사"
           docker cp /home/ubuntu/gotoday-config/application.properties gotoday:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
           docker cp /home/ubuntu/gotoday-config/db.properties gotoday:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
           docker cp /home/ubuntu/gotoday-config/api.properties gotoday:/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
 
+          echo "컨테이너 재시작"
           docker restart gotoday
+
+          echo "배포 success"
