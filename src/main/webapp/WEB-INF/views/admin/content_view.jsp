@@ -11,32 +11,6 @@
   </title>
 <link rel="stylesheet" href="${ctx}/css/vendor_content_create.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="/gotoday/smarteditor/js/HuskyEZCreator.js"></script>
-<script>
-//네이버 스마트 에디터
-var oEditors = [];
-$(function() {
-    nhn.husky.EZCreator.createInIFrame({
-        oAppRef: oEditors,
-        elPlaceHolder: "detail_description",
-        sSkinURI: "/gotoday/smarteditor/SmartEditor2Skin.html",    
-        htParams : {
-            bUseToolbar : true,                // 툴바 사용 여부 (true:사용/ false:사용하지 않음)
-            bUseVerticalResizer : true,        // 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
-            bUseModeChanger : true,            // 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음)
-            fOnBeforeUnload : function(){
-            }
-        }, //boolean
-        fOnAppLoad : function(){
-            oEditors.getById["detail_description"].exec("DISABLE_WYSIWYG");
-            oEditors.getById["detail_description"].exec("DISABLE_ALL_UI");
-        }
-,
-        fCreator: "createSEditor2"
-    });
-})
-
-</script>
 </head>
 <body>
 
@@ -294,8 +268,9 @@ $(function() {
 	    <h2>상세 소개</h2>
 	    <hr>
 	
-	    <!-- 네이버 에디터 placeholder -->
-	    <textarea name="detail_description" id="detail_description" style="width:100%;">${contentVO.detail_description }</textarea>
+	    <div class="detail-view">
+        	${contentVO.detail_description}
+    	</div>
     </section>
 
     <!-- 하단 버튼 -->
