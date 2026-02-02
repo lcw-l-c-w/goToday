@@ -188,6 +188,7 @@ public class MypageController {
     public String showReservationList(
     		@RequestParam(required = false, defaultValue = "ALL") String filter,
     		@RequestParam(required = false, defaultValue = "1") Integer page,
+    		@RequestParam(required = false, defaultValue = "") String keyword,
     		HttpSession sess,
     		Model model) {
     	UserVO userVO = (UserVO)sess.getAttribute("loginSess");
@@ -198,10 +199,11 @@ public class MypageController {
             return "common/return";
         }
 
-    	Map<String, Object> result = reservationService.findReservationListByUserId(userVO.getUser_id(), filter, page);
+    	Map<String, Object> result = reservationService.findReservationListByUserId(userVO.getUser_id(), filter, page, keyword);
     	model.addAttribute("reservationList", result.get("list"));
     	model.addAttribute("pageInfo", result.get("pageInfo"));
     	model.addAttribute("currentFilter", filter);
+    	model.addAttribute("keyword", keyword);
 
     	return "mypage/reserve_list";
     }

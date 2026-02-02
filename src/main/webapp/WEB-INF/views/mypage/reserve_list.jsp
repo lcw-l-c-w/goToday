@@ -144,43 +144,53 @@
 	</div>
 </div>
 
-<!-- 고정 푸터 영역 (페이징) -->
+<!-- 고정 푸터 영역 (페이징 + 검색) -->
 <div class="fixed-footer">
-	<c:if test="${pageInfo.totalPage > 1}">
-		<div class="pagination">
-			<%-- 이전 블록 --%>
-			<c:choose>
-				<c:when test="${pageInfo.prev}">
-					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}" class="prev">&laquo;</a>
-				</c:when>
-				<c:otherwise>
-					<span class="prev disabled">&laquo;</span>
-				</c:otherwise>
-			</c:choose>
-
-			<%-- 페이지 번호 --%>
-			<c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="i">
+	<div class="footer-content">
+		<c:if test="${pageInfo.totalPage > 1}">
+			<div class="pagination">
+				<%-- 이전 블록 --%>
 				<c:choose>
-					<c:when test="${i == pageInfo.page}">
-						<span class="active">${i}</span>
+					<c:when test="${pageInfo.prev}">
+						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.startPage - 1}&keyword=${keyword}" class="prev">&laquo;</a>
 					</c:when>
 					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}">${i}</a>
+						<span class="prev disabled">&laquo;</span>
 					</c:otherwise>
 				</c:choose>
-			</c:forEach>
 
-			<%-- 다음 블록 --%>
-			<c:choose>
-				<c:when test="${pageInfo.next}">
-					<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}" class="next">&raquo;</a>
-				</c:when>
-				<c:otherwise>
-					<span class="next disabled">&raquo;</span>
-				</c:otherwise>
-			</c:choose>
+				<%-- 페이지 번호 --%>
+				<c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="i">
+					<c:choose>
+						<c:when test="${i == pageInfo.page}">
+							<span class="active">${i}</span>
+						</c:when>
+						<c:otherwise>
+							<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${i}&keyword=${keyword}">${i}</a>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+
+				<%-- 다음 블록 --%>
+				<c:choose>
+					<c:when test="${pageInfo.next}">
+						<a href="${pageContext.request.contextPath}/mypage/reservation?filter=${currentFilter}&page=${pageInfo.endPage + 1}&keyword=${keyword}" class="next">&raquo;</a>
+					</c:when>
+					<c:otherwise>
+						<span class="next disabled">&raquo;</span>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</c:if>
+
+		<div class="search-box">
+			<form id="searchForm" action="${pageContext.request.contextPath}/mypage/reservation" method="get">
+				<input type="hidden" name="filter" value="${currentFilter}">
+				<input type="text" name="keyword" id="searchKeyword" value="${keyword}" placeholder="예약번호 or 타이틀명 검색">
+				<button type="submit" class="search-btn">검색</button>
+			</form>
 		</div>
-	</c:if>
+	</div>
 </div>
 <jsp:include page="/WEB-INF/views/review/write.jsp" />
 
