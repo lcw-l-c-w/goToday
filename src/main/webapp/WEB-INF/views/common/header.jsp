@@ -225,7 +225,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
 <header class="header">
     <div class="nav-container">
         <div class="logo">
-            <a href="${pageContext.request.contextPath}">
+            <a href="${pageContext.request.contextPath}/main">
                 <img src="<c:url value='/img/logo.png'/>" alt="Logo" />
             </a>
         </div>
