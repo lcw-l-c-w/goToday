@@ -18,8 +18,8 @@ html, body {
     background-color: #ffffff;
     z-index: 100;
     padding: 0px 20px 20px 20px;
-    max-width: 900px;
     margin: 0 auto;
+    max-width: 900px;
     display: flex;
     justify-content: space-between;
     align-items: center;

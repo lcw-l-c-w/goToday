@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.co.gotoday.content.ContentEnum;
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.reservation.VendorReservationListDTO;
 import kr.co.gotoday.reservation.VendorReservationSearchDTO;
 import kr.co.gotoday.user.UserVO;
 
@@ -224,8 +226,22 @@ public class VendorController {
 	@ResponseBody
 	public Map<String, Object> updateStatus(
 	    @RequestParam("reserve_id") int reserve_id, // "reserve_id"라고 명시
-	    @RequestParam("status") String status          // "status"라고 명시
+	    @RequestParam("status") String status,          // "status"라고 명시
+	    HttpSession sess
 	) {
+		UserVO login = (UserVO)sess.getAttribute("loginSess");
+		if(login == null) {
+			return Map.of(
+					"success", false,
+					"code", "NO_AUTH",
+					"message", "로그인이 필요합니다.");
+		}
+		
+		int user_id = vendorService.findReservationWithVendorMoblieStatus(reserve_id);
+		if(user_id != login.getUser_id()) {
+			return Map.of("success", false, "message", "이 업체의 예약이 아닙니다.");
+		}
+		
 	    Map<String, Object> resultMap = new HashMap<>();
 	    try {
 	        int result = vendorService.updateReservationStatus(reserve_id);
@@ -249,6 +265,20 @@ public class VendorController {
 	public String contentReserve() {
 		
 		return "vendor/reserve_pay_manage";
+	}
+	
+	@GetMapping("/common/mobile/{reserve_id}")
+	public String moblieReserve (@PathVariable("reserve_id") int reserve_id, Model model) {
+		VendorReservationListDTO reservation = vendorService.findReservationByVendorMobile(reserve_id);
+		
+		if (reservation == null) {
+	        model.addAttribute("msg", "예약 정보를 찾을 수 없습니다.");
+	        model.addAttribute("cmd", "back");
+	        
+	        return "common/return";
+	    }
+		model.addAttribute("reservation", reservation);
+		return "common/mobile";
 	}
 
 }

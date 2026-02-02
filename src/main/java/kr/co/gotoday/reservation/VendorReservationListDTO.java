@@ -9,6 +9,10 @@ public class VendorReservationListDTO {
     private String visit_date;
     private String visit_time;
     private Integer person_count;
+    private Integer adult_qty;
+    private Integer child_qty;
+    private Integer teen_qty;
+    
     private String reserve_status;
     private String pay_status;
     private String content_title;
