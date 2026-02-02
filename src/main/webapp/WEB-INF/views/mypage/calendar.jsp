@@ -43,27 +43,119 @@ body {
 /* 오른쪽 리스트 스타일 */
 #event-container {
 	padding: 20px;
+	background: #fff;
 	border-left: 1px solid #ddd;
-	height: 100%;
+	height: 61vh;
+	overflow-y: auto;
+}
+
+#event-container h2 {
+	font-size: 20px;
+	font-weight: 700;
+	color: #111;
+}
+
+#event-container hr {
+	border: none;
+	border-top: 1px solid #eee;
+	margin: 15px 0;
 }
 
 .event-item {
 	padding: 10px 0;
 	border-bottom: 1px solid #eee;
 	font-size: 14px;
-	display: flex; /* 색상 점과 텍스트 정렬용 */
+	display: flex;
 	align-items: center;
 }
 
+.event-item .color-dot {
+	margin-right: 8px;
+}
+
+.event-item .color-dot.reservation {
+	color: #4dc3ff;
+}
+
+.event-item .color-dot.pick {
+	color: #ff9f89;
+}
+
+.event-title {
+	color: black;
+	font-size: 14px;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex: 1;
+}
+
+.delete-btn {
+	background: transparent;
+	border: none;
+	color: #999;
+	cursor: pointer;
+	padding: 5px 8px;
+	font-size: 14px;
+	font-weight: 600;
+	transition: all 0.2s;
+	margin-left: 10px;
+}
+
+.delete-btn:hover {
+	color: #ff4444;
+}
+
 .event-item a {
-	text-decoration: none; /* 밑줄 없애기 */
-	color: black; /* 글자색 검정으로 고정 (보라색 방지) */
-	cursor: pointer; /* 마우스 올리면 손가락 모양 */
+	text-decoration: none;
+	color: black;
+	cursor: pointer;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex: 1;
 }
 
 .event-item a:hover {
-	color: orange; /* 마우스 올리면 오렌지색 (선택사항) */
-	font-weight: bold; /* 굵게 (선택사항) */
+	color: orange;
+	font-weight: bold;
+}
+
+/* FullCalendar 더보기 버튼 스타일 */
+.fc-daygrid-more-link {
+	color: #4dc3ff !important;
+	font-weight: 600;
+	font-size: 12px;
+}
+
+/* FullCalendar 팝오버 스타일 */
+.fc-popover {
+	border-radius: 12px !important;
+	border: 2px solid #eee !important;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.fc-popover-header {
+	background: #f9f9f9 !important;
+	border-radius: 10px 10px 0 0 !important;
+	padding: 10px 12px !important;
+	font-weight: 600 !important;
+}
+
+.fc-popover-body {
+	padding: 8px !important;
+}
+
+.fc-popover-body .fc-daygrid-event-harness {
+	margin-bottom: 6px !important;
+}
+
+.fc-popover-body .fc-daygrid-event-harness:last-child {
+	margin-bottom: 0 !important;
 }
 </style>
 
@@ -79,8 +171,10 @@ body {
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView : 'dayGridMonth',
             locale : 'ko',
-            selectable : true, 
-            height: 700, 
+            selectable : true,
+            height: 700,
+            dayMaxEvents: 2, // 일정이 2개 초과시 "더보기" 표시
+            moreLinkClick: 'popover', // 더보기 클릭 시 팝오버로 전체 일정 표시 
 
             // [중요] 날짜 클릭 시 실행
             dateClick : function(info) {
@@ -101,34 +195,29 @@ body {
 
                 if (filteredEvents.length > 0) {
                     filteredEvents.forEach(function(event) {
-                        // 색상 점 만들기
-                        var colorDot = '<span style="color:' + event.color + '; margin-right:8px;">●</span>';
-                        
-                        // ★ [수정됨] 백틱(`) 대신 따옴표(')와 더하기(+)를 사용해서 안전하게 연결합니다.
-                        
-                        if (event.color === '#4dc3ff') { 
+                        if (event.color === '#4dc3ff') {
                             // [CASE 1] 파란색(예약) -> 상세 페이지 이동
-                            // contextPath 변수 사용
                             var html = "<div class='event-item'>";
-                            html += "<a href='" + contextPath + "/mypage/reservation/" + event.reservation_id + "'>";
-                            html += colorDot + " " + event.title;
-                            html += "</a></div>";
-                            
-                            listDiv.innerHTML += html;
-                                
-                        } else if (event.color === '#ff9f89') { 
-                            // [CASE 2] 주황색(찜) -> 삭제 버튼 표시
-                            var html = "<div class='event-item' style='display: flex; justify-content: space-between; align-items: center;'>";
-                            html += "<span>" + colorDot + " " + event.title + "</span>";
-                            html += "<button onclick='deletePick(" + event.reservation_id + ")' style='border:1px solid #ddd; background:#fff; color:red; cursor:pointer; padding:2px 6px; font-size:12px; border-radius:4px;'>삭제</button>";
+                            html += "<span class='color-dot reservation'>●</span>";
+                            html += "<a href='" + contextPath + "/mypage/reservation/" + event.reservation_id + "' title='" + event.title + "'>" + event.title + "</a>";
                             html += "</div>";
-                            
+
+                            listDiv.innerHTML += html;
+
+                        } else if (event.color === '#ff9f89') {
+                            // [CASE 2] 주황색(찜) -> 콘텐츠 상세 페이지 이동
+                            var html = "<div class='event-item'>";
+                            html += "<span class='color-dot pick'>●</span>";
+                            html += "<a href='javascript:void(0);' onclick='goToDetail(" + event.content_id + ")' title='" + event.title + "'>" + event.title + "</a>";
+                            html += "<button class='delete-btn' onclick='deletePick(" + event.reservation_id + ")'>X</button>";
+                            html += "</div>";
+
                             listDiv.innerHTML += html;
                         }
                     });
                 } else {
                     // 일정이 없으면
-                    listDiv.innerHTML = "<div class='event-item' style='color:#999;'>일정이 없습니다.</div>";
+                    listDiv.innerHTML = "<div style='color:#999; text-align:center;'>일정이 없습니다.</div>";
                 }
             },
             
@@ -152,7 +241,12 @@ body {
         });
     });
 
-    // 4. 캘린더 삭제 함수
+    // 4. 콘텐츠 상세 페이지 이동 (iframe 탈출)
+    function goToDetail(contentId) {
+        window.top.location.href = contextPath + "/detail/" + contentId;
+    }
+
+    // 5. 캘린더 삭제 함수
     function deletePick(id) { 
         if(!confirm("캘린더 목록에서 삭제하시겠습니까?")) return;
 
@@ -194,8 +288,8 @@ body {
 					<br>
 
 					<div id="event-list-box">
-						<div style="color: #999;">
-							달력의 날짜를 클릭하면<br> 예약/찜 내역이 여기에 표시됩니다.
+						<div style="color: #999; text-align: center; line-height: 1.8;">
+							달력의 날짜를 클릭하면<br>예약/찜 내역이<br>여기에 표시됩니다.
 						</div>
 					</div>
 				</div>

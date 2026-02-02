@@ -15,7 +15,7 @@ html, body {
 .fixed-header {
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px 20px 10px 20px;
+    padding: 0px 20px 20px 20px;
 }
 
 .page-title {
@@ -84,13 +84,25 @@ html, body {
 /* 6. 페이징 버튼 영역 (위치 고정) */
 .pagination {
     flex-shrink: 0;
-    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
 
 }
+.fixed-footer {
+	position: fixed;
+	bottom: 300px;
+	left: 0;
+	right: 0;
+	background-color: #ffffff;
+	z-index: 100;
+	padding: 15px 20px 20px 20px;
+	max-width: 900px;
+	margin: 0 auto;
+	height: 50px;
+}
+
 
 .page-btn {
     display: flex;
@@ -104,6 +116,13 @@ html, body {
     color: #333;
     text-decoration: none;
     font-size: 14px;
+    transition: all 0.2s;
+}
+
+.page-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+    cursor: pointer;        /* 선택 */
 }
 
 .page-btn.active {

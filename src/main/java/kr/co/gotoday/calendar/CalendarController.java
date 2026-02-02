@@ -95,6 +95,12 @@ public class CalendarController {
 		return result;
 	}
 
+	// 캘린더에서 콘텐츠 상세 페이지로 이동 (iframe 탈출용)
+	@GetMapping("/calendar/detail/{contentId}")
+	public String goToContentDetail(@org.springframework.web.bind.annotation.PathVariable("contentId") int contentId) {
+		return "redirect:/detail/" + contentId;
+	}
+
 	@PostMapping("/calendar/remove")
 	@ResponseBody
 	public Map<String, Object> removeCalendar(@RequestBody Map<String, Integer> params, HttpSession session) {

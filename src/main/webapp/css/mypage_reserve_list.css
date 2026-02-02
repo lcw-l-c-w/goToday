@@ -17,7 +17,7 @@ html, body {
     right: 0;
     background-color: #ffffff;
     z-index: 100;
-    padding: 15px 20px 20px 20px;
+    padding: 0px 20px 20px 20px;
     max-width: 900px;
     margin: 0 auto;
     display: flex;
@@ -74,7 +74,7 @@ html, body {
 /* 고정 푸터 영역 */
 .fixed-footer {
     position: fixed;
-    bottom: 250px;
+    bottom: 300px;
     left: 0;
     right: 0;
     background-color: #ffffff;

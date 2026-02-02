@@ -8,27 +8,31 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body { f
-	ont-family: 'Pretendard', sans-serif; 
+body { 
+	font-family: 'Pretendard', sans-serif; 
 	background-color: #ffffff;
+	overflow: hidden;
 }
 
 .container {
     display: flex;
-    gap: 40px;
+    gap: 30px;
     padding: 60px 8%;
     max-width: 1400px;
     margin: 0 auto;
+    
 }
 
 .content {
     flex: 1;
     min-width: 0;
+    height: 70vh;
 }
 
 .main-content {
     width: 100%;
     background-color: transparent; 
+    height: 70vh;
 }
 
 .main-content iframe {
