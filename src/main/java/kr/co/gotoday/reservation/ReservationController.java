@@ -462,6 +462,7 @@ public class ReservationController {
         ReservationVO reservationVO =reservationService.findByReservationId(reservation_id); 
         if(reservationVO==null) {
             model.addAttribute("msg","존재하지 않는 예약입니다");
+            model.addAttribute("cmd","back");
             return "common/return";
         }
         
@@ -469,7 +470,7 @@ public class ReservationController {
         ContentVO contentVO = contentService.getDetailContentsForTicket(reservationVO.getContent_id(), userVO.getUser_id());
         if(contentVO == null) {
             // 콘텐츠 정보가 사라졌거나 가져올 수 없는 경우에 대한 처리
-        	System.out.println("???");
+        	
             model.addAttribute("msg", "해당 콘텐츠 정보를 불러올 수 없습니다.");
             return "common/return";
         }
