@@ -53,22 +53,15 @@ public class ContentReplyController {
 
 	// 작성폼으로 이동
 	@GetMapping("/detail/tab/inquiry/write/{content_id}")
-	public String writeQuestion(@PathVariable("content_id") int content_id, Model model, HttpSession sess) {
+	public String writeQuestion(@PathVariable("content_id") int content_id, Model model, HttpSession sess,HttpServletRequest request) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-
-		// 2. 로그인 안 되어 있으면 로그인 페이지로
-		if (user == null) {
-			model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return";
-		}
+		String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
 
 		if (user.getRole() == 1) {
 			// vendor인경우
 			model.addAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
 			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/detail/" + content_id + "?tab=inquiry");
+			model.addAttribute("url", cp+"/detail/" + content_id + "?tab=inquiry");
 			return "common/return";
 		}
 		model.addAttribute("content_id", content_id);
@@ -81,18 +74,12 @@ public class ContentReplyController {
 	public String InsertQuestion(@RequestParam int content_id, Model model, HttpSession sess, ContentReplyVO vo,
 			@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-
-		// 로그인 여부 체크 ㄱ ㅍ/9
-		if (user == null) {
-			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return";
-		}
+		String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
+	
 		if (user.getRole() == 1) {
 			// vendor인경우
 			model.addAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
-			model.addAttribute("url", "/gotoday/detail/" + content_id + "?tab=inquiry");
+			model.addAttribute("url", cp+"/detail/" + content_id + "?tab=inquiry");
 			model.addAttribute("cmd", "move");
 			return "common/return";
 		}
@@ -101,8 +88,8 @@ public class ContentReplyController {
 		if (file != null && !file.isEmpty()) {
 			try {
 				// 1. 저장할 절대 경로 설정 (webapp/resources/upload/inquiry/)
-				 uploadPath += "/inquiry/";
-				File folder = new File(uploadPath);
+				String realUploadPath = uploadPath + File.separator + "inquiry" + File.separator;
+				File folder = new File(realUploadPath);
 				if (!folder.exists())
 					folder.mkdirs(); // 폴더가 없으면 생성
 
@@ -111,7 +98,7 @@ public class ContentReplyController {
 				String saveName = System.currentTimeMillis() + "_" + originName;
 
 				// 3. 실제 서버 폴더에 파일 저장
-				file.transferTo(new File(uploadPath + saveName));
+				file.transferTo(new File(realUploadPath + saveName));
 
 				// 4. DB에 저장할 상대 경로를 VO에 세팅
 				// 나중에 <img src="/resources/upload/inquiry/파일명"> 으로 쓰기 위함
@@ -130,8 +117,9 @@ public class ContentReplyController {
 		int success = contentReplyService.insertQA(vo);
 		if (success == 1) {
 			// 성공했을 경우
+			
 			model.addAttribute("msg", "등록되었습니다.");
-			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("url", cp+"/detail/" + vo.getContent_id() + "?tab=inquiry");
 			model.addAttribute("cmd", "move");
 			return "common/return";
 
@@ -170,8 +158,8 @@ public class ContentReplyController {
 				if (file != null && !file.isEmpty()) {
 					try {
 						// 1. 저장할 절대 경로 설정 (webapp/resources/upload/inquiry/)
-						String uploadPath = request.getServletContext().getRealPath("/resources/upload/inquiry/");
-						File folder = new File(uploadPath);
+						String realUploadPath = uploadPath + File.separator + "inquiry" + File.separator;
+						File folder = new File(realUploadPath);
 						if (!folder.exists())
 							folder.mkdirs(); // 폴더가 없으면 생성
 
@@ -180,7 +168,7 @@ public class ContentReplyController {
 						String saveName = System.currentTimeMillis() + "_" + originName;
 
 						// 3. 실제 서버 폴더에 파일 저장
-						file.transferTo(new File(uploadPath + saveName));
+						file.transferTo(new File(realUploadPath + saveName));
 
 						// 4. DB에 저장할 상대 경로를 VO에 세팅
 						// 나중에 <img src="/resources/upload/inquiry/파일명"> 으로 쓰기 위함
@@ -197,8 +185,9 @@ public class ContentReplyController {
 			
 			int success2=contentReplyService.updateStatus(vo.getGno());
 			if(success2==1){
+				String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
 			model.addAttribute("msg", "등록되었습니다.");
-			model.addAttribute("url","/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("url",cp+"/detail/" + vo.getContent_id() + "?tab=inquiry");
 			model.addAttribute("cmd", "move");
 			return "common/return";
 			}
@@ -219,18 +208,10 @@ public class ContentReplyController {
 		// 가지고 가기
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 
-		// 예외처리
-		if (user == null) {
-			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return";
-		}
-		// 본인이 아닌경우 막기
 		// 일단 불러오기
 		ContentReplyVO result = contentReplyService.getReplyForUser(creply_id, user.getUser_id());
 		if (result.getUser_id() != user.getUser_id()) {
-			model.addAttribute("msg", "본인이 아닌경우 수정이 어렵습니다..");
+			model.addAttribute("msg", "본인이 아닌경우 수정이 어렵습니다.");
 			model.addAttribute("cmd", "back");
 			return "common/return";
 		}
@@ -252,12 +233,7 @@ public class ContentReplyController {
 	        @RequestParam(value="fileDelete", required=false) String fileDelete,HttpServletRequest request) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 
-		if (user == null) {
-			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return";
-		}
+		
 		// 2. 기존 데이터 조회 (기존 파일 경로 확인 및 본인 확인용)
 	    ContentReplyVO original = contentReplyService.getReplyForUser(vo.getCreply_id(), user.getUser_id());
 	    if (original == null) {
@@ -266,9 +242,9 @@ public class ContentReplyController {
 	        return "common/return";
 	    }
 	 // 3. 파일 처리 로직 시작
-	    String uploadPath = request.getServletContext().getRealPath("/resources/upload/inquiry/");
-	    vo.setFile_path(original.getFile_path()); // 기본적으로 기존 경로 유지
-
+	    String realUploadPath = uploadPath + File.separator + "inquiry" + File.separator;
+	    vo.setFile_path(original.getFile_path());
+	    
 	    // (1) 기존 파일 삭제 체크박스를 선택한 경우
 	    if ("ok".equals(fileDelete)) {
 	        deletePhysicalFile(request, original.getFile_path());
@@ -284,13 +260,13 @@ public class ContentReplyController {
 
 	        try {
 	            // 폴더 생성
-	            File folder = new File(uploadPath);
+	            File folder = new File(realUploadPath);
 	            if (!folder.exists()) folder.mkdirs();
 
 	            // 파일 저장
 	            String originName = file.getOriginalFilename();
 	            String saveName = System.currentTimeMillis() + "_" + originName;
-	            file.transferTo(new File(uploadPath + File.separator + saveName));
+	            file.transferTo(new File(realUploadPath + File.separator + saveName));
 
 	            // VO에 새 경로 세팅
 	            vo.setFile_path("/resources/upload/inquiry/" + saveName);
@@ -302,8 +278,9 @@ public class ContentReplyController {
 		int success = contentReplyService.updateQA(vo);
 		if (success == 1) {
 			// 성공했을 경우
+			String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
 			model.addAttribute("msg", "수정되었습니다.");
-			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry");
+			model.addAttribute("url", cp+"/detail/" + vo.getContent_id() + "?tab=inquiry");
 			model.addAttribute("cmd","move");
 			return "common/return";
 		} else {
@@ -316,22 +293,18 @@ public class ContentReplyController {
 
 	// 삭제 (예외처리할것-> 회원이 삭제할 경우 , 서비스단 vendor껏도 삭제해야하고 / vendor가 삭제하는 경우 상태 변경도 해줘야함)
 	@PostMapping("/detail/tab/inquiry/delete")
-	public String deleteQuestion(HttpSession sess, ContentReplyVO vo, Model model) {
+	public String deleteQuestion(HttpSession sess, ContentReplyVO vo, Model model,HttpServletRequest request) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 
-		if (user == null) {
-			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return";
-		}
+	
 
 		vo.setUser_id(user.getUser_id());
 		int success = contentReplyService.deleteQA(vo);
 		if (success == 1) {
 			// 성공했을 경우
+			String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
 			model.addAttribute("msg", "삭제되었습니다.");
-			model.addAttribute("url", "/gotoday/detail/" + vo.getContent_id() + "?tab=inquiry"); // 이동할 경로
+			model.addAttribute("url", cp+ "/detail/" + vo.getContent_id() + "?tab=inquiry"); // 이동할 경로
 			model.addAttribute("cmd", "move");
 			return "common/return";
 		} else {
@@ -345,12 +318,7 @@ public class ContentReplyController {
 	@GetMapping("/inquiry/my")
 	public String showQuestion(HttpSession sess, Model model) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-		if (user == null) {
-			model.addAttribute("msg", "로그인이 필요합니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", "/gotoday/member/login");
-			return "common/return";
-		}
+		
 
 		List<ContentReplyVO> voList = contentReplyService.showQAByID(user.getUser_id());
 		model.addAttribute("list", voList);
@@ -387,8 +355,10 @@ public class ContentReplyController {
 	// 물리적 파일 삭제 공통 메서드
 	private void deletePhysicalFile(HttpServletRequest request, String filePath) {
 	    if (filePath != null && !filePath.isEmpty()) {
-	        String fullPath = request.getServletContext().getRealPath(filePath);
-	        File f = new File(fullPath);
+	    	String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+	    	String fullPath = uploadPath + File.separator + "inquiry" + File.separator + fileName;
+	        
+	    	File f = new File(fullPath);
 	        if (f.exists()) {
 	            f.delete();
 	        }

@@ -64,7 +64,7 @@
            
         </header>
 
-        <form method="post" name="frm" id="frm" action="/gotoday/detail/tab/inquiry/modify" enctype="multipart/form-data">
+        <form method="post" name="frm" id="frm" action="${ctx}/detail/tab/inquiry/modify" enctype="multipart/form-data">
            <input type="hidden" name="creply_id" value="${item.creply_id}" />
   		  <input type="hidden" name="content_id" value="${item.content_id}" />
             <table class="edit-form-table">
