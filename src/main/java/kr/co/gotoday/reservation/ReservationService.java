@@ -11,7 +11,7 @@ public interface ReservationService {
 	int calculate(ReservationDTO reservationDTO, ContentVO contentVO);
 
 	ReservationVO findByReservationId(int reservation_id);
-	PaymentVO findByOrderId(String order_key);
+	ReservationVO confirmFreeReservation(ReservationVO reservationVO, String order_key);
 
 	ReservationVO convertToVO(ReservationDTO dto, ReservationVO vo);
 	
