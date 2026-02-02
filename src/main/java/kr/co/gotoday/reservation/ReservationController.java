@@ -249,6 +249,11 @@ public class ReservationController {
 	            
 	            //success get 접근을 막기 위한 예약코드
 	            session.setAttribute("LAST_RESERVATION_CODE", resultVO.getReservation_code());
+	            
+	    		// 세션 정리
+	            session.removeAttribute("schedule");
+	            session.removeAttribute("pendingReservation");
+	            session.removeAttribute("paymentDTO");
 
 	            return ResponseEntity.ok(result);
 			}
@@ -306,11 +311,6 @@ public class ReservationController {
 		model.addAttribute("orderId", orderId);
 		model.addAttribute("amount", amount ==null ? 0 : amount);
 		model.addAttribute("reservationCode", reservationCode);
-		
-		// 세션 정리
-        session.removeAttribute("schedule");
-        session.removeAttribute("pendingReservation");
-        session.removeAttribute("paymentDTO");
 
 		return "reserve_pay/success";
 	}
