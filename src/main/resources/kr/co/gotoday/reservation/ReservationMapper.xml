@@ -218,8 +218,6 @@
 				AND r.reservation_status = 'DONE'
 			</when>
 			<when test="filter == 'VISITED'">
-				AND (DATE(r.reserved_for_at) &lt; CURDATE() 
-          			OR DATE(r.reserved_for_at) = CURDATE())
 	            AND r.reservation_status = 'VISITED'
 			</when>
 			<when test="filter == 'END'">
@@ -249,15 +247,13 @@
 	            AND DATE(r.reserved_for_at) >= CURDATE()
 	            AND r.reservation_status = 'DONE'
 	        </when>
-	
-	    	<when test="filter == 'END'">
-	            AND DATE(r.reserved_for_at) &lt; CURDATE()
-	        </when>
 	        
           	<when test="filter == 'VISITED'">
-          		AND (DATE(r.reserved_for_at) &lt; CURDATE() 
-          			OR DATE(r.reserved_for_at) = CURDATE())
 	            AND r.reservation_status = 'VISITED'
+	        </when>
+	        
+	    	<when test="filter == 'END'">
+	            AND DATE(r.reserved_for_at) &lt; CURDATE()
 	        </when>
 	        
 	        <otherwise></otherwise>
