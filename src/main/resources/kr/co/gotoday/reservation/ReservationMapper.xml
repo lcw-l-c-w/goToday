@@ -225,6 +225,12 @@
 			</when>
 			<otherwise></otherwise>
 		</choose>
+		<if test="keyword != null and keyword != ''">
+			AND (
+				r.reservation_code LIKE CONCAT('%', #{keyword}, '%')
+				OR c.title LIKE CONCAT('%', #{keyword}, '%')
+			)
+		</if>
 	</select>
 
 	<select id="findReservationListByUserId" parameterType="map" resultType="kr.co.gotoday.reservation.ReservationListDTO">
@@ -242,26 +248,32 @@
 	        <when test="filter == 'CANCELED'">
 	            AND r.reservation_status = 'CANCELED'
 	        </when>
-	
+
 	        <when test="filter == 'UPCOMING'">
 	            AND DATE(r.reserved_for_at) >= CURDATE()
 	            AND r.reservation_status = 'DONE'
 	        </when>
-	        
+
           	<when test="filter == 'VISITED'">
 	            AND r.reservation_status = 'VISITED'
 	        </when>
-	        
+
 	    	<when test="filter == 'END'">
 	            AND DATE(r.reserved_for_at) &lt; CURDATE()
 	        </when>
-	        
+
 	        <otherwise></otherwise>
 	    </choose>
-		ORDER BY 
-			CASE 
-	        WHEN r.reserved_for_at >= CURDATE() THEN 0 
-	        ELSE 1 
+		<if test="keyword != null and keyword != ''">
+			AND (
+				r.reservation_code LIKE CONCAT('%', #{keyword}, '%')
+				OR c.title LIKE CONCAT('%', #{keyword}, '%')
+			)
+		</if>
+		ORDER BY
+			CASE
+	        WHEN r.reserved_for_at >= CURDATE() THEN 0
+	        ELSE 1
 	    END,
 	    ABS(DATEDIFF(r.reserved_for_at, CURDATE())),
 	    r.time_zone
@@ -314,7 +326,8 @@
 	
 	<update id="updatePaymentStatus" parameterType="map">
 		UPDATE payment
-		SET payment_status = #{payment_status}
+		SET payment_status = #{payment_status},
+			paid_at = NOW()
 		WHERE order_key = #{order_key}
 	</update>
 	
