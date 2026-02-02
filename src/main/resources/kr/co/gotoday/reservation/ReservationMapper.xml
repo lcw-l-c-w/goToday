@@ -199,6 +199,7 @@
 			paid_at
 		FROM payment
 		WHERE order_key = #{order_key}
+		FOR UPDATE
 	</select>
 	
 	<!-- 예약 목록 COUNT -->
