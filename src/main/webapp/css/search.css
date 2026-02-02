@@ -102,12 +102,12 @@ img {
 
 .poster-like-btn:hover {
 	transform: translateY(-2px);
-	border-color: var(- -main-color);
+	border-color: var(--main-color);
 }
 
 .poster-like-btn.active-liked {
 	background: #f0faff;
-	border-color: var(- -main-color);
+	border-color: var(--main-color);
 }
 
 /* 5. 정보 및 예매 섹션 */
@@ -139,13 +139,13 @@ img {
 .reserve-section {
 	display: flex;
 	gap: 20px;
-	border-top: 1px solid var(- -border-color);
+	border-top: 1px solid var(--border-color);
 	padding-top: 30px;
 }
 
 #calendar {
 	flex: 1.2;
-	border: 1px solid var(- -border-color);
+	border: 1px solid var(--border-color);
 	border-radius: 10px;
 	padding: 10px;
 	font-size: 12px;
@@ -153,7 +153,7 @@ img {
 
 .time-selector {
 	flex: 1;
-	border: 1px solid var(- -border-color);
+	border: 1px solid var(--border-color);
 	border-radius: 10px;
 	padding: 15px;
 	background: #fafafa;
@@ -164,7 +164,7 @@ img {
 	align-items: center;
 	padding: 10px;
 	background: #fff;
-	border: 1px solid var(- -border-color);
+	border: 1px solid var(--border-color);
 	border-radius: 6px;
 	margin-bottom: 8px;
 	cursor: pointer;
@@ -215,7 +215,7 @@ img {
 .tab-menu {
 	display: flex;
 	list-style: none;
-	border-bottom: 2px solid var(- -border-color);
+	border-bottom: 2px solid var(--border-color);
 	margin-bottom: 30px;
 }
 
@@ -230,7 +230,7 @@ img {
 
 .tab-item.active {
 	color: #333;
-	border-bottom: 3px solid var(- -main-color);
+	border-bottom: 3px solid var(--main-color);
 }
 
 .tab-panel {
