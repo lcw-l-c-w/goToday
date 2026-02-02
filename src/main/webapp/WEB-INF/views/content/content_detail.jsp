@@ -366,7 +366,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 		<div class="content-title-area">
 			<div>
 				<h1>${content.title}</h1>
-				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at.substring(0,10)}
+				<p style="margin-top: 8px; color: var(--text-gray);">${content.start_at.substring(0,10)}
 					~ ${content.end_at.substring(0,10)}  |  ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">

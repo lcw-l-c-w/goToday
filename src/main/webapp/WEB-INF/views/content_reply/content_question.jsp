@@ -158,7 +158,9 @@
     </div>
 
     <script>
-    
+    const CTX = "${pageContext.request.contextPath}";
+    const CURRENT_USER_ID = "${loginSess.user_id}";
+    const USER_ROLE = "${loginSess.role}";
     var currentUserId = '${loginSess.user_id}';
     var userRole = '${loginSess.role}';
 
@@ -176,13 +178,13 @@
             return;
         }
             // 단순 이동이 가장 확실하고 빠릅니다.
-            location.href = "${pageContext.request.contextPath}/detail/tab/inquiry/write/"+content_id;
+            location.href = `\${CTX}/detail/tab/inquiry/write/\${content_id}`;
                     }
 
         function goDetail(creply_id, isSecret, authorId, vendor_id) {
             // 1. 공개글이면 누구나 통과
             if (isSecret !== '1') {
-                location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;
+                location.href = `\${CTX}/inquiry/detail/\${creply_id}`;
                 return;
             }
 
@@ -193,7 +195,7 @@
 
             // 한 명이라도 해당하면 상세페이지 이동
             if (isAuthor || isAdmin || isVendor) {
-                location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;
+                location.href = `\${CTX}/inquiry/detail/\${creply_id}`;
             } else {
                 // 권한 없으면 차단
                 alert("비밀글은 작성자 및 담당자만 확인할 수 있습니다.");

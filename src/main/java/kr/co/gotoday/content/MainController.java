@@ -21,7 +21,7 @@ public class MainController {
 	// service를 통해서만 데이터 접근 가능 controller-> service는 단방향 규칙
 	// controller가 책임져야하는 것 1. 웹정보처리(세션/로그인 여부) 2. 조회 조건 생성(MainContentDTO세팅 )
 	// 3.service 결과를 모델에 담기
-	@GetMapping("/main")
+	@GetMapping(value = {"/", "/main"})
 	public String MainHome(Model model, HttpSession sess) {
 		MainContentDTO mcd = new MainContentDTO();
 		// 조회조건 확인
