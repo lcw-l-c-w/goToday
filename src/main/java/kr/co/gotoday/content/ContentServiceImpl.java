@@ -90,11 +90,11 @@ public class ContentServiceImpl implements ContentService {
 		}
 	
 		if("false".equals(vo.getReservation_type())) {
-			System.out.println("현장대기 실행됨");
+			
 			vo.setContentReservation(0); //볼수없게함
 		}
 		else if ("true".equals(vo.getReservation_type())) {
-			System.out.println("사전 예매");
+			
 			vo.setContentReservation(1);
 		}
 		return updateContentStatus(vo);

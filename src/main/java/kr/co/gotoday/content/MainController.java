@@ -35,8 +35,6 @@ public class MainController {
 			List<String> likeTagName= contentService.getUserTagName(user.getUser_id());
 			mcd.setUser_tag_name(likeTagName);
 		}
-		System.out.println("DTO 데이터 확인: " + mcd);
-		System.out.println("태그 리스트 사이즈: " + (mcd.getUser_tag_name() != null ? mcd.getUser_tag_name().size() : "null"));
 		// service 호출
 		model.addAttribute("random", contentService.getRandomContents(mcd));
 		model.addAttribute("recommend", contentService.getRecommendContents(mcd));

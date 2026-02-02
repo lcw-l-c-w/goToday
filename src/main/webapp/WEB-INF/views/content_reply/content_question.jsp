@@ -13,7 +13,9 @@
 	</head>
 <body>
     <div class="wrap">
-        <div class="dynamic-list-container">
+       <div class="dynamic-list-container inquiry-container"
+     data-content-id="${content_id}"
+     data-ajax-url="${pageContext.request.contextPath}/detail/tab/inquiry">
             <div class="list-info-header">
           
             <c:if test="${loginSess.role==0}">
@@ -171,7 +173,9 @@
     <script>
     var currentUserId = '${loginSess.user_id}';
     var userRole = '${loginSess.role}';
+    const urlParams = new URLSearchParams(window.location.search);
 
+  	const inquiryPage = urlParams.get("inquiryPage") || 1;
         // 글쓰기 페이지 이동
         function goWriteForm() {
             
@@ -208,6 +212,39 @@
                 alert("비밀글은 작성자 및 담당자만 확인할 수 있습니다.");
             }
         }
+        
+        $(document).on("click", ".inquiry-page", function (e) {
+            e.preventDefault();
+
+            const $container = $(this).closest(".inquiry-container");
+            const page = $(this).data("page");
+
+            const contentId = $container.data("content-id");
+            const url = $container.data("ajax-url");
+
+            if (!contentId || !url) {
+                console.error("content_id 또는 ajax url 없음");
+                return;
+            }
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                    content_id: contentId,
+                    inquiryPage: page
+                },
+                success: function (html) {
+                    // 현재 inquiry 영역만 다시 그림
+                    $container.replaceWith(html);
+                },
+                error: function () {
+                    alert("문의사항을 불러오지 못했습니다.");
+                }
+            });
+        });
+        
+       
     </script>
 </body>
 </html>
