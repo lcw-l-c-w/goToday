@@ -15,6 +15,7 @@ public interface ReservationMapper {
 	int createPayment(PaymentVO paymentVO);
 	ReservationVO findByReservationId(int reservation_id);
 	List<VendorReservationListDTO> findReservationByVendor(VendorReservationSearchDTO dto);
+	VendorReservationListDTO findReservationByVendorMobile(int reserve_id);
 	int subCurrentTicket(Map<String, Object> map);
 	int addCurrentTicket(Map<String, Object> map);
 	int createScheduleByReservation(CalendarVO calendarVO);
@@ -26,4 +27,6 @@ public interface ReservationMapper {
 	List<ReservationListDTO> findReservationListByUserId(Map<String, Object> map);
 	ReservationDetailDTO findReservationDetailById(Map<String, Object> map);
 	ContentScheduleVO findCurrentTickets(int schedule_id);
+	int findReservationWithVendorMoblieStatus(int reserve_id);
+	
 }

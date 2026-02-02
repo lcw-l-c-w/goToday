@@ -10,10 +10,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="${ctx}/smarteditor/js/HuskyEZCreator.js"></script>
-    <link rel="stylesheet" href="/css/write.css">
+    <link rel="stylesheet" href="${ctx}/css/write.css">
    
 
     <script>
+    let isSubmitting = false;
+    $(document).ready(function() {
+        // 컨트롤러에서 보낸 FlashAttribute "msg"를 확인
+        var message = "${msg}"; 
+        if(message) {
+            alert(message);
+        }
+    });
     var oEditors = [];
     $(function() {
         nhn.husky.EZCreator.createInIFrame({
@@ -36,6 +44,10 @@
 
     function goSave() {
         // 스마트에디터의 내용을 textarea에 동기화
+           // 🔒 중복 실행 방지
+    if (isSubmitting) {
+        return;
+    }
         if (!oEditors.getById["body"]) {
         alert("에디터 로딩 중입니다. 잠시만 기다려주세요.");
         return;
@@ -55,6 +67,13 @@
              oEditors[0].exec("FOCUS"); 
              return false;
         }
+        // 🔒 여기서 잠금
+        isSubmitting = true;
+        // 버튼 비활성화 + UX
+        $(".btn-save")
+            .prop("disabled", true)
+            .text("등록 중...")
+            .css("pointer-events", "none");
 
         $("#frm").submit();
     }

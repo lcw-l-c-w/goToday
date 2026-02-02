@@ -77,6 +77,17 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 	
 	@Override
+	@Transactional
+	public ReservationVO confirmFreeReservation(ReservationVO reservationVO, String order_key){
+		//사전에 중복 결제 방지 
+		PaymentVO existingPayment = reservationMapper.findByOrderId(order_key);
+	    if (existingPayment != null) {
+	        throw new RuntimeException("DUPLICATE:이미 처리된 주문입니다.");
+	    }
+	    return confirmAndCreateReservation(reservationVO, null, order_key, 0);
+	}
+	
+	@Override
 	public ContentScheduleVO findCurrentTickets(int schedule_id) {
 		return reservationMapper.findCurrentTickets(schedule_id);
 	}
@@ -86,14 +97,16 @@ public class ReservationServiceImpl implements ReservationService{
 		PaymentVO paymentVO = null;
 		boolean ticketSucceed = false; 
 		try {
+			
 			//confirm 중복 호출로 인한 결제 내역 중복 저장 방지
-			PaymentVO exist = reservationMapper.findByPaymentKey(paymentKey);
-			if (exist != null) {
+			PaymentVO existToss = reservationMapper.findByPaymentKey(paymentKey);
+			if (existToss != null) {
 			    log.warn("[DUPLICATE_CONFIRM] paymentKey={}, orderId={}", paymentKey, orderId);
 
 			    ReservationVO existReservation =
-			        reservationMapper.findByReservationId(exist.getReservation_id());
+			        reservationMapper.findByReservationId(existToss.getReservation_id());
 
+			    
 			    return existReservation;
 			}
 			
@@ -105,7 +118,7 @@ public class ReservationServiceImpl implements ReservationService{
 			if (amount == 0) {
 	            //무료 결제 로직
 	            paymentVO = new PaymentVO();
-	            paymentVO.setOrder_key("FREE_" + UUID.randomUUID());
+	            paymentVO.setOrder_key(orderId);
 	            paymentVO.setAmount_price(0);
 	            paymentVO.setPayment_method("FREE");
 	            paymentVO.setRefund_status("NONE");

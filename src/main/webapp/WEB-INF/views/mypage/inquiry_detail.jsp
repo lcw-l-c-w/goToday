@@ -11,12 +11,12 @@
 <body>
     <h1 class="page-title">나의 1:1 문의</h1>
     
-    <div class="page-wrap">
         <div class="page-header">
             <button type="button" class="btn-back" onclick="history.back();" title="목록으로">
                 &lt;
             </button>
         </div>
+    <div class="page-wrap">
 
         <div class="detail-card">
             <div class="question-title">
@@ -26,6 +26,13 @@
                 <fmt:formatDate value="${detailList[0].created_at}" pattern="yyyy.MM.dd"/> | ${userName}
             </div>
             <div class="content-area">${detailList[0].body}</div>
+            <c:if test="${not empty detailList[0].file_path}">
+		        <div class="image-area" style="margin-top: 20px;">
+		            <img src="${pageContext.request.contextPath}${detailList[0].file_path}" 
+		                 alt="첨부이미지" 
+		                 style="max-width: 100%; height: auto; border-radius: 8px;">
+		        </div>
+		    </c:if>
         </div>
 
         <c:forEach var="item" items="${detailList}">

@@ -13,6 +13,11 @@
 
 
 <script>
+// FlashAttribute로 보낸 "msg"가 있다면 alert을 띄웁니다.
+var msg = "${msg}";
+if(msg) {
+    alert(msg);
+}
 $(function() {
       //탭전환
       $(".tab-item").click(function() {
@@ -22,6 +27,9 @@ $(function() {
       	const tabCategory=$(this).data("type");
       	const content_id=$("#content_id").val();
       	
+      	const urlParams = new URLSearchParams(window.location.search);
+      	const inquiryPage = urlParams.get("inquiryPage") || 1;
+
           //활성화 스타일 변경 (누르면 그 페이지에 맞게 띄움)
       	$(".tab-item").removeClass("active");
           $(this).addClass("active");
@@ -31,14 +39,15 @@ $(function() {
           const currentPanel = $(".tab-panel").eq(index);
           currentPanel.addClass("active").show();
           
-          if(tabCategory !== "detail") {   
+          if(tabCategory !== "detail" && tabCategory !=="review") {   
           //패널 가시성 조절
           
           $.ajax({
           	url: "${pageContext.request.contextPath}/detail/tab/"+tabCategory,
           	type:"GET", //목록 조회는 get
           	data:{
-          		content_id:content_id
+          		content_id:content_id,
+          		inquiryPage: inquiryPage
           	},
           	success:function(data){
           		 currentPanel.html(data);
@@ -50,6 +59,27 @@ $(function() {
 
     
       });
+      //  문의사항 페이지네이션(AJAX) - 탭 내부에서 동작
+      $(document).on("click", ".inquiry-page", function(e){
+        e.preventDefault();
+
+        const page = $(this).data("page");
+        const content_id = $("#content_id").val();
+
+        $.ajax({
+          url: "${pageContext.request.contextPath}/detail/tab/inquiry",
+          type: "GET",
+          data: { content_id: content_id, inquiryPage: page },
+          success: function(html){
+            // inquiry 탭 패널(3번째)만 갱신
+            $(".tab-panel").eq(2).html(html);
+
+            // 주소만 바꾸기(새로고침 없음)
+            history.replaceState(null, "", `?tab=inquiry&inquiryPage=${page}`);
+          }
+        });
+      });
+
       
   	//이전페이지로 이동한 것처럼 
   	const urlParams = new URLSearchParams(window.location.search);
@@ -366,7 +396,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 		<div class="content-title-area">
 			<div>
 				<h1>${content.title}</h1>
-				<p style="margin-top: 8px; color: var(- -text-gray);">${content.start_at.substring(0,10)}
+				<p style="margin-top: 8px; color: var(--text-gray);">${content.start_at.substring(0,10)}
 					~ ${content.end_at.substring(0,10)}  |  ${content.location} 📍</p>
 			</div>
 			<div class="sns-group">
@@ -384,7 +414,7 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 				<img class="poster-img"
 					src="${pageContext.request.contextPath}${content.main_image_path}"
 					alt="포스터">
-					<c:if test="${loginSess.role==0}">
+					<c:if test="${loginSess.role!=1}">
 				<button type="button"
 					class="poster-like-btn ${content.liked == 1 ? 'active-liked' : ''}"
 					id="likeBtn">
@@ -473,7 +503,10 @@ $("#link").click(async function() { // async 사용 해야하는 이유
 				<section class="tab-panel">
 					<jsp:include page="/WEB-INF/views/review/review_list_by_content.jsp" />
 				</section>
-				<section class="tab-panel">문의사항 목록이 여기에 표시됩니다.</section>
+				<section class="tab-panel">
+				<div class="spinner"></div>
+   				     문의사항을 불러오고 있습니다...
+  			  </section>
 			</div>
 		</div>
 	</div>

@@ -8,11 +8,12 @@
     <meta charset="utf-8">
     <title>GoToday | 문의 상세</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
-    <script src="https://ajax.googleapis.com/ajax/mlibs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link rel="stylesheet" href="${ctx}/css/inquiry_view.css">
 
     <script>
     function del(creply_id, content_id,gno,vendor_id) {
+    	const v_id = vendor_id || "";
     	if (confirm('이 문의사항을 정말 삭제하시겠습니까?')) {
             // jQuery의 $.post(주소, 보낼데이터, 성공시실행할함수)
             $.post('${ctx}/detail/tab/inquiry/delete', {
@@ -103,7 +104,7 @@
         <%-- 1. 유저 본인인 경우: 수정 & 삭제 --%>
         <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id}">
             <a href="${ctx}/detail/inquiry/modify?creply_id=${vo.creply_id}" class="btn btn-action">수정하기</a>
-            <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno});" class="btn btn-action btn-danger">삭제하기</a>
+            <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno},null);" class="btn btn-action btn-danger">삭제하기</a>
         </c:if>
         
         <%-- 2. 관리자(Vendor)인 경우 --%>

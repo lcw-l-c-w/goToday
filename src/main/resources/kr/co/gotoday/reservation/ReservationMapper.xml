@@ -50,6 +50,9 @@
 		    r.reserved_for_at AS visit_date,
 		    r.time_zone AS visit_time,
 		    (r.adult_qty + r.child_qty + r.teen_qty) AS person_count,
+		    r.adult_qty AS adult_qty,
+		    r.child_qty AS child_qty,
+		    r.teen_qty AS teen_qty,
 		    r.reservation_status AS reserve_status,
 		    p.payment_status AS pay_status,
 		    r.receiver_name,
@@ -100,7 +103,45 @@
 	    </where>
     	ORDER BY r.reserved_for_at DESC
 	</select>
-
+	
+	<select id="findReservationByVendorMobile"
+	    parameterType="int"
+	    resultType="kr.co.gotoday.reservation.VendorReservationListDTO">
+	
+	    SELECT
+		    r.reservation_id AS reserve_id,
+		    r.reservation_code AS reservation_code,
+		    r.reserved_for_at AS visit_date,
+		    r.time_zone AS visit_time,
+		    (r.adult_qty + r.child_qty + r.teen_qty) AS person_count,
+		    r.adult_qty AS adult_qty,
+		    r.child_qty AS child_qty,
+		    r.teen_qty AS teen_qty,
+		    r.reservation_status AS reserve_status,
+		    p.payment_status AS pay_status,
+		    r.receiver_name,
+		    r.receiver_phone,
+		    c.title AS content_title,
+		    p.amount_price AS amount_price,
+		    p.payment_method AS payment_method,
+		   	c.user_id AS user_id
+	    FROM content c
+	    JOIN reservation r ON r.content_id = c.content_id
+	    LEFT JOIN payment p ON r.reservation_id = p.reservation_id
+	
+	    <where>
+	        r.reservation_id = #{reserve_id}
+	    </where>
+	</select>
+	
+	<!-- 벤더 여부 확인 -->
+	<select id="findReservationWithVendorMoblieStatus" parameterType="int" resultType="int">
+		SELECT
+			c.user_id
+		FROM reservation r
+		JOIN content c ON r.content_id = c.content_id
+		WHERE r.reservation_id = #{reserve_id}
+	</select>
 	
 	<select id="countReservationByVendor"
         parameterType="kr.co.gotoday.reservation.VendorReservationSearchDTO"
@@ -158,6 +199,7 @@
 			paid_at
 		FROM payment
 		WHERE order_key = #{order_key}
+		FOR UPDATE
 	</select>
 	
 	<!-- 예약 목록 COUNT -->

@@ -15,6 +15,14 @@
    
 
     <script>
+    let isSubmitting = false;
+    $(document).ready(function() {
+        // 컨트롤러에서 보낸 FlashAttribute "msg"를 확인
+        var message = "${msg}"; 
+        if(message) {
+            alert(message);
+        }
+    });
     var oEditors = [];
     $(function() {
         nhn.husky.EZCreator.createInIFrame({
@@ -32,6 +40,11 @@
 
     function goSave() {
         //제목 비는 거 막기 
+         // 이미 제출 중이면 무시
+    if (isSubmitting) {
+        return;
+    }
+
     	oEditors.getById['content'].exec('UPDATE_CONTENTS_FIELD',[]);
         if ($("#title").length > 0 && !$("#title").val().trim()) {
             alert("제목을 입력해주세요.");
@@ -52,6 +65,15 @@
              oEditors.getById['content'].exec("FOCUS");
              return false;
         }
+        //잠구기
+        isSubmitting = true;
+
+        // 버튼 비활성화 + UX 처리
+        $(".btn-save")
+            .prop("disabled", true)
+            .text("처리 중...")
+            .css("pointer-events", "none");
+
         $("#frm").submit();
         
     }
@@ -64,7 +86,7 @@
            
         </header>
 
-        <form method="post" name="frm" id="frm" action="/gotoday/detail/tab/inquiry/modify" enctype="multipart/form-data">
+        <form method="post" name="frm" id="frm" action="${ctx}/detail/tab/inquiry/modify" enctype="multipart/form-data">
            <input type="hidden" name="creply_id" value="${item.creply_id}" />
   		  <input type="hidden" name="content_id" value="${item.content_id}" />
             <table class="edit-form-table">
