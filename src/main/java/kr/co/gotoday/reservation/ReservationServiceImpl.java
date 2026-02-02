@@ -342,13 +342,16 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 
 	@Override
-	public Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page) {
+	public Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page, String keyword) {
 		final int PAGE_SIZE = 10;
 		final int BLOCK_SIZE = 5;
 
 		Map<String, Object> param = new HashMap<>();
 		param.put("user_id", user_id);
 		param.put("filter", filter);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			param.put("keyword", keyword.trim());
+		}
 
 		// COUNT 조회
 		int count = reservationMapper.countReservationByUserId(param);
@@ -376,7 +379,7 @@ public class ReservationServiceImpl implements ReservationService{
 			else if (diff == 0) dto.setDday("D-Day");
 			else dto.setDday("END");
 		}
-		
+
 		Map<String, Object> result = new HashMap<>();
 		result.put("list", listDTO);
 		result.put("pageInfo", pageInfo);

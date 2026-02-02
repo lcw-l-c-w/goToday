@@ -35,7 +35,7 @@ public interface ReservationService {
 	
 	List<ReservationListDTO> findReservationListByUserId(int user_id, String filter);
 
-	Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page);
+	Map<String, Object> findReservationListByUserId(int user_id, String filter, Integer page, String keyword);
 
 	ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id);
 }

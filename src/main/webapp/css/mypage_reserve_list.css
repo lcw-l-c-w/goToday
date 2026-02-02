@@ -474,3 +474,57 @@ html, body {
 .pagination .next {
     font-weight: 600;
 }
+
+/* 푸터 내용 래퍼 */
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* 검색 박스 */
+.search-box {
+    position: absolute;
+    right: 0;
+    margin-left: 10px;
+}
+
+.search-box form {
+    display: flex;
+    gap: 8px;
+}
+
+.search-box input[type="text"] {
+    width: 150px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-box input[type="text"]:focus {
+    border-color: #4dc3ff;
+}
+
+.search-box input[type="text"]::placeholder {
+    color: #999;
+}
+
+.search-btn {
+    padding: 8px 16px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-btn:hover {
+    background: #4dc3ff;
+}
