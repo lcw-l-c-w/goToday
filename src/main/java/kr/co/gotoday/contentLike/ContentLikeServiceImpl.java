@@ -2,6 +2,7 @@ package kr.co.gotoday.contentLike;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.gotoday.user.UserMapper;
 
@@ -13,6 +14,7 @@ public class ContentLikeServiceImpl implements ContentLikeService{
 	@Autowired
 	UserMapper userMapper;
 	//하트 관리하기 
+	@Transactional 
 	@Override
 	public ContentLikeVO getHeartByContentId(Integer content_id,Integer user_id) {
 		// TODO Auto-generated method stub

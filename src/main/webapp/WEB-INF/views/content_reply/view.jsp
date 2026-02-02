@@ -12,21 +12,26 @@
 <link rel="stylesheet" href="${ctx}/css/inquiry_view.css">
 
     <script>
-    function del(creply_id, content_id,gno,vendor_id) {
-    	const v_id = vendor_id || "";
-    	if (confirm('이 문의사항을 정말 삭제하시겠습니까?')) {
-            // jQuery의 $.post(주소, 보낼데이터, 성공시실행할함수)
-            $.post('${ctx}/detail/tab/inquiry/delete', {
+    function del(creply_id, content_id, gno, vendor_id) {
+        if (confirm('이 문의사항을 정말 삭제하시겠습니까?')) {
+            // 전송할 데이터를 객체로 명확히 생성
+            const dataToSend = {
                 creply_id: creply_id,
                 content_id: content_id,
-                gno:gno,
-                vendor_id:vendor_id
-            }, function(res) {
-                // 삭제 후 처리는 컨트롤러의 리턴 방식에 따라 달라집니다.
-                // 만약 컨트롤러가 알림창을 띄우는 common/return 페이지를 준다면, 
-                // 아래처럼 바로 리다이렉트 주소를 지정하는 게 속 편합니다.
+                gno: gno
+            };
+
+            // vendor_id가 파라미터로 넘어왔고 값이 있을 때만 추가
+            if (vendor_id !== undefined && vendor_id !== null) {
+                dataToSend.vendor_id = vendor_id;
+            }
+
+            $.post('${ctx}/detail/tab/inquiry/delete', dataToSend, function(res) {
                 alert("삭제되었습니다.");
                 location.href = "${ctx}/detail/" + content_id + "?tab=inquiry";
+            }).fail(function(xhr) {
+                console.log("Error Detail:", xhr.responseText);
+                alert("삭제 실패: " + xhr.status);
             });
         }
     }

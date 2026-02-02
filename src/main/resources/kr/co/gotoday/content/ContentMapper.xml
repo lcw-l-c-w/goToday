@@ -74,7 +74,6 @@ FROM (
     FROM content c
     <where>
         <include refid="USER_VISIBLE_CONTENT" />
-        AND c.start_at <![CDATA[<=]]> NOW()
         AND c.end_at <![CDATA[>=]]> NOW()
     </where>
 ) t
@@ -390,8 +389,7 @@ SELECT
     c.content_time 		AS 	content_time,
     c.content_kind		AS content_kind,
     c.x_url 			AS x_url,
-    c.instagram_url 	AS instagram_url,
-    c.reservation_type 	AS reservation_type
+    c.instagram_url 	AS instagram_url
    
 FROM content c
 WHERE 
