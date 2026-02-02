@@ -273,12 +273,13 @@
     	</div>
     </section>
 
-    <!-- 하단 버튼 -->
-    <footer class="form-footer">
-	    <button type="button" class="approve-btn">승인</button>
-	    <button type="button" class="reject-btn">거절</button>
-	</footer>
-
+	<c:if test="${contentVO.content_status eq 'STATUS_REQUESTED'}">
+	    <!-- 하단 버튼 -->
+	    <footer class="form-footer">
+		    <button type="button" class="approve-btn">승인</button>
+		    <button type="button" class="reject-btn">거절</button>
+		</footer>
+	</c:if>
 
     </form>
 
