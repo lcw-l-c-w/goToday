@@ -10,12 +10,16 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mypage_reserve_detail.css">
 </head>
 <body>
-<h1 class="page-title">예약 상세</h1>
-	<div class="top-area">
-		<button type="button" class="btn-back" onclick="history.back();" title="목록으로">&lt;</button>
-	</div>
+<!-- 고정 헤더 영역 -->
+<div class="fixed-header">
+	<h1 class="page-title">예약 상세</h1>
+	<button type="button" class="btn-back" onclick="history.back();" title="목록으로">&lt;</button>
+</div>
 
-	<div class="reservation-wrapper">
+<!-- 스크롤 컨테이너 -->
+<div class="container">
+	<!-- 컨텐츠 래퍼 (border로 감싸기) -->
+	<div class="content-wrapper">
 		<div class="header-section">
 			<div class="info-summary">
 				<div class="content-title">${reservationDetailDTO.title}</div>
@@ -40,7 +44,7 @@
 								<c:when test="${reservationDetailDTO.reservation_status eq 'CANCELED'}">예약 취소</c:when>
 								<c:when test="${reservationDetailDTO.reservation_status eq 'VISITED'}">이용 완료</c:when>
 								<c:otherwise>${reservationDetailDTO.reservation_status}</c:otherwise>
-							</c:choose> 
+							</c:choose>
 							<c:if test="${reservationDetailDTO.payment_status eq 'WAITING_FOR_DEPOSIT'}">(입금 대기)</c:if>
 						</td>
 					</tr>
@@ -125,12 +129,12 @@
 			</tr>
 		</table>
 
-		<br><br>
 		<div class="notice-box">
 			<span style="font-weight: 700; color: #004680; display: block; margin-bottom: 10px;">예약취소 유의사항</span>
 			<p>• 관람일 7일 전까지만 무료 취소가 가능합니다.</p>
 			<p>• 관람일 당일에 취소가 불가능합니다.</p>
 		</div>
 	</div>
+</div>
 </body>
 </html>

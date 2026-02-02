@@ -3,7 +3,7 @@ FROM tomcat:9.0-jdk11
 # 기본 예제 앱 제거
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# 빌드된 WAR 배포 (ROOT 컨텍스트)
+# 빌드된 WAR 배포
 COPY target/gotoday.war /usr/local/tomcat/webapps/ROOT.war
 
 # 업로드 디렉토리 생성 (볼륨 마운트 포인트)

@@ -24,6 +24,7 @@
 	<select id="getCalendarList" parameterType="int" resultType="kr.co.gotoday.calendar.CalendarDTO">
     SELECT
         c.title AS title,
+        c.content_id,
         LEFT(k.selected_at, 10) AS start,
         
         CASE

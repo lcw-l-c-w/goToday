@@ -1,4 +1,8 @@
 @charset "UTF-8";
+:root {
+	--main-color: #4dc3ff;
+}
+
 body {
 	font-family: 'Pretendard', sans-serif;
 	margin: 0;
@@ -8,7 +12,8 @@ body {
 	margin-top: 0px;
 	font-size: 28px;
 	font-weight: 700;
-	margin-bottom: 15px;
+	padding-left:20px;
+	margin-bottom: 30px;
 	color: #111;
 }
 
@@ -18,7 +23,8 @@ body {
 	padding: 25px;
 	box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 	width: 100%;
-	max-width: 700px;
+	max-width: 760px;
+	margin: 0px 20px;
 }
 
 .form-section {
@@ -132,8 +138,9 @@ input:checked + .btn-option {
 	font-size: 16px;
 	cursor: pointer;
 	margin-bottom: 5px;
+	transition: all 0.3s ease;
 }
 
 .btn-submit:hover {
-	background: #000;
+	background: var(--main-color);
 }

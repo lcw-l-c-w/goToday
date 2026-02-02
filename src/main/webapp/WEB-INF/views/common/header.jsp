@@ -30,7 +30,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
         z-index: 1000;
     }
     .nav-container {
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
         display: flex;
         align-items: center;
@@ -225,7 +225,7 @@ uri="http://java.sun.com/jsp/jstl/core"%>
 <header class="header">
     <div class="nav-container">
         <div class="logo">
-            <a href="${pageContext.request.contextPath}/main">
+            <a href="${pageContext.request.contextPath}">
                 <img src="<c:url value='/img/logo.png'/>" alt="Logo" />
             </a>
         </div>

@@ -40,7 +40,7 @@
 	    WHERE r.user_id = #{user_id}
 	      AND r.reply_status = 0
 	    ORDER BY r.reply_id DESC
-	    LIMIT #{startIdx}, 5
+	    LIMIT #{startIdx}, 7
 	</select>
 	
 	<!-- 내 Q&A 문의 개수 -->
@@ -76,7 +76,7 @@
 	    FROM content_reply a
 	    WHERE a.user_id = #{user_id} 
 	      AND a.nested = 0  ORDER BY a.creply_id DESC
-	    LIMIT #{startIdx}, 5
+	    LIMIT #{startIdx}, 7
 	</select>
 
 	<!-- 내1:1 문의사항 답변 개수 -->
