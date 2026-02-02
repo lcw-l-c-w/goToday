@@ -176,4 +176,16 @@ public class VendorServiceImpl implements VendorService {
 	public int updateReservationStatus(int reservation_id) { 
 		return reservationMapper.updateReservationStatusById(reservation_id);
 	}
+	
+	@Override
+	public int findReservationWithVendorMoblieStatus(int reserve_id) { 
+		return reservationMapper.findReservationWithVendorMoblieStatus(reserve_id);
+	}
+	
+	@Override
+	public VendorReservationListDTO findReservationByVendorMobile(int reserve_id) { 
+		return reservationMapper.findReservationByVendorMobile(reserve_id);
+	}
+	
+	
 }
