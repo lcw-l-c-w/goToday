@@ -64,8 +64,7 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 	    ContentReplyVO dbData = detailList.get(0);
 	    vo.setVendor_id(dbData.getVendor_id());
 	    vo.setGno(dbData.getGno());
-	    System.out.println("조회된 진짜 Vendor ID: " + vo.getVendor_id());
-	    System.out.println("조회된 진짜 GNO: " + vo.getGno());
+	   
 		if(vo.getUser_id()!=vo.getVendor_id()) {
 			//user인경우에 
 				
@@ -78,7 +77,7 @@ public class ContentReplyServiceImpl implements ContentReplyService{
 		}
 		else {
 			//vendor가 삭제한 경우에 
-			System.out.println("걸리긴 하는지 ");
+			
 			 contentReplyMapper.updateReplyStatus(vo.getGno(), 0); // 0이면 답변 안 한 상태  
 				return contentReplyMapper.deleteReply(vo);
 			

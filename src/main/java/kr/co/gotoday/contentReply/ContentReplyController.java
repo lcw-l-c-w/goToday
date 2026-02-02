@@ -115,7 +115,7 @@ public class ContentReplyController {
 				vo.setFile_path("/upload/inquiry/" + saveName);
 
 			} catch (Exception e) {
-				System.out.println("파일 업로드 실패: " + e.getMessage());
+				
 			}
 		}
 
@@ -184,7 +184,7 @@ public class ContentReplyController {
 						vo.setFile_path("/upload/inquiry/" + saveName);
 
 					} catch (Exception e) {
-						System.out.println("파일 업로드 실패: " + e.getMessage());
+						
 					}
 				}
 		int success = contentReplyService.vendorCreate(vo);
@@ -234,7 +234,7 @@ public class ContentReplyController {
 			return "common/return";
 		}
 		int status=contentReplyService.showStatus(result.getGno());
-		System.out.println(status);
+	
 		if(status>=1 &&user.getRole()==0) {
 			//답변 여부가 있는경우-> 유저는 수정이 어려움
 			model.addAttribute("msg", "답변완료된 글은 수정할 수 없습니다.");
