@@ -22,6 +22,7 @@ public class MypageDTO {
     private int secret;
     // 1:1 문의사항 detail
     private String body;                // 문의글 본문
+    private String file_path;	// 사진
     private String answer_body;         // 답변 본문
     private int gno;           // 그룹 번호 (답변 연결용)
     private int nested;        // 0:본문, 1:답변
