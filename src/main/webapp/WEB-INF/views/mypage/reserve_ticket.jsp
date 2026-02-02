@@ -67,7 +67,8 @@
 
         <div class="ticket-footer">
             <div class="qr-container">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${reservation.reservation_code}" alt="QR">
+           		 <c:set var="qrData" value="https://merge.io.kr/gotoday/common/mobile/${reservation.reservation_id}" />
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}" alt="QR">
             </div>
             <div class="ticket-id">RESERVATION ID : ${reservation.reservation_code}</div>
         </div>

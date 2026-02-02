@@ -11,12 +11,12 @@
 <body>
     <h1 class="page-title">나의 1:1 문의</h1>
     
-    <div class="page-wrap">
         <div class="page-header">
             <button type="button" class="btn-back" onclick="history.back();" title="목록으로">
                 &lt;
             </button>
         </div>
+    <div class="page-wrap">
 
         <div class="detail-card">
             <div class="question-title">

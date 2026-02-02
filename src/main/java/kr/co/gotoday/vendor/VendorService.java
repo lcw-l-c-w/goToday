@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.content.ContentVO;
+import kr.co.gotoday.reservation.VendorReservationListDTO;
 import kr.co.gotoday.reservation.VendorReservationSearchDTO;
 
 public interface VendorService {
@@ -29,6 +30,8 @@ public interface VendorService {
 	Map<String, Object> findReservationByVendor(VendorReservationSearchDTO dto);
 	int updateReservationStatus(int reserve_id);
 	List<ContentVO> getAllContentForFilter(int userId);
+	VendorReservationListDTO findReservationByVendorMobile(int reserve_id);
+	int findReservationWithVendorMoblieStatus(int reserve_id);
 
 
 }
