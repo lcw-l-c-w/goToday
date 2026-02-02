@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.co.gotoday.content.ContentService;
 import kr.co.gotoday.user.UserVO;
@@ -53,16 +54,21 @@ public class ContentReplyController {
 
 	// 작성폼으로 이동
 	@GetMapping("/detail/tab/inquiry/write/{content_id}")
-	public String writeQuestion(@PathVariable("content_id") int content_id, Model model, HttpSession sess,HttpServletRequest request) {
+	public String writeQuestion(@PathVariable("content_id") int content_id, Model model, HttpSession sess,HttpServletRequest request,RedirectAttributes rttr) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 		String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
-
+		// 1. 세션 체크 (세션 만료 시 NPE 방지)
+	    if (user == null) {
+	        model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 		if (user.getRole() == 1) {
 			// vendor인경우
-			model.addAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
-			model.addAttribute("cmd", "move");
-			model.addAttribute("url", cp+"/detail/" + content_id + "?tab=inquiry");
-			return "common/return";
+			
+			rttr.addFlashAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
+			return "redirect:/detail/" + content_id + "?tab=inquiry";
+
 		}
 		model.addAttribute("content_id", content_id);
 		return "/content_reply/content_reply_write";
@@ -72,16 +78,20 @@ public class ContentReplyController {
 	// -작성(user인경우에)
 	@PostMapping("/detail/tab/inquiry/write")
 	public String InsertQuestion(@RequestParam int content_id, Model model, HttpSession sess, ContentReplyVO vo,
-			@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
+			@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request,RedirectAttributes rttr) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
 		String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
-	
+		// 1. 세션 체크 (세션 만료 시 NPE 방지)
+	    if (user == null) {
+	        model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 		if (user.getRole() == 1) {
 			// vendor인경우
-			model.addAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
-			model.addAttribute("url", cp+"/detail/" + content_id + "?tab=inquiry");
-			model.addAttribute("cmd", "move");
-			return "common/return";
+			rttr.addFlashAttribute("msg", "개인회원만 문의사항을 남길 수 있습니다.");
+			return "redirect:/detail/" + content_id + "?tab=inquiry";
+			
 		}
 
 		// --- [파일 업로드 처리 시작] ---
@@ -102,7 +112,7 @@ public class ContentReplyController {
 
 				// 4. DB에 저장할 상대 경로를 VO에 세팅
 				// 나중에 <img src="/resources/upload/inquiry/파일명"> 으로 쓰기 위함
-				vo.setFile_path("/resources/upload/inquiry/" + saveName);
+				vo.setFile_path("/upload/inquiry/" + saveName);
 
 			} catch (Exception e) {
 				System.out.println("파일 업로드 실패: " + e.getMessage());
@@ -118,10 +128,9 @@ public class ContentReplyController {
 		if (success == 1) {
 			// 성공했을 경우
 			
-			model.addAttribute("msg", "등록되었습니다.");
-			model.addAttribute("url", cp+"/detail/" + vo.getContent_id() + "?tab=inquiry");
-			model.addAttribute("cmd", "move");
-			return "common/return";
+			rttr.addFlashAttribute("msg", "등록되었습니다.");
+			return "redirect:/detail/" + vo.getContent_id() + "?tab=inquiry";
+			
 
 		} else {
 			model.addAttribute("msg", "게시글 등록에 실패했습니다.");
@@ -141,7 +150,7 @@ public class ContentReplyController {
 	}
 
 	@PostMapping("/detail/inquiry/write/vendor.do")
-	public String writeVendor(HttpSession sess, ContentReplyVO vo, Model model,@RequestParam(value = "file", required = false) MultipartFile file,HttpServletRequest request) {
+	public String writeVendor(HttpSession sess, ContentReplyVO vo, Model model,@RequestParam(value = "file", required = false) MultipartFile file,HttpServletRequest request,RedirectAttributes rttr) {
 		UserVO Uservo = (UserVO) sess.getAttribute("loginSess");
 		int vendor_id = contentService.selectIdByContentId(vo.getContent_id());
 		if (Uservo.getUser_id() != vendor_id) {
@@ -172,7 +181,7 @@ public class ContentReplyController {
 
 						// 4. DB에 저장할 상대 경로를 VO에 세팅
 						// 나중에 <img src="/resources/upload/inquiry/파일명"> 으로 쓰기 위함
-						vo.setFile_path("/resources/upload/inquiry/" + saveName);
+						vo.setFile_path("/upload/inquiry/" + saveName);
 
 					} catch (Exception e) {
 						System.out.println("파일 업로드 실패: " + e.getMessage());
@@ -185,12 +194,10 @@ public class ContentReplyController {
 			
 			int success2=contentReplyService.updateStatus(vo.getGno());
 			if(success2==1){
-				String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
-			model.addAttribute("msg", "등록되었습니다.");
-			model.addAttribute("url",cp+"/detail/" + vo.getContent_id() + "?tab=inquiry");
-			model.addAttribute("cmd", "move");
-			return "common/return";
-			}
+				
+				rttr.addFlashAttribute("msg", "등록되었습니다.");
+			return "redirect:/detail/" + vo.getContent_id() + "?tab=inquiry";
+				}
 		}
 		
 			model.addAttribute("msg", "답변 등록에 실패했습니다.");
@@ -207,9 +214,20 @@ public class ContentReplyController {
 	public String showAndModifyQuestion(HttpSession sess, int creply_id, Model model) {
 		// 가지고 가기
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-
+		// 1. 세션 체크 (세션 만료 시 NPE 방지)
+	    if (user == null) {
+	        model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 		// 일단 불러오기
 		ContentReplyVO result = contentReplyService.getReplyForUser(creply_id, user.getUser_id());
+		// [핵심 추가] 결과가 없으면 여기서 커트!
+	    if (result == null) {
+	        model.addAttribute("msg", "존재하지 않거나 수정 권한이 없는 게시글입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 		if (result.getUser_id() != user.getUser_id()) {
 			model.addAttribute("msg", "본인이 아닌경우 수정이 어렵습니다.");
 			model.addAttribute("cmd", "back");
@@ -217,7 +235,7 @@ public class ContentReplyController {
 		}
 		int status=contentReplyService.showStatus(result.getGno());
 		System.out.println(status);
-		if(status>=1) {
+		if(status>=1 &&user.getRole()==0) {
 			//답변 여부가 있는경우-> 유저는 수정이 어려움
 			model.addAttribute("msg", "답변완료된 글은 수정할 수 없습니다.");
 			model.addAttribute("cmd", "back");
@@ -230,9 +248,14 @@ public class ContentReplyController {
 
 	@PostMapping("/detail/tab/inquiry/modify")
 	public String modifyQuestion(HttpSession sess, ContentReplyVO vo, Model model,@RequestParam(value="file", required=false) MultipartFile file,
-	        @RequestParam(value="fileDelete", required=false) String fileDelete,HttpServletRequest request) {
+	        @RequestParam(value="fileDelete", required=false) String fileDelete,HttpServletRequest request,RedirectAttributes rttr) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-
+		// 1. 세션 체크 (세션 만료 시 NPE 방지)
+	    if (user == null) {
+	        model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 		
 		// 2. 기존 데이터 조회 (기존 파일 경로 확인 및 본인 확인용)
 	    ContentReplyVO original = contentReplyService.getReplyForUser(vo.getCreply_id(), user.getUser_id());
@@ -269,7 +292,7 @@ public class ContentReplyController {
 	            file.transferTo(new File(realUploadPath + File.separator + saveName));
 
 	            // VO에 새 경로 세팅
-	            vo.setFile_path("/resources/upload/inquiry/" + saveName);
+	            vo.setFile_path("/upload/inquiry/" + saveName);
 	        } catch (Exception e) {
 	            System.out.println("파일 업로드 에러: " + e.getMessage());
 	        }
@@ -279,10 +302,9 @@ public class ContentReplyController {
 		if (success == 1) {
 			// 성공했을 경우
 			String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
-			model.addAttribute("msg", "수정되었습니다.");
-			model.addAttribute("url", cp+"/detail/" + vo.getContent_id() + "?tab=inquiry");
-			model.addAttribute("cmd","move");
-			return "common/return";
+			rttr.addFlashAttribute("msg", "수정되었습니다.");
+			return "redirect:/detail/" + vo.getContent_id() + "?tab=inquiry";
+			
 		} else {
 			model.addAttribute("msg", "게시글 수정에 실패했습니다.다시 시도해주세요.");
 			model.addAttribute("cmd","back");
@@ -293,20 +315,22 @@ public class ContentReplyController {
 
 	// 삭제 (예외처리할것-> 회원이 삭제할 경우 , 서비스단 vendor껏도 삭제해야하고 / vendor가 삭제하는 경우 상태 변경도 해줘야함)
 	@PostMapping("/detail/tab/inquiry/delete")
-	public String deleteQuestion(HttpSession sess, ContentReplyVO vo, Model model,HttpServletRequest request) {
+	public String deleteQuestion(HttpSession sess, ContentReplyVO vo, Model model,HttpServletRequest request,RedirectAttributes rttr) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-
+		// 1. 세션 체크 (세션 만료 시 NPE 방지)
+	    if (user == null) {
+	        model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 	
 
 		vo.setUser_id(user.getUser_id());
 		int success = contentReplyService.deleteQA(vo);
 		if (success == 1) {
 			// 성공했을 경우
-			String cp = request.getContextPath(); // "/gotoday" 또는 ""(서버)
-			model.addAttribute("msg", "삭제되었습니다.");
-			model.addAttribute("url", cp+ "/detail/" + vo.getContent_id() + "?tab=inquiry"); // 이동할 경로
-			model.addAttribute("cmd", "move");
-			return "common/return";
+			rttr.addFlashAttribute("msg", "삭제되었습니다.");
+			return "redirect:/detail/" + vo.getContent_id() + "?tab=inquiry"; // 이동할 경로
 		} else {
 			model.addAttribute("msg", "게시글 삭제에 실패했습니다.다시 시도해주세요.");
 			model.addAttribute("cmd", "back");
@@ -318,7 +342,12 @@ public class ContentReplyController {
 	@GetMapping("/inquiry/my")
 	public String showQuestion(HttpSession sess, Model model) {
 		UserVO user = (UserVO) sess.getAttribute("loginSess");
-		
+		// 1. 세션 체크 (세션 만료 시 NPE 방지)
+	    if (user == null) {
+	        model.addAttribute("msg", "로그인이 필요한 서비스입니다.");
+	        model.addAttribute("cmd", "back");
+	        return "common/return";
+	    }
 
 		List<ContentReplyVO> voList = contentReplyService.showQAByID(user.getUser_id());
 		model.addAttribute("list", voList);

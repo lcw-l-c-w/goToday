@@ -44,21 +44,17 @@
                                         </span>
                                          </c:if>
                                     </td>
-                                    <td class="text-left">
-                                        <div style="padding-left: ${item.nested * 20}px;">
-                                            <c:if test="${item.nested > 0}">
-                                                <span class="reply-icon">└ [답변]</span>
-                                            </c:if>
-                                            
-                                            <c:if test="${item.secret == 1}">
-                                                <span title="비밀글">🔒</span>
-                                            </c:if>
-                                            
-                                            <a class="title-link" onclick="goDetail('${item.creply_id}', '${item.secret}', '${item.user_id}','${item.vendor_id}')">
-                                                ${item.title}
-                                            </a>
-                                        </div>
-                                    </td>
+                      
+                    <td class="text-left">
+                        <div style="padding-left: 0px;">
+                            <c:if test="${item.secret == 1}">
+                                <span title="비밀글">🔒</span>
+                            </c:if>
+                            <a class="title-link" onclick="goDetail('${item.creply_id}', '${item.secret}', '${item.user_id}','${item.vendor_id}')">
+                                ${item.title}
+                            </a>
+                        </div>
+                    </td>
 					<td>
     <c:choose>
         <%-- 답변글은 무조건 '담당자' 표시 --%>
@@ -67,17 +63,12 @@
         </c:when>
 
         <c:otherwise>
-            <c:choose>
+
                 <%-- [실명 노출 조건] 본인이거나, 총관리자거나, 해당 벤더인 경우 --%>
-                <c:when test="${
-                                 loginSess.user_id eq item.user_id 
-                                || loginSess.role eq 1 
-                                || loginSess.user_id eq item.vendor_id}">
-                    ${item.writer}
-                </c:when>
+               
 
                 <%-- [마스킹 노출 조건] 권한 없는 타인이 비밀글을 볼 때 --%>
-                <c:otherwise>
+               
                     <c:set var="wName" value="${item.writer}" />
                     <span >
                         <c:choose>
@@ -90,8 +81,7 @@
                             <c:otherwise>${wName}</c:otherwise>
                         </c:choose>
                     </span>
-                </c:otherwise>
-            </c:choose>
+
         </c:otherwise>
     </c:choose>
 </td>
@@ -101,7 +91,28 @@
   										  <fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd"/>
                                     </td>
                                 </tr>
+                                <c:if test="${not empty item.answers}">
+                    <c:forEach var="ans" items="${item.answers}">
+                        <tr style="background-color: #f9f9f9; border-bottom: 1px solid #eee;">
+                            <td></td> <%-- 답변글은 상태 배지 칸을 비움 --%>
+                            <td class="text-left">
+                                <div style="padding-left: 20px;">
+                                    <span class="reply-icon" style="color: #4dc3ff; font-weight: bold; margin-right: 5px;">└ [답변]</span>
+                                    <a class="title-link" onclick="goDetail('${ans.creply_id}', '${item.secret}', '${item.user_id}','${item.vendor_id}')">
+                                        문의하신 내용에 대한 담당자의 답변입니다.
+                                    </a>
+                                </div>
+                            </td>
+                            <td><span style="color: #666; font-weight: bold;">담당자</span></td>
+                            <td style="color: #bbb; font-size: 13px;">
+                                <fmt:parseDate value="${ans.created_at}" var="ansDate" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                <fmt:formatDate value="${ansDate}" pattern="yyyy-MM-dd"/>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </c:if>
                             </c:forEach>
+                            
                         </c:when>
                         <c:otherwise>
                             <tr>
@@ -158,9 +169,6 @@
     </div>
 
     <script>
-    const CTX = "${pageContext.request.contextPath}";
-    const CURRENT_USER_ID = "${loginSess.user_id}";
-    const USER_ROLE = "${loginSess.role}";
     var currentUserId = '${loginSess.user_id}';
     var userRole = '${loginSess.role}';
 
@@ -178,13 +186,13 @@
             return;
         }
             // 단순 이동이 가장 확실하고 빠릅니다.
-            location.href = `\${CTX}/detail/tab/inquiry/write/\${content_id}`;
-                    }
+        location.href = "${pageContext.request.contextPath}/detail/tab/inquiry/write/"+content_id;
+        }
 
         function goDetail(creply_id, isSecret, authorId, vendor_id) {
             // 1. 공개글이면 누구나 통과
             if (isSecret !== '1') {
-                location.href = `\${CTX}/inquiry/detail/\${creply_id}`;
+            	 location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;
                 return;
             }
 
@@ -195,8 +203,7 @@
 
             // 한 명이라도 해당하면 상세페이지 이동
             if (isAuthor || isAdmin || isVendor) {
-                location.href = `\${CTX}/inquiry/detail/\${creply_id}`;
-            } else {
+            	location.href = "${pageContext.request.contextPath}/inquiry/detail/" + creply_id;           } else {
                 // 권한 없으면 차단
                 alert("비밀글은 작성자 및 담당자만 확인할 수 있습니다.");
             }
