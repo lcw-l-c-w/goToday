@@ -77,6 +77,11 @@ public class ReservationServiceImpl implements ReservationService{
 	}
 	
 	@Override
+	public PaymentVO findByOrderId(String order_key){
+		return reservationMapper.findByOrderId(order_key);
+	}
+	
+	@Override
 	public ContentScheduleVO findCurrentTickets(int schedule_id) {
 		return reservationMapper.findCurrentTickets(schedule_id);
 	}
@@ -87,13 +92,14 @@ public class ReservationServiceImpl implements ReservationService{
 		boolean ticketSucceed = false; 
 		try {
 			//confirm 중복 호출로 인한 결제 내역 중복 저장 방지
-			PaymentVO exist = reservationMapper.findByPaymentKey(paymentKey);
-			if (exist != null) {
+			PaymentVO existToss = reservationMapper.findByPaymentKey(paymentKey);
+			if (existToss != null) {
 			    log.warn("[DUPLICATE_CONFIRM] paymentKey={}, orderId={}", paymentKey, orderId);
 
 			    ReservationVO existReservation =
-			        reservationMapper.findByReservationId(exist.getReservation_id());
+			        reservationMapper.findByReservationId(existToss.getReservation_id());
 
+			    
 			    return existReservation;
 			}
 			

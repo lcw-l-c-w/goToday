@@ -127,6 +127,7 @@ public class ReservationController {
 
 	@PostMapping("/reserve/quantity.do")
 	public String selectQuantity(HttpSession session, ReservationDTO dto, Model model) {
+		
 		ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
 		if (reservation == null) {
 			model.addAttribute("cmd", "back");
@@ -144,6 +145,16 @@ public class ReservationController {
 		reservation.setTotal_price(total_price);
 
 		session.setAttribute("schedule", reservation);
+		
+		// 토스 요청 정보 생성
+		TossInputDTO paymentDTO = new TossInputDTO();
+		String orderId = "ORDER_" + UUID.randomUUID().toString();
+
+		paymentDTO.setOrderId(orderId);
+		paymentDTO.setOrderName(contentVO.getTitle()); // 상품명
+		paymentDTO.setAmount(reservation.getTotal_price()); // 결제 금액
+
+		session.setAttribute("paymentDTO",paymentDTO);
 
 		return "redirect:/reserve/payment.do";
 	}
@@ -186,19 +197,13 @@ public class ReservationController {
 		//금액 정보를 모델에 저장
 		model.addAttribute("total_price", reservation.getTotal_price());
 
-		// 토스 요청 정보 생성
-		TossInputDTO paymentDTO = new TossInputDTO();
-		String orderId = "ORDER_" + UUID.randomUUID().toString();
-
-		paymentDTO.setOrderId(orderId);
-		paymentDTO.setOrderName(contentVO.getTitle()); // 상품명
-		paymentDTO.setAmount(reservation.getTotal_price()); // 결제 금액
-		paymentDTO.setCustomerName(userInfo.getName()); // 구매자 이름
-		paymentDTO.setCustomerEmail(userInfo.getEmail()); // 이메일
+		TossInputDTO paymentDTO = (TossInputDTO) session.getAttribute("paymentDTO");
+		paymentDTO.setCustomerName(userVO.getName()); // 구매자 이름
+		paymentDTO.setCustomerEmail(userVO.getEmail()); // 이메일
 		session.setAttribute("paymentDTO",paymentDTO);
-
+		
 		model.addAttribute("payInfo",paymentDTO);
-		model.addAttribute("orderId", orderId);
+		model.addAttribute("orderId", paymentDTO.getOrderId());
 
 		return "reserve_pay/payment";
 	}
@@ -213,9 +218,16 @@ public class ReservationController {
 
 		Map<String, Object> result = new HashMap<>();
 
-		try {
+		try { 
+			String orderId = (String) session.getAttribute("paymentDTO");
+			if(reservationService.findByOrderId(orderId) != null) {
+				result.put("success", false);
+	            result.put("msg", "이미 결제된 에약 내역입니다.");
+				return ResponseEntity.badRequest().body(result);
+			}
+			
 			ReservationDTO reservation = (ReservationDTO) session.getAttribute("schedule");
-		
+			
 			if (reservation == null) {
 				result.put("success", false);
 	            result.put("msg", "예약 정보가 없습니다.");
@@ -236,6 +248,7 @@ public class ReservationController {
 			//0원일 때 서비스 분기
 			int total_price = reservation.getTotal_price();
 			if (total_price == 0) {
+				
 				ReservationVO resultVO = reservationService.confirmAndCreateReservation(reservationVO, null, null, 0);
 				result.put("success", true);
 				result.put("free", true);   // ⭐ 프론트 분기용
