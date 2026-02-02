@@ -89,17 +89,18 @@ img {
 }
 
 .poster-like-btn {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-top: 15px;
-	padding: 8px 25px;
-	background: #fff;
-	border: 1.5px solid #eee;
-	border-radius: 50px;
-	cursor: pointer;
-	transition: all 0.3s;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 8px 25px;
+    background: #fff;
+    border: 1.5px solid var(--border-color); /* 오타 수정 */
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .poster-like-btn:hover {
@@ -111,7 +112,19 @@ img {
 	background: #f0faff;
 	border-color: var(--main-color);
 }
+.heart-icon {
+    font-size: 20px; /* 이모지 크기 키움 */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
 
+/* 좋아요 숫자 스타일 */
+.like-count-num {
+    font-size: 16px;
+    font-weight: 700;
+    color: #444;
+}
 /* 5. 정보 및 예매 섹션 */
 .info-side {
 	flex: 1;
@@ -264,6 +277,25 @@ width: 100%;           /* 1. 상자 너비에 딱 맞게! */
   font-weight: 500;
   text-align: center;
 }
+.loading-box {
+    padding: 100px 0;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
 
-  .poster-like-btn { display: flex; align-items: center; gap: 8px; margin-top: 15px; font-weight: bold; color: #444; background: none; border: none; cursor: pointer; font-size: 18px; }
-    .poster-like-btn .heart-icon { color: var(--main-color); font-size: 20px; }
+/* 아주 간단한 회전 애니메이션 */
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--main-color);
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
