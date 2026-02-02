@@ -217,7 +217,7 @@ img {
 .tab-menu {
 	display: flex;
 	list-style: none;
-	border-bottom: 2px solid var(- -border-color);
+	border-bottom: 2px solid var(--border-color);
 	margin-bottom: 30px;
 }
 
@@ -232,7 +232,7 @@ img {
 
 .tab-item.active {
 	color: #333;
-	border-bottom: 3px solid var(- -main-color);
+	border-bottom: 3px solid var(--main-color);
 }
 
 .tab-panel {
