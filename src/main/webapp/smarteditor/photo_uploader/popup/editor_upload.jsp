@@ -15,9 +15,14 @@
 <body onload="document.frm.submit();">
 <%
 
-String realUploadPath = "https://merge.io.kr/upload/editor/";
+String uploadRoot = System.getenv("UPLOAD_PATH"); // /app/upload
+if (uploadRoot == null) {
+    throw new RuntimeException("UPLOAD_PATH env not set");
+}
 
-String savePath = "/upload/editor/";
+String realUploadPath = "/app/upload/editor"; // 저장용 (디스크)
+String savePath = "/upload/editor/";            // URL용
+
 
 int EDITOR_MAXSIZE 			= 20*1024*1024;
 
