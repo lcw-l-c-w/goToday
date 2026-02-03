@@ -251,9 +251,7 @@ h1 {
 var cnt = 1;
 var min = 1;
 var max = 10;
-function blurAltInsert(el) {
-    el.blur();
-}
+
 jQuery(window).load(function(){
 	var _form = jQuery("#editor_upimage");
 	jQuery("#btn_plus").click(function(){
@@ -280,8 +278,8 @@ jQuery(window).load(function(){
 		}
 	});
 	
-	jQuery("#btn_confirm").click(function(e){
-		e.preventDefault();
+	jQuery("#btn_confirm").click(function(){
+		
 		var pass = true; 
 		jQuery(".upload").each(function(){
 			var file = jQuery(this);
@@ -307,7 +305,6 @@ jQuery(window).load(function(){
 
 		if(pass){
 			jQuery("#fileCount").val(cnt);
-			jQuery("#editor_upimage")[0].submit();
 		}
 		
 	});
@@ -335,10 +332,7 @@ jQuery(window).load(function(){
 				<strong class="btn_in inbtn"><input value="빼기" type="button" id="btn_minus"/></strong>
 			</div>
 		</div>
-		<form id="editor_upimage"
-      action="editor_upload.jsp"
-      method="post"
-      enctype="multipart/form-data">
+		<form id="editor_upimage" name="editor_upimage" action="editor_upload.jsp" method="post" enctype="multipart/form-data" onSubmit="return false;">
 			<input type="hidden" name="fileCount" id="fileCount" value="1" />
 			<div id="pop_content2" class="pop_con">
 				<dl>
