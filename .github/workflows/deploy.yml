@@ -31,7 +31,7 @@ jobs:
     # Docker 이미지 빌드 & 푸시
     - name: Build and Push Docker Image
       run: |
-        docker image prune
+        docker rmi ${{ secrets.DOCKER_USERNAME }}/gotoday:latest 2>/dev/null || true
         docker build -t ${{ secrets.DOCKER_USERNAME }}/gotoday:latest .
         docker push ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
     
