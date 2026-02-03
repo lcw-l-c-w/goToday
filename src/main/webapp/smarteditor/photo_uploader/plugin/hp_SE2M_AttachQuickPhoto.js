@@ -35,6 +35,8 @@ nhn.husky.SE2M_AttachQuickPhoto = jindo.$Class({
 		this.htPopupOption.sUrl = this.makePopupURL();
 		this.htPopupOption.sProperties = "left=0,top=0,width=403,height=299,scrollbars=yes,location=no,status=0,resizable=no";
 		
+		console.log("[PHOTO] popup url =", this.htPopupOption.sUrl); // ✅ 여기!
+		
 		this.oPopupWindow = this.oPopupMgr.openWindow(this.htPopupOption);
 		
 		// 처음 로딩하고 IE에서 커서가 전혀 없는 경우
@@ -48,9 +50,11 @@ nhn.husky.SE2M_AttachQuickPhoto = jindo.$Class({
 	 * nhn.husky.SE2M_AttachQuickPhoto.prototype.makePopupURL로 덮어써서 사용하시면 됨.
 	 */
 	makePopupURL : function(){
-		var sPopupUrl = "./photo_uploader/popup/photo_uploader.html";
-		
-		return sPopupUrl;
+	    var ctx = window.__CTX__ !== undefined ? window.__CTX__ : "";
+	    
+	    var path = "/smarteditor/photo_uploader/popup/photo_uploader.html";
+	    
+	    return (ctx + path).replace(/\/+/g, '/'); 
 	},
 	
 	/**
