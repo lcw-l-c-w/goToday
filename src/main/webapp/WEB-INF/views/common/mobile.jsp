@@ -172,20 +172,20 @@ body {
     </div>
 
     <div>
-    <input type="hidden" name="reserve_id" id="reserve_id" value="${reservation.reserve_id}">
-    <c:choose>
-        <c:when test="${reservation.reserve_status eq 'VISITED'}">
-            <button type="button" class="btn-complete" disabled style="background: #ccc;">
-                방문 완료된 예약입니다
-            </button>
-        </c:when>
-        <c:otherwise>
-            <button type="button" id="completeBtn" class="btn-complete">
-                이용 완료 처리
-            </button>
-        </c:otherwise>
-    </c:choose>
-</div>
+	    <input type="hidden" name="reserve_id" id="reserve_id" value="${reservation.reserve_id}">
+	    <c:choose>
+	        <c:when test="${reservation.reserve_status eq 'VISITED'}">
+	            <button type="button" class="btn-complete" disabled style="background: #ccc;">
+	                방문 완료된 예약입니다
+	            </button>
+	        </c:when>
+	        <c:otherwise>
+	            <button type="button" id="completeBtn" class="btn-complete">
+	                이용 완료 처리
+	            </button>
+	        </c:otherwise>
+	    </c:choose>
+	</div>
 
     <div class="notice">
       이용 완료 처리 후에는<br>
@@ -214,7 +214,7 @@ body {
     btn.disabled = true;
     btn.innerText = '처리 중...';
 
-    fetch(ctx + '/vendor/reserve_pay_manage/update_status', {
+    fetch(ctx + '/reserve_pay_manage/update_mobile_status', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -224,12 +224,7 @@ body {
         status: 'VISITED'
       })
     })
-    .then(res => {
-	    if (!res.ok) {
-	        throw new Error('Network response was not ok');
-	    }
-	    return res.json();
-	})
+    .then(res => res.json())
     .then(res => {
       if (!res.success) {
         if (res.code === 'NO_AUTH') {
