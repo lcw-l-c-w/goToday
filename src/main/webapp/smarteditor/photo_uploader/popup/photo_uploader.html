@@ -305,6 +305,7 @@ jQuery(window).load(function(){
 
 		if(pass){
 			jQuery("#fileCount").val(cnt);
+			jQuery("#editor_upimage")[0].submit();
 		}
 		
 	});
@@ -332,7 +333,10 @@ jQuery(window).load(function(){
 				<strong class="btn_in inbtn"><input value="빼기" type="button" id="btn_minus"/></strong>
 			</div>
 		</div>
-		<form id="editor_upimage" name="editor_upimage" action="editor_upload.jsp" method="post" enctype="multipart/form-data" onSubmit="return false;">
+		<form id="editor_upimage"
+      action="editor_upload.jsp"
+      method="post"
+      enctype="multipart/form-data">
 			<input type="hidden" name="fileCount" id="fileCount" value="1" />
 			<div id="pop_content2" class="pop_con">
 				<dl>
