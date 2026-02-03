@@ -15,14 +15,9 @@
 <body onload="document.frm.submit();">
 <%
 
-
-String uploadRoot = System.getenv("UPLOAD_PATH"); // /app/upload
-if (uploadRoot == null) {
-    throw new RuntimeException("UPLOAD_PATH env not set");
-}
-
-String realUploadPath = uploadRoot + "/editor"; // ⭐ 여기
-String savePath = "/upload/editor/";
+String uploadRoot = "/app/upload";      // 디스크 경로(컨테이너 내부)
+String realUploadPath = uploadRoot + "/editor";
+String savePath = "/upload/editor/";    // 브라우저에서 접근할 URL prefix
 
 int EDITOR_MAXSIZE 			= 20*1024*1024;
 
