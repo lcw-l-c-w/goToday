@@ -5,6 +5,8 @@
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="util.*"%>
 <%@ page import="com.oreilly.servlet.MultipartRequest, com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -12,16 +14,27 @@
 </head>
 <body onload="document.frm.submit();">
 <%
+
+String realUploadPath = "https://merge.io.kr/upload/editor/";
+
 String savePath = "/upload/editor/";
+
 int EDITOR_MAXSIZE 			= 20*1024*1024;
 
 // 폴더생성
-File moveDir = new File(request.getRealPath(savePath));																								//복사될 디렉토리
-if (!moveDir.exists()) {																										//복사될 경로가 없을경우 만든다.
-	moveDir.mkdirs();
+File moveDir = new File(realUploadPath);
+if (!moveDir.exists()) {
+    moveDir.mkdirs();
 }
-System.out.println(request.getRealPath(savePath));
-MultipartRequest multi = new MultipartRequest(request, request.getRealPath(savePath), EDITOR_MAXSIZE, "utf-8",  new MyFileRenamePolicy());
+
+MultipartRequest multi =
+    new MultipartRequest(
+        request,
+        realUploadPath,
+        EDITOR_MAXSIZE,
+        "utf-8",
+        new MyFileRenamePolicy()
+    );
 
 String callback= multi.getParameter("callback");
 String callback_func= multi.getParameter("callback_func");
