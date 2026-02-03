@@ -362,7 +362,7 @@ public class ContentReplyController {
 
 		UserVO userVO = (UserVO) sess.getAttribute("loginSess");
 		List<ContentReplyVO> question = contentReplyService.showDetailByID(creply_id);
-		if (question == null) {
+		if (question == null ||question.isEmpty()) {
 			model.addAttribute("msg", "존재하지 않는 게시글입니다.");
 			model.addAttribute("cmd", "back");
 
