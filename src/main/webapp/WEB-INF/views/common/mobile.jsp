@@ -171,13 +171,21 @@ body {
       </div>
     </div>
 
-    <!-- 완료 처리 -->
     <div>
-      <input type="hidden" name="reserve_id" id="reserve_id" value="${reservation.reserve_id}">
-      <button type="button" id="completeBtn" class="btn-complete">
-        이용 완료 처리
-      </button>
-	</div>
+    <input type="hidden" name="reserve_id" id="reserve_id" value="${reservation.reserve_id}">
+    <c:choose>
+        <c:when test="${reservation.reserve_status eq 'VISITED'}">
+            <button type="button" class="btn-complete" disabled style="background: #ccc;">
+                방문 완료된 예약입니다
+            </button>
+        </c:when>
+        <c:otherwise>
+            <button type="button" id="completeBtn" class="btn-complete">
+                이용 완료 처리
+            </button>
+        </c:otherwise>
+    </c:choose>
+</div>
 
     <div class="notice">
       이용 완료 처리 후에는<br>
@@ -216,11 +224,21 @@ body {
         status: 'VISITED'
       })
     })
-    .then(res => res.json())
+    .then(res => {
+	    if (!res.ok) {
+	        throw new Error('Network response was not ok');
+	    }
+	    return res.json();
+	})
     .then(res => {
       if (!res.success) {
         if (res.code === 'NO_AUTH') {
           alert('로그인이 필요합니다.');
+          location.href = ctx + '/member/login';
+          return;
+        }
+        if (res.code === 'NO_VENDOR') {
+          alert('해당 업체만 이용완료 처리할 수 있습니다.');
           location.href = ctx + '/member/login';
           return;
         }
