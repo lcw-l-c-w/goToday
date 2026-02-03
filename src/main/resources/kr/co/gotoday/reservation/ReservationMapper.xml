@@ -131,6 +131,7 @@
 	
 	    <where>
 	        r.reservation_id = #{reserve_id}
+	        AND r.receive_type = 'MOBILE'
 	    </where>
 	</select>
 	
