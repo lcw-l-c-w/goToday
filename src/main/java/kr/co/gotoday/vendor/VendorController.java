@@ -261,6 +261,45 @@ public class VendorController {
 	    return resultMap;
 	}
 	
+	@PostMapping("/reserve_pay_manage/update_mobile_status")
+	@ResponseBody
+	public Map<String, Object> updateMobileStatus(
+			@RequestParam("reserve_id") int reserve_id, // "reserve_id"라고 명시
+			@RequestParam("status") String status,          // "status"라고 명시
+			HttpSession sess
+			) {
+		UserVO login = (UserVO)sess.getAttribute("loginSess");
+		Map<String, Object> resultMap = new HashMap<>();
+		if (login == null) {
+			resultMap.put("success", false);
+			resultMap.put("code", "NO_AUTH");
+			resultMap.put("message", "로그인이 필요합니다.");
+			return resultMap;
+		}
+		Integer vendor_id = vendorService.findReservationWithVendorMoblieStatus(reserve_id);
+		if (vendor_id == null || vendor_id != login.getUser_id()) {
+			resultMap.put("success", false);
+			resultMap.put("code", "NO_VENDOR");
+			resultMap.put("message", "해당 업체만 이용완료 처리할 수 있습니다.");
+			return resultMap;
+		}
+		try {
+			int result = vendorService.updateReservationStatus(reserve_id);
+			
+			if(result > 0) {
+				resultMap.put("success", true);
+			} else {
+				resultMap.put("success", false);
+				resultMap.put("message", "해당 예약 건을 찾을 수 없습니다.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			resultMap.put("success", false);
+			resultMap.put("message","서버 내부 오류" + e.getMessage());
+		}
+		return resultMap;
+	}
+	
 	
 	@GetMapping("/vendor/reserve_pay_manage")
 	public String contentReserve() {

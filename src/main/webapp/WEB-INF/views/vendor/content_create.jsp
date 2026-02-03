@@ -14,7 +14,7 @@
   </title>
 <link rel="stylesheet" href="${ctx}/css/vendor_content_create.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="${ctx}/smarteditor/js/HuskyEZCreator.js"></script>
+<script src="/smarteditor/js/HuskyEZCreator.js"></script>
 <script>
 //네이버 스마트 에디터
 var oEditors = [];
@@ -22,7 +22,7 @@ $(function() {
     nhn.husky.EZCreator.createInIFrame({
         oAppRef: oEditors,
         elPlaceHolder: "detail_description",
-        sSkinURI: "${ctx}/smarteditor/SmartEditor2Skin.html",    
+        sSkinURI: "/smarteditor/SmartEditor2Skin.html",    
         htParams : {
             bUseToolbar : true,                // 툴바 사용 여부 (true:사용/ false:사용하지 않음)
             bUseVerticalResizer : true,        // 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
