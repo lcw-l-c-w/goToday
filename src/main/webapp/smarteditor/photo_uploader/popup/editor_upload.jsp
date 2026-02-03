@@ -15,7 +15,7 @@
 <body onload="document.frm.submit();">
 <%
 
-String realUploadPath = "https://merge.io.kr/upload/editor/";
+String realUploadPath = application.getInitParameter("upload.path") + "editor";
 
 String savePath = "/upload/editor/";
 
