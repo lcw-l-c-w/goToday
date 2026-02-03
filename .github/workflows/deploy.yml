@@ -31,7 +31,6 @@ jobs:
     # Docker 이미지 빌드 & 푸시
     - name: Build and Push Docker Image
       run: |
-        docker rmi ${{ secrets.DOCKER_USERNAME }}/gotoday:latest 2>/dev/null || true 
         docker build -t ${{ secrets.DOCKER_USERNAME }}/gotoday:latest .
         docker push ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
     
@@ -43,7 +42,9 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}   #개인 .pem 
         script: |
+          docker rmi ${{ secrets.DOCKER_USERNAME }}/gotoday:latest 2>/dev/null || true
           docker pull ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
+          
           docker stop gotoday 2>/dev/null || true
           docker rm gotoday 2>/dev/null || true
           
@@ -63,4 +64,6 @@ jobs:
           echo "배포 success. 5초 대기 후 log 출력"
           sleep 5
           docker logs --tail 50 gotoday
+          docker image prune -af
+          
 

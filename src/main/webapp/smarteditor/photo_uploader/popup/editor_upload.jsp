@@ -14,15 +14,12 @@
 </head>
 <body onload="document.frm.submit();">
 <%
-
-String realUploadPath = application.getInitParameter("upload.path") + "editor";
-
 String uploadRoot = System.getenv("UPLOAD_PATH"); // /app/upload
 if (uploadRoot == null) {
     throw new RuntimeException("UPLOAD_PATH env not set");
 }
 
-String realUploadPath = uploadRoot + "/editor"; // 여기
+String realUploadPath = uploadRoot + "/editor";
 String savePath = "/upload/editor/";
 
 int EDITOR_MAXSIZE 			= 20*1024*1024;
