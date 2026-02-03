@@ -476,11 +476,14 @@
  	 * jindo에 파일 업로드 사용.(iframe에 Form을 Submit하여 리프레시없이 파일을 업로드하는 컴포넌트)
  	 */
  	function callFileUploader (){
+ 		// HTTPS 환경 지원을 위해 프로토콜을 현재 페이지 기준으로 설정
+ 		var baseUrl = location.protocol + '//' + location.host + location.pathname.replace(/\/[^\/]*$/, '');
+
  		oFileUploader = new jindo.FileUploader(jindo.$("uploadInputBox"),{
  			//sUrl  : location.href.replace(/\/[^\/]*$/, '') + '/file_uploader.php',	//샘플 URL입니다.
- 			sUrl  : location.href.replace(/\/[^\/]*$/, '') + '/editor_upload.jsp',	//샘플 URL입니다.
+ 			sUrl  : baseUrl + '/editor_upload.jsp',	//샘플 URL입니다.
  	        //sCallback : location.href.replace(/\/[^\/]*$/, '') + '/callback.html',	//업로드 이후에 iframe이 redirect될 콜백페이지의 주소
- 	        sCallback : location.href.replace(/\/[^\/]*$/, '') + '/callback.jsp',	//업로드 이후에 iframe이 redirect될 콜백페이지의 주소
+ 	        sCallback : baseUrl + '/callback.jsp',	//업로드 이후에 iframe이 redirect될 콜백페이지의 주소
  	    	sFiletype : "*.jpg;*.png;*.bmp;*.gif",						//허용할 파일의 형식. ex) "*", "*.*", "*.jpg", 구분자(;)	
  	    	sMsgNotAllowedExt : 'JPG, GIF, PNG, BMP 확장자만 가능합니다',	//허용할 파일의 형식이 아닌경우에 띄워주는 경고창의 문구
  	    	bAutoUpload : false,									 	//파일이 선택됨과 동시에 자동으로 업로드를 수행할지 여부 (upload 메소드 수행)
