@@ -27,7 +27,7 @@ String savePath = "/upload/editor/";
 
 int EDITOR_MAXSIZE 			= 20*1024*1024;
 
-// 폴더생성
+// 폴더생성ㅎㅎ
 File moveDir = new File(realUploadPath);
 if (!moveDir.exists()) {
     moveDir.mkdirs();
