@@ -38,7 +38,7 @@ FROM (
                         <foreach collection="eventTags" item="t" separator=" OR ">
                             c.content_kind LIKE CONCAT('%', #{t}, '%')
                         </foreach>
-                    ) THEN 4 ELSE 0 END
+                    ) THEN 3 ELSE 0 END
                 </when>
                 <otherwise>0</otherwise>
             </choose>
@@ -66,7 +66,7 @@ FROM (
                         <foreach collection="interestTags" item="t" separator=" OR ">
                             c.category LIKE CONCAT('%', #{t}, '%')
                         </foreach>
-                    ) THEN 2 ELSE 0 END
+                    ) THEN 3 ELSE 0 END
                 </when>
                 <otherwise>0</otherwise>
             </choose>
