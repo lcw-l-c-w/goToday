@@ -246,12 +246,14 @@ h1 {
 	font-weight: bold !important
 }
 </style>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script type="text/javascript">
 var cnt = 1;
 var min = 1;
 var max = 10;
-
+function blurAltInsert(el) {
+    el.blur();
+}
 jQuery(window).load(function(){
 	var _form = jQuery("#editor_upimage");
 	jQuery("#btn_plus").click(function(){
@@ -278,8 +280,8 @@ jQuery(window).load(function(){
 		}
 	});
 	
-	jQuery("#btn_confirm").click(function(){
-		
+	jQuery("#btn_confirm").click(function(e){
+		e.preventDefault();
 		var pass = true; 
 		jQuery(".upload").each(function(){
 			var file = jQuery(this);
