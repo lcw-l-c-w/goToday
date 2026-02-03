@@ -15,7 +15,7 @@
 <body onload="document.frm.submit();">
 <%
 
-String realUploadPath = "${pageContext.request.contextPath}" + "/upload/editor/";
+String realUploadPath = "https://merge.io.kr/upload/editor/";
 
 String savePath = "/upload/editor/";
 
