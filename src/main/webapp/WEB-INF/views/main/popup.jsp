@@ -35,7 +35,7 @@
 			<div class="indicator-dots" id="exDots"></div>
 		</section>
 
-		<h2 class="section-title">추천 전시</h2>
+		<h2 class="section-title">추천 팝업</h2>
 		<section class="recommend-section">
 			<%-- 컨트롤러 세션명 loginSess와 일치시킴 --%>
 			<%-- 1. 로그인 여부 확인 (세션 이름 확인 필수) --%>
