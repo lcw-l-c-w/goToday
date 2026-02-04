@@ -14,6 +14,9 @@
 </head>
 <body onload="document.frm.submit();">
 <%
+
+
+
 String uploadRoot = System.getenv("UPLOAD_PATH"); // /app/upload
 if (uploadRoot == null) {
     throw new RuntimeException("UPLOAD_PATH env not set");
