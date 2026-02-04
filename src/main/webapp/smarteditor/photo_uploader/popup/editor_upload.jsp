@@ -44,6 +44,15 @@ MultipartRequest multi =
 
 String callback= multi.getParameter("callback");
 String callback_func= multi.getParameter("callback_func");
+
+//만약 위에서 수정한 HTML이 적용 안 되어 null이 올 경우를 대비한 기본값 설정--->이채원 추가 
+if (callback == null || callback.equals("null")) {
+ callback = "/smarteditor/photo_uploader/popup/callback.html"; 
+}
+if (callback_func == null || callback_func.equals("null")) {
+ callback_func = "tmp";
+}
+
 int fileCount = 0;
 
 String url = callback + "?callback_func=" + callback_func;

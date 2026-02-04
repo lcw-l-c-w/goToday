@@ -324,6 +324,9 @@ jQuery(window).load(function(){
 		</div>
 		<form id="editor_upimage" name="editor_upimage" action="editor_upload.jsp" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="fileCount" id="fileCount" value="1" />
+			<input type="hidden" name="callback" value="/smarteditor/photo_uploader/popup/callback.jsp" />
+   			<input type="hidden" name="callback_func" value="tmp" />
+			
 			<div id="pop_content2" class="pop_con">
 				<dl>
 					<dt>첨부 1.</dt>
