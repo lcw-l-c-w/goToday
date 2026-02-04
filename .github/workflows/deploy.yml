@@ -47,7 +47,7 @@ jobs:
           docker stop gotoday 2>/dev/null || true
           docker rm gotoday 2>/dev/null || true
           
-          docker run -d --name gotoday -p 8080:8080 -v /home/ubuntu/gotoday-data:/app/upload ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
+          docker run -d --name gotoday -p 8080:8080 -e UPLOAD_PATH=/app/upload -v /home/ubuntu/gotoday-data:/app/upload ${{ secrets.DOCKER_USERNAME }}/gotoday:latest
 
           echo "container 시작되는 지점. war 압축 해제 대기 (30초 -> 10초는 죽음)"
           sleep 30 
