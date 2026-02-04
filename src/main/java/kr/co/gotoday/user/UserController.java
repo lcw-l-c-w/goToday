@@ -97,6 +97,8 @@ public class UserController {
     		@RequestParam(required = false) Integer role,
     		Model model) {
     	model.addAttribute("role", role != null ? role : 0);
+    	model.addAttribute("REST_API_KEY", kakaoRestApiKey);
+        model.addAttribute("REDIRECT_URI", kakaoRedirectUri);
     	return "/member/register1";
     }
     
