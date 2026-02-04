@@ -109,7 +109,11 @@
         <%-- 1. 유저 본인인 경우: 수정 & 삭제 --%>
         <c:if test="${not empty loginSess and loginSess.user_id == vo.user_id}">
             <a href="${ctx}/detail/inquiry/modify?creply_id=${vo.creply_id}" class="btn btn-action">수정하기</a>
-            <a href="javascript:del(${vo.creply_id}, ${vo.content_id}, ${vo.gno},null);" class="btn btn-action btn-danger">삭제하기</a>
+           <button type="button"
+        class="btn btn-action btn-danger"
+        onclick="del(${vo.creply_id}, ${vo.content_id}, ${vo.gno}, null)">
+    삭제하기
+</button>
         </c:if>
         
         <%-- 2. 관리자(Vendor)인 경우 --%>
@@ -122,7 +126,15 @@
                 <%-- 답변 수정 & 삭제 --%>
                 <c:otherwise>
                     <a href="${ctx}/detail/inquiry/modify?creply_id=${vendorList.creply_id}" class="btn btn-action">답변 수정</a>
-                    <a href="javascript:del(${vendorList.creply_id}, ${vo.content_id}, ${vendorList.gno},${vendorList.vendor_id});" class="btn btn-action btn-danger">답변 삭제</a>
+                   
+                   <button type="button"
+        class="btn btn-action btn-danger"
+        onclick="del(${vendorList.creply_id},
+                     ${vo.content_id},
+                     ${vendorList.gno},
+                     ${vendorList.vendor_id})">
+    답변 삭제
+</button>
                 </c:otherwise>
             </c:choose>
         </c:if>
