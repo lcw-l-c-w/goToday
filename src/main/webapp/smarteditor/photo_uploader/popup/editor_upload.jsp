@@ -15,7 +15,7 @@
 <body onload="document.frm.submit();">
 <%
 
-String realUploadPath = application.getInitParameter("upload.path") + "editor";
+
 
 String uploadRoot = System.getenv("UPLOAD_PATH"); // /app/upload
 if (uploadRoot == null) {
