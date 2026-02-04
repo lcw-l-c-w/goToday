@@ -281,7 +281,7 @@ function emailCheck() {
 					<a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=account_email,profile_nickname" class="btn-social btn-kakao">
 						<span class="kakao-icon"></span> 카카오 회원가입
 					</a>
-					<a href="/naver" class="btn-social btn-naver">
+					<a href="https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NAVER_CLIENT_ID}&state=${NAVER_STATE}&redirect_uri=${NAVER_REDIRECT_URI}" class="btn-social btn-naver">
 						<span class="naver-icon"></span> 네이버 회원가입
 					</a>
 				</div>
